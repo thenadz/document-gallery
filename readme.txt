@@ -11,7 +11,16 @@ directly into their page or post.
 
 1. Upload `document-gallery` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `[document gallery]` in any posts or pages you want a document gallery included. See **Other Notes** for additional display options.
+1. Place `[document gallery]` in any posts or pages you want a document gallery included. See below for additional display options.
+
+= Document Gallery Options =
+
+In order to include all compatible docuements from a given page or post, you must include 
+the following shortcode in the post:
+
+`[document gallery <descriptions=[true or false]> <orderby=[menu_order, date, rand]> <order=[ASC or DEC]>]`
+
+Using just `[document gallery]` is equivalent to `[document gallery descriptions=false orderby=menu_order order=ASC]`.
 
 == Screenshots ==
 
@@ -24,12 +33,3 @@ directly into their page or post.
 * First public release of Document Gallery.
 * Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
 * Documents can be ordered by a number of different factors.
-
-== A brief Markdown Example ==
-
-In order to include all compatible docuements from a given page or post, you must include 
-the following shortcode in the post:
-
-`[document gallery <descriptions=[true or false]> <orderby=[menu_order,date]> <order=[ASC or DEC]>]`
-
-Using just `[document gallery]` is equivalent to `[document gallery descriptions=false orderby=menu_order order=ASC]`.
