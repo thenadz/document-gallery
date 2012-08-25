@@ -11,7 +11,7 @@ directly into their page or post.
 
 1. Upload `file-gallery` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `shortcode` in any posts or pages you want a document gallery included.
+1. Place `[document gallery]` in any posts or pages you want a document gallery included. See **Other Notes** for additional display options.
 
 == Screenshots ==
 
