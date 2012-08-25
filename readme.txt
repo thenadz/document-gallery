@@ -15,10 +15,7 @@ directly into their page or post.
 
 == Screenshots ==
 
-The display will match whatever theme you have activated, but the general 
-layout of the documents will look like the following.
-
-1. This is how the Document Gallery looks with `descriptions=false` (default).
+1. This is how the Document Gallery looks with `descriptions=false` (default). Note that the display inherits styling from your active theme.
 2. This is how the Document Gallery looks with `descriptions=true`. The descriptions are auto-populated using the description field from when you upload the document.
 
 == A brief Markdown Example ==
