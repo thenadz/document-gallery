@@ -18,6 +18,13 @@ directly into their page or post.
 1. This is how the Document Gallery looks with `descriptions=false` (default). Note that the display inherits styling from your active theme.
 2. This is how the Document Gallery looks with `descriptions=true`. The descriptions are auto-populated using the description field from when you upload the document.
 
+== Changelog ==
+
+= 0.8 =
+* First public release of Document Gallery.
+* Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
+* Documents can be ordered by a number of different factors.
+
 == A brief Markdown Example ==
 
 In order to include all compatible docuements from a given page or post, you must include 
