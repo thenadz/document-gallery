@@ -13,6 +13,14 @@ directly into their page or post.
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Place `shortcode` in any posts or pages you want a document gallery included.
 
+== Screenshots ==
+
+The display will match whatever theme you have activated, but the general 
+layout of the documents will look like the following.
+
+1. This is how the Document Gallery looks with `descriptions=false` (default).
+2. This is how the Document Gallery looks with `descriptions=true`.
+
 == A brief Markdown Example ==
 
 In order to include all compatible docuements from a given page or post, you must include 
