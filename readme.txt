@@ -1,6 +1,7 @@
 === Plugin Name ===
 Contributors: dan.rossiter
 Tags: documents, gallery
+Requires at least: 2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
