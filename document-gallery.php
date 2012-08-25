@@ -12,15 +12,15 @@ License: GPL2
 add_action( 'wp_print_styles', 'add_header_css'); 
 
 function add_header_css() {
-  wp_enqueue_style('file-gallery-st-css', plugins_url('style.css', __FILE__));
+  wp_enqueue_style('document-gallery-css', plugins_url('style.css', __FILE__));
 }
 
 function get_attachment_icons($atts){
 	extract(shortcode_atts(array(
-	      'descriptions' 	=> FALSE,
-	      'echo'			=> FALSE,
-		  'orderby'			=> 'menu_order',
-		  'order'			=> 'ASC'
+		'descriptions'		=> FALSE,
+		'echo'			=> FALSE,
+		'orderby'		=> 'menu_order',
+		'order'			=> 'ASC'
      ), $atts));
 	 
 	if($descriptions){ 
@@ -137,5 +137,5 @@ function get_attachment_icons($atts){
 	}
 	return $sAttachmentString; /*$finalString;*/
 }
-add_shortcode('attachment icons', 'get_attachment_icons');
+add_shortcode('document gallery', 'get_attachment_icons');
 ?>
