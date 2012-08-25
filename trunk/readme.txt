@@ -9,7 +9,7 @@ directly into their page or post.
 
 == Installation ==
 
-1. Upload `file-gallery` to the `/wp-content/plugins/` directory
+1. Upload `document-gallery` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Place `[document gallery]` in any posts or pages you want a document gallery included. See **Other Notes** for additional display options.
 
