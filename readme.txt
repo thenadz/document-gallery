@@ -11,8 +11,13 @@ directly into the content of their page or post.
 
 1. Upload `file-gallery` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `short tag` in any posts or pages you want a document gallery included.
+1. Place `shortcode` in any posts or pages you want a document gallery included.
 
 == A brief Markdown Example ==
 
-**TO DO**
+In order to include all compatible docuements from a given page or post, you must include 
+the following shortcode in the post:
+
+`[document gallery <descriptions=[true or false]> <orderby=[menu_order,date]> <order=[ASC or DEC]>]`
+
+Using just `[document gallery]` is equivalent to `[document gallery descriptions=false orderby=menu_order order=ASC]`.
