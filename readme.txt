@@ -5,7 +5,7 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 This plugin allows the user to easily include documents (ie: PDF, MS Word, MS PowerPoint, MS Excel, and ZIP files) 
-directly into the content of their page or post.
+directly into their page or post.
 
 == Installation ==
 
