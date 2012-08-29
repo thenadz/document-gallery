@@ -2,7 +2,7 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images in gallery format on page.
-Version: 0.8
+Version: 0.8.5
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
@@ -64,6 +64,21 @@ function get_attachment_icons($atts){
 					break;
 				case 'application/zip': // zip files
 					$sAttachmentString .= "<img src='".plugins_url( 'images/zip.png' , __FILE__)."'/>";
+					break;
+				case 'application/vnd.oasis.opendocument.text': // OpenDocument (text)
+					$sAttachmentString .= "<img src='".plugins_url( 'images/open-text.png' , __FILE__)."'/>";
+					break;
+				case 'application/vnd.oasis.opendocument.spreadsheet': // OpenDocument (spreadsheet)
+					$sAttachmentString .= "<img src='".plugins_url( 'images/open-spreadsheet.png' , __FILE__)."'/>";
+					break;
+				case 'application/vnd.oasis.opendocument.presentation': // OpenDocument (presentation)
+					$sAttachmentString .= "<img src='".plugins_url( 'images/open-presentation.png' , __FILE__)."'/>";
+					break;
+				case 'application/vnd.oasis.opendocument.database': // OpenDocument (database)
+					$sAttachmentString .= "<img src='".plugins_url( 'images/open-database.png' , __FILE__)."'/>";
+					break;
+				case 'application/vnd.oasis.opendocument.formula': // OpenDocument (formula)
+					$sAttachmentString .= "<img src='".plugins_url( 'images/open-formula.png' , __FILE__)."'/>";
 					break;
 				default:
 					continue;
