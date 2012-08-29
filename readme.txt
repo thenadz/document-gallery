@@ -2,6 +2,7 @@
 Contributors: dan.rossiter
 Tags: documents, gallery
 Requires at least: 2.6
+Stable tag: 0.8.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +30,9 @@ Using just `[document gallery]` is equivalent to `[document gallery descriptions
 2. This is how the Document Gallery looks with `descriptions=true`. The descriptions are auto-populated using the description field from when you upload the document.
 
 == Changelog ==
+
+= 0.8.5 =
+* Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument) (does not include the graphic files within OpenDocument standards because this would not fit the document focus of this plugin)
 
 = 0.8 =
 * First public release of Document Gallery.
