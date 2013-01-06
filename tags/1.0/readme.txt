@@ -15,6 +15,9 @@ and many more files automatically in their page or post.
 This plugin allows the user to effortlessly include a gallery, much like a photo gallery,
 of all your non-image attachments anywhere within your post.
 
+*NOTE: If you find this plugin useful, please take 10 seconds to rate it so others can find it also. Thanks so 
+much for your support!*
+
 == Installation ==
 
 1. Upload `document-gallery` to the `/wp-content/plugins/` directory
@@ -29,7 +32,6 @@ the following shortcode in the post:
 `[dg <descriptions=[true or false]> <orderby=[menu_order, title, date, author, rand]> <order=[ASC or DEC]>]`
 
 **Orderby Options**
-
 * `menu_order` - This is probably the one you want to use. Order by the integer fields in the Insert / 
 Upload Media Gallery dialog. Note that these fields may be blank by default. If this is the case, 
 you must populate the fields before this option will work.
