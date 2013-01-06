@@ -11,17 +11,16 @@
 
 /* WITHOUT DESCRIPTION */
 div.document-icon{
-  float: left;
+  display: inline-block;
+  vertical-align: top;
   min-height: 125px;
-  max-height: 145px;
+  /*max-height: 145px;*/
   overflow: hidden;
   padding: 10px 0;
   width: 25%;
 }
-div#document-icon-wrapper hr{
-  border: none;
+div#document-icon-wrapper{
   width: 100%;
-  height: 0;
   padding: 0;
   margin: 0;
 }
