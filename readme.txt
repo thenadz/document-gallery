@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery
 Requires at least: 2.6
 Tested up to: 3.5
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,11 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Option to open documents directly within your browser (a la [Google Drive Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
+
+= 1.0.2 =
+
+* Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
+all is resolved with this release!
 
 = 1.0.1 =
 
