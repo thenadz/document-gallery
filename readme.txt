@@ -32,6 +32,7 @@ the following shortcode in the post:
 `[dg <descriptions=[true or false]> <orderby=[menu_order, title, date, author, rand]> <order=[ASC or DEC]>]`
 
 **Orderby Options**
+
 * `menu_order` - This is probably the one you want to use. Order by the integer fields in the Insert / 
 Upload Media Gallery dialog. Note that these fields may be blank by default. If this is the case, 
 you must populate the fields before this option will work.
