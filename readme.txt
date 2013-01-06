@@ -46,7 +46,8 @@ do not specify otherwise.
 = Theme Developers =
 
 If you would like to include Document Gallery functionality in your theme, you simply need to include the following
-code wherever you would like it to appear: `<?php echo do_shortcode('[document gallery]'); ?>`.
+code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`. You can include additional options 
+(listed above) as needed.
 
 == Screenshots ==
 
