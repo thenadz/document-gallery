@@ -7,8 +7,8 @@ Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin allows the user to easily include document icons for PDF, MS Word, MS PowerPoint, MS Excel, ZIP 
-and many more files automatically in their page or post.
+This plugin allows the user to easily create a "gallery" of all non-image attachments on a given post/page,
+making it easer to share this content.
 
 == Description ==
 
