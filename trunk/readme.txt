@@ -64,29 +64,32 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
+= 1.0.3 =
+* Improved links for a given icon.
+
 = 1.0.2 =
 
-* Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
+* **Bug Fix:** Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
 all is resolved with this release!
 
 = 1.0.1 =
 
-* Resolved issue with long document titles being cut off in some themes.
+* **Bug Fix:** Resolved issue with long document titles being cut off in some themes.
 
 = 1.0 =
 
-* Optimized gallery generation (faster!)
-* Plugin now has **36 icons** representing **72 filetypes**!
-* Added fallback to WordPress default icons if you happen to include one of the few filetypes not yet supported.
-* Changed shortcode to `[dg]` (`[document gallery]` will still work for backward compatibility).
-* Gave documentation some **much needed** revisions.
+* **Enhancement:** Optimized gallery generation (faster!)
+* **Enhancement:** Plugin now has **36 icons** representing **72 filetypes**!
+* **Enhancement:** Added fallback to WordPress default icons if you happen to include one of the few filetypes not yet supported.
+* **Enhancement:** Changed shortcode to `[dg]` (`[document gallery]` will still work for backward compatibility).
+* **Enhancement:** Gave documentation some **much needed** revisions.
 
 = 0.8.5 =
 
-* Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
+* **Enhancement:** Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
 
 = 0.8 =
 
-* First public release of Document Gallery.
-* Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
-* Documents can be ordered by a number of different factors.
+* **Release:** First public release of Document Gallery.
+* **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
+* **Feature:** Documents can be ordered by a number of different factors.
