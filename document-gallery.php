@@ -2,7 +2,7 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images in gallery format on page.
-Version: 1.0
+Version: 1.0.1
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
@@ -33,8 +33,6 @@ function dg_get_attachment_icons($atts) {
 
 		if($descriptions) {
 			$attachment_str[] = '<table id="document-icon-wrapper">'; 
-		} else { 
-			$attachment_str[] = '<div id="document-icon-wrapper">'; 
 		}
 
 		$count = 0;
@@ -46,6 +44,9 @@ function dg_get_attachment_icons($atts) {
 			if($descriptions) {
 				$attachment_str[] = '<tr><td class="document-icon">';
 			} else {
+				if( $count % 4 == 0 ) {
+					$attachment_str[] = '<div id="document-icon-wrapper">';
+				}
 				$attachment_str[] = '<div class="document-icon">';
 			}
 
@@ -56,7 +57,7 @@ function dg_get_attachment_icons($atts) {
 			} else {
 				$attachment_str[] = '</div>';
 				if( ++$count % 4 == 0 ) {
-					$attachment_str[] = '<hr>';
+					$attachment_str[] = '</div>';
 				}
 			}
 		} // end looping attachments
