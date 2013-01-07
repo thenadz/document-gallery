@@ -8,7 +8,7 @@ Author URI: http://danrossiter.org/
 License: GPL2
 */
 
-define( 'DG_URL', plugin_dir_url().'document-gallery/' );
+define( 'DG_URL', plugin_dir_url('document-gallery/') );
 
 // CREATE GALLERY STRING //
 function dg_get_attachment_icons($atts) {
@@ -37,15 +37,15 @@ function dg_get_attachment_icons($atts) {
 		}
 
 		$count = 0;
-		foreach( $attachments as $attachment ) { //setup array for more than one file attachment
-		 	$url = wp_get_attachment_url( $attachment->ID );
-			$filename = basename( $url );
-			
+		foreach( $attachments as $attachment ) { //setup array for more than one file attachment	
 			if( $attachment_pg ) {
 				$url = get_attachment_link( $attachment->ID );
+			} else {
+				$url = wp_get_attachment_url( $attachment->ID );
 			}
+
 		 	$title	= get_the_title( $attachment->ID );
-			$icon	= dg_get_attachment_icon( $attachment->ID, $tile, $filename );
+			$icon	= get_attachment_icon( $attachment->ID );
 			
 			if($descriptions) {
 				$attachment_str[] = '<tr><td class="document-icon">';
@@ -96,8 +96,9 @@ add_action( 'wp_print_styles', 'dg_add_header_css');
 // HELPERS //
 
 // pass in $title & $url to avoid mult function calls
-function dg_get_attachment_icon( $id, $title, $filename ) {
-	$filetype = wp_check_filetype( $filename );
+function dg_get_attachment_icon( $icon, $id) {
+	$url = wp_get_attachment_url( $id );
+	$filetype = wp_check_filetype( basename( $url ) );
 
 	// identify extension
 	switch( $filetype['ext'] ) {
@@ -252,12 +253,12 @@ function dg_get_attachment_icon( $id, $title, $filename ) {
 		case 'odf':
 			$icon = 'opendocument-formula.png';
 			break;
-		// fallback to default icons if not recognized
-		default:
-			return get_attachment_icon( $id );
+		default: // fallback to default icon if no match
+			return $icon;
 	}
 
 	$icon = '<img src="'.DG_URL.'icons/'.$icon."\" title=\"$title\" alt=\"$title\"/>";
 	return $icon;
 }
+add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );
 ?>
