@@ -2,7 +2,7 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images in gallery format on page.
-Version: 1.0.2
+Version: 1.0.3
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
@@ -16,7 +16,9 @@ function dg_get_attachment_icons($atts) {
 		'descriptions'		=> FALSE,
 		'echo'			=> FALSE,
 		'orderby'		=> 'menu_order',
-		'order'			=> 'ASC'
+		'order'			=> 'ASC',
+		'attachment_pg'		=> false, // link directly to file (true to link to attachment pg)
+		'ids'			=> false // not yet supported
 	), $atts) );
 	 
 	$args = array(
@@ -37,7 +39,11 @@ function dg_get_attachment_icons($atts) {
 
 		$count = 0;
 		foreach( $attachments as $attachment ) { //setup array for more than one file attachment
-		 	$url	= wp_get_attachment_url( $attachment->ID );
+			if($attachment_pg)
+				$url = get_attachment_link( $attachment->ID );
+			else
+		 		$url = wp_get_attachment_url( $attachment->ID );
+
 		 	$title	= get_the_title( $attachment->ID );
 			$icon	= dg_get_attachment_icon( $attachment->ID, $tile, $url );
 			
