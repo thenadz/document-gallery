@@ -29,7 +29,7 @@ much for your support!*
 In order to include all compatible docuements from a given page or post, you must include 
 the following shortcode in the post:
 
-`[dg <descriptions=[true or false]> <orderby=[menu_order, title, date, author, rand]> <order=[ASC or DEC]>]`
+`[dg <descriptions=[true/false]> <orderby=[menu_order, title, date, author, rand]> <attachment_pg=[false/true]> <order=[ASC/DEC]>]`
 
 **Orderby Options**
 
@@ -41,8 +41,8 @@ you must populate the fields before this option will work.
 * `author` - Order by the owner of the upload (username).
 * `rand` - Pseudo-random order.
 
-By default, document gallery will use `descriptions=false`, `orderby=menu_order`, and `order=ASC` if you
-do not specify otherwise.
+By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, and 
+`attachment_pg=false` if you do not specify otherwise.
 
 = Theme Developers =
 
@@ -66,6 +66,7 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 
 = 1.0.3 =
 * Improved links for a given icon.
+* Added support for choosing whether to link directly to media file or to attachment page.
 
 = 1.0.2 =
 
