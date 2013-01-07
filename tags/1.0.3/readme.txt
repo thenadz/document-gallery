@@ -29,7 +29,7 @@ much for your support!*
 In order to include all compatible docuements from a given page or post, you must include 
 the following shortcode in the post:
 
-`[dg <descriptions=[true/false]> <orderby=[menu_order, title, date, author, rand]> <attachment_pg=[false/true]> <order=[ASC/DEC]>]`
+`[dg <descriptions=[true or false]> <orderby=[menu_order, title, date, author, rand]> <order=[ASC or DEC]>]`
 
 **Orderby Options**
 
@@ -41,8 +41,8 @@ you must populate the fields before this option will work.
 * `author` - Order by the owner of the upload (username).
 * `rand` - Pseudo-random order.
 
-By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, and 
-`attachment_pg=false` if you do not specify otherwise.
+By default, document gallery will use `descriptions=false`, `orderby=menu_order`, and `order=ASC` if you
+do not specify otherwise.
 
 = Theme Developers =
 
@@ -64,38 +64,34 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
-= 1.0.4 =
-
-* Improved links for a given icon.
-* Added support for choosing whether to link directly to media file or to attachment page.
-
 = 1.0.3 =
 
 * **Bug Fix:** Resolved issue with detecting plugin directory.
+* **Enhancement:** Minor improvement to how linking to individual documents is handled.
 
 = 1.0.2 =
 
-* **Bug Fix:** Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
+* Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
 all is resolved with this release!
 
 = 1.0.1 =
 
-* **Bug Fix:** Resolved issue with long document titles being cut off in some themes.
+* Resolved issue with long document titles being cut off in some themes.
 
 = 1.0 =
 
-* **Enhancement:** Optimized gallery generation (faster!)
-* **Enhancement:** Plugin now has **36 icons** representing **72 filetypes**!
-* **Enhancement:** Added fallback to WordPress default icons if you happen to include one of the few filetypes not yet supported.
-* **Enhancement:** Changed shortcode to `[dg]` (`[document gallery]` will still work for backward compatibility).
-* **Enhancement:** Gave documentation some **much needed** revisions.
+* Optimized gallery generation (faster!)
+* Plugin now has **36 icons** representing **72 filetypes**!
+* Added fallback to WordPress default icons if you happen to include one of the few filetypes not yet supported.
+* Changed shortcode to `[dg]` (`[document gallery]` will still work for backward compatibility).
+* Gave documentation some **much needed** revisions.
 
 = 0.8.5 =
 
-* **Enhancement:** Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
+* Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
 
 = 0.8 =
 
-* **Release:** First public release of Document Gallery.
-* **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
-* **Feature:** Documents can be ordered by a number of different factors.
+* First public release of Document Gallery.
+* Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
+* Documents can be ordered by a number of different factors.
