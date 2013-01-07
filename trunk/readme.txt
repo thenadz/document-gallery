@@ -71,9 +71,8 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 
 = 1.0.3 =
 
-* **Bug Fix:** Resolved issue with detecting plugin directory.
-
-= 1.0.2 =
+* **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks, Brigitte!)
+* **Enhancement:** Minor improvement to how linking to individual documents is han= 1.0.2 =
 
 * **Bug Fix:** Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
 all is resolved with this release!
