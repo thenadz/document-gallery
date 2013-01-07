@@ -2,13 +2,13 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images in gallery format on page.
-Version: 1.0.2
+Version: 1.0.3
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
 */
 
-define( 'DG_URL', plugin_dir_url().'document-gallery/' );
+define( 'DG_URL', plugin_dir_url( __FILE__ ) );
 
 // CREATE GALLERY STRING //
 function dg_get_attachment_icons($atts) {
@@ -38,7 +38,7 @@ function dg_get_attachment_icons($atts) {
 		$count = 0;
 		foreach( $attachments as $attachment ) { //setup array for more than one file attachment
 		 	$url	= wp_get_attachment_url( $attachment->ID );
-		 	$title	= wp_get_attachment_link( $attachment->ID );
+		 	$title	= get_the_title( $attachment->ID );
 			$icon	= dg_get_attachment_icon( $attachment->ID, $tile, $url );
 			
 			if($descriptions) {
@@ -50,7 +50,7 @@ function dg_get_attachment_icons($atts) {
 				$attachment_str[] = '<div class="document-icon">';
 			}
 
-			$attachment_str[] = "<a href=\"$url\">$icon</a><br><a href=\"$url\">$title</a>";
+			$attachment_str[] = "<a href=\"$url\">$icon<br>$title</a>";
 
 			if($descriptions) {
 				$attachment_str[] = "</td><td valign=\"top\"><p>$attachment->post_content</p></td></tr>";
