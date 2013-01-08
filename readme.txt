@@ -60,19 +60,20 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 = Coming Soon! =
 
 * Option to include player for any music files uploaded to page.
-* Option to open documents directly within your browser (a la [Google Drive Viewer](https://drive.google.com/viewer)).
+* Option to open documents directly within your browser (&#224; la [Google Drive Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
 = 1.0.4 =
 
-* Improved links for a given icon.
-* Added support for choosing whether to link directly to media file or to attachment page.
+* **Enhancement:** Added support for choosing whether to link directly to media file or to attachment page.
 
 = 1.0.3 =
 
 * **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks, Brigitte!)
 * **Enhancement:** Minor improvement to how linking to individual documents is han= 1.0.2 =
+
+= 1.0.2 =
 
 * **Bug Fix:** Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
 all is resolved with this release!
