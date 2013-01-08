@@ -15,8 +15,8 @@ making them easy to share.
 This plugin allows the user to effortlessly include a gallery, much like a photo gallery,
 of all your non-image attachments anywhere within your post.
 
-*NOTE: If you find this plugin useful, please take 10 seconds to rate it so others can find it also. Thanks so 
-much for your support!*
+*If this plugin has helped you, please take a moment to 
+[rate it](http://wordpress.org/support/view/plugin-reviews/document-gallery?rate)!*
 
 == Installation ==
 
