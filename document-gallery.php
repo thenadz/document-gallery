@@ -96,9 +96,9 @@ add_action( 'wp_print_styles', 'dg_add_header_css');
 // HELPERS //
 
 // pass in $title & $url to avoid mult function calls
-function dg_get_attachment_icon( $icon, $id) {
-	$url = wp_get_attachment_url( $id );
-	$filetype = wp_check_filetype( basename( $url ) );
+function dg_get_attachment_icon( $id, $title, $url ) {
+	$filename = basename( $url );
+	$filetype = wp_check_filetype( $filename );
 
 	// identify extension
 	switch( $filetype['ext'] ) {
@@ -253,12 +253,18 @@ function dg_get_attachment_icon( $icon, $id) {
 		case 'odf':
 			$icon = 'opendocument-formula.png';
 			break;
-		default: // fallback to default icon if no match
-			return $icon;
+		// fallback to default icons if not recognized
+		default:
+			return get_attachment_icon( $id );
 	}
 
 	$icon = '<img src="'.DG_URL.'icons/'.$icon."\" title=\"$title\" alt=\"$title\"/>";
 	return $icon;
 }
-add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );
+
+// Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
+// doubling the amount of processing for each icon. The native WP function would create the icon,
+// then 99% of the time this function would replace it. Better to just call the native WP function 
+// at the end when needed. Filter would look like this:
+// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );
 ?>
