@@ -16,7 +16,7 @@ This plugin allows the user to effortlessly include a gallery, much like a photo
 of all your non-image attachments anywhere within your post.
 
 *If this plugin has helped you, please take a moment to 
-[rate it](http://wordpress.org/support/view/plugin-reviews/document-gallery?rate)!*
+[rate it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
 
 == Installation ==
 
