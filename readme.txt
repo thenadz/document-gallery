@@ -67,7 +67,7 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 = 1.0.3 =
 
 * **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks, Brigitte!)
-* **Enhancement:** Minor improvement to how linking to individual documents is han= 1.0.2 =
+* **Enhancement:** Minor improvement to how linking to individual documents is handled.
 
 = 1.0.2 =
 
