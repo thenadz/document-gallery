@@ -60,7 +60,7 @@ function dg_get_attachment_icons($atts) {
 
 			if($descriptions) {
 				$attachment_str[] = "</td><td valign=\"top\"><p>$attachment->post_content</p></td></tr>";
-			} else {
+			} elseif($count % 4 != 0) {
 				$attachment_str[] = '</div>';
 				if( ++$count % 4 == 0 ) {
 					$attachment_str[] = '</div>';
