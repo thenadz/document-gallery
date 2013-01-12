@@ -2,7 +2,7 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images in gallery format on page.
-Version: 1.0.3
+Version: 1.0.4
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
