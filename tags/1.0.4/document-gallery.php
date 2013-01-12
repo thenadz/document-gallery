@@ -8,16 +8,15 @@ Author URI: http://danrossiter.org/
 License: GPL2
 */
 
-define( 'DG_URL', plugin_dir_url('document-gallery/') );
+define( 'DG_URL', plugin_dir_url( __FILE__ ) );
 
 // CREATE GALLERY STRING //
 function dg_get_attachment_icons($atts) {
 	extract( shortcode_atts( array(
 		'descriptions'		=> FALSE,
+		'echo'			=> FALSE,
 		'orderby'		=> 'menu_order',
-		'order'			=> 'ASC',
-		'attachment_pg'		=> FALSE, // link directly to file (true to link to attachment pg)
-		'ids'			=> FALSE // not yet supported
+		'order'			=> 'ASC'
 	), $atts) );
 	 
 	$args = array(
@@ -29,23 +28,18 @@ function dg_get_attachment_icons($atts) {
 			'post_parent'		=> get_the_ID() );
 	
 	if ( $attachments = get_posts($args) ) {
-		$attachment_str = array( PHP_EOL.'<!-- GENERATED USING DOCUMENT GALLERY'.PHP_EOL.
-					 'http://wordpress.org/extend/plugins/document-gallery -->'.PHP_EOL );
+		$attachment_str = array( '<!-- GENERATED USING DOCUMENT GALLERY'.PHP_EOL.
+					 '     http://wordpress.org/extend/plugins/document-gallery -->'.PHP_EOL );
 
-		if( $descriptions ) {
+		if($descriptions) {
 			$attachment_str[] = '<table id="document-icon-wrapper">'; 
 		}
 
 		$count = 0;
-		foreach( $attachments as $attachment ) { //setup array for more than one file attachment	
-			if( $attachment_pg ) {
-				$url = get_attachment_link( $attachment->ID );
-			} else {
-				$url = wp_get_attachment_url( $attachment->ID );
-			}
-
+		foreach( $attachments as $attachment ) { //setup array for more than one file attachment
+		 	$url	= wp_get_attachment_url( $attachment->ID );
 		 	$title	= get_the_title( $attachment->ID );
-			$icon	= get_attachment_icon( $attachment->ID );
+			$icon	= dg_get_attachment_icon( $attachment->ID, $tile, $url );
 			
 			if($descriptions) {
 				$attachment_str[] = '<tr><td class="document-icon">';
@@ -60,7 +54,7 @@ function dg_get_attachment_icons($atts) {
 
 			if($descriptions) {
 				$attachment_str[] = "</td><td valign=\"top\"><p>$attachment->post_content</p></td></tr>";
-			} elseif($count % 4 != 0) {
+			} else {
 				$attachment_str[] = '</div>';
 				if( ++$count % 4 == 0 ) {
 					$attachment_str[] = '</div>';
@@ -71,7 +65,7 @@ function dg_get_attachment_icons($atts) {
 		// close #document-icon-wrapper
 		if($descriptions) {
 			$attachment_str[] = '</table>';
-		} else {
+		} elseif($count % 4 != 0) {
 			$attachment_str[] = '</div>';
 		}
 
@@ -80,7 +74,7 @@ function dg_get_attachment_icons($atts) {
 		return $attachment_str;
 	} // end if attachments
 	
-	return '<!-- Document Gallery: No attachments to display. -->'.PHP_EOL;
+	return PHP_EOL.'<!-- Document Gallery: No attachments to display. -->'.PHP_EOL;
 }
 add_shortcode('document gallery', 'dg_get_attachment_icons');
 add_shortcode('dg', 'dg_get_attachment_icons');
@@ -261,10 +255,9 @@ function dg_get_attachment_icon( $id, $title, $url ) {
 	$icon = '<img src="'.DG_URL.'icons/'.$icon."\" title=\"$title\" alt=\"$title\"/>";
 	return $icon;
 }
-
 // Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
 // doubling the amount of processing for each icon. The native WP function would create the icon,
 // then 99% of the time this function would replace it. Better to just call the native WP function 
 // at the end when needed. Filter would look like this:
-// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );
+// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );v
 ?>
