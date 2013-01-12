@@ -65,9 +65,13 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
-= 1.0.4 =
+= 1.0.5 =
 
 * **Enhancement:** Added support for choosing whether to link directly to media file or to attachment page.
+
+= 1.0.4 =
+
+* **Bug Fix:** Removed extra `div` at bottom when number of documents is evenly divisible by 4. (Thanks, joero4ri!)
 
 = 1.0.3 =
 
