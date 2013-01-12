@@ -30,7 +30,7 @@ of all your non-image attachments anywhere within your post. Read more in the
 In order to include all compatible docuements from a given page or post, you must include 
 the following shortcode in the post:
 
-`[dg <descriptions=[true/false]> <orderby=[menu_order, title, date, author, rand]> <attachment_pg=[false/true]> <order=[ASC/DEC]>]`
+`[dg <descriptions=[true or false]> <orderby=[menu_order, title, date, author, rand]> <order=[ASC or DEC]>]`
 
 **Orderby Options**
 
@@ -42,8 +42,8 @@ you must populate the fields before this option will work.
 * `author` - Order by the owner of the upload (username).
 * `rand` - Pseudo-random order.
 
-By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, and 
-`attachment_pg=false` if you do not specify otherwise.
+By default, document gallery will use `descriptions=false`, `orderby=menu_order`, and `order=ASC` if you
+do not specify otherwise.
 
 = Theme Developers =
 
@@ -65,10 +65,6 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
-= 1.0.5 =
-
-* **Enhancement:** Added support for choosing whether to link directly to media file or to attachment page.
-
 = 1.0.4 =
 
 * **Bug Fix:** Removed extra `div` at bottom when number of documents is evenly divisible by 4. (Thanks, joero4ri!)
@@ -76,7 +72,7 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 = 1.0.3 =
 
 * **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks, Brigitte!)
-* **Enhancement:** Minor improvement to how linking to individual documents is han= 1.0.2 =
+* **Enhancement:** Minor improvement to how linking to individual documents is handled.
 
 = 1.0.2 =
 
