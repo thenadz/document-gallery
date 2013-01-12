@@ -65,7 +65,7 @@ function dg_get_attachment_icons($atts) {
 		// close #document-icon-wrapper
 		if($descriptions) {
 			$attachment_str[] = '</table>';
-		} else {
+		} elseif($count % 4 != 0) {
 			$attachment_str[] = '</div>';
 		}
 
@@ -74,7 +74,7 @@ function dg_get_attachment_icons($atts) {
 		return $attachment_str;
 	} // end if attachments
 	
-	return '<!-- Document Gallery: No attachments to display. -->'.PHP_EOL;
+	return PHP_EOL.'<!-- Document Gallery: No attachments to display. -->'.PHP_EOL;
 }
 add_shortcode('document gallery', 'dg_get_attachment_icons');
 add_shortcode('dg', 'dg_get_attachment_icons');
@@ -255,4 +255,9 @@ function dg_get_attachment_icon( $id, $title, $url ) {
 	$icon = '<img src="'.DG_URL.'icons/'.$icon."\" title=\"$title\" alt=\"$title\"/>";
 	return $icon;
 }
+// Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
+// doubling the amount of processing for each icon. The native WP function would create the icon,
+// then 99% of the time this function would replace it. Better to just call the native WP function 
+// at the end when needed. Filter would look like this:
+// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );v
 ?>

@@ -13,10 +13,11 @@ making them easy to share.
 == Description ==
 
 This plugin allows the user to effortlessly include a gallery, much like a photo gallery,
-of all your non-image attachments anywhere within your post.
+of all your non-image attachments anywhere within your post. Read more in the 
+**Installation** tab!
 
-*NOTE: If you find this plugin useful, please take 10 seconds to rate it so others can find it also. Thanks so 
-much for your support!*
+*If this plugin has helped you, please take a moment to 
+[rate it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
 
 == Installation ==
 
@@ -60,38 +61,42 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 = Coming Soon! =
 
 * Option to include player for any music files uploaded to page.
-* Option to open documents directly within your browser (a la [Google Drive Viewer](https://drive.google.com/viewer)).
+* Option to open documents directly within your browser (&#224; la [Google Drive Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
+= 1.0.4 =
+
+* **Bug Fix:** Removed extra `div` at bottom when number of documents is evenly divisible by 4. (Thanks, joero4ri!)
+
 = 1.0.3 =
 
-* **Bug Fix:** Resolved issue with detecting plugin directory.
+* **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks, Brigitte!)
 * **Enhancement:** Minor improvement to how linking to individual documents is handled.
 
 = 1.0.2 =
 
-* Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
+* **Bug Fix:** Merge for changes in 1.0 did not go through correctly so users downloaded the old icon set which broke the functioning. Sorry about that, but
 all is resolved with this release!
 
 = 1.0.1 =
 
-* Resolved issue with long document titles being cut off in some themes.
+* **Bug Fix:** Resolved issue with long document titles being cut off in some themes.
 
 = 1.0 =
 
-* Optimized gallery generation (faster!)
-* Plugin now has **36 icons** representing **72 filetypes**!
-* Added fallback to WordPress default icons if you happen to include one of the few filetypes not yet supported.
-* Changed shortcode to `[dg]` (`[document gallery]` will still work for backward compatibility).
-* Gave documentation some **much needed** revisions.
+* **Enhancement:** Optimized gallery generation (faster!)
+* **Enhancement:** Plugin now has **36 icons** representing **72 filetypes**!
+* **Enhancement:** Added fallback to WordPress default icons if you happen to include one of the few filetypes not yet supported.
+* **Enhancement:** Changed shortcode to `[dg]` (`[document gallery]` will still work for backward compatibility).
+* **Enhancement:** Gave documentation some **much needed** revisions.
 
 = 0.8.5 =
 
-* Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
+* **Enhancement:** Added support for [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
 
 = 0.8 =
 
-* First public release of Document Gallery.
-* Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
-* Documents can be ordered by a number of different factors.
+* **Release:** First public release of Document Gallery.
+* **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a given page or post.
+* **Feature:** Documents can be ordered by a number of different factors.
