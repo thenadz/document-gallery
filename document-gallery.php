@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Document Gallery
-Description: Display non-images in gallery format on page.
+Description: Display non-images in gallery format on a page or post with the [dg] shortcode.
 Version: 1.1
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
@@ -20,10 +20,12 @@ function dg_get_attachment_icons($atts) {
 		'ids'			=> FALSE // not yet supported
 	), $atts) );
 
-
-	// Some validation of user values
+	// INIT
+	$attachments = array();
 	$errs = array();
 
+
+	// ATTRIBUTE VALIDATION
 	if($descriptions != FALSE){ $descriptions = TRUE; }
 
 	$order = strtoupper( $order );
@@ -31,22 +33,31 @@ function dg_get_attachment_icons($atts) {
 		$errs[] = "The order attribute must be either ASC or DEC. You entered $order.";
 
 	if($attachment_pg != FALSE){ $attachment_pg = TRUE; }
-	if($ids != FALSE){ $ids = FALSE; } // not yet supported
 
 	// http://www.youtube.com/watch?v=ClnSMCdw6E8
 	if( $errs ) return implode(' ', $errs);
-	// All's well. Carry on, my wayward son.
-	 
+	// END VALIDATION (WE MADE IT!)
 
-	$args = array(
+
+	// LET'S GET SOME DOCUMENTS!
+	if( $ids && $ids = explode( ',', $ids ) ){
+		$attachments = dg_get_attachments_by_ids( $ids );
+	}
+
+	// if 'ids' was used, skip
+	if( !$attachments ){
+		$args = array(
 			'numberposts'		=> -1,
 			'orderby'		=> $orderby,
 			'order'			=> $order,
 			'post_type'		=> 'attachment',
 			'post_mime_type'	=> 'application,video,text,audio',
 			'post_parent'		=> get_the_ID() );
+
+		$attachments = get_posts($args);
+	}
 	
-	if ( $attachments = get_posts($args) ) {
+	if ( $attachments ) { // DOCUMENT LOOP
 		$attachment_str = array( PHP_EOL.'<!-- Generated using Document Gallery. Get yours here: '.
 					'http://wordpress.org/extend/plugins/document-gallery -->'.PHP_EOL );
 
@@ -92,7 +103,7 @@ function dg_get_attachment_icons($atts) {
 
 		// join array & return
 		return implode( '', $attachment_str );
-	} // end if attachments
+	} // END DOCUMENT LOOP
 	
 	return PHP_EOL.'<!-- Document Gallery: No attachments to display. -->'.PHP_EOL;
 }
@@ -101,14 +112,18 @@ add_shortcode('dg', 'dg_get_attachment_icons');
 add_shortcode('document gallery', 'dg_get_attachment_icons'); 
 
 
-// ADD SOME STYLING //
-function dg_add_header_css() {
-	wp_enqueue_style( 'document-gallery-css', plugins_url('style.css', __FILE__) );
-}
-add_action( 'wp_print_styles', 'dg_add_header_css'); 
-
 
 // HELPERS //
+function dg_get_attachments_by_ids( $ids ){
+	$attachments = array();
+	foreach( $ids as $id ){
+		$attachment = get_post( $id );
+		if( $attachment->post_type == 'attachment' )
+			$attachments[] = $attachment;
+		// else: not an attachment so skip
+	}
+	return $attachments;
+}
 
 // pass in $title & $url to avoid mult function calls
 function dg_get_attachment_image( $id, $title, $filename ) {
@@ -275,9 +290,17 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 
 	return '<img src="'.DG_URL.'icons/'.$icon."\" title=\"$title\" alt=\"$title\"/>";
 }
+
 // Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
 // doubling the amount of processing for each icon. The native WP function would create the icon,
 // then 99% of the time this function would replace it. Better to just call the native WP function 
 // at the end when needed. Filter would look like this:
 // add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );v
+
+// ADD SOME STYLING //
+function dg_add_header_css() {
+	wp_enqueue_style( 'document-gallery-css', plugins_url('style.css', __FILE__) );
+}
+add_action( 'wp_print_styles', 'dg_add_header_css'); 
+
 ?>
