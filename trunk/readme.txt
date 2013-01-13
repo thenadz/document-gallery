@@ -43,9 +43,10 @@ By default, document gallery will use `descriptions=false`, `orderby=menu_order`
 
 **Descriptions Option**
 
-If `true`, each document will take its own line with the description displayed alongside it. *Note: 
-this will use the `description` field, **not** the `caption`. Be careful when entering your document 
-data.
+If `true`, each document will take its own line with the description displayed alongside it.
+
+*Note: this will use the `description` field, **not** the `caption`. Be careful when entering 
+your document data.*
 
 **Orderby Option**
 
@@ -65,9 +66,9 @@ ascending or decending order.
 **Attachment Page Option** *(New in Version 1.1)*
 
 This option determines whether each document icon will link to the actual file or to its attachment page. 
-If you want the user to be able to click on the icon and directly rective the option to download then use
-`attachment_pg=false` (the default). If you have information on the attachment page that you want the link 
-to go to, use `attachment_pg=true`.
+If you want the user to be able to click on the icon and directly rective the option to download then 
+use `attachment_pg=false` (the default). If you have information on the attachment page that you want the 
+link to go to, use `attachment_pg=true`.
 
 = Customize Appearance =
 
@@ -88,8 +89,9 @@ CSS to my theme stylesheet:
 }`
 
 Now, if I wanted to modify that code to instead add the same border to all of the document-icons, regardless of 
-whether they have a description or not, I would just change the first line, removing the descriptions class like 
-so: `.document-icon-wrapper .document-icon`.
+whether they have a description or not, I would just change the first line, removing the descriptions class like so:
+
+`.document-icon-wrapper .document-icon`
 
 *NOTE: Please don't modify the plugin stylesheet directly or your changes will be lost when a new version is released.*
 
@@ -116,7 +118,7 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 
 = 1.1 =
 
-* **Enhancement:** Included option to link to the attachment page as well as to the actual document.
+* **New Feature:** Included option to link to the attachment page as well as to the actual document.
 * **Enhancement:** Added documentation for customizing the appearance of the plugin.
 * **Enhancement:** Many improvements to the backend, including pretty HTML output and best practice implementation in
 calls to WordPress core functions.
