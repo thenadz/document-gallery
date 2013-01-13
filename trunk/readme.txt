@@ -38,8 +38,8 @@ the following shortcode in the post:
 
 **Default Values**
 
-By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, and 
-`attachment_pg=false` if you do not specify otherwise.
+By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, 
+and `attachment_pg=false` if you do not specify otherwise.
 
 **Descriptions Option**
 
