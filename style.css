@@ -1,52 +1,63 @@
-.document-icon{ text-align: center; }
+div.document-icon{ text-align: center; }
 
-.document-icon img{
+div.document-icon img{
   border: none;
 }
 
-.document-icon a{
+div.document-icon a{
   font-size: 10px;
   line-height: 12px;
 }
+
+div.document-icon{ margin: 5px 0 0; }
 
 /* WITHOUT DESCRIPTION */
 div.document-icon{
   display: inline-block;
   vertical-align: top;
-  min-height: 125px;
-  /*max-height: 145px;*/
   overflow: hidden;
-  padding: 10px 0;
-  width: 25%;
+  /* percents round up in some browsers, making 
+  only 3 icons fit per line so can't use 25% */
+  width: 24.5%;
 }
-div#document-icon-wrapper{
+div.document-icon-wrapper{
   width: 100%;
   padding: 0;
-  margin: 0;
+  text-align: center;
 }
 /* END WITHOUT DESCRIPTION */
 
 /* WITH DESCRIPTION */
-td.document-icon{ width: 115px; }
-table#document-icon-wrapper{ border-collapse: collapse; }
-
-table#document-icon-wrapper,
-table#document-icon-wrapper tbody,
-table#document-icon-wrapper tr,
-table#document-icon-wrapper p{
-  width: 100%;
+div.descriptions.document-icon-wrapper div.document-icon{ 
+  width: 115px;
   padding: 0;
-  margin: 0;
-  border: none;
+  padding-right: 3px;
+  float: left;
 }
 
-table#document-icon-wrapper td{
-  padding: 5px 4px 3px;
+div.descriptions.document-icon-wrapper{
   vertical-align: middle;
+  text-align: inherit;
 }
 
-table .document-icon img{
+div.descriptions.document-icon-wrapper img{
   width: 65px;
   height: 65px;
+}
+
+/* clearfix */
+/* can't depend on theme having a clearfix class,
+so build it into dg css */
+div.descriptions.document-icon-wrapper:before,
+div.descriptions.document-icon-wrapper:after{
+  content: "";
+  display: table;
+}
+ 
+div.descriptions.document-icon-wrapper:after{
+    clear: both;
+}
+div.descriptions.document-icon-wrapper{
+    zoom: 1; /* For IE 6/7 (trigger hasLayout) */
 }
 /* END WITH DESCRIPTION */

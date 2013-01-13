@@ -1,9 +1,9 @@
 === Document Gallery ===
 Contributors: dan.rossiter
-Tags: attachments, icons, documents, gallery
+Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf, openoffice
 Requires at least: 2.6
 Tested up to: 3.5
-Stable tag: 1.0.4
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,8 +13,12 @@ making them easy to share.
 == Description ==
 
 This plugin allows the user to effortlessly include a gallery, much like a photo gallery,
-of all your non-image attachments anywhere within your post. Read more in the 
-**Installation** tab!
+of all your non-image attachments anywhere within your post.
+
+The plugin will, by default, inherit the styling within your active theme, but with a 
+little CSS knowledge it is easily modified to meet your specific needs.
+
+Read more in the **Installation** tab!
 
 *If this plugin has helped you, please take a moment to 
 [rate it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
@@ -30,9 +34,20 @@ of all your non-image attachments anywhere within your post. Read more in the
 In order to include all compatible docuements from a given page or post, you must include 
 the following shortcode in the post:
 
-`[dg <descriptions=[true/false]> <orderby=[menu_order, title, date, author, rand]> <attachment_pg=[false/true]> <order=[ASC/DEC]>]`
+`[dg descriptions=[true or false] orderby=[menu_order, title, date, author, rand] order=[ASC or DEC] attachment_pg=[true or false]]`
 
-**Orderby Options**
+**Default Values**
+
+By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, and 
+`attachment_pg=false` if you do not specify otherwise.
+
+**Descriptions Option**
+
+If `true`, each document will take its own line with the description displayed alongside it. *Note: 
+this will use the `description` field, **not** the `caption`. Be careful when entering your document 
+data.
+
+**Orderby Option**
 
 * `menu_order` - This is probably the one you want to use. Order by the integer fields in the Insert / 
 Upload Media Gallery dialog. Note that these fields may be blank by default. If this is the case, 
@@ -42,8 +57,41 @@ you must populate the fields before this option will work.
 * `author` - Order by the owner of the upload (username).
 * `rand` - Pseudo-random order.
 
-By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, and 
-`attachment_pg=false` if you do not specify otherwise.
+**Order Option**
+
+This option works alongsied the `orderby` option to determine whether the documents are displayed in
+ascending or decending order.
+
+**Attachment Page Option** *(New in Version 1.1)*
+
+This option determines whether each document icon will link to the actual file or to its attachment page. 
+If you want the user to be able to click on the icon and directly rective the option to download then use
+`attachment_pg=false` (the default). If you have information on the attachment page that you want the link 
+to go to, use `attachment_pg=true`.
+
+= Customize Appearance =
+
+By default, the document gallery will use the styles within your active theme to handle most of the appearance,
+but, with a little CSS knowledge, you can customize pretty much anything about how it looks. See 
+[`style.css`](http://plugins.svn.wordpress.org/document-gallery/trunk/style.css) for an idea of what will 
+select different elements within the gallery display.
+
+**Example**
+
+Say I would like to include a border for the right and bottom of thedocument icon, but only when descriptions 
+are shown (to deliniate the icon from the description text). To do this, I would need to add the following 
+CSS to my theme stylesheet:
+
+`.document-icon-wrapper.descriptions .document-icon{
+  border-right: 1px solid #37824A;
+  border-bottom: 1px solid #37824A;
+}`
+
+Now, if I wanted to modify that code to instead add the same border to all of the document-icons, regardless of 
+whether they have a description or not, I would just change the first line, removing the descriptions class like 
+so: `.document-icon-wrapper .document-icon`.
+
+*NOTE: Please don't modify the plugin stylesheet directly or your changes will be lost when a new version is released.*
 
 = Theme Developers =
 
@@ -58,16 +106,20 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 
 == Changelog ==
 
-= Coming Soon! =
+= Coming (Relatively) Soon =
 
-* Option to include player for any music files uploaded to page.
+* Full integration with the new [Wordpress 3.5 Media Manager](http://codex.wordpress.org/Version_3.5#Highlights).
+* Option to include player for any music or video attachments uploaded to page.
 * Option to open documents directly within your browser (&#224; la [Google Drive Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
 
-= 1.0.5 =
+= 1.1 =
 
-* **Enhancement:** Added support for choosing whether to link directly to media file or to attachment page.
+* **Enhancement:** Included option to link to the attachment page as well as to the actual document.
+* **Enhancement:** Added documentation for customizing the appearance of the plugin.
+* **Enhancement:** Many improvements to the backend, including pretty HTML output and best practice implementation in
+calls to WordPress core functions.
 
 = 1.0.4 =
 
@@ -76,7 +128,7 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 = 1.0.3 =
 
 * **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks, Brigitte!)
-* **Enhancement:** Minor improvement to how linking to individual documents is han= 1.0.2 =
+* **Enhancement:** Minor improvement to how linking to individual documents is handled.
 
 = 1.0.2 =
 
