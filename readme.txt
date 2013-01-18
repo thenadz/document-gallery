@@ -134,7 +134,8 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 
 = 1.2 =
 
-* **New Feature:** Images can now be included alongside documents in a document gallery (using `images=true` attribute).
+* **New Feature:** Images can now be included alongside documents in a document gallery (using `images=true` attribute). 
+(Thanks for the suggestion, Luca!)
 * **New Feature:** Attachment ids can now be explicitly listed, allowing for documents not attached to a post or page 
 to be included in a document gallery (e.g.: `ids=2,42,57,1`). Note that no spaces should be included.
 * **Enhancement:** The CSS stylesheet has been enhanced for more flexibility in sizing icons.
