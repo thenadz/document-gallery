@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf, openoffice
 Requires at least: 2.6
 Tested up to: 3.5
-Stable tag: 1.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -128,6 +128,9 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Option to open documents directly within your browser (&#224; la [Google Drive Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
+
+= 1.2.1 =
+* **Bug Fix:** Resolved issue with the `ids` attribute in `1.2` not working. Sorry about that!
 
 = 1.2 =
 
