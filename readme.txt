@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf, openoffice
 Requires at least: 2.6
 Tested up to: 3.5
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,12 +34,13 @@ Read more in the **Installation** tab!
 In order to include all compatible docuements from a given page or post, you must include 
 the following shortcode in the post:
 
-`[dg descriptions=[true or false] orderby=[menu_order, title, date, author, rand] order=[ASC or DEC] attachment_pg=[true or false]]`
+`[dg descriptions=[true/false] orderby=[menu_order, title, date, author, rand] order=[ASC/DEC] 
+attachment_pg=[true/false] images=[true/false] ids=[false/comma-separated list of id #s]]`
 
 **Default Values**
 
-By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`, 
-and `attachment_pg=false` if you do not specify otherwise.
+By default, document gallery will use `descriptions=false`, `orderby=menu_order`, `order=ASC`
+, `attachment_pg=false`, `images=false`, and `ids=false` if you do not specify otherwise.
 
 **Descriptions Option**
 
@@ -69,6 +70,18 @@ This option determines whether each document icon will link to the actual file o
 If you want the user to be able to click on the icon and directly rective the option to download then 
 use `attachment_pg=false` (the default). If you have information on the attachment page that you want the 
 link to go to, use `attachment_pg=true`.
+
+**Images** *(New in Version 1.2)*
+
+This option will tell the plugin to pull all images attached to to a page or post in addition to all documents.
+
+**Ids** *(New in Version 1.2)*
+
+This is an advanced option intended for experienced WordPress users. If this option is used, the plugin will 
+ignore attached documents, instead including all attachments defined by the ids attribute (e.g.: `ids=10,2,4,42`).
+
+*Note: If this attribute is used, the `order`, `orderby`, and `images` attributes will be ignored. Order is defined
+by the order the ids are provided.*
 
 = Customize Appearance =
 
@@ -115,6 +128,13 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 * Option to open documents directly within your browser (&#224; la [Google Drive Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support forum](http://wordpress.org/support/plugin/document-gallery) if you have ideas)!
+
+= 1.2 =
+
+* **New Feature:** Images can now be included alongside documents in a document gallery (using `images=true` attribute).
+* **New Feature:** Attachment ids can now be explicitly listed, allowing for documents not attached to a post or page 
+to be included in a document gallery (e.g.: `ids=2,42,57,1`). Note that no spaces should be included.
+* **Enhancement:** The CSS stylesheet has been enhanced for more flexibility in sizing icons.
 
 = 1.1 =
 

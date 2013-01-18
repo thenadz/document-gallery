@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Document Gallery
-Description: Display non-images in gallery format on a page or post with the [dg] shortcode.
-Version: 1.1
+Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
+Version: 1.2
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
@@ -17,7 +17,8 @@ function dg_get_attachment_icons($atts) {
 		'orderby'		=> 'menu_order',
 		'order'			=> 'ASC',
 		'attachment_pg'		=> FALSE, // default: link directly to file (true to link to attachment pg)
-		'ids'			=> FALSE // not yet supported
+		'images'		=> FALSE, // if enabled, all images attached to current page will be included also
+		'ids'			=> FALSE // comma-separated list of attachment ids
 	), $atts) );
 
 	// INIT
@@ -26,13 +27,17 @@ function dg_get_attachment_icons($atts) {
 
 
 	// ATTRIBUTE VALIDATION
-	if($descriptions != FALSE){ $descriptions = TRUE; }
+	if( strtolower($descriptions) == "false" ){ $descriptions = FALSE; }
 
 	$order = strtoupper( $order );
 	if($order != 'ASC' && $order != 'DEC')
 		$errs[] = "The order attribute must be either ASC or DEC. You entered $order.";
 
-	if($attachment_pg != FALSE){ $attachment_pg = TRUE; }
+	if( strtolower($attachment_pg) == "false" ){ $attachment_pg = FALSE; }
+
+	if( strtolower($images) == "false" ){ $images = FALSE; }
+
+	if( strtolower($ids) ){ $ids = FALSE; }
 
 	// http://www.youtube.com/watch?v=ClnSMCdw6E8
 	if( $errs ) return implode(' ', $errs);
@@ -40,7 +45,7 @@ function dg_get_attachment_icons($atts) {
 
 
 	// LET'S GET SOME DOCUMENTS!
-	if( $ids && $ids = explode( ',', $ids ) ){
+	if( $ids && ( $ids = explode( ',', $ids ) ) ){
 		$attachments = dg_get_attachments_by_ids( $ids );
 	}
 
@@ -53,6 +58,7 @@ function dg_get_attachment_icons($atts) {
 			'post_type'		=> 'attachment',
 			'post_mime_type'	=> 'application,video,text,audio',
 			'post_parent'		=> get_the_ID() );
+		if( $images ) $args['post_mime_type'] .= ',image';
 
 		$attachments = get_posts($args);
 	}
@@ -284,11 +290,19 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 			break;
 		// fallback to default icons if not recognized
 		default:
-			// get_attachment_icon is DEPRECIATED! (replaced in v1.1)
-			return wp_get_attachment_image( $id, null, true );
+			// handle images
+			if( preg_match( '/^image/', $filetype['type'] ) &&
+				( $icon = wp_get_attachment_image( $id, 'thumbnail', false ) ) )
+					return $icon;
+
+			// fallback to wp defaults - get_attachment_icon is DEPRECIATED! (replaced in dg v1.1)
+			if( $icon = wp_get_attachment_image( $id, null, true ) )
+				return $icon;
+
+			return "<!-- Failed to retrive icon for attachment #$id -->"; // everything failed. This is bad...
 	}
 
-	return '<img src="'.DG_URL.'icons/'.$icon."\" title=\"$title\" alt=\"$title\"/>";
+	return '<img src="'.DG_URL."icons/$icon\" title=\"$title\" alt=\"$title\" />";
 }
 
 // Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
