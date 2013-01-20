@@ -116,8 +116,12 @@ code wherever you would like it to appear: `<?php echo do_shortcode('[dg]'); ?>`
 
 == Screenshots ==
 
-1. This is how the Document Gallery looks with `descriptions=false` (default). Note that the display inherits styling from your active theme.
-2. This is how the Document Gallery looks with `descriptions=true`. The descriptions are auto-populated using the description field from when you upload the document.
+1. This is an example of multiple Document Galleries on a single page (using the `ids` attribute). Note that the 
+description field supports HTML markup, so the possibilites are endless!
+2. This is how the Document Gallery looks with `descriptions=true`. The descriptions are auto-populated using the 
+description field from when you upload the document.
+3. This is how the Document Gallery looks with `descriptions=false` (default). Note that the display inherits 
+styling from your active theme.
 
 == Changelog ==
 
