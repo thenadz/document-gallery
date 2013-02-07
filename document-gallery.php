@@ -9,6 +9,12 @@ License: GPL2
 */
 
 define( 'DG_URL', plugin_dir_url( __FILE__ ) );
+define( 'DG_IMG_STRING', '<img src="'.DG_URL.'icons/%s" title="%s" alt="%s" />' );
+define( 'DG_DOC_ICON', 
+'   <div class="document-icon">
+      <a href="%s">%s<br>%s</a>
+   </div>
+');
 
 // CREATE GALLERY STRING //
 function dg_get_attachment_icons($atts) {
@@ -64,8 +70,8 @@ function dg_get_attachment_icons($atts) {
 	}
 	
 	if ( $attachments ) { // DOCUMENT LOOP
-		$attachment_str = array( PHP_EOL.'<!-- Generated using Document Gallery. Get yours here: '.
-					'http://wordpress.org/extend/plugins/document-gallery -->'.PHP_EOL );
+		$attachment_str = PHP_EOL.'<!-- Generated using Document Gallery. Get yours here: '.
+					'http://wordpress.org/extend/plugins/document-gallery -->'.PHP_EOL;
 
 		$count = 0;
 		foreach( $attachments as $attachment ) { //setup array for more than one file attachment
@@ -78,40 +84,35 @@ function dg_get_attachment_icons($atts) {
 		 	$title	= get_the_title( $attachment->ID );
 			$icon	= dg_get_attachment_image( $attachment->ID, $title, $filename );
 			
-			if($descriptions) { // start wrapper
-				$attachment_str[] = '<div class="document-icon-wrapper descriptions">'.PHP_EOL.
-					'   <div class="document-icon">'.PHP_EOL;
-			} else { // no description
-				if( $count % 4 == 0 ) { // start wrapper
-					$attachment_str[] = '<div id="document-icon-wrapper">'.PHP_EOL;
-				}
-				$attachment_str[] = '   <div class="document-icon">'.PHP_EOL;
+			if($descriptions) { // start description wrapper
+				$attachment_str .= '<div class="document-icon-wrapper descriptions">'.PHP_EOL;
+			} elseif( $count % 4 == 0 ) { // no description
+				$attachment_str .= '<div id="document-icon-wrapper">'.PHP_EOL;
 			}
 
-			$attachment_str[] = "   <a href=\"$url\">$icon<br>$title</a>".PHP_EOL;
+			// insert document-icon
+			$attachment_str .= apply_filters( 'dg_doc_icon', 
+				sprintf( DG_DOC_ICON, $url, $icon, $title ), $filename );
 
-			if($descriptions) { // end icon & add description
-				$attachment_str[] = '   </div>'.PHP_EOL.
-					"   <p>$attachment->post_content</p>".
+			if($descriptions) { // add description	
+				$attachment_str .= "   <p>$attachment->post_content</p>".
 					PHP_EOL.'</div>'.PHP_EOL;
-			} else { // end icon
-				$attachment_str[] = '   </div>'.PHP_EOL;
-				if( ++$count % 4 == 0 ) { // end wrapper
-					$attachment_str[] = '</div>'.PHP_EOL;
-				}
+
+			} elseif( ++$count % 4 == 0 ) { // end wrapper
+				$attachment_str .= '</div>'.PHP_EOL;
 			}
 		} // end looping attachments
 
 		// for galleries w/ number of docs != mult of 4
 		if( $count % 4 != 0 && !$descriptions ){ // end wrapper
-			$attachment_str[] = '</div>'.PHP_EOL;
+			$attachment_str .= '</div>'.PHP_EOL;
 		}
 
-		// join array & return
-		return implode( '', $attachment_str );
+		// return complete gallery
+		return $attachment_str;
 	} // END DOCUMENT LOOP
 	
-	return PHP_EOL.'<!-- Document Gallery: No attachments to display. -->'.PHP_EOL;
+	return PHP_EOL.'<!-- Document Gallery: No attachments to display. How boring... -->'.PHP_EOL;
 }
 add_shortcode('dg', 'dg_get_attachment_icons');
 // Depreciated as of v1.0. left for backward compatibility
@@ -132,6 +133,8 @@ function dg_get_attachments_by_ids( $ids ){
 }
 
 // pass in $title & $url to avoid mult function calls
+// Filter: dg_attachment_icon
+// 		passes the icon value as well as the file ext
 function dg_get_attachment_image( $id, $title, $filename ) {
 	$filetype = wp_check_filetype( $filename );
 
@@ -302,7 +305,7 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 			return "<!-- Failed to retrive icon for attachment #$id -->"; // everything failed. This is bad...
 	}
 
-	return '<img src="'.DG_URL."icons/$icon\" title=\"$title\" alt=\"$title\" />";
+	return sprintf( DG_IMG_STRING, $icon, $title, $title );
 }
 
 // Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
