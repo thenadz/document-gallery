@@ -20,6 +20,12 @@ with a little CSS knowledge it is easily modified to meet your specific needs.
 
 Read more in the **Installation** tab!
 
+= Developers =
+
+Document Gallery includes features intended to make integrating the plugin into 
+the core of your theme or plugin very convenient. See the bottom of the 
+**Installation**  tab for specific documentation on the various features included.
+
 *If this plugin has helped you, please take a moment to [rate
 it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
 
