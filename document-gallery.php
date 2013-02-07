@@ -2,7 +2,7 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-Version: 1.2.1
+Version: 1.3
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
@@ -33,15 +33,15 @@ function dg_get_attachment_icons($atts) {
 
 
 	// ATTRIBUTE VALIDATION
-	if( strtolower($descriptions) == "false" ){ $descriptions = FALSE; }
+	$descriptions = strtolower($descriptions) == "false" ? FALSE : TRUE;
 
 	$order = strtoupper( $order );
 	if($order != 'ASC' && $order != 'DEC')
 		$errs[] = "The order attribute must be either ASC or DEC. You entered $order.";
 
-	if( strtolower($attachment_pg) == "false" ){ $attachment_pg = FALSE; }
+	$attachment_pg = strtolower($attachment_pg) == "false" ? FALSE : TRUE;
 
-	if( strtolower($images) == "false" ){ $images = FALSE; }
+	$images = strtolower($images) == "false" ? FALSE : TRUE;
 
 	if( strtolower($ids) == "false" ){ $ids = FALSE; }
 
@@ -51,9 +51,8 @@ function dg_get_attachment_icons($atts) {
 
 
 	// LET'S GET SOME DOCUMENTS!
-	if( $ids && ( $ids = explode( ',', $ids ) ) ){
+	if( $ids && ( $ids = explode( ',', $ids ) ) )
 		$attachments = dg_get_attachments_by_ids( $ids );
-	}
 
 	// if 'ids' was used, skip this
 	if( !$attachments ){
@@ -88,6 +87,7 @@ function dg_get_attachment_icons($atts) {
 			// GENERATE OUTPUT
 			if($descriptions) { // start description wrapper
 				$attachment_str .= '<div class="document-icon-wrapper descriptions">'.PHP_EOL;
+
 			} elseif( $count % 4 == 0 ) { // no description
 				$attachment_str .= '<div id="document-icon-wrapper">'.PHP_EOL;
 			}
@@ -103,15 +103,14 @@ function dg_get_attachment_icons($atts) {
 			} elseif( ++$count % 4 == 0 ) { // end wrapper
 				$attachment_str .= '</div>'.PHP_EOL;
 			}
-		} // DOCUMENT LOOP
+		} // END DOCUMENT LOOP
 
 		// for galleries w/ number of docs != mult of 4
-		if( $count % 4 != 0 && !$descriptions ){ // end wrapper
+		if( $count % 4 != 0 && !$descriptions ) // end wrapper
 			$attachment_str .= '</div>'.PHP_EOL;
-		}
 
 		return $attachment_str;
-	} // IF
+	} // END IF
 
 	// NO DOCUMENTS
 	return PHP_EOL.'<!-- Document Gallery: No attachments to display. How boring... -->'.PHP_EOL;
@@ -294,11 +293,10 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 		// fallback to default icons if not recognized
 		default:
 			// handle images
-			if( preg_match( '/^image/', $filetype['type'] ) &&
+			if( strpos( $filetype['type'], 'image' ) === 0 &&
 				( $icon = wp_get_attachment_image( $id, 'thumbnail', false ) ) )
 					return $icon;
 
-			// fallback to wp defaults - get_attachment_icon is DEPRECIATED! (replaced in dg v1.1)
 			if( $icon = wp_get_attachment_image( $id, null, true ) )
 				return $icon;
 
@@ -312,7 +310,7 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 // doubling the amount of processing for each icon. The native WP function would create the icon,
 // then 99% of the time this function would replace it. Better to just call the native WP function 
 // at the end when needed. Filter would look like this:
-// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );v
+// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );
 
 // ADD SOME STYLING //
 function dg_add_header_css() {
