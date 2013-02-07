@@ -92,7 +92,7 @@ function dg_get_attachment_icons($atts) {
 				$attachment_str .= '<div id="document-icon-wrapper">'.PHP_EOL;
 			}
 
-			// insert document-icon
+			// insert filtered document-icon
 			$attachment_str .= apply_filters( 'dg_doc_icon', 
 				sprintf( DG_DOC_ICON, $url, $icon, $title ), $filename );
 
@@ -305,12 +305,6 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 
 	return sprintf( DG_IMG_STRING, $icon, $title, $title );
 }
-
-// Filtering attachment_icon was considered, then dismissed in v1.0.3 because it would mean almost 
-// doubling the amount of processing for each icon. The native WP function would create the icon,
-// then 99% of the time this function would replace it. Better to just call the native WP function 
-// at the end when needed. Filter would look like this:
-// add_filter( 'attachment_icon', 'dg_get_attachment_icon', 10, 2 );
 
 // ADD SOME STYLING //
 function dg_add_header_css() {
