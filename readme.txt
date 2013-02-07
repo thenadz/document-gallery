@@ -151,16 +151,16 @@ This parameter, `rid`, specifies the refering page and allows the page
 receiving the URL to dynamically detect which page ID the link came from.
 
 `function dg_doc_icon( $icon, $filetype ){
-	$ptn = '/(.* href=")([^"]+)(".*)/s';
-	$rpl = '$1$2$3';
+   $ptn = '/(.* href=")([^"]+)(".*)/s';
+   $rpl = '$1$2$3';
+
+   if( !preg_match( $ptn, $icon, $matches ) || count( $matches ) !== 4 )
+      return $icon;
+
+   if( strpos( $matches[2], '?' ) !== false )
+      return "{$matches[1]}{$matches[2]}&rid=".get_the_ID()."{$matches[3]}";
 	
-	if( !preg_match( $ptn, $icon, $matches ) || count( $matches ) !== 4 )
-		return $icon;
-	
-	if( strpos( $matches[2], '?' ) !== false )
-		return "{$matches[1]}{$matches[2]}&rid=".get_the_ID()."{$matches[3]}";
-	
-	return "{$matches[1]}{$matches[2]}?rid={$page->ID}{$matches[3]}";
+   return "{$matches[1]}{$matches[2]}?rid={$page->ID}{$matches[3]}";
 }
 add_filter( 'dg_doc_icon', 'dg_doc_icon', null, 2 );`
 
