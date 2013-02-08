@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf,openoffice
 Requires at least: 2.6
 Tested up to: 3.5.1
-Stable tag: 1.2.1
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,32 +141,33 @@ attachment title. Hooking into the `dg_doc_icon` filter will allow you to
 modify any of this content before it reaches your users.
 
 Any function using this filter will receive two parameters, the content to be
-filtered and the `filetype` of the file represented by the icon in question.
-If you are implementing something to override icons used by this plugin, for
-example, knowing the filetype would be useful in order to make this happen.
+filtered and the ID number of the file represented by the icon in question.
+If you are implementing something to override the plugin default functionality,
+it may be useful to be able to query various attributes of the attachment with 
+this value.
 
 One example use for this filter, which I have personally used in a project I
 am working on, will add a query parameter to the end of each attachment url.
 This parameter, `rid`, specifies the refering page and allows the page
 receiving the URL to dynamically detect which page ID the link came from.
 
-`function dg_doc_icon( $icon, $filetype ){
+`function dg_doc_icon( $icon, $id ){
    $ptn = '/(.* href=")([^"]+)(".*)/s';
-   $rpl = '$1$2$3';
 
    if( !preg_match( $ptn, $icon, $matches ) || count( $matches ) !== 4 )
       return $icon;
 
    if( strpos( $matches[2], '?' ) !== false )
-      return "{$matches[1]}{$matches[2]}&rid=".get_the_ID()."{$matches[3]}";
+      return "{$matches[1]}{$matches[2]}&rid=".get_the_ID().$matches[3];
 	
-   return "{$matches[1]}{$matches[2]}?rid={$page->ID}{$matches[3]}";
+   return "{$matches[1]}{$matches[2]}?rid=".get_the_ID().$matches[3];
 }
 add_filter( 'dg_doc_icon', 'dg_doc_icon', null, 2 );`
 
 Obviously this is just one very specific example, but anything that requires
 modifying the image tag, the anchor tag, or the title can be handled with this
-filter.
+filter. Note that this function does not use the $id value it receives, which 
+is perfectly alright.
 
 == Screenshots ==
 
@@ -197,12 +198,16 @@ Note that the display inherits styling from your active theme.
 = 1.3 =
 
 * **New Feature:** It is now possible to filter the HTML produced to represent
-	each individual icon, making it possible to add extra attributes and other
-  modifications on the fly as documents are generated. This will probably only
-  be of use to developers and people who don't mind getting their hands dirty.
+  each individual icon, making it possible to add extra attributes and other
+  modifications on the fly as document icons are generated. This will probably 
+  only be of use to developers and people who don't mind getting their hands 
+  dirty. *(See bottom **Installation** tab for more details.)*
 * **Enhancement:** There have been a lot of optimizations to the underlying
-	plugin code to make it run more efficiently and be easier to read, if you
+  plugin code to make it run more efficiently and be easier to read, if you
   are so inclined.
+* **Enhancement:** Changed how images, when included within the gallery, are 
+  generated so that the format of the icon returned now matches the rest of 
+  the icons.
 
 = 1.2.1 =
 
