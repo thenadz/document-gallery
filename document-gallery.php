@@ -9,7 +9,7 @@ License: GPL2
 */
 
 define( 'DG_URL', plugin_dir_url( __FILE__ ) );
-define( 'DG_IMG_STRING', '<img src="'.DG_URL.'icons/%s" title="%s" alt="%s" />' );
+define( 'DG_IMG_STRING', '<img src="%s" title="%s" alt="%s" />' );
 define( 'DG_DOC_ICON', 
         '   <div class="document-icon">'.PHP_EOL.
         '      <a href="%s">%s<br>%s</a>'.PHP_EOL.
@@ -94,7 +94,7 @@ function dg_get_attachment_icons($atts) {
 
 			// insert filtered document-icon
 			$attachment_str .= apply_filters( 'dg_doc_icon', 
-				sprintf( DG_DOC_ICON, $url, $icon, $title ), $filename );
+				sprintf( DG_DOC_ICON, $url, $icon, $title ), $attachment->ID );
 
 			if($descriptions) { // add description	
 				$attachment_str .= "   <p>$attachment->post_content</p>".
@@ -141,7 +141,7 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 	switch( $filetype['ext'] ) {
 		// Most Common First
 		case 'pdf':
-			$icon = 'pdf.png';
+			$icon = DG_URL.'icons/pdf.png';
 			break;
 		// MS Office
 		case 'doc':
@@ -149,7 +149,7 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 		case 'docm':
 		case 'dotx':
 		case 'dotm':
-			$icon = 'msdoc.png';
+			$icon = DG_URL.'icons/msdoc.png';
 			break;
 		case 'ppt':
 		case 'pot':
@@ -163,7 +163,7 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 		case 'ppam':
 		case 'sldx':
 		case 'sldm':
-			$icon = 'msppt.png';
+			$icon = DG_URL.'icons/msppt.png';
 			break;
 		case 'xla':
 		case 'xls':
@@ -175,138 +175,143 @@ function dg_get_attachment_image( $id, $title, $filename ) {
 		case 'xltx':
 		case 'xltm':
 		case 'xlam':
-			$icon = 'msxls.png';
+			$icon = DG_URL.'icons/msxls.png';
 			break;
 		case 'mdb':
-			$icon = 'msaccess.png';
+			$icon = DG_URL.'icons/msaccess.png';
 			break;
 		// Video formats
 		case 'avi':
-			$icon = 'avi.png';
+			$icon = DG_URL.'icons/avi.png';
 			break;
 		case 'divx':
-			$icon = 'divx.png';
+			$icon = DG_URL.'icons/divx.png';
 			break;
 		case 'flv':
-			$icon = 'flv.png';
+			$icon = DG_URL.'icons/flv.png';
 			break;
 		case 'qt':
 		case 'mov':
-			$icon = 'mov.png';
+			$icon = DG_URL.'icons/mov.png';
 			break;
 		case 'asf':
 		case 'asx':
 		case 'wax':
 		case 'wmv':
 		case 'wmx':
-			$icon = 'wmv.png';
+			$icon = DG_URL.'icons/wmv.png';
 			break;
 		case 'mkv':
-			$icon = 'mkv.png';
+			$icon = DG_URL.'icons/mkv.png';
 			break;
 		// Audio formats
 		case 'mp3':
-			$icon = 'mp3.png';
+			$icon = DG_URL.'icons/mp3.png';
 			break;
 		case 'wav':
-			$icon = 'wav.png';
+			$icon = DG_URL.'icons/wav.png';
 			break;
 		case 'ogg':
 		case 'oga':
-			$icon = 'ogg.png';
+			$icon = DG_URL.'icons/ogg.png';
 			break;
 		case 'midi':
 		case 'mid':
-			$icon = 'midi.png';
+			$icon = DG_URL.'icons/midi.png';
 			break;
 		case 'wma':
-			$icon = 'wma.png';
+			$icon = DG_URL.'icons/wma.png';
 			break;
 		// Text formats
 		case 'rtx':
-			$icon = 'rtx.png';
+			$icon = DG_URL.'icons/rtx.png';
 			break;
 		case 'ics':
-			$icon = 'ics.png';
+			$icon = DG_URL.'icons/ics.png';
 			break;
 		case 'csv':
-			$icon = 'csv.png';
+			$icon = DG_URL.'icons/csv.png';
 			break;
 		// Msc application formats
 		case 'html':
 		case 'htm': // death to all who use this!
-			$icon = 'html.png';
+			$icon = DG_URL.'icons/html.png';
 			break;
 		case 'css':
-			$icon = 'css.png';
+			$icon = DG_URL.'icons/css.png';
 			break;
 		case 'js':
-			$icon = 'javascript.png';
+			$icon = DG_URL.'icons/javascript.png';
 			break;
 		case 'class':
-			$icon = 'java.png';
+			$icon = DG_URL.'icons/java.png';
 			break; 
 		case 'zip':
-			$icon = 'zip.png';
+			$icon = DG_URL.'icons/zip.png';
 			break;
 		case 'tar':
 		case 'gzip':
 		case 'gz':
 		case 'bz2': // not yet WP-supported
 		case 'tgz': // not yet WP-supported
-			$icon = 'compressed.png';
+			$icon = DG_URL.'icons/compressed.png';
 			break;
 		case 'rar': // RAWR!!!
-			$icon = 'rar.png';
+			$icon = DG_URL.'icons/rar.png';
 			break;
 		case '7z':
-			$icon = '7zip.png';
+			$icon = DG_URL.'icons/7zip.png';
 			break;
 		case 'exec':
-			$icon = 'exec.png';
+			$icon = DG_URL.'icons/exec.png';
 			break;
 		case 'rtf':
-			$icon = 'rtf.png';
+			$icon = DG_URL.'icons/rtf.png';
 			break;
 		case 'swf':
-			$icon = 'shockwave.png';
+			$icon = DG_URL.'icons/shockwave.png';
 			break;
 		// OpenOffice formats
 		case 'odt':
-			$icon = 'opendocument-text.png';
+			$icon = DG_URL.'icons/opendocument-text.png';
 			break;
 		case 'odp':
-			$icon = 'opendocument-presentation.png';
+			$icon = DG_URL.'icons/opendocument-presentation.png';
 			break;
 		case 'ods':
-			$icon = 'opendocument-spreadsheet.png';
+			$icon = DG_URL.'icons/opendocument-spreadsheet.png';
 			break;
 		case 'odg':
-			$icon = 'opendocument-graphics.png';
+			$icon = DG_URL.'icons/opendocument-graphics.png';
 			break;
 		case 'odb':
-			$icon = 'opendocument-database.png';
+			$icon = DG_URL.'icons/opendocument-database.png';
 			break;
 		case 'odf':
-			$icon = 'opendocument-formula.png';
+			$icon = DG_URL.'icons/opendocument-formula.png';
 			break;
-		// fallback to default icons if not recognized
 		default:
 			// handle images
 			if( strpos( $filetype['type'], 'image' ) === 0 &&
-				( $icon = wp_get_attachment_image( $id, 'thumbnail', false ) ) )
-					return $icon;
+				( $icon = wp_get_attachment_image_src( $id, 'thumbnail', false ) ) ){
+					$icon = $icon[0];
+					break;
+			}
 
-			if( $icon = wp_get_attachment_image( $id, null, true ) )
-				return $icon;
+			// fallback to default icons if not recognized
+			if( $icon = wp_get_attachment_image_src( $id, null, true ) ){
+				$icon = $icon[0];
+				break;
+			}
 
-			return "<!-- Failed to retrive icon for attachment #$id -->"; // everything failed. This is bad...
+			// everything failed. This is bad...
+			return "<!-- Failed to retrive icon for attachment #$id -->";
 	}
 
 	return sprintf( DG_IMG_STRING, $icon, $title, $title );
 }
 
-// ADD SOME STYLING //
+// ADD SOME STYLING
 function dg_add_header_css() {
 	wp_enqueue_style( 'document-gallery-css', plugins_url('style.css', __FILE__) );
 }
