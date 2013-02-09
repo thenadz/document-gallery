@@ -2,7 +2,7 @@
 /*
 Plugin Name: Document Gallery
 Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-Version: 1.3
+Version: 1.3.1
 Author: Dan Rossiter
 Author URI: http://danrossiter.org/
 License: GPL2
