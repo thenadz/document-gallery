@@ -33,17 +33,15 @@ function dg_get_attachment_icons($atts) {
 
 
 	// ATTRIBUTE VALIDATION
-	$descriptions = strtolower($descriptions) == "false" ? FALSE : TRUE;
-
 	$order = strtoupper( $order );
 	if($order != 'ASC' && $order != 'DEC')
 		$errs[] = "The order attribute must be either ASC or DEC. You entered $order.";
 
-	$attachment_pg = strtolower($attachment_pg) == "false" ? FALSE : TRUE;
+   if( strtolower($ids) == "false" ) $ids = FALSE;
 
-	$images = strtolower($images) == "false" ? FALSE : TRUE;
-
-	if( strtolower($ids) == "false" ){ $ids = FALSE; }
+	$descriptions = !$descriptions || strtolower($descriptions) == "false" ? FALSE : TRUE;
+	$attachment_pg = !$attachment_pg || strtolower($attachment_pg) == "false" ? FALSE : TRUE;
+	$images = !$images || strtolower($images) == "false" ? FALSE : TRUE;
 
 	// http://www.youtube.com/watch?v=ClnSMCdw6E8
 	if( $errs ) return implode(' ', $errs);
