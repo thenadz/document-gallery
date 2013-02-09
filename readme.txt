@@ -47,9 +47,9 @@ ids=[false/comma-separated list of id #s]]`
 
 **Default Values**
 
-By default, document gallery will use `descriptions=false`,
-`orderby=menu_order`, `order=ASC` , `attachment_pg=false`, `images=false`, and
-`ids=false` if you do not specify otherwise.
+By default, document gallery will use `descriptions=false`
+, `orderby=menu_order`, `order=ASC` , `attachment_pg=false`, `images=false`
+, and `ids=false` if you do not specify otherwise.
 
 **Descriptions Option**
 
@@ -194,6 +194,11 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 1.3.1 =
+
+* **Bug Fix:** This resolves a bug introduced in version `1.3`. (Thanks to JKChad
+  for pointing this out!)
 
 = 1.3 =
 
