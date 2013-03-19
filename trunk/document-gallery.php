@@ -37,11 +37,11 @@ function dg_get_attachment_icons($atts) {
 	if($order != 'ASC' && $order != 'DEC')
 		$errs[] = "The order attribute must be either ASC or DEC. You entered $order.";
 
-   if( strtolower($ids) == "false" ) $ids = FALSE;
+	if( strtolower($ids) === "false" ) $ids = FALSE;
 
-	$descriptions = !$descriptions || strtolower($descriptions) == "false" ? FALSE : TRUE;
-	$attachment_pg = !$attachment_pg || strtolower($attachment_pg) == "false" ? FALSE : TRUE;
-	$images = !$images || strtolower($images) == "false" ? FALSE : TRUE;
+	$descriptions = !$descriptions || strtolower($descriptions) === "false" ? FALSE : TRUE;
+	$attachment_pg = !$attachment_pg || strtolower($attachment_pg) === "false" ? FALSE : TRUE;
+	$images = !$images || strtolower($images) === "false" ? FALSE : TRUE;
 
 	// http://www.youtube.com/watch?v=ClnSMCdw6E8
 	if( $errs ) return implode(' ', $errs);
@@ -124,7 +124,7 @@ function dg_get_attachments_by_ids( $ids ){
 	$attachments = array();
 	foreach( $ids as $id ){
 		$attachment = get_post( $id );
-		if( $attachment->post_type == 'attachment' )
+		if( $attachment->post_type === 'attachment' )
 			$attachments[] = $attachment;
 		// else: not an attachment so skip
 	}
