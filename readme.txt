@@ -57,26 +57,26 @@ without any added attributes.
 
 **Default Values**
 
-By default, document gallery will use `no descriptions`, `orderby menu_order`,
-`ASC order`, `no attachment_pg links`, and `no images` from the `local post`
+By default, document gallery will use `no descriptions`, `orderby menu_order`
+, `ASC order`, `no attachment_pg links`, and `no images` from the `local post`
 if you do not specify otherwise.
 
 **Attachment Page Option** *(New in Version 1.1)*
 
 This option determines whether each document icon will link to the actual file
 or to its attachment page.  If you want the user to be able to click on the
-icon and directly rective the option to download then use
-`attachment_pg=false` (the default). If you have information on the attachment
-page that you want the link to go to, use `attachment_pg=true`.
+icon and directly rective the option to download then use `attachment_pg=false`
+(the default). If you have information on the attachment page that you want the
+link to go to, use `attachment_pg=true`.
 
 **Categories/Custom Taxonomy Option** *(New in Version 1.4)*
 
 With the `categories` option you are able to select attachments based on
 their assigned category or any other
 [custom taxon](http://codex.wordpress.org/Taxonomies). Categories
-or any custom taxon can be referenced simply by including
-`category=category_value` or `taxon_name=taxon_value`. Multiple values for a
-single taxon may be separated by commas.
+or any custom taxon can be referenced simply by including `category=category_value`
+or `taxon_name=taxon_value`. Multiple values for a single taxon may be separated
+by commas.
 
 **Descriptions Option**
 
@@ -180,7 +180,8 @@ be lost when a new version is released.*
 
 = Developers =
 
-**Filter document-icon Content**
+**Filter .document-icon Content**
+
 For those unfamiliar with content filters, [here is some
 documentation](http://codex.wordpress.org/Plugin_API/Filter_Reference) that you
 should read before continuing.
