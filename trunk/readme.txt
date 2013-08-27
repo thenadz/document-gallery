@@ -1,6 +1,6 @@
 === Document Gallery ===
 Contributors: dan.rossiter
-Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf, openoffice
+Tags: attachments, icons, documents, gallery, MS office, pdf
 Requires at least: 2.8
 Tested up to: 3.6
 Stable tag: 1.4
