@@ -1,10 +1,10 @@
 === Document Gallery ===
 Contributors: dan.rossiter
-Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf,openoffice
-Requires at least: 2.6
-Tested up to: 3.5.1
-Stable tag: 1.3.1
-License: GPLv2 or later
+Tags: attachments, icons, documents, gallery, ms office, doc, ppt, xls, docx, pptx, xlsx, pdf, openoffice
+Requires at least: 2.8
+Tested up to: 3.6
+Stable tag: 1.4
+License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 This plugin allows the user to easily create a "gallery" of all non-image
@@ -12,19 +12,21 @@ attachments on a given post/page, making them easy to share.
 
 == Description ==
 
-This plugin allows the user to effortlessly include a gallery, much like a
-photo gallery, of all your non-image attachments anywhere within your post.
+This plugin allows the user to effortlessly create a gallery of documents and
+other attached media, much like the gallery option already available for image
+attachments.
 
 The plugin will, by default, inherit the styling within your active theme, but
-with a little CSS knowledge it is easily modified to meet your specific needs.
+with a little CSS knowledge it is possible to customize the appearance to meet
+your specific needs.
 
 Read more in the **Installation** tab!
 
 = Developers =
 
-Document Gallery includes features intended to make integrating the plugin into 
-the core of your theme or plugin very convenient. See the bottom of the 
-**Installation**  tab for specific documentation on the various features included.
+Document Gallery includes features intended to make integration with other plugins
+simple. See the bottom of the **Installation** tab for specific documentation on
+the various features provided.
 
 *If this plugin has helped you, please take a moment to [rate
 it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
@@ -33,47 +35,31 @@ it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!
 
 1. Upload `document-gallery` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `[dg]` in any posts or pages you want a document gallery included. See 
+1. Place `[dg]` in any posts or pages you want a document gallery included. See
 below for additional display options.
 
 = Document Gallery Options =
 
-In order to include all compatible docuements from a given page or post, you
-must include the following shortcode in the post:
+In order to include all compatible documents from a given page or post, you
+must include the following shortcode in the post: `[dg]`.
 
-`[dg descriptions=[true/false] orderby=[menu_order, title, date, author, rand]
-order=[ASC/DEC] attachment_pg=[true/false] images=[true/false]
-ids=[false/comma-separated list of id #s]]`
+In addition to the default behavior, the plugin provides many options to
+customize behavior with various attributes, seen below:
+
+`[dg [attachment_pg=<true/false>]
+[category/custom_taxon_name=<**comma-separated list of taxon values**> [relation=<AND/OR>]]
+[descriptions=<true/false>] [ids=<**comma-separated list of ID #s**>]
+[images=<true/false>] [localpost=<true/false>] [order=<ASC/DEC>] [orderby=<**see below**>]]`
+
+Though the shortcode above may seem far from "short," none of the attributes are
+required and most users will find that the plugin meets your needs "out of the box"
+without any added attributes.
 
 **Default Values**
 
-By default, document gallery will use `descriptions=false`
-, `orderby=menu_order`, `order=ASC` , `attachment_pg=false`, `images=false`
-, and `ids=false` if you do not specify otherwise.
-
-**Descriptions Option**
-
-If `true`, each document will take its own line with the description displayed
-alongside it.
-
-*Note: this will use the `description` field, **not** the `caption`. Be
-careful when entering your document data.*
-
-**Orderby Option**
-
-* `menu_order` - This is probably the one you want to use. Order by the
-  integer fields in the Insert / Upload Media Gallery dialog. (Note that 
-  these fields may be blank by default. If this is the case, you must 
-  populate the fields before this option will work.
-* `title` - Alphabetical order based on title.
-* `date` - Order by date of document upload.
-* `author` - Order by the owner of the upload (username).
-* `rand` - Pseudo-random order.
-
-**Order Option**
-
-This option works alongsied the `orderby` option to determine whether the
-documents are displayed in ascending or decending order.
+By default, document gallery will use `no descriptions`, `orderby menu_order`,
+`ASC order`, `no attachment_pg links`, and `no images` from the `local post`
+if you do not specify otherwise.
 
 **Attachment Page Option** *(New in Version 1.1)*
 
@@ -83,20 +69,85 @@ icon and directly rective the option to download then use
 `attachment_pg=false` (the default). If you have information on the attachment
 page that you want the link to go to, use `attachment_pg=true`.
 
-**Images** *(New in Version 1.2)*
+**Categories/Custom Taxonomy Option** *(New in Version 1.4)*
 
-This option will tell the plugin to pull all images attached to to a page or
+With the `categories` option you are able to select attachments based on
+their assigned category or any other
+[custom taxon](http://codex.wordpress.org/Taxonomies). Categories
+or any custom taxon can be referenced simply by including
+`category=category_value` or `taxon_name=taxon_value`. Multiple values for a
+single taxon may be separated by commas.
+
+**Descriptions Option**
+
+If `true`, each document will take its own line with the description displayed
+alongside it.
+
+*Note: this will use the `description` field, **not** the `caption`. Be
+careful when entering your document data.*
+
+**Order Option**
+
+This option works alongside the `orderby` option to determine whether the
+documents are displayed in ascending or descending order.
+
+**Orderby Option**
+
+* `menu_order` - This is probably the one you want to use. Menu order is
+  the order that icons appear when seen in the Insert / Upload Media Gallery
+  dialog. To change this order, you simply drag the icons around until they
+  are where you want them. In earlier versions of WordPress, menu_order was
+  modified by the integer fields in the Insert / Upload Media Gallery dialog.
+  These fields no longer exist in recent releases.
+* `title` - Order by title.
+* `date` - Order by upload date.
+* `modified` - Order by last modified date.
+* `rand` - Random order.
+* `ID` - Order by post id.
+* `author` - Order by author.
+* `name` - Order by attachment slug.
+* `parent` - Order by post/page parent id.
+  (Only useful in conjunction with `localpost=false` option.)
+* `comment_count` - Order by number of comments (available with WP >= 2.9).
+* `none` - No order (available with Version 2.8).
+* `post__in` - Preserve post ID order given in the post__in array (available
+  with WP >= 3.5).
+
+**Images Option** *(New in Version 1.2)*
+
+This option will tell the plugin to include all images attached to to a page or
 post in addition to all documents.
 
-**Ids** *(New in Version 1.2)*
+**IDs Option** *(New in Version 1.2)*
 
 This is an advanced option intended for experienced WordPress users. If this
 option is used, the plugin will ignore attached documents, instead including
-all attachments defined by the ids attribute (e.g.: `ids=10,2,4,42`).
+all attachments defined by the `ids` attribute (e.g.: `ids=10,2,4,42`).
 
-*Note: If this attribute is used, the `order`, `orderby`, and `images`
-attributes will be ignored. Order is defined by the order the ids are
+*Note: If this attribute is used, the `order`, `orderby`, `images` and other
+attributes which generally determine which attachments to include or how to
+order them will be ignored. Order is defined by the order the ids are
 provided.*
+
+**Localpost Option** *(New in Version 1.4)*
+
+By default a document gallery only looks at attachments of the page/post where
+the `[dg]` shortcode is used. If you would like to search beyond that local scope,
+you must set `localpost=false`.
+
+This option would probably be useful especially when querying with the *category
+or taxonomy* option, though it can be used with any options you chose.
+
+**Relation Option** *(New in Version 1.4)*
+
+The relation option should only be used when also using the *category or custom
+taxonomy* option (see above). Additionally, this option is only effective in
+WordPress installs version 3.1 or higher. Older versions cannot use this value
+and will ignore it.
+
+When using multiple taxa, this option allows you to decide whether the attachments
+returned must meet all of the taxa_names specified (AND) or a minimum of one
+match (OR).
 
 = Customize Appearance =
 
@@ -108,7 +159,7 @@ for an idea of what will select different elements within the gallery display.
 
 **Example**
 
-Say I would like to include a border for the right and bottom of thedocument
+Say I would like to include a border for the right and bottom of the document
 icon, but only when descriptions are shown (to deliniate the icon from the
 description text). To do this, I would need to add the following CSS to my
 theme stylesheet:
@@ -143,12 +194,12 @@ modify any of this content before it reaches your users.
 Any function using this filter will receive two parameters, the content to be
 filtered and the ID number of the file represented by the icon in question.
 If you are implementing something to override the plugin default functionality,
-it may be useful to be able to query various attributes of the attachment with 
+it may be useful to be able to query various attributes of the attachment with
 this value.
 
 One example use for this filter, which I have personally used in a project I
-am working on, will add a query parameter to the end of each attachment url.
-This parameter, `rid`, specifies the refering page and allows the page
+am working on, will add a query parameter to the end of each attachment URL.
+This parameter, `rid`, specifies the referring page and allows the page
 receiving the URL to dynamically detect which page ID the link came from.
 
 `function dg_doc_icon( $icon, $id ){
@@ -159,14 +210,14 @@ receiving the URL to dynamically detect which page ID the link came from.
 
    if( strpos( $matches[2], '?' ) !== false )
       return "{$matches[1]}{$matches[2]}&rid=".get_the_ID().$matches[3];
-	
+
    return "{$matches[1]}{$matches[2]}?rid=".get_the_ID().$matches[3];
 }
 add_filter( 'dg_doc_icon', 'dg_doc_icon', null, 2 );`
 
 Obviously this is just one very specific example, but anything that requires
 modifying the image tag, the anchor tag, or the title can be handled with this
-filter. Note that this function does not use the $id value it receives, which 
+filter. Note that this function does not use the $id value it receives, which
 is perfectly alright.
 
 == Screenshots ==
@@ -174,11 +225,11 @@ is perfectly alright.
 1. This is an example of multiple Document Galleries on a single page (using
 the `ids` attribute). It also shows how images will appear in a Document
 Gallery. Note that the description field supports HTML markup, so the
-possibilites are endless!
-2. This is how the Document Gallery looks with `descriptions=true`. The 
-descriptions are auto-populated using the description field from when you 
+possibilities are endless!
+2. This is how the Document Gallery looks with `descriptions=true`. The
+descriptions are auto-populated using the description field from when you
 upload the document.
-3. This is how the Document Gallery looks with `descriptions=false` (default). 
+3. This is how the Document Gallery looks with `descriptions=false` (default).
 Note that the display inherits styling from your active theme.
 
 == Changelog ==
@@ -187,13 +238,21 @@ Note that the display inherits styling from your active theme.
 
 * Full integration with the new [Wordpress 3.5 Media
   Manager](http://codex.wordpress.org/Version_3.5#Highlights).
-* Option to include player for any music or video attachments uploaded to page.
-* Option to open documents directly within your browser (&#224; la [Google Drive
+* Option to open music or video files directly from your gallery.
+* Option to open documents directly from your gallery (&#224; la [Google Drive
   Viewer](https://drive.google.com/viewer)).
 * Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 1.4 =
+
+* **New Feature:** This release features the addition of *category/taxonomy* support,
+  [as suggested by Pyo](http://wordpress.org/support/topic/sorting-documents-by-categorytag-or-other-taxonomy).
+* **Under The Hood:** The plugin was completely rewritten for this release. Logic
+  was cleaned up to make maintenance easier and facilitate some *big* changes
+  planned for version 2.0 of Document Gallery.
 
 = 1.3.1 =
 
@@ -204,14 +263,14 @@ Note that the display inherits styling from your active theme.
 
 * **New Feature:** It is now possible to filter the HTML produced to represent
   each individual icon, making it possible to add extra attributes and other
-  modifications on the fly as document icons are generated. This will probably 
-  only be of use to developers and people who don't mind getting their hands 
+  modifications on the fly as document icons are generated. This will probably
+  only be of use to developers and people who don't mind getting their hands
   dirty. *(See bottom **Installation** tab for more details.)*
 * **Enhancement:** There have been a lot of optimizations to the underlying
   plugin code to make it run more efficiently and be easier to read, if you
   are so inclined.
-* **Enhancement:** Changed how images, when included within the gallery, are 
-  generated so that the format of the icon returned now matches the rest of 
+* **Enhancement:** Changed how images, when included within the gallery, are
+  generated so that the format of the icon returned now matches the rest of
   the icons.
 
 = 1.2.1 =
@@ -225,7 +284,7 @@ Note that the display inherits styling from your active theme.
   document gallery (using `images=true` attribute).
   (Thanks for the suggestion, Luca!)
 * **New Feature:** Attachment ids can now be explicitly listed, allowing for
-  documents not attached to a post or page to be included in a document 
+  documents not attached to a post or page to be included in a document
   gallery (e.g.: `ids=2,42,57,1`). Note that no spaces should be included.
 * **Enhancement:** The CSS stylesheet has been enhanced for more flexibility
   in sizing icons.
@@ -235,7 +294,7 @@ Note that the display inherits styling from your active theme.
 * **New Feature:** Included option to link to the attachment page as well as
   to the actual document.
 * **Enhancement:** Added documentation for customizing the appearance of the plugin.
-* **Enhancement:** Many improvements to the backend, including pretty HTML output 
+* **Enhancement:** Many improvements to the backend, including pretty HTML output
   and best practice implementation in calls to WordPress core functions.
 
 = 1.0.4 =
@@ -265,9 +324,9 @@ Note that the display inherits styling from your active theme.
 
 * **New Feature:** Plugin now has **36 icons** representing **72 filetypes**!
 * **Enhancement:** Optimized gallery generation (faster!)
-* **Enhancement:** Added fallback to WordPress default icons if you happen to 
+* **Enhancement:** Added fallback to WordPress default icons if you happen to
   include one of the few filetypes not yet supported.
-* **Enhancement:** Changed shortcode to `[dg]` (`[document gallery]` will still 
+* **Enhancement:** Changed shortcode to `[dg]` (`[document gallery]` will still
   work for backward compatibility).
 * **Enhancement:** Gave documentation some **much needed** revisions.
 
@@ -279,6 +338,6 @@ Note that the display inherits styling from your active theme.
 = 0.8 =
 
 * **Release:** First public release of Document Gallery.
-* **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a 
-  given page or post.  **Feature:** Documents can be ordered by a number of 
+* **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a
+  given page or post.  **Feature:** Documents can be ordered by a number of
   different factors.
