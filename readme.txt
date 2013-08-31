@@ -3,8 +3,8 @@ Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery, MS office, pdf
 Requires at least: 2.8
 Tested up to: 3.6
-Stable tag: 1.4
-License: GPL2
+Stable tag: 1.4.1
+License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 This plugin allows the user to easily create a "gallery" of all non-image
@@ -246,6 +246,12 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 1.4.1 =
+* **Bug Fix:** This resolves a bug introduced in `1.4`, which caused a warning
+  to be thrown when no attributes were used (i.e.: `[dg]`). (Thanks to
+  [wtfbingo](http://wordpress.org/support/topic/error-after-update-19) for
+  pointing this out!)
 
 = 1.4 =
 

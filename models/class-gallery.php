@@ -33,7 +33,7 @@ class Gallery {
 
    /**
     * Builds a gallery object with attributes passed.
-    * @param type $atts    Array of attributes used in shortcode.
+    * @param array $atts    Array of attributes used in shortcode.
     */
    public function __construct($atts) {
       // init templates for HTML output

@@ -141,7 +141,7 @@ class Document {
          $icon = $this->icon_url . self::$exts[$filetype['ext']];
       }
       // handle images
-      elseif (strpos($filetype['type'], 'image') === 0 &&
+      elseif (wp_attachment_is_image($this->ID) &&
           ($icon = wp_get_attachment_image_src($this->ID, 'thumbnail', false))) {
          $icon = $icon[0];
       }
