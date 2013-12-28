@@ -341,8 +341,7 @@ Note that the display inherits styling from your active theme.
 
 = 1.0.1 =
 
-* **Bug Fix:** Resolved issue with long document titles being cut off in some
-* themes.
+* **Bug Fix:** Resolved issue with long document titles being cut off in some themes.
 
 = 1.0 =
 
@@ -363,5 +362,6 @@ Note that the display inherits styling from your active theme.
 
 * **Release:** First public release of Document Gallery.
 * **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a
-  given page or post.  **Feature:** Documents can be ordered by a number of
+  given page or post.
+* **Feature:** Documents can be ordered by a number of
   different factors.
