@@ -1,9 +1,9 @@
 === Document Gallery ===
 Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery, MS office, pdf
-Requires at least: 2.8
-Tested up to: 3.6
-Stable tag: 1.4.1
+Requires at least: 3.5
+Tested up to: 3.8
+Stable tag: 1.4.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -246,6 +246,23 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 1.4.2 =
+* **Note:** This release includes an increase in the minimum WP version to 3.5.
+  If you have not yet upgraded to at least this version, you should consider doing
+  so as future releases include a number of *fantastic* new features as well as
+  many security improvements. If you chose not to upgrade, you must stay with
+  Document Gallery 1.4.1 or lower until you do. Sorry for the inconvenience!
+* **Bug Fix:** Resolved icons being displayed differently depending on which
+  user was currently logged in. (Thanks to
+  [Sean](http://wordpress.org/support/topic/error-after-update-19?replies=12#post-5041251)
+  for reporting the issue.)
+* **Enhancement:** A number of new icons were added (mainly for the iWork suite
+  and source code filetypes) and a number of pre-existing icons were removed if
+  they were very similar to another icon.
+* **Under The Hood:** Many, many cool things. Stay tuned for a big reveal in the
+  coming weeks!
+  PS: If you're really curious, there are some clues in the source code ;)
 
 = 1.4.1 =
 * **Bug Fix:** This resolves a bug introduced in `1.4`, which caused a warning
