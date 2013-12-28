@@ -6,7 +6,7 @@
  * @author drossiter
  */
 class Gallery {
-   private $atts, $taxa, $comment;
+   private $atts, $taxa;
    private $docs = array();
    private $errs = array();
 
@@ -28,8 +28,9 @@ class Gallery {
    );
 
    // templates for HTML output
-   private $no_docs = '<!-- No attachments to display. How boring! :( -->';
-   private $icon_wrapper;
+   private static $no_docs = '<!-- No attachments to display. How boring! :( -->';
+   private static $icon_wrapper = false;
+   private static $comment = false;
 
    /**
     * Builds a gallery object with attributes passed.
@@ -37,10 +38,13 @@ class Gallery {
     */
    public function __construct($atts) {
       // init templates for HTML output
-      $this->comment =
-         PHP_EOL . '<!-- Generated using Document Gallery. Get yours here: ' .
-         'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
-      $this->icon_wrapper = '<div class="%s">'. PHP_EOL . '%s</div>' . PHP_EOL;
+      if(self::$comment === false)
+      {
+         self::$comment =
+            PHP_EOL . '<!-- Generated using Document Gallery. Get yours here: ' .
+            'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
+         self::$icon_wrapper = '<div class="%s">'. PHP_EOL . '%s</div>' . PHP_EOL;
+      }
 
       // values used to construct tax query (may be empty)
       $this->taxa = array_diff_key($atts, self::$defaults);
@@ -374,7 +378,7 @@ class Gallery {
          $classes[] = 'descriptions';
       }
 
-      $icon_wrapper = sprintf($this->icon_wrapper, implode(' ', $classes), '%s');
+      $icon_wrapper = sprintf(self::$icon_wrapper, implode(' ', $classes), '%s');
 
       if($this->useDescriptions()) {
          foreach($this->docs as $doc) {
@@ -393,7 +397,7 @@ class Gallery {
          }
       }
 
-      return $this->comment . $core;
+      return self::$comment . $core;
    }
 }
 
