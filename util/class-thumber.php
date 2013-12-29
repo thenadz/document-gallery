@@ -15,28 +15,96 @@ class Thumber {
    }
 
    /**
+    * Wraps generation of thumbnails for various attachment filetypes.
+    *
+    * @filter dg_thumbers Allows developers to filter the Thumbers used
+    * for specific filetypes. Index is the regex to match file extensions
+    * supported and the value is anything that can be accepted by call_user_func().
+    * The function must take two parameters, 1st is the int ID of the attachment
+    * to get a thumbnail for, 2nd is the page to take a thumbnail of
+    * (may not be relevant for some filetypes).
+    *
+    * NOTE: Last thumber in array *must* match ALL extensions (i.e.: ".*")
+    *
     * @param type $ID Document ID
     * @return string  URL to the thumbnail.
     */
-   public static function getThumbnail($ID) {
-      if (!($url = wp_get_attachment_thumb_url($ID))
-          && !($url = self::getGhostscriptThumbnail($ID))
-          && !($url = self::getGoogleDriveThumbnail($ID))) {
-         $url = self::getDefaultThumbnail($ID);
+   public static function getThumbnail($ID, $pg = 1) {
+      static $thumbers = array();
+
+      if (!$thumbers) {
+         global $wp_version;
+
+         // Audio/Video embedded images
+         if (version_compare($wp_version, '3.6', '>=')) {
+            $exts = implode('|', self::getAudioVideoExts());
+            $thumbers[$exts] = array('Thumber', 'getAudioVideoThumbnail');
+         }
+
+         // Ghostscript
+         if (self::isGhostscriptAvailable()) {
+            $exts = implode('|', self::getGhostscriptExts());
+            $thumbers[$exts] = array('Thumber', 'getGhostscriptThumbnail');
+         }
+
+         // Imagick
+         if (call_user_func(array( 'WP_Image_Editor_Imagick', 'test'))) {
+            try {
+               $exts = @Imagick::queryFormats();
+               if($exts) {
+                  $exts = implode('|', $exts);
+                  $thumbers[$exts] = array('Thumber', 'getImagickThumbnail');
+               }
+            }
+            catch (Exception $e) {
+
+            }
+         }
+
+         // Google Drive Viewer
+         $exts = implode('|', self::getGoogleDriveExts());
+         $thumbers[$exts] = array('Thumber', 'getGoogleDriveThumbnail');
+
+         // match everything that falls through to the end
+         $thumbers['.*'] = array('Thumber', 'getDefaultThumbnail');
+
+         // allow users to filter thumbers used
+         $thumbers = apply_filter('dg_thumbers', $thumbers);
+
+         // strip out anything that can't be called
+         $thumbers = array_filter($thumbers, 'is_callable');
+      }
+
+      // if we haven't saved a thumb, generate one
+      if(!($url = wp_get_attachment_thumb_url($ID))) {
+         $file = get_attached_file($ID);
+
+         foreach ($thumbers as $ext_preg => $thumber) {
+            $ext_preg = '!\.(\.' . $ext_preg . ')$!i';
+
+            if (preg_match($ext_preg, $file)                      // can handle ext
+                && ($url = call_user_func($thumber, $ID, $pg))) { // is vaild return
+               break;
+            }
+         }
       }
 
       return $url;
    }
 
-   public static function getAudioVideoThumbnail($ID) {
-      global $wp_version;
-
-      // can only pull images from videos/audio after 3.6
-      if(version_compare($wp_version, '3.6', '<')) return false;
-
+   /**
+    * Uses wp_read_video_metadata() and wp_read_audio_metadata() to retrieve
+    * an embedded image to use as a thumbnail.
+    *
+    * NOTE: Caller must verify that WP version >= 3.6.
+    *
+    * @param string $ID   The attachment ID to retrieve thumbnail from.
+    * @param int $pg      Unused.
+    * @return bool|string False on failure, URL to thumb on success.
+    */
+   public static function getAudioVideoThumbnail($ID, $pg = 1) {
       $attachment = get_post($ID);
       $doc_path = get_attached_file($ID);
-      $doc_url = wp_get_attachment_url($ID);
 
       if (preg_match('#^video/#', get_post_mime_type($attachment))) {
          $metadata = wp_read_video_metadata($doc_path);
@@ -44,57 +112,104 @@ class Thumber {
       elseif (preg_match('#^audio/#', get_post_mime_type($attachment))) {
          $metadata = wp_read_audio_metadata($doc_path);
       }
-      else {
+
+      // unsupported mime type || no embedded image present
+      if(!isset($metadata) || empty($metadata['image']['data'])) {
          return false;
       }
 
-      if (!empty($metadata['image']['data'])) {
-         $ext = '.jpg';
-         switch ($metadata['image']['mime']) {
-            case 'image/gif':
-               $ext = '.gif';
-               break;
-            case 'image/png':
-               $ext = '.png';
-               break;
-         }
+      self::deleteExistingThumb($ID);
 
-         self::deleteExistingThumb($ID);
-
-         $dirname = dirname($doc_path);
-         $basename = basename($doc_path);
-         $thumb_name = self::getUniqueThumbName(
-             $dirname,substr($basename, 0, strrpos($basename, '.')), $ext);
-         $basename = str_replace('.', '-', $basename) . '-thumb' . $ext;
-         $uploaded = wp_upload_bits($basename, '', $metadata['image']['data']);
-         if (false === $uploaded['error']) {
-            $attachment = array(
-                'post_mime_type' => $metadata['image']['mime'],
-                'post_type' => 'attachment',
-                'post_content' => '',
-            );
-            $sub_attachment_id = wp_insert_attachment($attachment, $uploaded['file']);
-            $attach_data = wp_generate_attachment_metadata($sub_attachment_id, $uploaded['file']);
-            wp_update_attachment_metadata($sub_attachment_id, $attach_data);
-            update_post_meta($attachment_id, '_thumbnail_id', $sub_attachment_id);
-         }
+      $ext = '.jpg';
+      switch ($metadata['image']['mime']) {
+         case 'image/gif':
+            $ext = '.gif';
+            break;
+         case 'image/png':
+            $ext = '.png';
+            break;
       }
+
+      $dirname = dirname($doc_path);
+      $basename = basename($doc_path);
+
+      $thumb_name = self::getUniqueThumbName(
+              $dirname, substr($basename, 0, strrpos($basename, '.')), $ext);
+      $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
+
+      // TODO: This doesn't work... Need alternate to wp_upload_bits()
+      $uploaded = wp_upload_bits($thumb_path, null, $metadata['image']['data']);
+
+      if (false !== $uploaded['error']) {
+         if (WP_DEBUG) {
+            error_log("DG: Failed to save AV thumbnail: " . $uploaded['error']);
+         }
+
+         return false;
+      }
+
+      self::fixNewThumb($uploaded['file']);
+
+      // store reference to new thumbnail
+      wp_update_attachment_metadata($ID, array('thumb' => $thumb_name));
+
+      return $uploaded['url'];
    }
 
    /**
-    * Get thumbnail for document with given ID using Ghostscript
-    * .
+    * Uses WP_Image_Editor_Imagick to generate thumbnails.
+    *
+    * NOTE: Caller must verify that Imagick is present and that the extension is supported.
+    *
+    * @param string $ID   The attachment ID to retrieve thumbnail from.
+    * @param int $pg      Unused.
+    * @return bool|string False on failure, URL to thumb on success.
+    */
+   public static function getImagickThumbnail($ID, $pg = 1) {
+      $doc_path = get_attached_file($ID);
+
+      $img = wp_get_image_editor($doc_path);
+      if(is_wp_error($img)) {
+         return false;
+      }
+
+      $doc_url = wp_get_attachment_url($ID);
+      $dirname = dirname($doc_path);
+      $basename = basename($doc_path);
+
+      self::deleteExistingThumb($ID);
+
+      $thumb_name = self::getUniqueThumbName(
+          $dirname, substr($basename, 0, strrpos($basename, '.')));
+      $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
+
+      $img->resize(150, 150, false);
+      $img->save($thumb_path);
+
+      // ensure perms are correct
+      $stat = stat($dirname);
+      $perms = $stat['mode'] & 0000666;
+      @chmod($thumb_path, $perms);
+
+      // store reference to new thumbnail
+      wp_update_attachment_metadata($ID, array('thumb' => $thumb_name));
+
+      // return URL pointing to new thumbnail
+      return preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url);
+   }
+
+   /**
+    * Get thumbnail for document with given ID using Ghostscript. Imagick could
+    * also handle this, but is *much* slower.
+    *
+    * NOTE: Caller must verify that exec and gs are available and that extension is supported.
+    *
     * @param string $ID   The attachment ID to retrieve thumbnail from.
     * @param int $pg      The page number to make thumbnail of -- index starts at 1.
     * @return bool|string False on failure, URL to thumb on success.
     */
    public static function getGhostscriptThumbnail($ID, $pg = 1) {
       static $gs = false;
-      static $exts = array('pdf');
-
-      if (!self::isGhostscriptAvailable())
-         return false;
-
       if (!$gs) {
          // I don't understand why anyone would run a Windows server...
          $gs = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'gswin32c' : 'gs')
@@ -107,14 +222,10 @@ class Thumber {
       $dirname = dirname($doc_path);
       $basename = basename($doc_path);
 
-      // check whether filetype supported by Ghostscript
-      if (!in_array(strtolower(self::getExt($basename)), $exts))
-         return false;
-
       self::deleteExistingThumb($ID);
 
       $thumb_name = self::getUniqueThumbName(
-          $dirname,substr($basename, 0, strrpos($basename, '.')));
+          $dirname, substr($basename, 0, strrpos($basename, '.')));
       $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
 
       exec(sprintf($gs, $pg, $pg, $thumb_path, $doc_path), $out, $ret);
@@ -131,11 +242,13 @@ class Thumber {
       wp_update_attachment_metadata($ID, array('thumb' => $thumb_name));
 
       // return URL pointing to new thumbnail
-      return str_replace($basename, $thumb_name, $doc_url);
+      return preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url);
    }
 
    /**
     * Get thumbnail for document with given ID from Google Drive Viewer.
+    *
+    * NOTE: Caller must verify that extension is supported.
     *
     * @param string $ID   The attachment ID to retrieve thumbnail from.
     * @param int $pg      The page number to make thumbnail of -- index starts at 1.
@@ -145,11 +258,8 @@ class Thumber {
       // User agent for Lynx 2.8.7rel.2 -- Why? Because I can.
       static $user_agent = "Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a";
       static $timeout = 90;
-      static $exts = array(
-         'tiff', 'bmp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-         'pdf', 'pages', 'ai', 'psd', 'dxf', 'svg', 'eps', 'ps', 'ttf'
-      );
 
+      $exts = self::getGoogleDriveExts();
       $google_viewer = "https://docs.google.com/viewer?url=%s&a=bi&pagenumber=%d&w=%d";
       $doc_path = get_attached_file($ID);
       $doc_url = wp_get_attachment_url($ID);
@@ -163,7 +273,7 @@ class Thumber {
       self::deleteExistingThumb($ID);
 
       $thumb_name = self::getUniqueThumbName(
-          $dirname,substr($basename, 0, strrpos($basename, '.')));
+          $dirname, substr($basename, 0, strrpos($basename, '.')));
       $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
 
       // args for use in HTTP request
@@ -207,16 +317,17 @@ class Thumber {
       wp_update_attachment_metadata($ID, array('thumb' => $thumb_name));
 
       // return URL pointing to new thumbnail
-      return str_replace($basename, $thumb_name, $doc_url);
+      return preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url);
    }
 
    /**
     * Get thumbnail for document with given ID from default images.
     *
-    * @param string $ID The attachment ID to retrieve thumbnail from.
-    * @return string    URL to thumb on success.
+    * @param string $ID   The attachment ID to retrieve thumbnail from.
+    * @param int $pg      Unused.
+    * @return string URL to thumbnail.
     */
-   public static function getDefaultThumbnail($ID) {
+   public static function getDefaultThumbnail($ID, $pg = 1) {
       $icon_url = DG_URL . 'icons/';
 
       $url = wp_get_attachment_url($ID);
@@ -241,6 +352,30 @@ class Thumber {
       }
 
       return $icon;
+   }
+
+   /**
+    * @return array All extensions supported by Google Drive Viewer.
+    */
+   private static function getGoogleDriveExts() {
+      return array(
+         'tiff', 'bmp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+         'pdf', 'pages', 'ai', 'psd', 'dxf', 'svg', 'eps', 'ps', 'ttf'
+      );
+   }
+
+   /**
+    * @return array All extensions supported by Ghostscript.
+    */
+   private static function getGhostscriptExts() {
+      return array('pdf');
+   }
+
+   /**
+    * @return array All extensions supported by WP Audio Video Media metadata.
+    */
+   private static function getAudioVideoExts() {
+      return array_merge(wp_get_audio_extensions(), wp_get_video_extensions());
    }
 
    /**
@@ -323,8 +458,9 @@ class Thumber {
          $is_win = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
          $gs = $is_win ? 'gswin32c' : 'gs';
 
+         $available = self::isExecAvailable();
          $exec = exec($is_win ? "where $gs" : "which $gs");
-         $available = self::isExecAvailable() && !empty($exec);
+         $available = $available && !empty($exec);
 
          if (WP_DEBUG && $available) {
             error_log("DG: Found the $gs executable.");
