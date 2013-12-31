@@ -3,7 +3,7 @@
 /*
   Plugin Name: Document Gallery
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 1.4.2
+  Version: 1.4.3
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
@@ -23,7 +23,7 @@ function dg_get_attachment_icons($atts) {
    include_once(DG_PATH . 'models/class-gallery.php');
 
    // empty string is passed when no arguments are given, but constructor expects an array
-   return (string)(new Gallery(empty($atts) ? array() : $atts));
+   return (string)(new DG_Gallery(empty($atts) ? array() : $atts));
 }
 
 /**

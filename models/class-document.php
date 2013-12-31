@@ -5,7 +5,7 @@
  *
  * @author drossiter
  */
-class Document {
+class DG_Document {
    // templates for HTML output
    private static $doc_icon = false;
    private static $img_string = '<img src="%s" title="%s" alt="%s" />';
@@ -65,7 +65,7 @@ class Document {
     * @return string
     */
    public function __toString() {
-      $icon = sprintf(self::$img_string, Thumber::getDefaultThumbnail($this->ID),
+      $icon = sprintf(self::$img_string, DG_Thumber::getDefaultThumbnail($this->ID),
           $this->title_attribute, $this->title_attribute);
       $core = sprintf(self::$doc_icon, $this->link, $icon, $this->title);
 
