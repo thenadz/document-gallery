@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, icons, documents, gallery, MS office, pdf
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -246,6 +246,9 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 1.4.3 =
+* **Bug Fix:** Resolves minor bug introduced in version 1.4.2. Thanks, tkokholm!
 
 = 1.4.2 =
 * **Note:** This release includes an increase in the minimum WP version to 3.5.

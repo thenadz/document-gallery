@@ -6,7 +6,7 @@
  *
  * @author drossiter
  */
-class Thumber {
+class DG_Thumber {
    /**
     * Blocks instantiation. All functionality is static.
     */
