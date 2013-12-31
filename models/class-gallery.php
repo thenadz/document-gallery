@@ -5,7 +5,7 @@
  *
  * @author drossiter
  */
-class Gallery {
+class DG_Gallery {
    private $atts, $taxa;
    private $docs = array();
    private $errs = array();
@@ -60,7 +60,7 @@ class Gallery {
          $docs = $this->getDocuments();
          include_once(DG_PATH . 'models/class-document.php');
          foreach($docs as $doc) {
-            $this->docs[] = new Document($doc, $this);
+            $this->docs[] = new DG_Document($doc, $this);
          }
       } catch(InvalidArgumentException $e) {
          // errors will be printed in __toString()
