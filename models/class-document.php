@@ -5,7 +5,7 @@
  *
  * @author drossiter
  */
-class Document {
+class DG_Document {
    // templates for HTML output
    private $doc_icon, $icon_url;
    private $img_string = '<img src="%s" title="%s" alt="%s" />';
