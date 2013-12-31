@@ -21,7 +21,7 @@ define('DG_PATH', dirname(__FILE__).'/');
  */
 function dg_get_attachment_icons($atts) {
    include_once(DG_PATH . 'models/class-gallery.php');
-   return (string)(new Gallery($atts));
+   return (string)(new DG_Gallery($atts));
 }
 
 /**
