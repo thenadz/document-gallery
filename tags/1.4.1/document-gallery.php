@@ -23,7 +23,7 @@ function dg_get_attachment_icons($atts) {
    include_once(DG_PATH . 'models/class-gallery.php');
 
    // empty string is passed when no arguments are given, but constructor expects an array
-   return (string)(new Gallery(empty($atts) ? array() : $atts));
+   return (string)(new DG_Gallery(empty($atts) ? array() : $atts));
 }
 
 /**
