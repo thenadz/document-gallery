@@ -11,6 +11,12 @@
 
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', trailingslashit(dirname(__FILE__)));
+if(!defined('WP_INCLUDE_DIR')) {
+   define('WP_INCLUDE_DIR', preg_replace('/wp-content$/', 'wp-includes', WP_CONTENT_DIR));
+}
+if(!defined('WP_ADMIN_DIR')) {
+   define('WP_ADMIN_DIR', preg_replace('/wp-content$/', 'wp-admin', WP_CONTENT_DIR));
+}
 
 /**
  * Takes values passed from attributes and returns sutable HTML to represent

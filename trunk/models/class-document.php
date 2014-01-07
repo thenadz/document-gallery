@@ -65,7 +65,7 @@ class DG_Document {
     * @return string
     */
    public function __toString() {
-      $icon = sprintf(self::$img_string, DG_Thumber::getDefaultThumbnail($this->ID),
+      $icon = sprintf(self::$img_string, DG_Thumber::getThumbnail($this->ID),
           $this->title_attribute, $this->title_attribute);
       $core = sprintf(self::$doc_icon, $this->link, $icon, $this->title);
 
