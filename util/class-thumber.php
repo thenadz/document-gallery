@@ -8,7 +8,7 @@
  */
 class DG_Thumber {
    /**
-    * Blocks instantiation. All functionality is static.
+    * Blocks instantiation. All functions are static.
     */
    private function __construct() {
 
@@ -17,87 +17,64 @@ class DG_Thumber {
    /**
     * Wraps generation of thumbnails for various attachment filetypes.
     *
-    * @filter dg_thumbers Allows developers to filter the Thumbers used
-    * for specific filetypes. Index is the regex to match file extensions
-    * supported and the value is anything that can be accepted by call_user_func().
-    * The function must take two parameters, 1st is the int ID of the attachment
-    * to get a thumbnail for, 2nd is the page to take a thumbnail of
-    * (may not be relevant for some filetypes).
-    *
-    * NOTE: Last thumber in array *must* match ALL extensions (i.e.: ".*")
-    *
     * @param type $ID Document ID
     * @return string  URL to the thumbnail.
     */
    public static function getThumbnail($ID, $pg = 1) {
-      static $thumbers = false;
-
-      if ($thumbers === false) {
-         global $wp_version;
-         $thumbers = array();
-
-         // Audio/Video embedded images
-         if (version_compare($wp_version, '3.6', '>=')) {
-            $exts = implode('|', self::getAudioVideoExts());
-            $thumbers[$exts] = array('DG_Thumber', 'getAudioVideoThumbnail');
-         }
-
-         // Ghostscript
-         if (self::isGhostscriptAvailable()) {
-            $exts = implode('|', self::getGhostscriptExts());
-            $thumbers[$exts] = array('DG_Thumber', 'getGhostscriptThumbnail');
-         }
-
-         // Imagick
-         if (file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor.php')
-             && file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php')) {
-            include_once WP_INCLUDE_DIR .'/class-wp-image-editor.php';
-            include_once WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php';
-
-            if (call_user_func(array('WP_Image_Editor_Imagick', 'test'))) {
-               try {
-                  $exts = @Imagick::queryFormats();
-                  if($exts) {
-                     $exts = implode('|', $exts);
-                     $thumbers[$exts] = array('DG_Thumber', 'getImagickThumbnail');
-                  }
-               }
-               catch (Exception $e) {
-
-               }
-            }
-         }
-
-         // Google Drive Viewer
-         $exts = implode('|', self::getGoogleDriveExts());
-         $thumbers[$exts] = array('DG_Thumber', 'getGoogleDriveThumbnail');
-
-         // match everything that falls through to the end
-         //$thumbers['.*'] = 'Thumber::getDefaultThumbnail';
-
-         // allow users to filter thumbers used
-         $thumbers = apply_filters('dg_thumbers', $thumbers);
-
-         // strip out anything that can't be called
-         $thumbers = array_filter($thumbers, 'is_callable');
+      static $timeout = false;
+      if ($timeout === false) {
+         $timeout = time();
       }
 
+      // we cache thumbnails inside document_meta in attachment metadata
+      // current values in document_metadata:
+      // * thumb_path - System path to thumbnail image.
+      // * thumb_url - URL pointing to the thumbnail for this document.
+      // * thumber - Generator used to create thumb OR false if failed to gen.
+      $meta = wp_get_attachment_metadata($ID, true);
+      $meta = is_array($meta) ? $meta : array();
+      $doc_meta = isset($meta['document_meta']) ? $meta['document_meta'] : array();
+
       // if we haven't saved a thumb, generate one
-      if (!$url = wp_get_attachment_thumb_url($ID)) {
+      if (!isset($doc_meta['thumber'])) {
+         // prevent page timing out -- generate for no more than 30 sec
+         if ((time() - $timeout) > 30) {
+            return self::getDefaultThumbnail($ID, $pg);
+         }
+
          $file = get_attached_file($ID);
 
-         foreach ($thumbers as $ext_preg => $thumber) {
+         foreach (self::getThumbers() as $ext_preg => $thumber) {
             $ext_preg = '!\.(' . $ext_preg . ')$!i';
 
             if (preg_match($ext_preg, $file)
-                && ($url = self::getThumbnailTemplate($thumber, $ID, $pg))) {
+                && ($thumb = self::getThumbnailTemplate($thumber, $ID, $pg))) {
+               $doc_meta['created_timestamp'] = time();
+               $doc_meta['thumb_url'] = $thumb['url'];
+               $doc_meta['thumb_path'] = $thumb['path'];
+               $doc_meta['thumber'] = $thumber;
+
+               $meta['document_meta'] = $doc_meta;
+               wp_update_attachment_metadata($ID, $meta);
                break;
             }
          }
+      }
 
-         if (empty($url)) {
-            $url = self::getDefaultThumbnail($ID, $pg);
+      if (!isset($doc_meta['thumber']) || $doc_meta['thumber'] === false) {
+         // only execute a database query if necessary
+         if (!isset($doc_meta['thumber'])) {
+            $doc_meta['thumber'] = false;
+
+            $meta['document_meta'] = $doc_meta;
+            wp_update_attachment_metadata($ID, $meta);
          }
+
+         // fallback to default thumb for attachment type
+         $url = self::getDefaultThumbnail($ID, $pg);
+      } else {
+         // use generated thumbnail
+         $url = $doc_meta['thumb_url'];
       }
 
       return $url;
@@ -231,8 +208,7 @@ class DG_Thumber {
     */
    public static function getGhostscriptThumbnail($ID, $pg = 1) {
       static $gs = false;
-      if (!$gs) {
-         // I don't understand why anyone would run a Windows server...
+      if ($gs === false) {
          $gs = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'gswin32c' : 'gs')
              . ' -sDEVICE=png16m -dFirstPage=%d -dLastPage=%d -dBATCH'
              . ' -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
@@ -266,9 +242,9 @@ class DG_Thumber {
     * @return bool
     */
    private static function isGhostscriptAvailable() {
-      static $available;
+      static $available = null;
 
-      if (!isset($available)) {
+      if (is_null($available)) {
          $is_win = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
          $gs = $is_win ? 'gswin32c' : 'gs';
 
@@ -298,7 +274,7 @@ class DG_Thumber {
    public static function getGoogleDriveThumbnail($ID, $pg = 1) {
       // User agent for Lynx 2.8.7rel.2 -- Why? Because I can.
       static $user_agent = "Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a";
-      static $timeout = 90;
+      static $timeout = 60;
 
       $google_viewer = "https://docs.google.com/viewer?url=%s&a=bi&pagenumber=%d&w=%d";
       $doc_url = wp_get_attachment_url($ID);
@@ -329,7 +305,7 @@ class DG_Thumber {
       // get thumbnail from Google Drive Viewer & check for error on return
       $response = wp_remote_get($google_viewer, $args);
 
-      if (is_wp_error($response) || $response['response']['code'] != 200) {
+      if (is_wp_error($response) || !preg_match('/[23][0-9]{2}/', $response['response']['code'])) {
          self::writeLog('Failed to retrieve thumbnail from Google: ' .
              (is_wp_error($response)
                ? $response->get_error_message()
@@ -471,22 +447,77 @@ class DG_Thumber {
     *=========================================================================*/
 
    /**
+    * @filter dg_thumbers Allows developers to filter the Thumbers used
+    * for specific filetypes. Index is the regex to match file extensions
+    * supported and the value is anything that can be accepted by call_user_func().
+    * The function must take two parameters, 1st is the int ID of the attachment
+    * to get a thumbnail for, 2nd is the page to take a thumbnail of
+    * (may not be relevant for some filetypes).
+    *
+    * @return array
+    */
+   private static function getThumbers() {
+      static $thumbers = false;
+
+      if ($thumbers === false) {
+         global $wp_version;
+         $thumbers = array();
+
+         // Audio/Video embedded images
+         if (version_compare($wp_version, '3.6', '>=')) {
+            $exts = implode('|', self::getAudioVideoExts());
+            $thumbers[$exts] = array('DG_Thumber', 'getAudioVideoThumbnail');
+         }
+
+         // Ghostscript
+         if (self::isGhostscriptAvailable()) {
+            $exts = implode('|', self::getGhostscriptExts());
+            $thumbers[$exts] = array('DG_Thumber', 'getGhostscriptThumbnail');
+         }
+
+         // Imagick
+         if (file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor.php')
+             && file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php')) {
+            include_once WP_INCLUDE_DIR .'/class-wp-image-editor.php';
+            include_once WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php';
+
+            if (call_user_func(array('WP_Image_Editor_Imagick', 'test'))) {
+               try {
+                  $exts = @Imagick::queryFormats();
+                  if($exts) {
+                     $exts = implode('|', $exts);
+                     $thumbers[$exts] = array('DG_Thumber', 'getImagickThumbnail');
+                  }
+               }
+               catch (Exception $e) {
+
+               }
+            }
+         }
+
+         // Google Drive Viewer
+         $exts = implode('|', self::getGoogleDriveExts());
+         $thumbers[$exts] = array('DG_Thumber', 'getGoogleDriveThumbnail');
+
+         // allow users to filter thumbers used
+         $thumbers = apply_filters('dg_thumbers', $thumbers);
+
+         // strip out anything that can't be called
+         $thumbers = array_filter($thumbers, 'is_callable');
+      }
+
+      return $thumbers;
+   }
+
+   /**
     * Template that handles generating a thumbnail.
     *
     * @param callable $generator Takes ID and pg and returns path to temp file or false.
     * @param int $ID ID for the attachment that we need a thumbnail for.
     * @param int $pg Page number of the attachment to get a thumbnail for.
-    * @return bool|str
+    * @return bool|array Array containing 'url' and 'path' values or false.
     */
    public static function getThumbnailTemplate($generator, $ID, $pg = 1) {
-      if (!is_callable($generator)) {
-         self::writeLog((is_array($generator)
-             ? implode('::', $generator)
-             : print_r($generator, true))
-             . ' is not callable. Uh-oh!');
-         return false;
-      }
-
       // delegate thumbnail generation to $generator
       if (($temp_path = call_user_func($generator, $ID, $pg)) === false) {
          return false;
@@ -510,7 +541,7 @@ class DG_Thumber {
          return false;
       }
 
-      self::deleteExistingThumb($ID);
+      self::deleteThumbMeta($ID);
 
       // ensure perms are correct - no exe
       $stat = stat(dirname($thumb_path));
@@ -521,21 +552,16 @@ class DG_Thumber {
       $img = wp_get_image_editor($thumb_path);
 
       if (is_wp_error($img)) {
-         self::writeLog('Failed to get image editor. Can\'t resize thumbnail.');
+         self::writeLog('Failed to get image editor: ' . $img->get_error_message());
          return false;
       }
 
       $img->resize(150, 150, false);
       $img->save($thumb_path);
 
-      // store reference to new thumbnail
-      $meta = wp_get_attachment_metadata($ID, true);
-      $meta = is_array($meta)
-          ? array_merge($meta, array('thumb' => $thumb_name))
-          : array('thumb' => $thumb_name);
-      wp_update_attachment_metadata($ID, $meta);
-
-      return preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url);
+      return array(
+          'path' => $thumb_path,
+          'url'  => preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url));
    }
 
    /**
@@ -561,7 +587,7 @@ class DG_Thumber {
       static $count = 0;
       static $base = false;
       if ($base === false) {
-         $base = md5("Document Gallery");
+         $base = md5('Document Gallery');
       }
 
       // in the off chance this file exists, loop 'til it's unique
@@ -573,37 +599,22 @@ class DG_Thumber {
    }
 
    /**
-    * Removes the existing thumbnail for the attachment
+    * Removes the existing thumbnail/document meta for the attachment
     * with $ID, if such a thumbnail exists.
     *
-    * Substantially borrowed from wp_delete_attachment() in wp-includes/post.php
-    *
-    * @filter wp_delete_file Filter the path of the file to delete.
-    * @global type $wpdb
-    * @param type $ID
+    * @param int $ID
     */
-   private static function deleteExistingThumb($ID) {
-      global $wpdb;
+   public static function deleteThumbMeta($ID) {
+      $meta = wp_get_attachment_metadata($ID, true);
 
-      $meta = wp_get_attachment_metadata($ID);
+      if (is_array($meta) && isset($meta['document_meta'])) {
+         if (isset($meta['document_meta']['thumber'])
+             && $meta['document_meta']['thumber'] !== false) {
+            @unlink($meta['document_meta']['thumb_path']);
+         }
 
-      if (empty($meta['thumb']))
-         return;
-
-      $doc_path = get_attached_file($ID);
-
-      // Don't delete the thumb if another attachment uses it
-      $SQL = 'SELECT meta_id '
-          . "FROM $wpdb->postmeta "
-          . 'WHERE meta_key = \'_wp_attachment_metadata\' '
-          . 'AND meta_value LIKE %s '
-          . 'AND post_id <> %d';
-
-      if (!$wpdb->get_row($wpdb->prepare($SQL, '%' . $meta['thumb'] . '%', $ID))) {
-         $thumb_path = str_replace(basename($doc_path), $meta['thumb'], $doc_path);
-         // This filter is documented in wp-admin/custom-header.php
-         $thumb_path = apply_filters('wp_delete_file', $thumb_path);
-         @unlink($thumb_path);
+         unset($meta['document_meta']);
+         wp_update_attachment_metadata($ID, $meta);
       }
    }
 
@@ -614,9 +625,9 @@ class DG_Thumber {
     * @return bool Whether exec() is available.
     */
    private static function isExecAvailable() {
-      static $available;
+      static $available = null;
 
-      if (!isset($available)) {
+      if (is_null($available)) {
          $available = true;
 
          if (ini_get('safe_mode')) {
@@ -663,9 +674,10 @@ class DG_Thumber {
     * @param str $entry
     */
    private static function writeLog($entry) {
-      if (WP_DEBUG) {
-         error_log('DG: ' . print_r($entry, true));
-      }
+      // TODO: back to error log
+      //if (WP_DEBUG) {
+         echo('<!-- DG: ' . print_r($entry, true) . ' -->' . PHP_EOL);
+      //}
    }
 }
 
