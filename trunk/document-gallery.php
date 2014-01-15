@@ -46,4 +46,7 @@ function dg_add_header_css() {
 }
 add_action('wp_print_styles', 'dg_add_header_css');
 
+// delete thumbnail when attachment is deleted
+add_action('delete_attachment', array('DG_Thumber', 'deleteThumbMeta'));
+
 ?>
