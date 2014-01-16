@@ -116,13 +116,13 @@ class DG_Thumber {
          return false;
       }
 
-      $ext = '.jpg';
+      $ext = 'jpg';
       switch ($metadata['image']['mime']) {
          case 'image/gif':
-            $ext = '.gif';
+            $ext = 'gif';
             break;
          case 'image/png':
-            $ext = '.png';
+            $ext = 'png';
             break;
       }
 
@@ -164,8 +164,6 @@ class DG_Thumber {
     * @return bool|string False on failure, URL to thumb on success.
     */
    public static function getImagickThumbnail($ID, $pg = 1) {
-      $doc_path = get_attached_file($ID);
-
       if (!file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor.php')
           || !file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php')) {
          return false;
@@ -173,6 +171,13 @@ class DG_Thumber {
 
       include_once WP_INCLUDE_DIR .'/class-wp-image-editor.php';
       include_once WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php';
+
+      $doc_path = get_attached_file($ID);
+
+      // if we have a PDF then specify page number
+      if (strcasecmp(self::getExt($doc_path), 'pdf') === 0) {
+         $doc_path .= '[' . $pg - 1 . ']';
+      }
 
       $img = new WP_Image_Editor_Imagick($doc_path);
       $err = $img->load();
@@ -183,7 +188,7 @@ class DG_Thumber {
 
       $temp_file = self::getTempFile();
 
-      $err = $img->save($temp_file);
+      $err = $img->save($temp_file, 'image/png');
       if (is_wp_error($err)) {
          self::writeLog('Failed to save img in Imagick: ' . $err->get_error_message());
          return false;
@@ -343,7 +348,7 @@ class DG_Thumber {
       $icon_url = DG_URL . 'icons/';
 
       $url = wp_get_attachment_url($ID);
-      $ext = self::getExt(basename($url));
+      $ext = self::getExt($url);
 
       // handle images
       if (wp_attachment_is_image($ID) &&
@@ -573,7 +578,7 @@ class DG_Thumber {
     * @param string $ext      The extension of the image to be created.
     * @return string Name unique within the directory given, derived from the basename given.
     */
-   private static function getUniqueThumbName($dirname, $extless, $ext = '.png') {
+   private static function getUniqueThumbName($dirname, $extless, $ext = 'png') {
       return wp_unique_filename($dirname, str_replace('.', '-', $extless) . '-thumb.' . $ext);
    }
 
@@ -583,16 +588,16 @@ class DG_Thumber {
     * @staticvar int $count
     * @param type $ext
     */
-   private static function getTempFile($ext = '.png') {
+   private static function getTempFile($ext = 'png') {
       static $count = 0;
       static $base = false;
       if ($base === false) {
-         $base = md5('Document Gallery');
+         $base = get_temp_dir() . md5('Document Gallery');
       }
 
       // in the off chance this file exists, loop 'til it's unique
       do {
-         $ret = get_temp_dir() . $base . $count++ . $ext;
+         $ret =  $base . $count++ . '.' . $ext;
       } while(file_exists($ret));
 
       return $ret;
