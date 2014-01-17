@@ -546,12 +546,8 @@ class DG_Thumber {
          return false;
       }
 
+      // remove any pre-existing document metadata
       self::deleteThumbMeta($ID);
-
-      // ensure perms are correct - no exe
-      $stat = stat(dirname($thumb_path));
-      $perms = $stat['mode'] & 0000666;
-      @chmod($thumb_path, $perms);
 
       // scale to no larger than 150x150px
       $img = wp_get_image_editor($thumb_path);
@@ -586,21 +582,20 @@ class DG_Thumber {
     * Caller must handle removal of the temp file when finished.
     *
     * @staticvar int $count
-    * @param type $ext
+    * @param string $ext
     */
    private static function getTempFile($ext = 'png') {
-      static $count = 0;
       static $base = false;
+      static $tmp;
+
       if ($base === false) {
-         $base = get_temp_dir() . md5('Document Gallery');
+         $base = md5('Document Gallery');
+         $tmp = untrailingslashit(get_temp_dir());
       }
 
-      // in the off chance this file exists, loop 'til it's unique
-      do {
-         $ret =  $base . $count++ . '.' . $ext;
-      } while(file_exists($ret));
-
-      return $ret;
+      $file = "$tmp/" . wp_unique_filename($tmp, "$base.$ext");
+      self::writeLog("Temp file: $file");
+      return $file;
    }
 
    /**
