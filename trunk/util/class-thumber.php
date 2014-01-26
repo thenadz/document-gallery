@@ -17,12 +17,13 @@ class DG_Thumber {
    /**
     * Wraps generation of thumbnails for various attachment filetypes.
     *
-    * @param type $ID Document ID
-    * @return string  URL to the thumbnail.
+    * @param int $ID  Document ID
+    * @param int $pg  Page number to get thumb from.
+    * @return str     URL to the thumbnail.
     */
    public static function getThumbnail($ID, $pg = 1) {
       static $timeout = false;
-      if ($timeout === false) {
+      if (false === $timeout) {
          $timeout = time();
       }
 
@@ -61,7 +62,7 @@ class DG_Thumber {
          }
       }
 
-      if (!isset($doc_meta['thumber']) || $doc_meta['thumber'] === false) {
+      if (!isset($doc_meta['thumber']) || false === $doc_meta['thumber']) {
          // only execute a database query if necessary
          if (!isset($doc_meta['thumber'])) {
             $doc_meta['thumber'] = false;
@@ -90,9 +91,9 @@ class DG_Thumber {
     *
     * NOTE: Caller must verify that WP version >= 3.6.
     *
-    * @param string $ID   The attachment ID to retrieve thumbnail from.
-    * @param int $pg      Unused.
-    * @return bool|string False on failure, URL to thumb on success.
+    * @param str $ID    The attachment ID to retrieve thumbnail from.
+    * @param int $pg    Unused.
+    * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getAudioVideoThumbnail($ID, $pg = 1) {
       if(!file_exists(WP_ADMIN_DIR . '/includes/media.php')) {
@@ -159,25 +160,29 @@ class DG_Thumber {
     *
     * NOTE: Caller must verify that Imagick is present and that the extension is supported.
     *
-    * @param string $ID   The attachment ID to retrieve thumbnail from.
-    * @param int $pg      Unused.
-    * @return bool|string False on failure, URL to thumb on success.
+    * @param int $ID    The attachment ID to retrieve thumbnail from.
+    * @param int $pg    The page to get the thumbnail of.
+    * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getImagickThumbnail($ID, $pg = 1) {
-      if (!file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor.php')
-          || !file_exists(WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php')) {
+      static $files = null;
+
+      if (is_null($files)) {
+         $files = file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor.php')
+            && file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php');
+      }
+
+      if (!$files) {
          return false;
       }
 
-      include_once WP_INCLUDE_DIR .'/class-wp-image-editor.php';
-      include_once WP_INCLUDE_DIR .'/class-wp-image-editor-imagick.php';
+      include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
+      include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
 
       $doc_path = get_attached_file($ID);
 
-      // if we have a PDF then specify page number
-      if (strcasecmp(self::getExt($doc_path), 'pdf') === 0) {
-         $doc_path .= '[' . $pg - 1 . ']';
-      }
+      // Imagick *should* ignore this if filetype doesn't have "pages"
+      $doc_path .= '[' . $pg - 1 . ']';
 
       $img = new WP_Image_Editor_Imagick($doc_path);
       $err = $img->load();
@@ -207,16 +212,23 @@ class DG_Thumber {
     *
     * NOTE: Caller must verify that exec and gs are available and that extension is supported.
     *
-    * @param string $ID   The attachment ID to retrieve thumbnail from.
-    * @param int $pg      The page number to make thumbnail of -- index starts at 1.
-    * @return bool|string False on failure, URL to thumb on success.
+    * @param int $ID    The attachment ID to retrieve thumbnail from.
+    * @param int $pg    The page number to make thumbnail of -- index starts at 1.
+    * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getGhostscriptThumbnail($ID, $pg = 1) {
-      static $gs = false;
-      if ($gs === false) {
-         $gs = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'gswin32c' : 'gs')
-             . ' -sDEVICE=png16m -dFirstPage=%d -dLastPage=%d -dBATCH'
-             . ' -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
+      static $gs = null;
+
+      if (is_null($gs)) {
+         $gs = self::getGhostscriptExecutable();
+         if (false !== $gs) {
+            $gs = "\"$gs\" -sDEVICE=png16m -dFirstPage=%d -dLastPage=%d -dBATCH"
+                . ' -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
+         }
+      }
+
+      if (false === $gs) {
+         return false;
       }
 
       $doc_path = get_attached_file($ID);
@@ -225,7 +237,7 @@ class DG_Thumber {
       exec(sprintf($gs, $pg, $pg, $temp_path, $doc_path), $out, $ret);
 
       if ($ret != 0) {
-         self::writeLog('Ghostscript failed: ' . $out);
+         self::writeLog('Ghostscript failed: ' . print_r($out));
          @unlink($temp_path);
          return false;
       }
@@ -243,24 +255,46 @@ class DG_Thumber {
    /**
     * Checks whether we may call gs through exec().
     *
-    * @staticvar bool $available
-    * @return bool
+    * @return bool|str If available, returns exe path. False otherwise.
     */
-   private static function isGhostscriptAvailable() {
-      static $available = null;
+   private static function getGhostscriptExecutable() {
+      static $executable = null;
 
-      if (is_null($available)) {
-         $is_win = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-         $gs = $is_win ? 'gswin32c' : 'gs';
+      if (is_null($executable)) {
+         // we must be able to exec()
+         $executable = self::isExecAvailable();
+         if (!$executable) return $executable;
 
-         $available = self::isExecAvailable();
-         $exec = exec($is_win ? "where $gs" : "which $gs");
-         $available = $available && !empty($exec);
+         // find on Windows system
+         if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
+            // look for environment variable
+            $executable = getenv('GSC');
+            if($executable) return $executable;
 
-         self::writeLog(($available ? 'Found' : 'Didn\'t find') . " the $gs executable.");
+            // hope GS in the path
+            $executable = exec('where gswin*c.exe');
+            if(!empty($executable)) return $executable;
+
+            // look directly in filesystem
+            // 64- or 32-bit binary
+            $executable = exec('dir /o:n/s/b "C:\Program Files\gs\*gswin*c.exe"');
+            if (!empty($executable)) {
+               return $executable;
+            }
+
+            // 32-bit binary on 64-bit OS
+            $executable = exec('dir /o:n/s/b "C:\Program Files (x86)\gs\*gswin32c.exe"');
+            $executable = empty($executable) ? false : $executable;
+            return $executable;
+         }
+
+         // this is why I use Linux...
+         $executable = exec('which gs');
+         $executable = empty($executable) ? false : $executable;
+         return $executable;
       }
 
-      return $available;
+      return $executable;
    }
 
    /*==========================================================================
@@ -272,9 +306,9 @@ class DG_Thumber {
     *
     * NOTE: Caller must verify that extension is supported.
     *
-    * @param string $ID   The attachment ID to retrieve thumbnail from.
-    * @param int $pg      The page number to make thumbnail of -- index starts at 1.
-    * @return bool|string False on failure, URL to thumb on success.
+    * @param str $ID    The attachment ID to retrieve thumbnail from.
+    * @param int $pg    The page number to make thumbnail of -- index starts at 1.
+    * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getGoogleDriveThumbnail($ID, $pg = 1) {
       // User agent for Lynx 2.8.7rel.2 -- Why? Because I can.
@@ -340,9 +374,9 @@ class DG_Thumber {
    /**
     * Get thumbnail for document with given ID from default images.
     *
-    * @param string $ID   The attachment ID to retrieve thumbnail from.
-    * @param int $pg      Unused.
-    * @return string URL to thumbnail.
+    * @param str $ID  The attachment ID to retrieve thumbnail from.
+    * @param int $pg  Unused.
+    * @return str     URL to thumbnail.
     */
    public static function getDefaultThumbnail($ID, $pg = 1) {
       $icon_url = DG_URL . 'icons/';
@@ -374,9 +408,8 @@ class DG_Thumber {
    /**
     * Returns the name of the image to represent the filetype given.
     *
-    * @staticvar array $exts
-    * @param type $filename
-    * @return bool
+    * @param str $ext
+    * @return str
     */
    private static function getDefaultIcon($ext) {
       // Maps file ext to default image name.
@@ -464,7 +497,7 @@ class DG_Thumber {
    private static function getThumbers() {
       static $thumbers = false;
 
-      if ($thumbers === false) {
+      if (false === $thumbers) {
          global $wp_version;
          $thumbers = array();
 
@@ -475,7 +508,7 @@ class DG_Thumber {
          }
 
          // Ghostscript
-         if (self::isGhostscriptAvailable()) {
+         if (false !== self::getGhostscriptExecutable()) {
             $exts = implode('|', self::getGhostscriptExts());
             $thumbers[$exts] = array('DG_Thumber', 'getGhostscriptThumbnail');
          }
@@ -518,9 +551,9 @@ class DG_Thumber {
     * Template that handles generating a thumbnail.
     *
     * @param callable $generator Takes ID and pg and returns path to temp file or false.
-    * @param int $ID ID for the attachment that we need a thumbnail for.
-    * @param int $pg Page number of the attachment to get a thumbnail for.
-    * @return bool|array Array containing 'url' and 'path' values or false.
+    * @param int $ID      ID for the attachment that we need a thumbnail for.
+    * @param int $pg      Page number of the attachment to get a thumbnail for.
+    * @return bool|array  Array containing 'url' and 'path' values or false.
     */
    public static function getThumbnailTemplate($generator, $ID, $pg = 1) {
       // delegate thumbnail generation to $generator
@@ -532,7 +565,7 @@ class DG_Thumber {
       $doc_url = wp_get_attachment_url($ID);
       $dirname = dirname($doc_path);
       $basename = basename($doc_path);
-      if (($len = strrpos($basename, '.')) === false) {
+      if (false === ($len = strrpos($basename, '.'))) {
          $len = strlen($basename);
       }
       $extless = substr($basename, 0, $len);
@@ -569,10 +602,10 @@ class DG_Thumber {
     * Constructs name for file's thumbnail, ensuring that it does not conflict
     * with any existing file.
     *
-    * @param string $dirname  Directory where the document is located.
-    * @param string $extless  Base name, less the extension.
-    * @param string $ext      The extension of the image to be created.
-    * @return string Name unique within the directory given, derived from the basename given.
+    * @param str $dirname  Directory where the document is located.
+    * @param str $extless  Base name, less the extension.
+    * @param str $ext      The extension of the image to be created.
+    * @return str          Name unique within the directory given, derived from the basename given.
     */
    private static function getUniqueThumbName($dirname, $extless, $ext = 'png') {
       return wp_unique_filename($dirname, str_replace('.', '-', $extless) . '-thumb.' . $ext);
@@ -582,19 +615,18 @@ class DG_Thumber {
     * Caller must handle removal of the temp file when finished.
     *
     * @staticvar int $count
-    * @param string $ext
+    * @param str $ext
     */
    private static function getTempFile($ext = 'png') {
       static $base = false;
       static $tmp;
 
-      if ($base === false) {
+      if (false === $base) {
          $base = md5('Document Gallery');
          $tmp = untrailingslashit(get_temp_dir());
       }
 
-      $file = "$tmp/" . wp_unique_filename($tmp, "$base.$ext");
-      self::writeLog("Temp file: $file");
+      $file = $tmp . DIRECTORY_SEPARATOR . wp_unique_filename($tmp, "$base.$ext");
       return $file;
    }
 
@@ -609,7 +641,7 @@ class DG_Thumber {
 
       if (is_array($meta) && isset($meta['document_meta'])) {
          if (isset($meta['document_meta']['thumber'])
-             && $meta['document_meta']['thumber'] !== false) {
+             && false !== $meta['document_meta']['thumber']) {
             @unlink($meta['document_meta']['thumb_path']);
          }
 
@@ -632,8 +664,7 @@ class DG_Thumber {
 
          if (ini_get('safe_mode')) {
             $available = false;
-         }
-         else {
+         } else {
             $d = ini_get('disable_functions');
             $s = ini_get('suhosin.executor.func.blacklist');
             if ("$d$s") {
@@ -654,8 +685,8 @@ class DG_Thumber {
     * Formerly achieved with wp_check_filetype(), but it was only returning
     * valid results if the active user had permission to upload the given filetype.
     *
-    * @param str $filename Name of the file to get extension from.
-    * @return str|bool Returns the file extension on success, false on failure.
+    * @param str $filename  Name of the file to get extension from.
+    * @return str|bool      Returns the file extension on success, false on failure.
     */
    private static function getExt($filename) {
       foreach (wp_get_mime_types() as $ext_preg => $unused) {
