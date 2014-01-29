@@ -26,7 +26,7 @@ if(!defined('WP_ADMIN_DIR')) {
  * @return string             HTML for the Document Gallery.
  */
 function dg_get_attachment_icons($atts) {
-   include_once(DG_PATH . 'models/class-gallery.php');
+   include_once DG_PATH . 'models/class-gallery.php';
 
    // empty string is passed when no arguments are given, but constructor expects an array
    return (string)(new DG_Gallery(empty($atts) ? array() : $atts));
@@ -46,7 +46,14 @@ function dg_add_header_css() {
 }
 add_action('wp_print_styles', 'dg_add_header_css');
 
-// delete thumbnail when attachment is deleted
-add_action('delete_attachment', array('DG_Thumber', 'deleteThumbMeta'));
+/**
+ * Delete thumbnail when attachment is deleted
+ * @param int $ID ID of the attachment being deleted.
+ */
+function dg_delete_thumb($ID) {
+   include_once DG_PATH . 'util/class-thumber.php';
+   DG_Thumber::deleteThumbMeta($ID);
+}
+add_action('delete_attachment', 'dg_delete_thumb');
 
 ?>
