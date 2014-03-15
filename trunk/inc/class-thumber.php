@@ -687,22 +687,6 @@ class DG_Thumber {
    }
 
    /**
-    * Removes all stored failed thumbnails generation, allowing for retry.
-    */
-   public static function deleteFailedThumbMeta() {
-      $options = self::getOptions();
-      $thumbs = $options['thumbs'];
-
-      foreach ($thumbs as $ID => $v) {
-         if (false === $v) {
-            unset($options['thumbs'][$ID]);
-         }
-      }
-
-      self::setOptions($options);
-   }
-
-   /**
     * Checks whether exec() may be used.
     * Source: http://stackoverflow.com/a/12980534/866618
     *
