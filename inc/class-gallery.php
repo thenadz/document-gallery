@@ -261,7 +261,9 @@ class DG_Gallery {
 
          if(!empty($bad)) {
             $err =
-                __('The following ID(s) are invalid: ', 'document-gallery') . implode(', ', $bad);
+                _n('The following ID is invalid: ',
+                    'The following IDs are invalid: ',
+                    'document-gallery') . implode(', ', $bad);
          } else {
             $ret = $ids;
          }
