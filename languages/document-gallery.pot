@@ -1,0 +1,204 @@
+# Copyright (C) 2014 Document Gallery
+# This file is distributed under the same license as the Document Gallery package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Document Gallery 2.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
+"POT-Creation-Date: 2014-03-15 19:07:13+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: admin/class-admin.php:27
+msgid "Settings"
+msgstr ""
+
+#: admin/class-admin.php:37
+msgid "Document Gallery Settings"
+msgstr ""
+
+#. #-#-#-#-#  plugin.pot (Document Gallery 2.0)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: admin/class-admin.php:38
+msgid "Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:66
+msgid "Default Settings"
+msgstr ""
+
+#: admin/class-admin.php:70
+msgid "Thumbnail Generation"
+msgstr ""
+
+#: admin/class-admin.php:74
+msgid "Advanced Thumbnail Generation"
+msgstr ""
+
+#: admin/class-admin.php:86
+msgid "Link to attachment page rather than to file"
+msgstr ""
+
+#: admin/class-admin.php:98
+msgid "Include document descriptions"
+msgstr ""
+
+#: admin/class-admin.php:110
+msgid "Use auto-generated document thumbnails"
+msgstr ""
+
+#: admin/class-admin.php:122
+msgid "Include image attachments in gallery"
+msgstr ""
+
+#: admin/class-admin.php:134
+msgid "Only look for attachments in post where [dg] is used"
+msgstr ""
+
+#: admin/class-admin.php:147
+msgid "Ascending or decending sorting of documents"
+msgstr ""
+
+#: admin/class-admin.php:160
+msgid "Which field to order documents by"
+msgstr ""
+
+#: admin/class-admin.php:173
+msgid ""
+"Whether matched documents must have all taxa_names (AND) or at least one (OR)"
+msgstr ""
+
+#: admin/class-admin.php:185
+msgid "Locally generate thumbnails for audio & video files."
+msgstr ""
+
+#: admin/class-admin.php:197
+msgid ""
+"Use <a href=\"http://www.ghostscript.com/\" target=\"_blank\">Ghostscript</"
+"a> for faster local PDF processing (compared to Imagick)."
+msgstr ""
+
+#: admin/class-admin.php:209
+msgid ""
+"Use <a href=\"http://www.imagemagick.org/\" target=\"_blank\">Imagick</a> to "
+"handle lots of filetypes locally."
+msgstr ""
+
+#: admin/class-admin.php:221
+msgid ""
+"Use <a href=\"https://drive.google.com/viewer\" target=\"_blank\">Google "
+"Drive Viewer</a> to generate thumbnails for MS Office files and many other "
+"file types remotely."
+msgstr ""
+
+#: admin/class-admin.php:234
+msgid "Successfully auto-detected the location of Ghostscript."
+msgstr ""
+
+#: admin/class-admin.php:235
+msgid "Failed to auto-detect the location of Ghostscript."
+msgstr ""
+
+#: admin/class-admin.php:243
+msgid ""
+"The following values will be used by default in the shortcode. You can still "
+"manually set each of these values in each individual shortcode."
+msgstr ""
+
+#: admin/class-admin.php:250
+msgid "Select which tools to use when generating thumbnails."
+msgstr ""
+
+#: admin/class-admin.php:258
+msgid ""
+"Unless you <em>really</em> know what you're doing, you should not touch "
+"these values."
+msgstr ""
+
+#: admin/class-admin.php:260
+msgid ""
+"NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
+msgstr ""
+
+#: admin/class-admin.php:355
+msgid "Invalid Ghostscript path given: "
+msgstr ""
+
+#: inc/class-gallery.php:88
+msgid "Generated using Document Gallery. Get yours here: "
+msgstr ""
+
+#: inc/class-gallery.php:91
+msgid "No attachments to display. How boring! :("
+msgstr ""
+
+#: inc/class-gallery.php:92
+msgid "The %s parameter may only be \"%s\" or \"%s.\" You entered \"%s.\""
+msgstr ""
+
+#: inc/class-gallery.php:263
+msgid "The following ID is invalid: "
+msgid_plural "The following IDs are invalid: "
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/class-gallery.php:329
+msgid "The orderby value entered, \"%s,\" is not valid."
+msgstr ""
+
+#: inc/class-gallery.php:438
+msgid "The following attributes are invalid: "
+msgstr ""
+
+#: inc/class-gallery.php:488
+msgid "%s is not a valid term name in %s."
+msgstr ""
+
+#: inc/class-thumber.php:131
+msgid "Could not open file: "
+msgstr ""
+
+#: inc/class-thumber.php:136
+msgid "Could not write file: "
+msgstr ""
+
+#: inc/class-thumber.php:174
+msgid "Failed to open file in Imagick: "
+msgstr ""
+
+#: inc/class-thumber.php:184
+msgid "Failed to save img in Imagick: "
+msgstr ""
+
+#: inc/class-thumber.php:226
+msgid "Ghostscript failed: "
+msgstr ""
+
+#: inc/class-thumber.php:335
+msgid "Failed to retrieve thumbnail from Google: "
+msgstr ""
+
+#: inc/class-thumber.php:614
+msgid "Failed to get image editor: "
+msgstr ""
+
+#: inc/class-thumber.php:625
+msgid "Failed to save image: "
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Display non-images (and images) in gallery format on a page or post with the "
+"[dg] shortcode."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Dan Rossiter"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://danrossiter.org/"
+msgstr ""
