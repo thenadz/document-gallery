@@ -339,9 +339,12 @@ class DG_Admin {
 
       // if new thumbers available, clear failed thumbnails for retry
       foreach ($dg_options['thumber']['active'] as $k => $v) {
-         if (!$dg_options['thumber']['active'][$k] && $ret['thumber']['active'][$k]) {
-            include_once DG_PATH . 'inc/class-thumber.php';
-            DG_Thumber::deleteFailedThumbMeta();
+         if (!$v && $ret['thumber']['active'][$k]) {
+            foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
+               if (false === $v) {
+                  unset($ret['thumber']['thumbs'][$k]);
+               }
+            }
             break;
          }
       }
