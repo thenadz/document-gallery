@@ -194,8 +194,7 @@ class DG_Admin {
             'name'        => 'thumber_active][gs',
             'value'       => esc_attr($thumber_active['gs']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a>
-               for faster local PDF processing (compared to Imagick).', 'document-gallery')
+            'description' => __('Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a> for faster local PDF processing (compared to Imagick).', 'document-gallery')
         ));
 
       add_settings_field(
@@ -207,8 +206,7 @@ class DG_Admin {
             'name'        => 'thumber_active][imagick',
             'value'       => esc_attr($thumber_active['imagick']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Use <a href="http://www.imagemagick.org/" target="_blank">Imagick</a>
-               to handle lots of filetypes locally.', 'document-gallery')
+            'description' => __('Use <a href="http://www.imagemagick.org/" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
         ));
 
       add_settings_field(
@@ -220,8 +218,7 @@ class DG_Admin {
             'name'        => 'thumber_active][google',
             'value'       => esc_attr($thumber_active['google']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a>
-               to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
+            'description' => __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
         ));
 
       add_settings_field(
