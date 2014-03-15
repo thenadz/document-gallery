@@ -181,7 +181,7 @@ class DG_Thumber {
       $err = $img->save($temp_file, 'image/png');
       if (is_wp_error($err)) {
          self::writeLog(
-             __('Failed to save img in Imagick: ', 'document-gallery') .
+             __('Failed to save image in Imagick: ', 'document-gallery') .
              $err->get_error_message());
          return false;
       }
