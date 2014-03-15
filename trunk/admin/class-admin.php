@@ -225,7 +225,9 @@ class DG_Admin {
             'name'        => 'thumber_active][google',
             'value'       => esc_attr($thumber_active['google']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
+            'description' => true // TODO
+                              ? __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
+                              : __('Your server does not allow remote HTTP access.', 'document-gallery')
         ));
 
       add_settings_field(
