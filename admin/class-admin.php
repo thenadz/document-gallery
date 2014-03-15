@@ -23,7 +23,7 @@ class DG_Admin {
     * Adds settings link to main plugin view.
     */
    public static function addSettingsLink($links) {
-      $settings = '<a href="options-general.php?page=document-gallery">' .
+      $settings = '<a href="options-general.php?page=document_gallery">' .
           __('Settings', 'document-gallery') . '</a>';
       array_unshift($links, $settings);
       return $links;
