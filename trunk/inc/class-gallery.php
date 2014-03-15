@@ -260,10 +260,9 @@ class DG_Gallery {
          $bad = array_filter($ids, array(__CLASS__, 'negativeInt'));
 
          if(!empty($bad)) {
-            $err =
-                _n('The following ID is invalid: ',
-                    'The following IDs are invalid: ',
-                    'document-gallery') . implode(', ', $bad);
+            $err = _n('The following ID is invalid: ',
+                'The following IDs are invalid: ',
+                count($bad), 'document-gallery') . implode(', ', $bad);
          } else {
             $ret = $ids;
          }
