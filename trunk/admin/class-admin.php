@@ -240,8 +240,7 @@ class DG_Admin {
     * Render the Default Settings section.
     */
    public static function renderDefaultSettingsSection() { ?>
-      <p><?php _e('The following values will be used by default in the shortcode. You can still
-         manually set each of these values in each individual shortcode.', 'document-gallery'); ?></p>
+      <p><?php _e('The following values will be used by default in the shortcode. You can still manually set each of these values in each individual shortcode.', 'document-gallery'); ?></p>
    <?php }
 
    /**
