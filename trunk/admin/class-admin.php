@@ -55,6 +55,7 @@ class DG_Admin {
       global $dg_options;
 
       include_once DG_PATH . 'inc/class-gallery.php';
+      include_once DG_PATH . 'inc/class-thumber.php';
 
       $defaults = $dg_options['gallery']['defaults'];
       $thumber_active = $dg_options['thumber']['active'];
@@ -194,7 +195,10 @@ class DG_Admin {
             'name'        => 'thumber_active][gs',
             'value'       => esc_attr($thumber_active['gs']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a> for faster local PDF processing (compared to Imagick).', 'document-gallery')
+            'description' => DG_Thumber::getGhostscriptExecutable()
+                              ? __('Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a> for faster local PDF processing (compared to Imagick).', 'document-gallery')
+                              : __('Your server is not configured to run <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a>.', 'document-gallery'),
+            'disabled'    => !DG_Thumber::getGhostscriptExecutable()
         ));
 
       add_settings_field(
@@ -206,7 +210,10 @@ class DG_Admin {
             'name'        => 'thumber_active][imagick',
             'value'       => esc_attr($thumber_active['imagick']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Use <a href="http://www.imagemagick.org/" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
+            'description' => DG_Thumber::isImagickAvailable()
+                              ? __('Use <a href="http://www.imagemagick.org/" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
+                              : __('Your server is not configured to run <a href="http://www.imagemagick.org/" target="_blank">Imagick</a>.', 'document-gallery'),
+            'disabled'    => !DG_Thumber::isImagickAvailable()
         ));
 
       add_settings_field(
@@ -266,11 +273,13 @@ class DG_Admin {
     * @param array $args
     */
    public static function renderCheckboxField($args) {
-      printf('<input type="checkbox" value="1" name="%1$s[%2$s]" id="%3$s" %4$s/> %5$s',
+      $args['disabled'] = isset($args['disabled']) ? $args['disabled'] : false;
+      printf('<input type="checkbox" value="1" name="%1$s[%2$s]" id="%3$s" %4$s %5$s/> %6$s',
           $args['option_name'],
           $args['name'],
           $args['label_for'],
           checked($args['value'], 1, false),
+          $args['disabled'] ? 'disabled="disabled"' : '',
           $args['description']);
    }
 
