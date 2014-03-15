@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Document Gallery 2.0\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
-"POT-Creation-Date: 2014-03-15 19:07:13+00:00\n"
+"POT-Creation-Date: 2014-03-15 20:12:02+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -26,104 +26,116 @@ msgstr ""
 msgid "Document Gallery"
 msgstr ""
 
-#: admin/class-admin.php:66
+#: admin/class-admin.php:67
 msgid "Default Settings"
 msgstr ""
 
-#: admin/class-admin.php:70
+#: admin/class-admin.php:71
 msgid "Thumbnail Generation"
 msgstr ""
 
-#: admin/class-admin.php:74
+#: admin/class-admin.php:75
 msgid "Advanced Thumbnail Generation"
 msgstr ""
 
-#: admin/class-admin.php:86
+#: admin/class-admin.php:87
 msgid "Link to attachment page rather than to file"
 msgstr ""
 
-#: admin/class-admin.php:98
+#: admin/class-admin.php:99
 msgid "Include document descriptions"
 msgstr ""
 
-#: admin/class-admin.php:110
+#: admin/class-admin.php:111
 msgid "Use auto-generated document thumbnails"
 msgstr ""
 
-#: admin/class-admin.php:122
+#: admin/class-admin.php:123
 msgid "Include image attachments in gallery"
 msgstr ""
 
-#: admin/class-admin.php:134
+#: admin/class-admin.php:135
 msgid "Only look for attachments in post where [dg] is used"
 msgstr ""
 
-#: admin/class-admin.php:147
+#: admin/class-admin.php:148
 msgid "Ascending or decending sorting of documents"
 msgstr ""
 
-#: admin/class-admin.php:160
+#: admin/class-admin.php:161
 msgid "Which field to order documents by"
 msgstr ""
 
-#: admin/class-admin.php:173
+#: admin/class-admin.php:174
 msgid ""
 "Whether matched documents must have all taxa_names (AND) or at least one (OR)"
 msgstr ""
 
-#: admin/class-admin.php:185
+#: admin/class-admin.php:186
 msgid "Locally generate thumbnails for audio & video files."
 msgstr ""
 
-#: admin/class-admin.php:197
+#: admin/class-admin.php:199
 msgid ""
 "Use <a href=\"http://www.ghostscript.com/\" target=\"_blank\">Ghostscript</"
 "a> for faster local PDF processing (compared to Imagick)."
 msgstr ""
 
-#: admin/class-admin.php:209
+#: admin/class-admin.php:200
+msgid ""
+"Your server is not configured to run <a href=\"http://www.ghostscript.com/\" "
+"target=\"_blank\">Ghostscript</a>."
+msgstr ""
+
+#: admin/class-admin.php:214
 msgid ""
 "Use <a href=\"http://www.imagemagick.org/\" target=\"_blank\">Imagick</a> to "
 "handle lots of filetypes locally."
 msgstr ""
 
-#: admin/class-admin.php:221
+#: admin/class-admin.php:215
+msgid ""
+"Your server is not configured to run <a href=\"http://www.imagemagick.org/\" "
+"target=\"_blank\">Imagick</a>."
+msgstr ""
+
+#: admin/class-admin.php:228
 msgid ""
 "Use <a href=\"https://drive.google.com/viewer\" target=\"_blank\">Google "
 "Drive Viewer</a> to generate thumbnails for MS Office files and many other "
 "file types remotely."
 msgstr ""
 
-#: admin/class-admin.php:234
+#: admin/class-admin.php:241
 msgid "Successfully auto-detected the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:235
+#: admin/class-admin.php:242
 msgid "Failed to auto-detect the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:243
+#: admin/class-admin.php:250
 msgid ""
 "The following values will be used by default in the shortcode. You can still "
 "manually set each of these values in each individual shortcode."
 msgstr ""
 
-#: admin/class-admin.php:250
+#: admin/class-admin.php:257
 msgid "Select which tools to use when generating thumbnails."
 msgstr ""
 
-#: admin/class-admin.php:258
+#: admin/class-admin.php:265
 msgid ""
 "Unless you <em>really</em> know what you're doing, you should not touch "
 "these values."
 msgstr ""
 
-#: admin/class-admin.php:260
+#: admin/class-admin.php:267
 msgid ""
 "NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
 msgstr ""
 
-#: admin/class-admin.php:355
+#: admin/class-admin.php:364
 msgid "Invalid Ghostscript path given: "
 msgstr ""
 
@@ -170,7 +182,7 @@ msgid "Failed to open file in Imagick: "
 msgstr ""
 
 #: inc/class-thumber.php:184
-msgid "Failed to save img in Imagick: "
+msgid "Failed to save image in Imagick: "
 msgstr ""
 
 #: inc/class-thumber.php:226
