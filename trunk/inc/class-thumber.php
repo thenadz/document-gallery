@@ -714,12 +714,15 @@ class DG_Thumber {
    }
 
    public static function isImagickAvailable() {
-      $ret = false;
+      static $ret = null;
 
-      if (file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php')) {
-         include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-         include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
-         $ret = WP_Image_Editor_Imagick::test();
+      if (is_null($ret)) {
+         $ret = false;
+         if (file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php')) {
+            include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
+            include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
+            $ret = WP_Image_Editor_Imagick::test();
+         }
       }
 
       return $ret;
