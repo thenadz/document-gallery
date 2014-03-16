@@ -72,6 +72,10 @@ class DG_Admin {
         array(__CLASS__, 'renderThumberSection'), 'document_gallery');
 
       add_settings_section(
+          'css', __('Custon CSS', 'document-gallery'),
+          array(__CLASS__, 'renderCssSection'), 'document_gallery');
+
+      add_settings_section(
         'thumber_advanced', __('Advanced Thumbnail Generation', 'document-gallery'),
         array(__CLASS__, 'renderThumberAdvancedSection'), 'document_gallery');
 
@@ -257,6 +261,12 @@ class DG_Admin {
     */
    public static function renderThumberSection() { ?>
       <p><?php _e('Select which tools to use when generating thumbnails.', 'document-gallery'); ?></p>
+   <?php }
+
+   public static function renderCssSection() { ?>
+      <p><?php printf(
+          __('Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.'),
+          DG_URL . 'assets/css/style.css'); ?></p>
    <?php }
 
    /**

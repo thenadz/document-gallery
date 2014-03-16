@@ -154,13 +154,13 @@ match (OR).
 By default, the document gallery will use the styles within your active theme
 to handle most of the appearance, but, with a little CSS knowledge, you can
 customize pretty much anything about how it looks. See
-[`style.css`](http://plugins.svn.wordpress.org/document-gallery/trunk/style.css)
+[`style.css`](http://plugins.svn.wordpress.org/document-gallery/trunk/assets/css/style.css)
 for an idea of what will select different elements within the gallery display.
 
 **Example**
 
 Say I would like to include a border for the right and bottom of the document
-icon, but only when descriptions are shown (to deliniate the icon from the
+icon, but only when descriptions are shown (to delineate the icon from the
 description text). To do this, I would need to add the following CSS to my
 theme stylesheet:
 
