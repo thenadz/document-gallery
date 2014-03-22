@@ -1,14 +1,14 @@
 === Document Gallery ===
 Contributors: dan.rossiter
-Tags: attachments, icons, documents, gallery, MS office, pdf
-Requires at least: 3.5
-Tested up to: 3.8
-Stable tag: 1.4.3
+Tags: attachments, thumbnail, documents, gallery, MS office, pdf
+Requires at least: 3.6
+Tested up to: 3.8.1
+Stable tag: 2.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin allows the user to easily create a "gallery" of all non-image
-attachments on a given post/page, making them easy to share.
+This plugin generates thumbnails for documents and displays them in a
+gallery-like format for easy sharing.
 
 == Description ==
 
@@ -46,7 +46,7 @@ must include the following shortcode in the post: `[dg]`.
 In addition to the default behavior, the plugin provides many options to
 customize behavior with various attributes, seen below:
 
-`[dg [attachment_pg=<true/false>]
+`[dg [fancy=true] [attachment_pg=<true/false>]
 [category/custom_taxon_name=<**comma-separated list of taxon values**> [relation=<AND/OR>]]
 [descriptions=<true/false>] [ids=<**comma-separated list of ID #s**>]
 [images=<true/false>] [localpost=<true/false>] [order=<ASC/DEC>] [orderby=<**see below**>]]`
@@ -59,7 +59,8 @@ without any added attributes.
 
 By default, document gallery will use `no descriptions`, `orderby menu_order`
 , `ASC order`, `no attachment_pg links`, and `no images` from the `local post`
-if you do not specify otherwise.
+if you do not specify otherwise. These defaults can be configured in your dashboard
+under `Settings -> Document Gallery`.
 
 **Attachment Page Option** *(New in Version 1.1)*
 
@@ -86,6 +87,19 @@ alongside it.
 *Note: this will use the `description` field, **not** the `caption`. Be
 careful when entering your document data.*
 
+**Fancy** *(New in Version 2.0)*
+
+If `true`, we will try to generate a thumbnail for each document in the gallery.
+The success in generating thumbs will depend mostly on what your server supports.
+To fine-tune how thumbnails are generated, visit `Settings -> Document Gallery`
+in your site's dashboard.
+
+*NOTE: By default, the most universally-supported option for generating thumbnails,
+[Google Drive Viewer](https://docs.google.com/viewer) is disabled by default
+in order to protect your privacy, since using it requires sending your documents
+to Google's servers. If you're not working with confidential documents, you are
+encouraged to enable this for optimum performance.*
+
 **Order Option**
 
 This option works alongside the `orderby` option to determine whether the
@@ -110,8 +124,7 @@ documents are displayed in ascending or descending order.
   (Only useful in conjunction with `localpost=false` option.)
 * `comment_count` - Order by number of comments (available with WP >= 2.9).
 * `none` - No order (available with Version 2.8).
-* `post__in` - Preserve post ID order given in the post__in array (available
-  with WP >= 3.5).
+* `post__in` - Preserve post ID order given in the post__in array.
 
 **Images Option** *(New in Version 1.2)*
 
@@ -223,13 +236,12 @@ is perfectly alright.
 
 == Screenshots ==
 
-1. This is an example of multiple Document Galleries on a single page (using
+1. This is an example of "fancy" thumbnails. The images are a copy of the front
+page for each document.
+2. This is an example of multiple Document Galleries on a single page (using
 the `ids` attribute). It also shows how images will appear in a Document
 Gallery. Note that the description field supports HTML markup, so the
 possibilities are endless!
-2. This is how the Document Gallery looks with `descriptions=true`. The
-descriptions are auto-populated using the description field from when you
-upload the document.
 3. This is how the Document Gallery looks with `descriptions=false` (default).
 Note that the display inherits styling from your active theme.
 
@@ -246,6 +258,36 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.0 =
+* **Enhancement:** This release is a **BIG** deal! We are introducing true
+  document thumbnails (rather than the boring static images that were the same
+  for every document), meaning that you will be able to generate and display
+  thumbnails for most of your documents so your users can see a preview of the
+  document before downloading. This has been
+  [months in development](http://wordpress.org/support/topic/pdf-thumbnails-instead-of-generic-icon)
+  and I really hope that you all enjoy it!
+* **Enhancement:** Document Gallery now has a settings page where you can
+  configure the default options for your galleries and chose how thumbnails are
+  generated.
+* **Enhancement:** Customizing CSS for your document gallery is now *much easier*.
+  If you want to add additional styling, just navigate to `Settings -> Document Gallery`
+  in your dashboard and enter valid CSS in the "Custom CSS" textbox. See the changes
+  instantly in your galleries!
+* **Enhancement:** Entire plugin is now
+  [Internalization-enabled](https://codex.wordpress.org/I18n_for_WordPress_Developers).
+  This means that we can now support users speaking all languages. If you are
+  interested in translating Document Gallery into a language that you speak,
+  please [let me know](http://wordpress.org/support/topic/seeking-translators)!
+* **Enhancement:** This release saw much of the backend refactored to better
+  support future development. Nothing you will notice unless you're digging into
+  the code, but it will keep me sane long-term ;)
+* **Note:** The thumbnail generation implementation works very hard to support
+  all hosting servers (including Unix and Windows systems). That said, I cannot
+  test on all hosts out there, so there is the potential for bugs to appear.
+  If you notice something that doesn't look right, please don't hesitate to
+  [report the issue](http://wordpress.org/support/plugin/document-gallery)
+  so that I can resolve it. Thanks!
 
 = 1.4.3 =
 * **Bug Fix:** Resolves minor bug introduced in version 1.4.2. Thanks, tkokholm!
