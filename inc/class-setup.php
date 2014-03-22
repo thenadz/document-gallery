@@ -26,7 +26,7 @@ class DG_Setup {
                   'attachment_pg'  => false,
                   'descriptions'   => false,
                   // include thumbnail of actual document in gallery display
-                  'fancy'          => false,
+                  'fancy'          => true,
                   // comma-separated list of attachment ids
                   'ids'            => false,
                   // if true, all images attached to current page will be included also
