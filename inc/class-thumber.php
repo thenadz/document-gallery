@@ -767,8 +767,13 @@ class DG_Thumber {
     * @param str $entry
     */
    private static function writeLog($entry) {
-      if (WP_DEBUG) {
-         echo('<!-- DG: ' . print_r($entry, true) . ' -->' . PHP_EOL);
+      if (defined('WP_DEBUG') && WP_DEBUG) {
+         $err = 'DG: ' . print_r($entry, true) . PHP_EOL;
+         if (defined('ERRORLOGFILE')) {
+            error_log($err, 3, ERRORLOGFILE);
+         } else {
+            error_log($err);
+         }
       }
    }
 
