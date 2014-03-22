@@ -37,6 +37,10 @@ class DG_Gallery {
       return $this->atts['attachment_pg'];
    }
 
+   public function useFancyThumbs() {
+      return $this->atts['fancy'];
+   }
+
    /**
     * Returns whether descriptions should be included in output.
     * @return bool
