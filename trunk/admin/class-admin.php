@@ -215,8 +215,8 @@ class DG_Admin {
             'value'       => esc_attr($thumber_active['imagick']),
             'option_name' => DG_OPTION_NAME,
             'description' => DG_Thumber::isImagickAvailable()
-                              ? __('Use <a href="http://www.imagemagick.org/" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
-                              : __('Your server is not configured to run <a href="http://www.imagemagick.org/" target="_blank">Imagick</a>.', 'document-gallery'),
+                              ? __('Use <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
+                              : __('Your server is not configured to run <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a>.', 'document-gallery'),
             'disabled'    => !DG_Thumber::isImagickAvailable()
         ));
 
@@ -229,9 +229,10 @@ class DG_Admin {
             'name'        => 'thumber_active][google',
             'value'       => esc_attr($thumber_active['google']),
             'option_name' => DG_OPTION_NAME,
-            'description' => true // TODO
+            'description' => DG_Thumber::isGoogleDriveAvailable()
                               ? __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
-                              : __('Your server does not allow remote HTTP access.', 'document-gallery')
+                              : __('Your server does not allow remote HTTP access.', 'document-gallery'),
+            'disabled'    => !DG_Thumber::isGoogleDriveAvailable()
         ));
 
       add_settings_field(
@@ -263,10 +264,20 @@ class DG_Admin {
       <p><?php _e('Select which tools to use when generating thumbnails.', 'document-gallery'); ?></p>
    <?php }
 
-   public static function renderCssSection() { ?>
+   public static function renderCssSection() {
+      global $dg_options; ?>
       <p><?php printf(
           __('Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.'),
           DG_URL . 'assets/css/style.css'); ?></p>
+      <table class="form-table">
+         <tbody>
+            <tr valign="top">
+               <td>
+                  <textarea name="document_gallery[css]" rows="10" cols="50" class="large-text code"><?php echo $dg_options['css']['text']; ?></textarea>
+               </td>
+            </tr>
+         </tbody>
+      </table>
    <?php }
 
    /**
@@ -363,6 +374,17 @@ class DG_Admin {
                }
             }
             break;
+         }
+      }
+
+      // handle changed CSS
+      if (trim($values['css']) != trim($ret['css']['text'])) {
+         if (DocumentGallery::updateUserGalleryStyle($values['css'])) {
+            $ret['css']['text'] = $values['css'];
+            $ret['css']['version']++;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'css',
+                __('Failed to update CSS file.', 'document-gallery'));
          }
       }
 

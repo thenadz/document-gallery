@@ -38,7 +38,7 @@ class DG_Setup {
                   'relation'       => 'AND'
               )
           ),
-          'css' => false,
+          'css' => array('version' => 0, 'text' => ''),
           'version' => DocumentGallery::version(true)
       );
    }
@@ -55,6 +55,9 @@ class DG_Setup {
          // update version number
          $options['version'] = DocumentGallery::version(true);
          update_option(DG_OPTION_NAME, $options);
+         if ('' !== $options['css']['text']) {
+            DocumentGallery::updateUserGalleryStyle($options['css']['text']);
+         }
       }
    }
 
