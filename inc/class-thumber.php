@@ -189,6 +189,24 @@ class DG_Thumber {
       return $temp_file;
    }
 
+   /**
+    * @return bool Whether WP_Image_Editor_Imagick can be used on this system.
+    */
+   public static function isImagickAvailable() {
+      static $ret = null;
+
+      if (is_null($ret)) {
+         $ret = false;
+         if (file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php')) {
+            include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
+            include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
+            $ret = WP_Image_Editor_Imagick::test();
+         }
+      }
+
+      return $ret;
+   }
+
    /*==========================================================================
     * GHOSTSCRIPT THUMBNAILS
     *=========================================================================*/
@@ -292,17 +310,21 @@ class DG_Thumber {
     *
     * NOTE: Caller must verify that extension is supported.
     *
-    * @param str $ID    The attachment ID to retrieve thumbnail from.
-    * @param int $pg    The page number to make thumbnail of -- index starts at 1.
-    * @return bool|str  False on failure, URL to thumb on success.
+    * @param str $ID     The attachment ID to retrieve thumbnail for.
+    * @param int $pg     The page number to make thumbnail of -- index starts at 1.
+    * @return bool|str   False on failure, URL to thumb on success.
     */
-   public static function getGoogleDriveThumbnail($ID, $pg = 1) {
+   public static function getGoogleDriveThumbnail($ID_URL, $pg = 1) {
       // User agent for Lynx 2.8.7rel.2 -- Why? Because I can.
       static $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
       static $timeout = 60;
 
       $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=%d&w=%d';
-      $doc_url = wp_get_attachment_url($ID);
+      $doc_url = wp_get_attachment_url($ID_URL);
+      if (!$doc_url) {
+         return false;
+      }
+
       $temp_file = self::getTempFile();
 
       // args for use in HTTP request
@@ -352,6 +374,14 @@ class DG_Thumber {
          'tiff', 'bmp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
          'pdf', 'pages', 'ai', 'psd', 'dxf', 'svg', 'eps', 'ps', 'ttf'
       );
+   }
+
+   /**
+    * TODO: Currently always returns true.
+    * @return bool Whether Google Drive can access files on this system.
+    */
+   public static function isGoogleDriveAvailable() {
+      return true;
    }
 
    /*==========================================================================
@@ -711,21 +741,6 @@ class DG_Thumber {
       }
 
       return $available;
-   }
-
-   public static function isImagickAvailable() {
-      static $ret = null;
-
-      if (is_null($ret)) {
-         $ret = false;
-         if (file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php')) {
-            include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-            include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
-            $ret = WP_Image_Editor_Imagick::test();
-         }
-      }
-
-      return $ret;
    }
 
    /**

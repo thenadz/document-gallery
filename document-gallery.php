@@ -56,13 +56,7 @@ if (is_admin()) {
    }
 } else {
    // styling for gallery
-   if (false === $dg_options['css']) {
-      // enqueue standard CSS
-      add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
-   } else {
-      // print custom CSS
-      add_action('wp_print_styles', array('DocumentGallery', 'printGalleryStyle'));
-   }
+   add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
 }
 
 // adds 'dg' shortcode
@@ -95,22 +89,22 @@ class DocumentGallery {
     * Enqueue standard DG CSS.
     */
    public static function enqueueGalleryStyle() {
-      wp_register_style('dg-main', DG_URL . 'assets/css/style.css', null, self::version());
+      global $dg_options;
+      wp_register_style('dg-main', DG_URL . 'assets/css/style.css', null,
+          self::version() . ':' . $dg_options['css']['version']);
       wp_enqueue_style('dg-main');
    }
 
-   /**
-    * Print custom user CSS.
-    */
-   public static function printGalleryStyle() {
-      global $dg_options;
+   public static function updateUserGalleryStyle($css) {
+      $ret = false;
 
-      if ($dg_options['css'])
-      {
-         echo '<style type="text/css">' . PHP_EOL;
-         echo $dg_options['css'];
-         echo '</style>' . PHP_EOL;
+      if ($css_file = file_get_contents(DG_PATH . 'assets/css/style.css')) {
+         $css_file = preg_replace('#/\* CUSTOM USER CSS \*/.*#s',
+             "/* CUSTOM USER CSS */\n" . $css, $css_file);
+         $ret = (bool)file_put_contents(DG_PATH . 'assets/css/style.css', $css_file, LOCK_EX);
       }
+
+      return $ret;
    }
 
    /*==========================================================================

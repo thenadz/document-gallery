@@ -18,7 +18,7 @@ div.document-icon{
   display: inline-block;
   vertical-align: top;
   overflow: hidden;
-  /* percents round up in some browsers, making 
+  /* percents round up in some browsers, making
   only 3 icons fit per line so can't use 25% */
   width: 24.5%;
 }
@@ -30,7 +30,7 @@ div.document-icon-wrapper{
 /* END WITHOUT DESCRIPTION */
 
 /* WITH DESCRIPTION */
-div.descriptions.document-icon-wrapper div.document-icon{ 
+div.descriptions.document-icon-wrapper div.document-icon{
   max-width: 115px;
   padding: 0;
   padding-right: 3px;
@@ -55,7 +55,7 @@ div.descriptions.document-icon-wrapper:after{
   content: "";
   display: table;
 }
- 
+
 div.descriptions.document-icon-wrapper:after{
     clear: both;
 }
@@ -63,3 +63,5 @@ div.descriptions.document-icon-wrapper{
     zoom: 1; /* For IE 6/7 (trigger hasLayout) */
 }
 /* END WITH DESCRIPTION */
+
+/* CUSTOM USER CSS */
