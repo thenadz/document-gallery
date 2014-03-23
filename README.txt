@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 2.0
+Stable tag: 2.0.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -258,6 +258,13 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.0.1 =
+* **Bug Fix:** Resolves issue with `2.0` where DG options were not properly
+  initialized when the plugin was updated. This caused the settings page to
+  behave oddly and many other things throughout to not work as expected when
+  you updated through the dashboard. Thanks to jawhite & rigbypa for [reporting
+  this](http://wordpress.org/support/topic/errors-after-updating-to-20)!
 
 = 2.0 =
 * **Enhancement:** This release is a **BIG** deal! We are introducing true

@@ -45,7 +45,7 @@ class DG_Admin {
     * Registers stylesheet for admin options page.
     */
    public static function registerAdminStyle() {
-      wp_register_style('dg-admin', DG_URL . 'admin/css/style.css', null, DocumentGallery::version());
+      wp_register_style('dg-admin', DG_URL . 'admin/css/style.css', null, DG_VERSION);
    }
 
    /**
