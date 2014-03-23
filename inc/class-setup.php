@@ -12,6 +12,7 @@ class DG_Setup {
     * @return array Contains default options for DG.
     */
    public static function getDefaultOptions() {
+      include_once DG_PATH . 'inc/class-thumber.php';
       return array(
           'thumber' => array(
               'thumbs' => array(),
@@ -39,24 +40,29 @@ class DG_Setup {
               )
           ),
           'css' => array('version' => 0, 'text' => ''),
-          'version' => DocumentGallery::version(true)
+          'version' => DG_VERSION
       );
    }
 
    /**
-    * Runs when DG is activated.
+    * Runs every page load, updates when needed.
     */
-   public static function activation() {
-      $options = get_option(DG_OPTION_NAME, null);
-      if (is_null($options)) {
-         // first installation
-         add_option(DG_OPTION_NAME, self::getDefaultOptions());
-      } else if (DocumentGallery::version(true) !== $options['version']) {
-         // update version number
-         $options['version'] = DocumentGallery::version(true);
-         update_option(DG_OPTION_NAME, $options);
-         if ('' !== $options['css']['text']) {
-            DocumentGallery::updateUserGalleryStyle($options['css']['text']);
+   public static function maybeUpdate() {
+      global $dg_options;
+
+      // first installation
+      if (is_null($dg_options)) {
+         $options = self::getDefaultOptions();
+         add_option(DG_OPTION_NAME, $options);
+      }
+
+      // do update
+      elseif (DG_VERSION !== $dg_options['version']) {
+         $dg_options['version'] = DG_VERSION;
+         update_option(DG_OPTION_NAME, $dg_options);
+
+         if ('' !== $dg_options['css']['text']) {
+            DocumentGallery::updateUserGalleryStyle($dg_options['css']['text']);
          }
       }
    }
