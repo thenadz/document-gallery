@@ -3,7 +3,7 @@ Contributors: dan.rossiter
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -258,6 +258,13 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.0.2 =
+* **Bug Fix:** Imagick was actually never working... My bad -- it is now! Thanks to
+  [kaldimar](http://wordpress.org/support/profile/kaldimar) for reporting this.
+* **Enhancement:** Document Gallery en el Español por Andrew de
+  [WebHostingHub](http://www.webhostinghub.com/). (To help translate to another
+  language, [see here](http://wordpress.org/support/topic/seeking-translators).)
 
 = 2.0.1 =
 * **Bug Fix:** Resolves issue with `2.0` where DG options were not properly

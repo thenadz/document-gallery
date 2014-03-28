@@ -51,19 +51,31 @@ class DG_Setup {
       global $dg_options;
 
       // first installation
-      if (is_null($dg_options)) {
+      if (empty($dg_options)) {
          $options = self::getDefaultOptions();
          add_option(DG_OPTION_NAME, $options);
       }
 
       // do update
       elseif (DG_VERSION !== $dg_options['version']) {
+         // update version in DB
          $dg_options['version'] = DG_VERSION;
-         update_option(DG_OPTION_NAME, $dg_options);
 
+         // remove previously-failed thumbs
+         $thumbs = $dg_options['thumber']['thumbs'];
+         foreach ($thumbs as $k => $v) {
+            if (false === $v) {
+               unset($dg_options['thumber']['thumbs'][$k]);
+            }
+         }
+
+         // re-edit CSS file
          if ('' !== $dg_options['css']['text']) {
             DocumentGallery::updateUserGalleryStyle($dg_options['css']['text']);
          }
+
+         // commit DB changes
+         update_option(DG_OPTION_NAME, $dg_options);
       }
    }
 
