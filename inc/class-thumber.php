@@ -162,12 +162,10 @@ class DG_Thumber {
     * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getImagickThumbnail($ID, $pg = 1) {
-      include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-      include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
+      include_once DG_PATH . 'inc/class-image-editor-imagick.php';
 
-      $doc_path = get_attached_file($ID) . '[' . $pg - 1 . ']';
-
-      $img = new WP_Image_Editor_Imagick($doc_path);
+      $doc_path = get_attached_file($ID);
+      $img = new DG_Image_Editor_Imagick($doc_path, $pg - 1);
       $err = $img->load();
       if(is_wp_error($err)) {
          self::writeLog(

@@ -4,7 +4,7 @@ defined('WPINC') OR exit;
 /*
   Plugin Name: Document Gallery
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.0.1
+  Version: 2.0.2
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
@@ -12,7 +12,7 @@ defined('WPINC') OR exit;
  */
 
 // define helper paths & URLs
-define('DG_VERSION', '2.0.1');
+define('DG_VERSION', '2.0.2');
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', plugin_dir_path(__FILE__));
 if(!defined('WP_INCLUDE_DIR')) {
@@ -113,7 +113,7 @@ class DocumentGallery {
     *=========================================================================*/
 
    public static function loadTextDomain() {
-      load_plugin_textdomain('document-gallery', false, DG_PATH . 'languages');
+      load_plugin_textdomain('document-gallery', false, dirname(plugin_basename(__FILE__ )) . '/languages/');
    }
 
    /*==========================================================================
