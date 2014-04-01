@@ -37,15 +37,6 @@ class DG_Admin {
           __('Document Gallery Settings', 'document-gallery'),
           __('Document Gallery', 'document-gallery'),
           'manage_options', 'document_gallery', array(__CLASS__, 'renderOptions'));
-
-      add_action('admin_print_styles-' . $page, array(__CLASS__, 'enqueueAdminStyle'));
-   }
-
-   /**
-    * Registers stylesheet for admin options page.
-    */
-   public static function registerAdminStyle() {
-      wp_register_style('dg-admin', DG_URL . 'admin/css/style.css', null, DG_VERSION);
    }
 
    /**
@@ -377,15 +368,12 @@ class DG_Admin {
          }
       }
 
-      // handle changed CSS
-      if (trim($values['css']) != trim($ret['css']['text'])) {
-         if (DocumentGallery::updateUserGalleryStyle($values['css'])) {
-            $ret['css']['text'] = $values['css'];
-            $ret['css']['version']++;
-         } else {
-            add_settings_error(DG_OPTION_NAME, 'css',
-                __('Failed to update CSS file.', 'document-gallery'));
-         }
+      // handle modified CSS
+      if (trim($ret['css']['text']) !== trim($values['css'])) {
+         $ret['css']['text'] = trim($values['css']);
+         $ret['css']['version']++;
+         $ret['css']['last-modified'] = gmdate('D, d M Y H:i:s');
+         $ret['css']['etag'] = md5($ret['css']['last-modified']);
       }
 
       // handle setting the Ghostscript path
@@ -401,13 +389,6 @@ class DG_Admin {
       }
 
       return $ret;
-   }
-
-   /**
-    * Enqueues stylesheet for admin options page.
-    */
-   public static function enqueueAdminStyle() {
-      wp_enqueue_style('dg-admin');
    }
 
    /**
