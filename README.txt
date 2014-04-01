@@ -237,7 +237,6 @@ is perfectly alright.
 
 == Frequently Asked Questions ==
 
-
 = Q: Why is (insert thumbnail generation method) enabled on one of my WordPress
 installs, but not on another one? =
 
