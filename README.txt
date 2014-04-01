@@ -339,7 +339,7 @@ Note that the display inherits styling from your active theme.
   in your dashboard and enter valid CSS in the "Custom CSS" textbox. See the changes
   instantly in your galleries!
 * **Enhancement:** Entire plugin is now
-  [Internalization-enabled](https://codex.wordpress.org/I18n_for_WordPress_Developers).
+  [Internationalization-enabled](https://codex.wordpress.org/I18n_for_WordPress_Developers).
   This means that we can now support users speaking all languages. If you are
   interested in translating Document Gallery into a language that you speak,
   please [let me know](http://wordpress.org/support/topic/seeking-translators)!
