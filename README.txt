@@ -1,9 +1,10 @@
 === Document Gallery ===
 Contributors: dan.rossiter
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +235,43 @@ modifying the image tag, the anchor tag, or the title can be handled with this
 filter. Note that this function does not use the $id value it receives, which
 is perfectly alright.
 
+== FAQ ==
+
+= Q: Why is (insert thumbnail generation method) enabled on one of my WordPress
+installs, but not on another one? =
+
+A: Document Gallery works very hard behind the scenes to ensure that it enables
+as much as is possible for any given server, but some servers just can't do
+some of the things that the plugin supports. Document Gallery detects when a
+server can't do something (run Ghostscript, for example) and disables that option.
+If you later modify your server to handle one of the thumbnail generation methods,
+Document Gallery will notice this and re-enable the option on the settings page,
+though you will need to go in and tell Document Gallery that it should use this
+newly-enabled method.
+
+= Q: Why is Ghostscript so much faster than Imagick? =
+
+A: This comes down to how the two programs work. Imagick actually delegates
+handling of PDFs to Ghostscript behind the scenes, but it doesn't do so
+intelligently. Before passing off the PDF, it first reads the entire contents
+of the PDF into memory. Since we only need a single page to generate the
+thumbnail, this is much more work than is needed. Ghostscript, on the other hand,
+can handle reading only one page into memory, thus doing much less work before
+returning our thumbnail.
+
+= Q: Why isn't Google Drive Viewer enabled by default? =
+
+A: Google Drive Viewer is the most commonly-supported thumbnail generation method,
+alongside the Audio/Video generation, but is disabled by default. The reason
+for this is that in order to use this method, Document Gallery has to send your
+document over to Google's servers, where Google will generate the thumbnail for
+you. For most users, this shouldn't be a big deal, but since some users
+retain sensitive documents on their site, this was made opt-in to avoid
+compromising anyone's security. If you don't have sensitive documents, I
+would recommend enabling it, since it's currently the only way to generate a
+thumbnail for any of the Microsoft Office files, as well as some less common
+file types.
+
 == Screenshots ==
 
 1. This is an example of "fancy" thumbnails. The images are a copy of the front
@@ -258,6 +296,18 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.0.3 =
+* **Enhancement:** Now handles custom user CSS more securely.
+* **Enhancement:** Now handles calling Ghostscript executable more securely.
+* **Enhancement:** Now provides timing information for gallery generation
+  when running WordPress in [WP_DEBUG](https://codex.wordpress.org/WP_DEBUG)
+  mode. When enabled, DG will log to the PHP error log file.
+* **Info:** Did you know that in tests I performed, Ghostscript (GS) performed
+  350% faster than using Imagick (IM)? Try testing with 
+  [this file](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf),
+  which finished almost instantly using GS, but took multiple minutes when
+  using IM on my test server (results may vary). See new FAQ tab to find out why.
 
 = 2.0.2 =
 * **Bug Fix:** Imagick was actually never working... My bad -- it is now! Thanks to
