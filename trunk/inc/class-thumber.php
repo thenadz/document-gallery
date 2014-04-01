@@ -87,17 +87,11 @@ class DG_Thumber {
     * Uses wp_read_video_metadata() and wp_read_audio_metadata() to retrieve
     * an embedded image to use as a thumbnail.
     *
-    * NOTE: Caller must verify that WP version >= 3.6.
-    *
     * @param str $ID    The attachment ID to retrieve thumbnail from.
     * @param int $pg    Unused.
     * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getAudioVideoThumbnail($ID, $pg = 1) {
-      if(!file_exists(WP_ADMIN_DIR . '/includes/media.php')) {
-         return false;
-      }
-
       include_once WP_ADMIN_DIR . '/includes/media.php';
 
       $attachment = get_post($ID);
@@ -128,12 +122,12 @@ class DG_Thumber {
       $temp_file = self::getTempFile($ext);
 
       if (!$fp = @fopen($temp_file, 'wb')) {
-         self::writeLog(__('Could not open file: ', 'document-gallery') . $temp_file);
+         DocumentGallery::writeLog(__('Could not open file: ', 'document-gallery') . $temp_file);
          return false;
       }
 
       if (!@fwrite($fp, $metadata['image']['data'])) {
-         self::writeLog(__('Could not write file: ', 'document-gallery') . $temp_file);
+         DocumentGallery::writeLog(__('Could not write file: ', 'document-gallery') . $temp_file);
          fclose($fp);
          return false;
       }
@@ -168,7 +162,7 @@ class DG_Thumber {
       $img = new DG_Image_Editor_Imagick($doc_path, $pg - 1);
       $err = $img->load();
       if(is_wp_error($err)) {
-         self::writeLog(
+         DocumentGallery::writeLog(
              __('Failed to open file in Imagick: ', 'document-gallery') .
              $err->get_error_message());
          return false;
@@ -178,7 +172,7 @@ class DG_Thumber {
 
       $err = $img->save($temp_file, 'image/png');
       if (is_wp_error($err)) {
-         self::writeLog(
+         DocumentGallery::writeLog(
              __('Failed to save image in Imagick: ', 'document-gallery') .
              $err->get_error_message());
          return false;
@@ -194,12 +188,9 @@ class DG_Thumber {
       static $ret = null;
 
       if (is_null($ret)) {
-         $ret = false;
-         if (file_exists(WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php')) {
-            include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-            include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
-            $ret = WP_Image_Editor_Imagick::test();
-         }
+         include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
+         include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
+         $ret = WP_Image_Editor_Imagick::test();
       }
 
       return $ret;
@@ -223,9 +214,10 @@ class DG_Thumber {
       if (is_null($gs)) {
          $options = self::getOptions();
          $gs = $options['gs'];
+         
          if (false !== $gs) {
-            $gs = "\"$gs\" -sDEVICE=png16m -dFirstPage=%d -dLastPage=%d"
-                . ' -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
+            $gs = escapeshellarg($gs) . ' -sDEVICE=png16m -dFirstPage=%d'
+                . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
          }
       }
 
@@ -239,7 +231,7 @@ class DG_Thumber {
       exec(sprintf($gs, $pg, $pg, $temp_path, $doc_path), $out, $ret);
 
       if ($ret != 0) {
-         self::writeLog(__('Ghostscript failed: ', 'document-gallery') . print_r($out));
+         DocumentGallery::writeLog(__('Ghostscript failed: ', 'document-gallery') . print_r($out));
          @unlink($temp_path);
          return false;
       }
@@ -255,7 +247,10 @@ class DG_Thumber {
    }
 
    /**
-    * Checks whether we may call gs through exec().
+    * Dynamically determines whether we may call gs through exec().
+    * 
+    * NOTE: This does not check the options for gs path. Don't use in
+    * thumbnail generation as it's slow and not configurable.
     *
     * @return bool|str If available, returns exe path. False otherwise.
     */
@@ -271,11 +266,11 @@ class DG_Thumber {
          if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
             // look for environment variable
             $executable = getenv('GSC');
-            if($executable) return $executable;
+            if ($executable) return $executable;
 
             // hope GS in the path
             $executable = exec('where gswin*c.exe');
-            if(!empty($executable)) return $executable;
+            if (!empty($executable)) return $executable;
 
             // look directly in filesystem
             // 64- or 32-bit binary
@@ -352,7 +347,7 @@ class DG_Thumber {
       $response = wp_remote_get($google_viewer, $args);
 
       if (is_wp_error($response) || !preg_match('/[23][0-9]{2}/', $response['response']['code'])) {
-         self::writeLog(__('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
+         DocumentGallery::writeLog(__('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
              (is_wp_error($response)
                ? $response->get_error_message()
                : $response['response']['message']));
@@ -563,7 +558,7 @@ class DG_Thumber {
          $thumbers = array();
 
          // Audio/Video embedded images
-         if ($active['av'] && version_compare($wp_version, '3.6', '>=')) {
+         if ($active['av']) {
             $exts = implode('|', self::getAudioVideoExts());
             $thumbers[$exts] = array(__CLASS__, 'getAudioVideoThumbnail');
          }
@@ -576,17 +571,10 @@ class DG_Thumber {
 
          // Imagick
          if ($active['imagick'] && self::isImagickAvailable()) {
-            include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-            include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
-            try {
-               $exts = @Imagick::queryFormats();
-               if($exts) {
-                  $exts = implode('|', $exts);
-                  $thumbers[$exts] = array(__CLASS__, 'getImagickThumbnail');
-               }
-            }
-            catch (Exception $e) {
-
+            include_once DG_PATH . 'inc/class-image-editor-imagick.php';
+            if ($exts = DG_Image_Editor_Imagick::query_formats()) {
+               $exts = implode('|', $exts);
+               $thumbers[$exts] = array(__CLASS__, 'getImagickThumbnail');
             }
          }
 
@@ -638,7 +626,7 @@ class DG_Thumber {
       $img = wp_get_image_editor($temp_path);
 
       if (is_wp_error($img)) {
-         self::writeLog(
+         DocumentGallery::writeLog(
              __('Failed to get image editor: ', 'document-gallery') .
              $img->get_error_message());
          return false;
@@ -649,7 +637,7 @@ class DG_Thumber {
       $err = $img->save($thumb_path);
 
       if (is_wp_error($err)) {
-         self::writeLog(
+         DocumentGallery::writeLog(
              __('Failed to save image: ', 'document-gallery') .
              $err->get_error_message());
          return false;
@@ -757,22 +745,6 @@ class DG_Thumber {
       }
 
       return false;
-   }
-
-   /**
-    * Appends error log with $entry if WordPress is in debug mode.
-    *
-    * @param str $entry
-    */
-   private static function writeLog($entry) {
-      if (defined('WP_DEBUG') && WP_DEBUG) {
-         $err = 'DG: ' . print_r($entry, true) . PHP_EOL;
-         if (defined('ERRORLOGFILE')) {
-            error_log($err, 3, ERRORLOGFILE);
-         } else {
-            error_log($err);
-         }
-      }
    }
 
    /**

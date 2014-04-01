@@ -4,7 +4,7 @@ defined('WPINC') OR exit;
 /*
   Plugin Name: Document Gallery
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.0.2
+  Version: 2.0.3
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
@@ -12,7 +12,7 @@ defined('WPINC') OR exit;
  */
 
 // define helper paths & URLs
-define('DG_VERSION', '2.0.2');
+define('DG_VERSION', '2.0.3');
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', plugin_dir_path(__FILE__));
 if(!defined('WP_INCLUDE_DIR')) {
@@ -52,12 +52,17 @@ if (is_admin()) {
    if (!empty($GLOBALS['pagenow'])
        && ('options-general.php' === $GLOBALS['pagenow'] // output
        || 'options.php' === $GLOBALS['pagenow'])) {      // validation
-       add_action('admin_init', array('DG_Admin', 'registerAdminStyle'));
        add_action('admin_init', array('DG_Admin', 'registerSettings'));
    }
 } else {
    // styling for gallery
-   add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
+   if (empty($dg_options['css']['text'])) {
+      add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
+   } else {
+      add_action('template_redirect', array('DocumentGallery', 'buildCustomCss'));
+      add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueCustomStyle'));
+      add_filter('query_vars', array('DocumentGallery', 'addCustomStyleQueryVar'));
+   }
 }
 
 // adds 'dg' shortcode
@@ -70,6 +75,11 @@ add_shortcode('dg', array('DocumentGallery', 'doShortcode'));
  */
 class DocumentGallery {
 
+   /**
+    * @var str Name of the query var used to check whether we should print custom CSS.
+    */
+   private static $query_var = 'document-gallery-css';
+   
    /*==========================================================================
     * THE SHORTCODE
     *=========================================================================*/
@@ -83,29 +93,85 @@ class DocumentGallery {
     */
    public static function doShortcode($atts) {
       include_once 'inc/class-gallery.php';
-      return new DG_Gallery($atts);
+      
+      $start = microtime(true);
+      $gallery = (string)new DG_Gallery($atts);
+      DocumentGallery::writeLog('Generation Time: ' . (microtime(true) - $start) . ' s');
+      
+      return $gallery;
    }
 
    /**
     * Enqueue standard DG CSS.
     */
    public static function enqueueGalleryStyle() {
+      wp_register_style('document-gallery', DG_URL . 'assets/css/style.css', null, DG_VERSION);
+      wp_enqueue_style('document-gallery');
+   }
+   
+   /**
+    * Enqueue user's custom DG CSS.
+    */
+   public static function enqueueCustomStyle() {
       global $dg_options;
-      wp_register_style('dg-main', DG_URL . 'assets/css/style.css', null,
-          DG_VERSION . ':' . $dg_options['css']['version']);
-      wp_enqueue_style('dg-main');
+      wp_register_style('document-gallery', add_query_arg(self::$query_var, 1, home_url('/')),
+              null, DG_VERSION . ':' . $dg_options['css']['version']);
+      wp_enqueue_style('document-gallery');
+   }
+   
+   /**
+    * Add query custom CSS query string.
+    * Taken from here: http://ottopress.com/2010/dont-include-wp-load-please/
+    * @param array $vars
+    * @return array
+    */
+   public static function addCustomStyleQueryVar($vars) {
+      $vars[] = self::$query_var;
+      return $vars;
+   }
+   
+   /**
+    * Constructs user's custom CSS dynamically, then instructs
+    * browser to cache for a year. Cache is busted by versioning
+    * CSS any time the user makes a change.
+    */
+   public static function buildCustomCss() {
+      if (1 == intval(get_query_var(self::$query_var))) {
+            global $dg_options;
+            
+            header('Content-type: text/css; charset=UTF-8');
+            header('Cache-Control: no-transform,public,maxage=' . 31536000);
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT');
+            header('Last-Modified: ' . $dg_options['css']['last-modified']);
+            header('ETag: ' . $dg_options['css']['etag']);
+
+            // standard CSS
+            echo file_get_contents(DG_PATH . 'assets/css/style.css') . PHP_EOL;
+
+            // custom CSS
+            echo str_replace('&gt;', '>', esc_html($dg_options['css']['text']));
+            exit;
+      }
    }
 
-   public static function updateUserGalleryStyle($css) {
-      $ret = false;
+   /*==========================================================================
+    * Logging
+    *=========================================================================*/
 
-      if ($css_file = file_get_contents(DG_PATH . 'assets/css/style.css')) {
-         $css_file = preg_replace('#/\* CUSTOM USER CSS \*/.*#s',
-             "/* CUSTOM USER CSS */\n" . $css, $css_file);
-         $ret = (bool)file_put_contents(DG_PATH . 'assets/css/style.css', $css_file, LOCK_EX);
+   /**
+    * Appends error log with $entry if WordPress is in debug mode.
+    *
+    * @param str $entry
+    */
+   public static function writeLog($entry) {
+      if (defined('WP_DEBUG') && WP_DEBUG) {
+         $err = 'DG: ' . print_r($entry, true) . PHP_EOL;
+         if (defined('ERRORLOGFILE')) {
+            error_log($err, 3, ERRORLOGFILE);
+         } else {
+            error_log($err);
+         }
       }
-
-      return $ret;
    }
 
    /*==========================================================================

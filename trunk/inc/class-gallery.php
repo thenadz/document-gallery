@@ -406,42 +406,25 @@ class DG_Gallery {
     */
    private function setTaxa(&$query) {
       if(!empty($this->taxa)) {
-         global $wp_version;
          $taxa = array();
 
-         // use preferred tax_query if supported
-         if (version_compare($wp_version, '3.1', '>=')) {
-            // only include relation if we have multiple taxa
-            if(count($this->taxa) > 1) {
-               $taxa['relation'] = $this->atts['relation'];
-            }
-
-            foreach ($this->taxa as $taxon => $terms) {
-               $terms = $this->getTermIdsByNames($taxon, explode(',', $terms));
-
-               $taxa[] = array(
-                  'taxonomy' => $taxon,
-                  'field' => 'id',
-                  'terms' => $terms
-               );
-            }
-
-            // create nested structure
-            $query['tax_query'] = $taxa;
-         } elseif (version_compare($wp_version, '2.3', '>=')) {
-            // fallback to deprecated {tax_name} => {term_slug} construct
-            foreach ($this->taxa as $taxon => $terms) {
-               $taxa[$taxon] = ($taxon == 'category')
-                   ? implode(',', $this->getTermIdsByNames($taxon, explode(',', $terms)))
-                   : implode(',', $this->getTermSlugsByNames($taxon, explode(',', $terms)));
-            }
-
-            $query = array_merge($taxa, $query);
-         } else {
-            // WP < 2.3 not supported for category/custom taxa
-            $this->errs[] = __('The following attributes are invalid: ', 'document-gallery') .
-                implode(', ', array_keys($this->taxa));
+         // only include relation if we have multiple taxa
+         if(count($this->taxa) > 1) {
+            $taxa['relation'] = $this->atts['relation'];
          }
+
+         foreach ($this->taxa as $taxon => $terms) {
+            $terms = $this->getTermIdsByNames($taxon, explode(',', $terms));
+
+            $taxa[] = array(
+               'taxonomy' => $taxon,
+               'field' => 'id',
+               'terms' => $terms
+            );
+         }
+
+         // create nested structure
+         $query['tax_query'] = $taxa;
       }
    }
 
