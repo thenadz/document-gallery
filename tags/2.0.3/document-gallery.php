@@ -3,6 +3,7 @@ defined('WPINC') OR exit;
 
 /*
   Plugin Name: Document Gallery
+  Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
   Version: 2.0.3
   Author: Dan Rossiter
