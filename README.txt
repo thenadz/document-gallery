@@ -235,7 +235,7 @@ modifying the image tag, the anchor tag, or the title can be handled with this
 filter. Note that this function does not use the $id value it receives, which
 is perfectly alright.
 
-== FAQ ==
+== Frequently Asked Questions ==
 
 = Q: Why is (insert thumbnail generation method) enabled on one of my WordPress
 installs, but not on another one? =
