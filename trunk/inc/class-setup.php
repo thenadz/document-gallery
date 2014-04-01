@@ -13,6 +13,8 @@ class DG_Setup {
     */
    public static function getDefaultOptions() {
       include_once DG_PATH . 'inc/class-thumber.php';
+      $date = gmdate('D, d M Y H:i:s');
+      $etag = md5($date);
       return array(
           'thumber' => array(
               'thumbs' => array(),
@@ -39,7 +41,12 @@ class DG_Setup {
                   'relation'       => 'AND'
               )
           ),
-          'css' => array('version' => 0, 'text' => ''),
+          'css' => array(
+              'text' => '',
+              'last-modified' => $date,
+              'etag' => $etag,
+              'version' => 0
+          ),
           'version' => DG_VERSION
       );
    }
@@ -52,14 +59,18 @@ class DG_Setup {
 
       // first installation
       if (empty($dg_options)) {
-         $options = self::getDefaultOptions();
-         add_option(DG_OPTION_NAME, $options);
+         $dg_options = self::getDefaultOptions();
+         add_option(DG_OPTION_NAME, $dg_options);
       }
 
       // do update
       elseif (DG_VERSION !== $dg_options['version']) {
-         // update version in DB
+         // update plugin version
          $dg_options['version'] = DG_VERSION;
+         
+         // used in dynamic CSS HTTP headers
+         $dg_options['css']['last-modified'] = gmdate('D, d M Y H:i:s');
+         $dg_options['css']['etag'] = md5($dg_options['css']['last-modified']);
 
          // remove previously-failed thumbs
          $thumbs = $dg_options['thumber']['thumbs'];
@@ -67,11 +78,6 @@ class DG_Setup {
             if (false === $v) {
                unset($dg_options['thumber']['thumbs'][$k]);
             }
-         }
-
-         // re-edit CSS file
-         if ('' !== $dg_options['css']['text']) {
-            DocumentGallery::updateUserGalleryStyle($dg_options['css']['text']);
          }
 
          // commit DB changes
