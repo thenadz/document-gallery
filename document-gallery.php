@@ -3,8 +3,9 @@ defined('WPINC') OR exit;
 
 /*
   Plugin Name: Document Gallery
+  Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.0.3
+  Version: 2.0.4
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
@@ -12,7 +13,7 @@ defined('WPINC') OR exit;
  */
 
 // define helper paths & URLs
-define('DG_VERSION', '2.0.3');
+define('DG_VERSION', '2.0.4');
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', plugin_dir_path(__FILE__));
 if(!defined('WP_INCLUDE_DIR')) {
@@ -79,7 +80,7 @@ class DocumentGallery {
     * @var str Name of the query var used to check whether we should print custom CSS.
     */
    private static $query_var = 'document-gallery-css';
-   
+
    /*==========================================================================
     * THE SHORTCODE
     *=========================================================================*/
@@ -93,11 +94,11 @@ class DocumentGallery {
     */
    public static function doShortcode($atts) {
       include_once 'inc/class-gallery.php';
-      
+
       $start = microtime(true);
       $gallery = (string)new DG_Gallery($atts);
       DocumentGallery::writeLog('Generation Time: ' . (microtime(true) - $start) . ' s');
-      
+
       return $gallery;
    }
 
@@ -108,7 +109,7 @@ class DocumentGallery {
       wp_register_style('document-gallery', DG_URL . 'assets/css/style.css', null, DG_VERSION);
       wp_enqueue_style('document-gallery');
    }
-   
+
    /**
     * Enqueue user's custom DG CSS.
     */
@@ -118,7 +119,7 @@ class DocumentGallery {
               null, DG_VERSION . ':' . $dg_options['css']['version']);
       wp_enqueue_style('document-gallery');
    }
-   
+
    /**
     * Add query custom CSS query string.
     * Taken from here: http://ottopress.com/2010/dont-include-wp-load-please/
@@ -129,7 +130,7 @@ class DocumentGallery {
       $vars[] = self::$query_var;
       return $vars;
    }
-   
+
    /**
     * Constructs user's custom CSS dynamically, then instructs
     * browser to cache for a year. Cache is busted by versioning
@@ -138,18 +139,14 @@ class DocumentGallery {
    public static function buildCustomCss() {
       if (1 == intval(get_query_var(self::$query_var))) {
             global $dg_options;
-            
-            header('Content-type: text/css; charset=UTF-8');
+
+            header('Content-type: text/css');
             header('Cache-Control: no-transform,public,maxage=' . 31536000);
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT');
             header('Last-Modified: ' . $dg_options['css']['last-modified']);
             header('ETag: ' . $dg_options['css']['etag']);
 
-            // standard CSS
-            echo file_get_contents(DG_PATH . 'assets/css/style.css') . PHP_EOL;
-
-            // custom CSS
-            echo str_replace('&gt;', '>', esc_html($dg_options['css']['text']));
+            echo $dg_options['css']['minified'];
             exit;
       }
    }
@@ -185,6 +182,80 @@ class DocumentGallery {
    /*==========================================================================
     * HELPER FUNCTIONS
     *=========================================================================*/
+   
+   /**
+    * Compiles any custom CSS plus the default CSS together,
+    * minifying in the process.
+    * @param str $custom The custom CSS to compile.
+    * @return str Compiled CSS, including both standard and any custom.
+    */
+   public static function compileCustomCss($custom) {
+      $css = file_get_contents(DG_PATH . 'assets/css/style.css');
+      $css .= str_replace('&gt;', '>', esc_html($custom));
+      
+      return self::minifyCss($css);
+   }
+   
+   /**
+    * Removes all comments & space from CSS string.
+    * Source: http://stackoverflow.com/a/15195752/866618
+    */
+   private static function minifyCss($css) {
+      # remove comments first (simplifies the other regex)
+      $re1 = <<<EOS
+(?sx)
+  # quotes
+  (
+    "(?:[^"\\]++|\\.)*+"
+  | '(?:[^'\\]++|\\.)*+'
+  )
+|
+  # comments
+  /\* (?> .*? \*/ )
+EOS;
+
+      $re2 = <<<EOS
+(?six)
+  # quotes
+  (
+    "(?:[^"\\]++|\\.)*+"
+  | '(?:[^'\\]++|\\.)*+'
+  )
+|
+  # ; before } (and the spaces after it while we're here)
+  \s*+ ; \s*+ ( } ) \s*+
+|
+  # all spaces around meta chars/operators
+  \s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\b ) \s*+
+|
+  # spaces right of ( [ :
+  ( [[(:] ) \s++
+|
+  # spaces left of ) ]
+  \s++ ( [])] )
+|
+  # spaces left (and right) of :
+  \s++ ( : ) \s*+
+  # but not in selectors: not followed by a {
+  (?!
+    (?>
+      [^{}"']++
+    | "(?:[^"\\]++|\\.)*+"
+    | '(?:[^'\\]++|\\.)*+' 
+    )*+
+    {
+  )
+|
+  # spaces at beginning/end of string
+  ^ \s++ | \s++ \z
+|
+  # double spaces to single
+  (\s)\s+
+EOS;
+
+      $css = preg_replace("%$re1%", '$1', $css);
+      return preg_replace("%$re2%", '$1$2$3$4$5$6$7', $css);
+   }
 
    /**
     * Blocks instantiation. All functions are static.
