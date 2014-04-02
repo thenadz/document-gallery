@@ -65,6 +65,9 @@ class DG_Setup {
 
       // do update
       elseif (DG_VERSION !== $dg_options['version']) {
+         $dg_options['css']['minified'] =
+                 DocumentGallery::compileCustomCss($dg_options['css']['text']);
+         
          // update plugin version
          $dg_options['version'] = DG_VERSION;
          
