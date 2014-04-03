@@ -301,6 +301,10 @@ Note that the display inherits styling from your active theme.
 * **Enhancement:** Custom CSS is now loaded faster, meaning faster page loads
   for your users. Tests are showing a speedup of around 30% over where it was
   in the last release.
+* **Enhancement:** All of the default icons were sent through
+  [Yahoo! Smush.it](http://www.smushit.com/ysmush.it/), giving a few percentage
+  points decrease in size. Thanks for the suggestion,
+  [wm](http://wordpress.org/support/profile/webbmasterpianise)!
 
 = 2.0.3 =
 * **Enhancement:** Now handles custom user CSS more securely.
