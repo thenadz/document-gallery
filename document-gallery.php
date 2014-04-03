@@ -5,7 +5,7 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.0.4
+  Version: 2.0.5
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
@@ -13,7 +13,7 @@ defined('WPINC') OR exit;
  */
 
 // define helper paths & URLs
-define('DG_VERSION', '2.0.4');
+define('DG_VERSION', '2.0.5');
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', plugin_dir_path(__FILE__));
 if(!defined('WP_INCLUDE_DIR')) {
@@ -139,7 +139,7 @@ class DocumentGallery {
    public static function buildCustomCss() {
       if (1 == intval(get_query_var(self::$query_var))) {
             global $dg_options;
-
+            
             header('Content-type: text/css');
             header('Cache-Control: no-transform,public,maxage=' . 31536000);
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT');
@@ -193,7 +193,7 @@ class DocumentGallery {
       $css = file_get_contents(DG_PATH . 'assets/css/style.css');
       $css .= str_replace('&gt;', '>', esc_html($custom));
       
-      return self::minifyCss($css);
+      return $css;
    }
    
    /**
