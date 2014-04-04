@@ -1,8 +1,8 @@
 <?php
 defined('WPINC') OR exit;
 
-include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
+include_once DG_WPINC_PATH . 'class-wp-image-editor.php';
+include_once DG_WPINC_PATH . 'class-wp-image-editor-imagick.php';
 
 /**
  * Extends WP_Image_Editor_Imagick to support specifying which
