@@ -92,7 +92,7 @@ class DG_Thumber {
     * @return bool|str  False on failure, URL to thumb on success.
     */
    public static function getAudioVideoThumbnail($ID, $pg = 1) {
-      include_once WP_ADMIN_DIR . '/includes/media.php';
+      include_once DG_WPADMIN_PATH . 'includes/media.php';
 
       $attachment = get_post($ID);
       $doc_path = get_attached_file($ID);
@@ -188,8 +188,8 @@ class DG_Thumber {
       static $ret = null;
 
       if (is_null($ret)) {
-         include_once WP_INCLUDE_DIR . '/class-wp-image-editor.php';
-         include_once WP_INCLUDE_DIR . '/class-wp-image-editor-imagick.php';
+         include_once DG_WPINC_PATH . 'class-wp-image-editor.php';
+         include_once DG_WPINC_PATH . 'class-wp-image-editor-imagick.php';
          $ret = WP_Image_Editor_Imagick::test();
       }
 
