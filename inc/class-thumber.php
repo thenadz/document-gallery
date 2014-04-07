@@ -389,14 +389,16 @@ class DG_Thumber {
     * @return str     URL to thumbnail.
     */
    public static function getDefaultThumbnail($ID, $pg = 1) {
+      $options = self::getOptions();
+      $width = $options['width'];
+      $height = $options['height'];
       $icon_url = DG_URL . 'assets/icons/';
 
       $url = wp_get_attachment_url($ID);
       $ext = self::getExt($url);
 
       // handle images
-      if (wp_attachment_is_image($ID) &&
-          ($icon = wp_get_attachment_image_src($ID, 'thumbnail', false))) {
+      if (wp_attachment_is_image($ID) && ($icon = image_downsize($ID, array($width, $height)))) {
          $icon = $icon[0];
       }
       // default extension icon
@@ -404,11 +406,8 @@ class DG_Thumber {
          $icon = $icon_url . $name;
       }
       // fallback to standard WP icons
-      elseif ($icon = wp_get_attachment_image_src($ID, null, true)) {
-         $icon = $icon[0];
-      }
-      // everything failed. This is bad...
-      else {
+      elseif (!$icon = wp_mime_type_icon($ID)) {
+         // everything failed. This is bad...
          $icon = $icon_url . 'missing.png';
       }
 
