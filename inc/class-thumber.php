@@ -398,7 +398,7 @@ class DG_Thumber {
       $ext = self::getExt($url);
 
       // handle images
-      if (wp_attachment_is_image($ID) && ($icon = image_downsize($ID, array($width, $height)))) {
+      if ($icon = image_downsize($ID, array($width, $height))) {
          $icon = $icon[0];
       }
       // default extension icon
