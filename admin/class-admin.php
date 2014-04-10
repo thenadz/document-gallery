@@ -190,10 +190,10 @@ class DG_Admin {
             'name'        => 'thumber_active][gs',
             'value'       => esc_attr($thumber_active['gs']),
             'option_name' => DG_OPTION_NAME,
-            'description' => DG_Thumber::getGhostscriptExecutable()
+            'description' => DG_Thumber::isGhostscriptAvailable()
                               ? __('Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a> for faster local PDF processing (compared to Imagick).', 'document-gallery')
                               : __('Your server is not configured to run <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a>.', 'document-gallery'),
-            'disabled'    => !DG_Thumber::getGhostscriptExecutable()
+            'disabled'    => !DG_Thumber::isGhostscriptAvailable()
         ));
 
       add_settings_field(
