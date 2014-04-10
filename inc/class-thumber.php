@@ -578,7 +578,7 @@ class DG_Thumber {
          }
 
          // Ghostscript
-         if ($active['gs'] && false !== self::getGhostscriptExecutable()) {
+         if ($active['gs'] && self::isGhostscriptAvailable()) {
             $exts = implode('|', self::getGhostscriptExts());
             $thumbers[$exts] = array(__CLASS__, 'getGhostscriptThumbnail');
          }
