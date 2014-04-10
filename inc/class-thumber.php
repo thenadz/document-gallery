@@ -293,6 +293,20 @@ class DG_Thumber {
 
       return $executable;
    }
+   
+   /**
+    * @return bool Whether we can use the GS executable.
+    */
+   public static function isGhostscriptAvailable() {
+      static $ret = null;
+      
+      if (is_null($ret)) {
+         $options = self::getOptions();
+         $ret = $options['gs'] && self::isExecAvailable();
+      }
+      
+      return $ret;
+   }
 
    /*==========================================================================
     * GOOGLE DRIVE VIEWER THUMBNAILS
@@ -515,11 +529,13 @@ class DG_Thumber {
     *      + thumb_path - System path to thumbnail image.
     *      + thumb_url - URL pointing to the thumbnail for this document.
     *      + thumber - Generator used to create thumb OR false if failed to gen.
-    * @return array Thumber options from DB.
+    * @return array|null Thumber options from DB or null if options not initialized.
     */
    public static function getOptions() {
       global $dg_options;
-      return $dg_options['thumber'];
+      return !empty($dg_options) && isset($dg_options['thumber'])
+              ? $dg_options['thumber']
+              : null;
    }
 
    /**
@@ -551,7 +567,6 @@ class DG_Thumber {
       static $thumbers = false;
 
       if (false === $thumbers) {
-         global $wp_version;
          $options = self::getOptions();
          $active = $options['active'];
          $thumbers = array();

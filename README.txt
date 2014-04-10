@@ -3,8 +3,8 @@ Contributors: dan.rossiter
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
-Tested up to: 3.8.1
-Stable tag: 2.0.5
+Tested up to: 3.9
+Stable tag: 2.0.6
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -237,7 +237,8 @@ is perfectly alright.
 
 == Frequently Asked Questions ==
 
-= Q: Why is -insert thumbnail generation method- enabled on one of my WordPress
+
+= Q: Why is [insert thumbnail generation method] enabled on one of my WordPress
 installs, but not on another one? =
 
 A: Document Gallery works very hard behind the scenes to ensure that it enables
@@ -296,6 +297,15 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.0.6 =
+* **Bug Fix:** If DG failed to automagically detect the location of the
+  Ghostscript binary, manually setting the location did not enable using it.
+  Thanks for tracking this bug down,
+  [Chris](http://wordpress.org/support/profile/fredd500)!
+* **Minor:** Included various enhancements in handling thumbnail generation
+  for image types.
+* **Tested Up To:** Document Gallery has been tested in WP 3.9 (RC 1).
 
 = 2.0.5 =
 * **Bug Fix:** Rolling back part of CSS enhancments in 2.0.4 that were causing
