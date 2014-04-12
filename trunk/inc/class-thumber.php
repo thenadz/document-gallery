@@ -243,7 +243,7 @@ class DG_Thumber {
     * @return array All extensions supported by Ghostscript.
     */
    private static function getGhostscriptExts() {
-      return array('pdf');
+      return array('pdf', 'ps', 'eps');
    }
 
    /**
