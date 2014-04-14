@@ -5,7 +5,7 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.0.7
+  Version: 2.0.8
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
@@ -13,7 +13,7 @@ defined('WPINC') OR exit;
  */
 
 // define helper paths & URLs
-define('DG_VERSION', '2.0.7');
+define('DG_VERSION', '2.0.8');
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', plugin_dir_path(__FILE__));
 define('DG_WPINC_PATH', ABSPATH . WPINC . '/');

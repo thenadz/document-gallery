@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2014-03-27 21:33-0600\n"
+"PO-Revision-Date: 2014-04-14 18:48-0600\n"
 "Last-Translator: Dan Rossiter <dan.rossiters@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: Poedit 1.6.4\n"
@@ -37,7 +37,7 @@ msgid "Thumbnail Generation"
 msgstr "Generación de Miniaturas"
 
 #: admin/class-admin.php:75
-msgid "Custon CSS"
+msgid "Custom CSS"
 msgstr "CSS Personalizado"
 
 #: admin/class-admin.php:79
