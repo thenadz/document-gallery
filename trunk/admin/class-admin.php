@@ -63,7 +63,7 @@ class DG_Admin {
         array(__CLASS__, 'renderThumberSection'), 'document_gallery');
 
       add_settings_section(
-          'css', __('Custon CSS', 'document-gallery'),
+          'css', __('Custom CSS', 'document-gallery'),
           array(__CLASS__, 'renderCssSection'), 'document_gallery');
 
       add_settings_section(
