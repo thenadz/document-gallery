@@ -488,8 +488,9 @@ class DG_Gallery {
       $args = array(
          'post_type'     => 'attachment',
          'post_status'   => 'inherit',
-         'post_per_page' => -1,
-         'post__in'      => $this->atts['ids']
+         'numberposts'   => -1,
+         'post__in'      => $this->atts['ids'],
+         'orderby'       => 'post__in'
       );
 
       return count($args['post__in']) ? get_posts($args) : array();
