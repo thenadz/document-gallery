@@ -299,7 +299,7 @@ Note that the display inherits styling from your active theme.
   ideas)!
 
 = 2.0.8 =
-* **Enhancement:** Ghostscript will now handle PS and ESP files if enabled.
+* **Enhancement:** Ghostscript will now handle PS and EPS files if enabled.
 * **Bug Fix:** There were a couple of issues in how the `ids` attribute was being
   handled. Thanks, [demur](http://wordpress.org/support/profile/demur) for catching
   these!
