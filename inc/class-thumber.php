@@ -285,9 +285,17 @@ class DG_Thumber {
             return $executable;
          }
 
-         // this is why I use Linux...
+         // handle Linux systems
          $executable = exec('which gs');
-         $executable = empty($executable) ? false : $executable;
+         if (!empty($executable)) {
+            return $executable;
+         }
+         
+         // GoDaddy and others aren't setup in such a way that
+         // the above works so we need to fallback to a direct
+         // filesystem check
+         $executable = file_exists('/usr/bin/gs') ? '/usr/bin/gs' : false;
+         
          return $executable;
       }
 
