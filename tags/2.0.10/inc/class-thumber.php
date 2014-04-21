@@ -294,7 +294,8 @@ class DG_Thumber {
          // GoDaddy and others aren't setup in such a way that
          // the above works so we need to fallback to a direct
          // filesystem check
-         $executable = file_exists('/usr/bin/gs') ? '/usr/bin/gs' : false;
+         $executable = file_exists('/usr/bin/gs')
+                 ? '/usr/bin/gs' : false;
          
          return $executable;
       }
