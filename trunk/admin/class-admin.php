@@ -140,7 +140,7 @@ class DG_Admin {
             'value'       => esc_attr($defaults['order']),
             'options'     => DG_Gallery::getOrderOptions(),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Ascending or decending sorting of documents', 'document-gallery')
+            'description' => __('Ascending or descending sorting of documents', 'document-gallery')
         ));
 
       add_settings_field(

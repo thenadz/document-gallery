@@ -311,7 +311,7 @@ class DG_Gallery {
 
       $order = strtoupper($value);
       if(!in_array($order, self::getOrderOptions())) {
-         $err = sprintf(self::$binary_err, 'order', 'ASC', 'DEC', $value);
+         $err = sprintf(self::$binary_err, 'order', 'ASC', 'DESC', $value);
       } else {
          $ret = $order;
       }
@@ -320,7 +320,7 @@ class DG_Gallery {
    }
 
    public static function getOrderOptions() {
-      return array('ASC', 'DEC');
+      return array('ASC', 'DESC');
    }
 
    private static function sanitizeOrderby($value, &$err) {
