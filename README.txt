@@ -50,7 +50,7 @@ customize behavior with various attributes, seen below:
 `[dg [fancy=true] [attachment_pg=<true/false>]
 [category/custom_taxon_name=<**comma-separated list of taxon values**> [relation=<AND/OR>]]
 [descriptions=<true/false>] [ids=<**comma-separated list of ID #s**>]
-[images=<true/false>] [localpost=<true/false>] [order=<ASC/DEC>] [orderby=<**see below**>]]`
+[images=<true/false>] [localpost=<true/false>] [order=<ASC/DESC>] [orderby=<**see below**>]]`
 
 Though the shortcode above may seem far from "short," none of the attributes are
 required and most users will find that the plugin meets your needs "out of the box"
@@ -238,7 +238,7 @@ is perfectly alright.
 == Frequently Asked Questions ==
 
 
-= Q: Why is [insert thumbnail generation method] enabled on one of my WordPress
+= Q: Why is insert thumbnail generation method enabled on one of my WordPress
 installs, but not on another one? =
 
 A: Document Gallery works very hard behind the scenes to ensure that it enables
@@ -297,6 +297,12 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.0.9 =
+* **Bug Fix:** The `order` attribute was documented and implemented as being `ASC`
+  or `DEC`, but the latter should actually have been `DESC`. Documentation and 
+  implementation for this option has been corrected. Thanks again to
+  [demur](http://wordpress.org/support/profile/demur) for catching this!
 
 = 2.0.8 =
 * **Enhancement:** Ghostscript will now handle PS and EPS files if enabled.
