@@ -238,7 +238,7 @@ is perfectly alright.
 == Frequently Asked Questions ==
 
 
-= Q: Why is insert thumbnail generation method enabled on one of my WordPress installs, but not on another one? =
+= Q: Why is [insert thumbnail generation method] enabled on one of my WordPress installs, but not on another one? =
 
 A: Document Gallery works very hard behind the scenes to ensure that it enables
 as much as is possible for any given server, but some servers just can't do
