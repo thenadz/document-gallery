@@ -29,8 +29,8 @@ class DG_Thumber {
     * @return str     URL to the thumbnail.
     */
    public static function getThumbnail($ID, $pg = 1) {
-      static $timeout = false;
-      if (false === $timeout) {
+      static $timeout = null;
+      if (is_null($timeout)) {
          $timeout = time();
       }
 
@@ -329,13 +329,13 @@ class DG_Thumber {
     * @param int $pg     The page number to make thumbnail of -- index starts at 1.
     * @return bool|str   False on failure, URL to thumb on success.
     */
-   public static function getGoogleDriveThumbnail($ID_URL, $pg = 1) {
+   public static function getGoogleDriveThumbnail($ID, $pg = 1) {
       // User agent for Lynx 2.8.7rel.2 -- Why? Because I can.
       static $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
       static $timeout = 60;
 
       $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=%d&w=%d';
-      $doc_url = wp_get_attachment_url($ID_URL);
+      $doc_url = wp_get_attachment_url($ID);
       if (!$doc_url) {
          return false;
       }
@@ -677,7 +677,6 @@ class DG_Thumber {
    /**
     * Caller should handle removal of the temp file when finished.
     *
-    * @staticvar int $count
     * @param str $ext
     */
    private static function getTempFile($ext = 'png') {
