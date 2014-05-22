@@ -165,18 +165,19 @@ match (OR).
 
 = Customize Appearance =
 
-By default, the document gallery will use the styles within your active theme
-to handle most of the appearance, but, with a little CSS knowledge, you can
-customize pretty much anything about how it looks. See
-[`style.css`](http://plugins.svn.wordpress.org/document-gallery/trunk/assets/css/style.css)
-for an idea of what will select different elements within the gallery display.
+The Default Document gallery will often fit quite well with whatever theme you
+are using. But, if you want to change things, Document Gallery makes that easy.
+Just navigate to `Settings -> Document Gallery` and put any custom CSS in the
+provided text box.
+
+See [`style.css`](http://plugins.svn.wordpress.org/document-gallery/trunk/assets/css/style.css)
+for all of the ids and classes being used in a Document Gallery.
 
 **Example**
 
 Say I would like to include a border for the right and bottom of the document
 icon, but only when descriptions are shown (to delineate the icon from the
-description text). To do this, I would need to add the following CSS to my
-theme stylesheet:
+description text). To do this, I would need to use the following CSS:
 
 `.document-icon-wrapper.descriptions .document-icon{
    border-right: 1px solid #37824A;
@@ -189,19 +190,16 @@ would just change the first line, removing the descriptions class like so:
 
 `.document-icon-wrapper .document-icon`
 
-*NOTE: Please don't modify the plugin stylesheet directly or your changes will
-be lost when a new version is released.*
-
 = Developers =
-
-**Filter .document-icon Content**
 
 For those unfamiliar with content filters, [here is some
 documentation](http://codex.wordpress.org/Plugin_API/Filter_Reference) that you
 should read before continuing.
 
-Document Gallery implements its own filter, allowing developers to customize
-the output generated. Specifically, the `div.document-icon` content, including
+**Filter .document-icon Content**
+
+Document Gallery provides a filter allowing developers to customize
+the HTML returned. Specifically, the `div.document-icon` content, including
 the div itself, the URL to the attachment, the attachment icon, and the
 attachment title. Hooking into the `dg_doc_icon` filter will allow you to
 modify any of this content before it reaches your users.
@@ -234,6 +232,81 @@ Obviously this is just one very specific example, but anything that requires
 modifying the image tag, the anchor tag, or the title can be handled with this
 filter. Note that this function does not use the $id value it receives, which
 is perfectly alright.
+
+**Filter Thumbnail Generation Methods**
+
+Document Gallery provides the `dg_thumbers` filter, which allows developers to
+add, remove, or even re-order which methods are used to generate a thumbnail
+for a given attachment.
+
+The value being filtered is an associative array with keys equal to a string
+containing all supported file extensions, separated by a vertical bar (|) and values
+equal to [callables](http://www.php.net/manual/en/language.types.callable.php) 
+which take an attachment ID and a page number as arguments.
+
+The callable given should return false if thumbnail generation fails or
+a system path to a **temporary** copy of the generated image if generation
+succeeds. The caller will manipulate the file at the returned path so **do not** pass
+in a file path to the original copy of anything as it will be destroyed. Also, do not
+worry about any image resizing or giving the file a sensible name as the caller
+of your method will resize and rename the file before returning.
+
+The following is an example taken from the Document Gallery source (with a few
+modifications for ease of readability), where we add thumbnail generation for
+all Audio/Video filetypes supported by WordPress:
+
+`function dg_filter_thumbers($thumbers) {
+    $av_file_types = array_merge(wp_get_audio_extensions(), wp_get_video_extensions());
+    $exts = implode('|', $av_file_types);
+    $thumbers[$exts] = 'dg_get_audio_video_thumbnail';
+}
+add_filter('dg_thumbers', 'dg_filter_thumbers', 10);
+
+function dg_get_audio_video_thumbnail($ID, $pg) {
+    include_once ABSPATH . 'wp-admin/includes/media.php';
+
+    $attachment = get_post($ID);
+    $doc_path = get_attached_file($ID);
+
+    // get the file metadata
+    if (preg_match('#^video/#', get_post_mime_type($attachment))) {
+       $metadata = wp_read_video_metadata($doc_path);
+    }
+    elseif (preg_match('#^audio/#', get_post_mime_type($attachment))) {
+       $metadata = wp_read_audio_metadata($doc_path);
+    }
+
+    // unsupported mime type || no embedded image present
+    if(!isset($metadata) || empty($metadata['image']['data'])) {
+       return false;
+    }
+
+    $ext = 'jpg';
+    switch ($metadata['image']['mime']) {
+       case 'image/gif':
+          $ext = 'gif';
+          break;
+       case 'image/png':
+          $ext = 'png';
+          break;
+    }
+
+    $tmp_dir = untrailingslashit(get_temp_dir());
+    $temp_file = $tmp_dir . DIRECTORY_SEPARATOR . wp_unique_filename($tmp_dir, md5(time()) + ".$ext");
+
+    if (!$fp = @fopen($temp_file, 'wb')) {
+       return false;
+    }
+
+    if (!@fwrite($fp, $metadata['image']['data'])) {
+       fclose($fp);
+       return false;
+    }
+
+    fclose($fp);
+
+    return $temp_file;
+}`
 
 == Frequently Asked Questions ==
 
