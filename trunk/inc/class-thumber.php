@@ -572,9 +572,9 @@ class DG_Thumber {
     * @return array
     */
    private static function getThumbers() {
-      static $thumbers = false;
+      static $thumbers = null;
 
-      if (false === $thumbers) {
+      if (is_null($thumbers)) {
          $options = self::getOptions();
          $active = $options['active'];
          $thumbers = array();
@@ -608,9 +608,22 @@ class DG_Thumber {
 
          // allow users to filter thumbers used
          $thumbers = apply_filters('dg_thumbers', $thumbers);
-
+         
          // strip out anything that can't be called
          $thumbers = array_filter($thumbers, 'is_callable');
+         
+         // log which thumbers are being used
+         if (DocumentGallery::logEnabled()) {
+            if (count($thumbers) > 0) {
+               $entry = __('Thumbnail Generators: ', 'document-gallery');
+               foreach ($thumbers as $k => $v) {
+                  $entry .= '{' . $k . ' => ' . print_r($v, true) . '} ';
+               }
+            } else {
+               $entry = __('No thumbnail generators enabled.', 'document-gallery');
+            }
+            DocumentGallery::writeLog($entry);
+         }
       }
 
       return $thumbers;
@@ -758,7 +771,7 @@ class DG_Thumber {
     * @return str|bool      Returns the file extension on success, false on failure.
     */
    private static function getExt($filename) {
-      foreach (wp_get_mime_types() as $ext_preg => $unused) {
+      foreach (array_keys(wp_get_mime_types()) as $ext_preg) {
          $ext_preg = '!\.(' . $ext_preg . ')$!i';
          if (preg_match($ext_preg, $filename, $ext_matches)) {
             return $ext_matches[1];

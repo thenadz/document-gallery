@@ -157,14 +157,29 @@ class DocumentGallery {
     * @param str $entry
     */
    public static function writeLog($entry) {
-      if (defined('WP_DEBUG') && WP_DEBUG) {
-         $err = 'DG: ' . print_r($entry, true) . PHP_EOL;
+      if (self::logEnabled()) {
+         // NOTE: First entry in stack trace is this method -- need to get second
+         list(, $caller) = array_shift(debug_backtrace());
+         $caller = (isset($caller['class']) ? $caller['class'] : '') . $caller['type'] . $caller['function'];
+         
+         // build log entry, removing any extra spaces
+         $err = preg_replace('/\s+/', ' ', trim(print_r($entry, true)));
+         $err = 'DG (' . $caller . '): ' . $err . PHP_EOL;
+         
+         // insert log entry
          if (defined('ERRORLOGFILE')) {
             error_log($err, 3, ERRORLOGFILE);
          } else {
             error_log($err);
          }
       }
+   }
+   
+   /**
+    * @return bool Whether debug logging is currently enabled.
+    */
+   public static function logEnabled() {
+      return defined('WP_DEBUG') && WP_DEBUG;
    }
 
    /*==========================================================================
