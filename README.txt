@@ -292,7 +292,7 @@ function dg_get_audio_video_thumbnail($ID, $pg) {
     }
 
     $tmp_dir = untrailingslashit(get_temp_dir());
-    $temp_file = $tmp_dir . DIRECTORY_SEPARATOR . wp_unique_filename($tmp_dir, md5(time()) + ".$ext");
+    $temp_file = $tmp_dir . DIRECTORY_SEPARATOR . wp_unique_filename($tmp_dir, md5(time()) . ".$ext");
 
     if (!$fp = @fopen($temp_file, 'wb')) {
        return false;
