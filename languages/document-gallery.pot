@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Document Gallery package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Document Gallery 2.0.9\n"
+"Project-Id-Version: Document Gallery 2.1\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
-"POT-Creation-Date: 2014-04-21 02:57:10+00:00\n"
+"POT-Creation-Date: 2014-05-26 15:34:24+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,7 +20,7 @@ msgstr ""
 msgid "Document Gallery Settings"
 msgstr ""
 
-#. #-#-#-#-#  plugin.pot (Document Gallery 2.0.9)  #-#-#-#-#
+#. #-#-#-#-#  plugin.pot (Document Gallery 2.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: admin/class-admin.php:38
 msgid "Document Gallery"
@@ -122,35 +122,35 @@ msgstr ""
 msgid "Failed to auto-detect the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:248
+#: admin/class-admin.php:262
 msgid ""
 "The following values will be used by default in the shortcode. You can still "
 "manually set each of these values in each individual shortcode."
 msgstr ""
 
-#: admin/class-admin.php:255
+#: admin/class-admin.php:269
 msgid "Select which tools to use when generating thumbnails."
 msgstr ""
 
-#: admin/class-admin.php:261
+#: admin/class-admin.php:275
 msgid ""
 "Enter custom CSS styling for use with document galleries. To see which ids "
 "and classes you can style, take a look at <a href=\"%s\" target=\"_blank"
 "\">style.css</a>."
 msgstr ""
 
-#: admin/class-admin.php:279
+#: admin/class-admin.php:293
 msgid ""
 "Unless you <em>really</em> know what you're doing, you should not touch "
 "these values."
 msgstr ""
 
-#: admin/class-admin.php:281
+#: admin/class-admin.php:295
 msgid ""
 "NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
 msgstr ""
 
-#: admin/class-admin.php:388
+#: admin/class-admin.php:407
 msgid "Invalid Ghostscript path given: "
 msgstr ""
 
@@ -204,15 +204,23 @@ msgstr ""
 msgid "Ghostscript failed: "
 msgstr ""
 
-#: inc/class-thumber.php:364
+#: inc/class-thumber.php:372
 msgid "Failed to retrieve thumbnail from Google: "
 msgstr ""
 
-#: inc/class-thumber.php:644
+#: inc/class-thumber.php:616
+msgid "Thumbnail Generators: "
+msgstr ""
+
+#: inc/class-thumber.php:621
+msgid "No thumbnail generators enabled."
+msgstr ""
+
+#: inc/class-thumber.php:663
 msgid "Failed to get image editor: "
 msgstr ""
 
-#: inc/class-thumber.php:655
+#: inc/class-thumber.php:674
 msgid "Failed to save image: "
 msgstr ""
 
