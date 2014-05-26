@@ -33,7 +33,7 @@ class DG_Admin {
     * Adds Document Gallery settings page to admin navigation.
     */
    public static function addAdminPage() {
-      $page = add_options_page(
+      add_options_page(
           __('Document Gallery Settings', 'document-gallery'),
           __('Document Gallery', 'document-gallery'),
           'manage_options', 'document_gallery', array(__CLASS__, 'renderOptions'));
@@ -240,6 +240,20 @@ class DG_Admin {
                : __('Failed to auto-detect the location of Ghostscript.', 'document-gallery')
         ));
    }
+   
+   /**
+    * @return bool Whether to register settings.
+    */
+   public static function doRegisterSettings() {
+      if (!is_multisite()) {
+         $script = !empty($GLOBALS['pagenow']) ? $GLOBALS['pagenow'] : null;
+      } else {
+         $script = parse_url($_SERVER['REQUEST_URI']);
+         $script = basename($script['path']);
+      }
+      
+      return !empty($script) && ('options-general.php' === $script || 'options.php' === $script);
+   }
 
    /**
     * Render the Default Settings section.
@@ -371,11 +385,16 @@ class DG_Admin {
       // handle modified CSS
       if (trim($ret['css']['text']) !== trim($values['css'])) {
          $ret['css']['text'] = trim($values['css']);
-         $ret['css']['minified'] =
-                 DocumentGallery::compileCustomCss($ret['css']['text']);
          $ret['css']['version']++;
          $ret['css']['last-modified'] = gmdate('D, d M Y H:i:s');
          $ret['css']['etag'] = md5($ret['css']['last-modified']);
+         
+         if (empty($ret['css']['text'])) {
+            unset($ret['css']['minified']);
+         } else {
+            $ret['css']['minified'] =
+                    DocumentGallery::compileCustomCss($ret['css']['text']);
+         }
       }
 
       // handle setting the Ghostscript path

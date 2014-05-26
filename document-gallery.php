@@ -5,15 +5,17 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.0.10
+  Version: 2.1
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
   Text Domain: document-gallery
  */
 
+define('DG_VERSION', '2.1');
+
 // define helper paths & URLs
-define('DG_VERSION', '2.0.10');
+define('DG_BASENAME', plugin_basename(__FILE__));
 define('DG_URL', plugin_dir_url(__FILE__));
 define('DG_PATH', plugin_dir_path(__FILE__));
 define('DG_WPINC_PATH', ABSPATH . WPINC . '/');
@@ -24,10 +26,12 @@ global $dg_options;
 define('DG_OPTION_NAME', 'document_gallery');
 $dg_options = get_option(DG_OPTION_NAME, null);
 
-// handle activation and uninstallation
+// handle activation, updates, and uninstallation
 include_once DG_PATH . 'inc/class-setup.php';
-DG_Setup::maybeUpdate();
+register_activation_hook(__FILE__, array('DG_Setup', 'activate'));
+add_action('wpmu_new_blog', array('DG_Setup','activateNewBlog'));
 register_uninstall_hook(__FILE__, array('DG_Setup', 'uninstall'));
+DG_Setup::maybeUpdate();
 
 // I18n
 add_action('plugins_loaded', array('DocumentGallery', 'loadTextDomain'));
@@ -41,15 +45,13 @@ if (is_admin()) {
    include_once DG_PATH . 'admin/class-admin.php';
 
    // add settings link
-   add_filter('plugin_action_links_' . plugin_basename(__FILE__),
+   add_filter('plugin_action_links_' . DG_BASENAME,
        array('DG_Admin', 'addSettingsLink'));
-
+   
    // build options page
    add_action('admin_menu', array('DG_Admin', 'addAdminPage'));
-   if (!empty($GLOBALS['pagenow'])
-       && ('options-general.php' === $GLOBALS['pagenow'] // output
-       || 'options.php' === $GLOBALS['pagenow'])) {      // validation
-       add_action('admin_init', array('DG_Admin', 'registerSettings'));
+   if (DG_Admin::doRegisterSettings()) {
+      add_action('admin_init', array('DG_Admin', 'registerSettings'));
    }
 } else {
    // styling for gallery
@@ -141,7 +143,7 @@ class DocumentGallery {
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT');
             header('Last-Modified: ' . $dg_options['css']['last-modified']);
             header('ETag: ' . $dg_options['css']['etag']);
-
+            
             echo $dg_options['css']['minified'];
             exit;
       }
@@ -159,7 +161,8 @@ class DocumentGallery {
    public static function writeLog($entry) {
       if (self::logEnabled()) {
          // NOTE: First entry in stack trace is this method -- need to get second
-         list(, $caller) = array_shift(debug_backtrace());
+         $callers = debug_backtrace();
+         $caller = $callers[1];
          $caller = (isset($caller['class']) ? $caller['class'] : '') . $caller['type'] . $caller['function'];
          
          // build log entry, removing any extra spaces
@@ -187,12 +190,41 @@ class DocumentGallery {
     *=========================================================================*/
 
    public static function loadTextDomain() {
-      load_plugin_textdomain('document-gallery', false, dirname(plugin_basename(__FILE__ )) . '/languages/');
+      load_plugin_textdomain('document-gallery', false, dirname(DG_BASENAME) . '/languages/');
    }
 
    /*==========================================================================
     * HELPER FUNCTIONS
     *=========================================================================*/
+   
+   /**
+    * @param int $blog ID of the blog to be retrieved in multisite env.
+    * @return array Options for the blog.
+    */
+   public static function getOptions($blog = null) {
+      global $dg_options;
+      return is_null($blog)
+              ? $dg_options
+              : get_blog_option($blog, DG_OPTION_NAME, null);
+   }
+   
+   public static function setOptions($options, $blog = null) {
+      if (is_null($blog)) {
+         global $dg_options;
+         update_option(DG_OPTION_NAME, $options);
+         $dg_options = $options;
+      } else {
+         update_blog_option($blog, DG_OPTION_NAME, $options);
+      }
+   }
+   
+   public static function deleteOptions($blog = null) {
+      if (is_null($blog)) {
+         delete_option(DG_OPTION_NAME);
+      } else {
+         delete_blog_option($blog, DG_OPTION_NAME);
+      }
+   }
    
    /**
     * Compiles any custom CSS plus the default CSS together,
