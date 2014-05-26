@@ -539,11 +539,9 @@ class DG_Thumber {
     *      + thumber - Generator used to create thumb OR false if failed to gen.
     * @return array|null Thumber options from DB or null if options not initialized.
     */
-   public static function getOptions() {
-      global $dg_options;
-      return !empty($dg_options) && isset($dg_options['thumber'])
-              ? $dg_options['thumber']
-              : null;
+   public static function getOptions($blog = null) {
+      $options = DocumentGallery::getOptions($blog);
+      return $options['thumber'];
    }
 
    /**
@@ -555,10 +553,10 @@ class DG_Thumber {
     *      + thumber - Generator used to create thumb OR false if failed to gen.
     * @param array $options Thumber options to store in DB
     */
-   private static function setOptions($options) {
-      global $dg_options;
+   private static function setOptions($options, $blog = null) {
+      $dg_options = DocumentGallery::getOptions($blog);
       $dg_options['thumber'] = $options;
-      update_option(DG_OPTION_NAME, $dg_options);
+      DocumentGallery::setOptions($dg_options, $blog);
    }
 
    /**
