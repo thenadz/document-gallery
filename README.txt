@@ -3,8 +3,8 @@ Contributors: dan.rossiter
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
-Tested up to: 3.9
-Stable tag: 2.0.10
+Tested up to: 3.9.1
+Stable tag: 2.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,10 +239,10 @@ Document Gallery provides the `dg_thumbers` filter, which allows developers to
 add, remove, or even re-order which methods are used to generate a thumbnail
 for a given attachment.
 
-The value being filtered is an associative array with keys equal to a string
-containing all supported file extensions, separated by a vertical bar (|) and values
+The value being filtered is an associative array with keys equal to a regular
+expression matching all file extensions supported by the generator and values
 equal to [callables](http://www.php.net/manual/en/language.types.callable.php) 
-which take an attachment ID and a page number as arguments.
+which take an **attachment ID** and a **file page number** as arguments.
 
 The callable given should return false if thumbnail generation fails or
 a system path to a **temporary** copy of the generated image if generation
@@ -365,10 +365,13 @@ Note that the display inherits styling from your active theme.
 * Option to open music or video files directly from your gallery.
 * Option to open documents directly from your gallery (&#224; la [Google Drive
   Viewer](https://drive.google.com/viewer)).
-* Support for adding your own filetypes/icons.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.1 =
+* **Enhancement:** Document Gallery now supports
+  [multisite networks](http://codex.wordpress.org/Create_A_Network).
 
 = 2.0.10 =
 * **Enhancement:** Ghostscript detection should now work correctly on GoDaddy
