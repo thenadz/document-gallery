@@ -17,9 +17,8 @@ This plugin allows the user to effortlessly create a gallery of documents and
 other attached media, much like the gallery option already available for image
 attachments.
 
-The plugin will, by default, inherit the styling within your active theme, but
-with a little CSS knowledge it is possible to customize the appearance to meet
-your specific needs.
+Watch the following video for a brief demonstration of Document Gallery in action:
+[youtube https://www.youtube.com/watch?v=pCQsx5z-uOU]
 
 Read more in the **Installation** tab!
 
