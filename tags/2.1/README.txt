@@ -46,7 +46,7 @@ must include the following shortcode in the post: `[dg]`.
 In addition to the default behavior, the plugin provides many options to
 customize behavior with various attributes, seen below:
 
-`[dg [fancy=true] [attachment_pg=<true/false>]
+`[dg [fancy=<true/false>] [attachment_pg=<true/false>]
 [category/custom_taxon_name=<**comma-separated list of taxon values**> [relation=<AND/OR>]]
 [descriptions=<true/false>] [ids=<**comma-separated list of ID #s**>]
 [images=<true/false>] [localpost=<true/false>] [order=<ASC/DESC>] [orderby=<**see below**>]]`
