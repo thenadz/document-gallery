@@ -2,7 +2,11 @@
 defined('WPINC') OR exit;
 
 class DG_Admin {
-
+   /**
+    * @var str The hook for the Document Gallery settings page.
+    */
+   private static $hook;
+   
    /**
     * Renders Document Gallery options page.
     */
@@ -33,10 +37,21 @@ class DG_Admin {
     * Adds Document Gallery settings page to admin navigation.
     */
    public static function addAdminPage() {
-      add_options_page(
+      DG_Admin::$hook = add_options_page(
           __('Document Gallery Settings', 'document-gallery'),
           __('Document Gallery', 'document-gallery'),
           'manage_options', 'document_gallery', array(__CLASS__, 'renderOptions'));
+      add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueueScriptsAndStyles'));
+   }
+   
+   /**
+    * Enqueues styles and scripts for the admin settings page.
+    */
+   public static function enqueueScriptsAndStyles($hook) {
+      if ($hook !== DG_Admin::$hook) return;
+      
+      wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
+      wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
    }
 
    /**
@@ -366,7 +381,7 @@ class DG_Admin {
       }
 
       // handle setting the active thumbers
-      foreach ($ret['thumber']['active'] as $k => $v) {
+      foreach (array_keys($ret['thumber']['active']) as $k) {
          $ret['thumber']['active'][$k] = isset($values['thumber_active'][$k]);
       }
 
