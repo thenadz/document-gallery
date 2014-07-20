@@ -49,16 +49,23 @@ class DG_Thumber {
          foreach (self::getThumbers() as $ext_preg => $thumber) {
             $ext_preg = '!\.(' . $ext_preg . ')$!i';
 
-            if (preg_match($ext_preg, $file)
-                && ($thumb = self::getThumbnailTemplate($thumber, $ID, $pg))) {
-               $options['thumbs'][$ID] = array(
-                   'created_timestamp' => time(),
-                   'thumb_url'         => $thumb['url'],
-                   'thumb_path'        => $thumb['path'],
-                   'thumber'           => $thumber
-               );
-               self::setOptions($options);
-               break;
+            if (preg_match($ext_preg, $file)) {
+               if (DocumentGallery::logEnabled()) {
+                  $toLog = sprintf(__('Attempting to generate thumbnail for attachment #%d with \'%s\'',
+                          'document-gallery'), $ID, print_r($thumber, true));
+                  DocumentGallery::writeLog($toLog);
+               }
+               
+               if ($thumb = self::getThumbnailTemplate($thumber, $ID, $pg)) {
+                  $options['thumbs'][$ID] = array(
+                      'created_timestamp' => time(),
+                      'thumb_url'         => $thumb['url'],
+                      'thumb_path'        => $thumb['path'],
+                      'thumber'           => $thumber
+                  );
+                  self::setOptions($options);
+                  break;
+               }
             }
          }
       }
@@ -716,22 +723,27 @@ class DG_Thumber {
    }
 
    /**
-    * Removes the existing thumbnail/document meta for the attachment
-    * with $ID, if such a thumbnail exists.
+    * Removes the existing thumbnail/document meta for the attachment(s)
+    * with the ID(s), if such a thumbnails exists.
     *
-    * @param int $ID
+    * @param int|array $ids
     */
-   public static function deleteThumbMeta($ID) {
+   public static function deleteThumbMeta($ids) {
       $options = self::getOptions();
+      $modified = false;
 
-      if (isset($options['thumbs'][$ID])) {
-         if (false !== $options['thumbs'][$ID]) {
-            @unlink($options['thumbs'][$ID]['thumb_path']);
+      foreach ((array)$ids as $id) {
+         if (isset($options['thumbs'][$id])) {
+            if (false !== $options['thumbs'][$id]) {
+               @unlink($options['thumbs'][$id]['thumb_path']);
+            }
+
+            unset($options['thumbs'][$id]);
+            $modified = true;
          }
-
-         unset($options['thumbs'][$ID]);
-         self::setOptions($options);
       }
+      
+      if ($modified) { self::setOptions($options); }
    }
 
    /**
