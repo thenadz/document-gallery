@@ -104,8 +104,7 @@ class DocumentGallery {
     * Enqueue standard DG CSS.
     */
    public static function enqueueGalleryStyle() {
-      wp_register_style('document-gallery', DG_URL . 'assets/css/style.css', null, DG_VERSION);
-      wp_enqueue_style('document-gallery');
+      wp_enqueue_style('document-gallery', DG_URL . 'assets/css/style.css', null, DG_VERSION);
    }
 
    /**
