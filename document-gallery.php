@@ -53,6 +53,9 @@ if (is_admin()) {
    if (DG_Admin::doRegisterSettings()) {
       add_action('admin_init', array('DG_Admin', 'registerSettings'));
    }
+   
+   // delete multiple thumbs
+   add_action('wp_ajax_DG_multipleDeletion', array('DG_Admin', 'multipleDeletion'));
 } else {
    // styling for gallery
    if (empty($dg_options['css']['text'])) {

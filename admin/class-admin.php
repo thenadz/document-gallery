@@ -14,11 +14,32 @@ class DG_Admin {
 <div class="wrap">
 <h2>Document Gallery Settings</h2>
 
-<form method="post" action="options.php">
-   <?php settings_fields(DG_OPTION_NAME); ?>
-   <?php do_settings_sections('document_gallery'); ?>
-   <?php submit_button(); ?>
-</form>
+<?php $tabs = array('settings' => __('Settings', 'document-gallery'), 'thumbs-list' => __('List of Generated Thumbnails', 'document-gallery'));
+$currentTab = $_REQUEST['tab'];
+if (!array_key_exists($currentTab, $tabs))
+   $currentTab = 'settings'; ?>
+<h2 class="nav-tab-wrapper">
+<?php foreach ($tabs as $tab => $name) {
+   $class = ($tab == $currentTab) ? ' nav-tab-active' : '';
+   echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=document_gallery&tab='.$tab.'">'.$name.'</a>';
+}
+echo '</h2>';
+switch($currentTab) {
+   case 'thumbs-list':
+      self::renderThumbsTable();
+      break;
+   
+   case 'settings':
+   default:
+?>
+      <form method="post" action="options.php">
+         <?php settings_fields(DG_OPTION_NAME); ?>
+         <?php do_settings_sections('document_gallery'); ?>
+         <?php submit_button(); ?>
+      </form>
+<?php
+      break;
+} ?>
 
 </div>
    <?php }
@@ -360,6 +381,142 @@ class DG_Admin {
       print '</select> ' . $args['description'];
    }
 
+   /**
+    * Render the Thumbnail table.
+    */
+   public static function renderThumbsTable() {
+      global $dg_options;
+
+      $URL_params = array('page' => 'document_gallery', 'tab' => 'thumbs-list');
+      
+      if (isset($_REQUEST['orderby']) && in_array(strtolower($_REQUEST['orderby']), array('title', 'date'))) {
+         $orderby = strtolower($_REQUEST['orderby']);
+         $URL_params['orderby'] = $orderby;
+         
+         if ($orderby == 'date') {
+            foreach ($dg_options['thumber']['thumbs'] as $key => $node) {
+               $keyArray[$key] = $node['created_timestamp'];
+               $dg_options['thumber']['thumbs'][$key]['thumb_id'] = $key;
+            }
+         }
+         
+         if ($orderby == 'title') {
+            foreach ($dg_options['thumber']['thumbs'] as $key => $node) {
+               $keyArray[$key] = basename($node['thumb_path']);
+               $dg_options['thumber']['thumbs'][$key]['thumb_id'] = $key;
+            }
+         }
+         
+         if (!isset($_REQUEST['order']) || !in_array(strtolower($_REQUEST['order']), array('asc', 'desc'))) {
+            $order = 'asc';
+         } else {
+            $order = strtolower($_REQUEST['order']);
+         }
+         
+         $URL_params['order'] = $order;
+
+         if ($order == 'asc') {
+            array_multisort($keyArray, SORT_ASC, $dg_options['thumber']['thumbs']);
+         } else {
+            array_multisort($keyArray, SORT_DESC, $dg_options['thumber']['thumbs']);
+         }
+      } else {
+         $orderby = '';
+         foreach ($dg_options['thumber']['thumbs'] as $key => $node) {
+            $dg_options['thumber']['thumbs'][$key]['thumb_id'] = $key;
+         }
+      }
+
+      static $limit_options = array(10, 25, 75);
+      if (!isset($_REQUEST['limit']) || !in_array(intval($_REQUEST['limit']), $limit_options)) {
+         $limit = $limit_options[0];
+      } else {
+         $limit = intval($_REQUEST['limit']);
+      }
+      
+      $URL_params['limit'] = $limit;
+      $select_limit = '';
+      foreach ($limit_options as $l_o) {
+         $select_limit .= '<option value="'.$l_o.'"'.selected($limit, $l_o, false).'>'.$l_o.'</option>'.PHP_EOL;
+      }
+      $thumbs_number = count($dg_options['thumber']['thumbs']);
+      $lastsheet = ceil($thumbs_number/$limit);
+      $sheet = isset($_REQUEST['sheet']) ? intval($_REQUEST['sheet']) : 1;
+      if ($sheet <= 0 || $sheet > $lastsheet) {
+         $sheet = 1;
+      }
+      
+      $offset = ($sheet - 1) * $limit;
+
+      $thead = '<tr>'.
+            '<th scope="col" class="manage-column column-cb check-column %s">'.
+               '<label class="screen-reader-text" for="cb-select-all-%d">'.__('Select All', 'document-gallery').'</label>'.
+               '<input id="cb-select-all-%d" type="checkbox">'.
+            '</th>'.
+            '<th scope="col" class="manage-column column-icon">'.__('Thumbnail', 'document-gallery').'</th>'.
+            '<th scope="col" class="manage-column column-title '.(($orderby != 'title')?'sortable desc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'title','order'=>(($orderby != 'title')?'asc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('File name', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
+            '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).' %s"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
+         '</tr>';
+
+      $pagination = '<div class="alignleft actions bulkactions"><button class="button action deleteSelected">'.__('Delete Selected', 'document-gallery').'</button></div><div class="tablenav-pages">'.
+            '<span class="displaying-num">'.
+            $thumbs_number.' '._n('item', 'items', $thumbs_number).
+            '</span>'.($lastsheet>1?
+            '<span class="pagination-links">'.
+               '<a class="first-page'.( $sheet==1 ? ' disabled' : '').'" title="'.__('Go to the first page', 'document-gallery').'"'.( $sheet==1 ? '' : ' href="?'.http_build_query($URL_params).'"').'>«</a>'.
+               '<a class="prev-page'.( $sheet==1 ? ' disabled' : '').'" title="'.__('Go to the previous page', 'document-gallery').'"'.( $sheet==1 ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$sheet-1))).'"').'>‹</a>'.
+               '<span class="paging-input">'.
+                  '<input class="current-page" title="'.__('Current page').'" type="text" name="paged" value="'.$sheet.'" size="'.strlen($sheet).'" maxlength="'.strlen($sheet).'"> '.__('of').' <span class="total-pages">'.$lastsheet.'</span></span>'.
+               '<a class="next-page'.( $sheet==$lastsheet ? ' disabled' : '').'" title="'.__('Go to the next page').'"'.( $sheet==$lastsheet ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$sheet+1))).'"').'>›</a>'.
+               '<a class="last-page'.( $sheet==$lastsheet ? ' disabled' : '').'" title="'.__('Go to the last page').'"'.( $sheet==$lastsheet ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$lastsheet))).'"').'>»</a>'.
+            '</span>':' <b>|</b> ').
+            '<span class="displaying-num"><select dir="rtl" class="limit_per_page">'.$select_limit.'</select> '.__('items per page').'</span>'.
+         '</div>'.
+         '<br class="clear" />';
+      ?>
+      
+      <script type="text/javascript">
+         var URL_params = <?php echo json_encode($URL_params); ?>;
+      </script>
+      <div class="thumbs-list-wrapper"><div>
+         <div class="tablenav top"><?php echo $pagination; ?></div>
+         <table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">
+            <thead>
+               <?php printf($thead, 'topLeft', 1, 1, 'topRight'); ?>
+            </thead>
+            <tfoot>
+               <?php printf($thead, 'bottomLeft', 2, 2, 'bottomRight'); ?>
+            </tfoot>
+            <tbody><?php
+               $WP_date_format = get_option('date_format').' '.get_option('time_format');
+               $i = 0;
+               foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
+                  if ($i < $offset) { $i++; continue; }
+                  if (++$i > $offset + $limit) { break; }
+                  echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="ids[]" value="' .
+                          $dg_options['thumber']['thumbs'][$k]['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
+                          $dg_options['thumber']['thumbs'][$k]['thumb_url'].'" />'.'</td><td class="title column-title">' .
+                          basename($dg_options['thumber']['thumbs'][$k]['thumb_path']).'</td><td class="date column-date">' .
+                          date($WP_date_format, $dg_options['thumber']['thumbs'][$k]['created_timestamp']).'</td></tr>'."\n";
+               } ?>
+            </tbody>
+         </table>
+         <div class="tablenav bottom"><?php echo $pagination; ?></div>
+      </div></div>
+   <?php }
+
+   /**
+    * Delete multiple thumbnails. Response for AJAX request.
+    */
+   public static function multipleDeletion() {
+      if (is_array($_REQUEST['selectedIDs'])) {
+         $deleted = array_map('intval', $_REQUEST['selectedIDs']);
+         DG_Thumber::deleteThumbMeta($deleted);
+         echo json_encode($deleted);
+         die();
+      }
+   }
+   
    /**
     * Validates submitted options, sanitizing any invalid options.
     * @param array $values User-submitted new options.
