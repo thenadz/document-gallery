@@ -1,0 +1,86 @@
+table.wp-list-table.widefat.fixed.media{
+   background:transparent;
+   border: none;
+   -webkit-box-shadow: none;
+   box-shadow: none;
+}
+div.thumbs-list-wrapper{
+   text-align:center;
+}
+div.thumbs-list-wrapper>div{
+   margin: 0 auto;
+   display: inline-block;
+}
+#ThumbsTable{
+   width: auto;
+   margin: 10px auto;
+}
+#ThumbsTable td, #ThumbsTable th{
+   text-align: center;
+   vertical-align: middle;
+   margin: 0;
+   padding: 4px;
+}
+td.title.column-title{
+   text-align: left !important;
+}
+#ThumbsTable tbody{
+   background: #e8edff;
+   color: #669;
+}
+#ThumbsTable thead, #ThumbsTable tfoot{
+   background: #b9c9fe;
+   color: #039;
+}
+#ThumbsTable>tbody>tr:hover{
+   background: #d0dafd;
+}
+#ThumbsTable img{
+   display: block;
+   margin: 0 auto;
+}
+tr.selected{
+   background: #B6ADCE;
+}
+tr.selected:hover{
+   background: #D8D3E5 !important;
+}
+th.topLeft{
+   border-top-left-radius: 10px;
+   -moz-border-top-left-radius: 10px;
+}
+th.topRight{
+   border-top-right-radius: 10px;
+   -moz-border-top-right-radius: 10px;
+}
+th.bottomLeft{
+   border-bottom-left-radius: 10px;
+   -moz-border-bottom-left-radius: 10px;
+}
+th.bottomRight{
+   border-bottom-right-radius: 10px;
+   -moz-border-bottom-right-radius: 10px;
+}
+.nav-tab:before, .deleteSelected:before{
+   display: inline-block;
+   -webkit-font-smoothing: antialiased;
+   font: normal 20px/1 'dashicons';
+   vertical-align: text-bottom;
+   padding-right: 5px;
+}
+.settings-tab:before{
+   content: '\f108';
+}
+.thumbs-list-tab:before{
+   content: '\f233';
+}
+.deleteSelected:before{
+   content: '\f182';
+}
+th input{
+   margin-left: 0 !important;
+   margin-top: 1px !important;
+}
+td input{
+   margin-right: 0 !important;
+}
