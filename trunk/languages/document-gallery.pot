@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Document Gallery 2.1\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
-"POT-Creation-Date: 2014-07-28 00:56:47+00:00\n"
+"POT-Creation-Date: 2014-07-28 03:02:55+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,203 +12,203 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: admin/class-admin.php:17 admin/class-admin.php:52
+#: admin/class-admin.php:18 admin/class-admin.php:56
 msgid "Settings"
 msgstr ""
 
-#: admin/class-admin.php:17
+#: admin/class-admin.php:19
 msgid "List of Generated Thumbnails"
 msgstr ""
 
-#: admin/class-admin.php:62
+#: admin/class-admin.php:66
 msgid "Document Gallery Settings"
 msgstr ""
 
 #. #-#-#-#-#  plugin.pot (Document Gallery 2.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: admin/class-admin.php:63
+#: admin/class-admin.php:67
 msgid "Document Gallery"
 msgstr ""
 
-#: admin/class-admin.php:94
+#: admin/class-admin.php:98
 msgid "Default Settings"
 msgstr ""
 
-#: admin/class-admin.php:98
+#: admin/class-admin.php:102
 msgid "Thumbnail Generation"
 msgstr ""
 
-#: admin/class-admin.php:102
+#: admin/class-admin.php:106
 msgid "Custom CSS"
 msgstr ""
 
-#: admin/class-admin.php:106
+#: admin/class-admin.php:110
 msgid "Advanced Thumbnail Generation"
 msgstr ""
 
-#: admin/class-admin.php:118
+#: admin/class-admin.php:122
 msgid "Link to attachment page rather than to file"
 msgstr ""
 
-#: admin/class-admin.php:130
+#: admin/class-admin.php:134
 msgid "Include document descriptions"
 msgstr ""
 
-#: admin/class-admin.php:142
+#: admin/class-admin.php:146
 msgid "Use auto-generated document thumbnails"
 msgstr ""
 
-#: admin/class-admin.php:154
+#: admin/class-admin.php:158
 msgid "Include image attachments in gallery"
 msgstr ""
 
-#: admin/class-admin.php:166
+#: admin/class-admin.php:170
 msgid "Only look for attachments in post where [dg] is used"
 msgstr ""
 
-#: admin/class-admin.php:179
+#: admin/class-admin.php:183
 msgid "Ascending or descending sorting of documents"
 msgstr ""
 
-#: admin/class-admin.php:192
+#: admin/class-admin.php:196
 msgid "Which field to order documents by"
 msgstr ""
 
-#: admin/class-admin.php:205
+#: admin/class-admin.php:209
 msgid ""
 "Whether matched documents must have all taxa_names (AND) or at least one (OR)"
 msgstr ""
 
-#: admin/class-admin.php:217
+#: admin/class-admin.php:221
 msgid "Locally generate thumbnails for audio & video files."
 msgstr ""
 
-#: admin/class-admin.php:230
+#: admin/class-admin.php:234
 msgid ""
 "Use <a href=\"http://www.ghostscript.com/\" target=\"_blank\">Ghostscript</"
 "a> for faster local PDF processing (compared to Imagick)."
 msgstr ""
 
-#: admin/class-admin.php:231
+#: admin/class-admin.php:235
 msgid ""
 "Your server is not configured to run <a href=\"http://www.ghostscript.com/\" "
 "target=\"_blank\">Ghostscript</a>."
 msgstr ""
 
-#: admin/class-admin.php:245
+#: admin/class-admin.php:249
 msgid ""
 "Use <a href=\"http://www.php.net/manual/en/book.imagick.php\" target=\"_blank"
 "\">Imagick</a> to handle lots of filetypes locally."
 msgstr ""
 
-#: admin/class-admin.php:246
+#: admin/class-admin.php:250
 msgid ""
 "Your server is not configured to run <a href=\"http://www.php.net/manual/en/"
 "book.imagick.php\" target=\"_blank\">Imagick</a>."
 msgstr ""
 
-#: admin/class-admin.php:260
+#: admin/class-admin.php:264
 msgid ""
 "Use <a href=\"https://drive.google.com/viewer\" target=\"_blank\">Google "
 "Drive Viewer</a> to generate thumbnails for MS Office files and many other "
 "file types remotely."
 msgstr ""
 
-#: admin/class-admin.php:261
+#: admin/class-admin.php:265
 msgid "Your server does not allow remote HTTP access."
 msgstr ""
 
-#: admin/class-admin.php:275
+#: admin/class-admin.php:279
 msgid "Successfully auto-detected the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:276
+#: admin/class-admin.php:280
 msgid "Failed to auto-detect the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:298
+#: admin/class-admin.php:302
 msgid ""
 "The following values will be used by default in the shortcode. You can still "
 "manually set each of these values in each individual shortcode."
 msgstr ""
 
-#: admin/class-admin.php:305
+#: admin/class-admin.php:309
 msgid "Select which tools to use when generating thumbnails."
 msgstr ""
 
-#: admin/class-admin.php:311
+#: admin/class-admin.php:315
 msgid ""
 "Enter custom CSS styling for use with document galleries. To see which ids "
 "and classes you can style, take a look at <a href=\"%s\" target=\"_blank"
 "\">style.css</a>."
 msgstr ""
 
-#: admin/class-admin.php:329
+#: admin/class-admin.php:333
 msgid ""
 "Unless you <em>really</em> know what you're doing, you should not touch "
 "these values."
 msgstr ""
 
-#: admin/class-admin.php:331
+#: admin/class-admin.php:335
 msgid ""
 "NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
 msgstr ""
 
-#: admin/class-admin.php:453
+#: admin/class-admin.php:457
 msgid "Select All"
 msgstr ""
 
-#: admin/class-admin.php:456
+#: admin/class-admin.php:460
 msgid "Thumbnail"
 msgstr ""
 
-#: admin/class-admin.php:457
+#: admin/class-admin.php:461
 msgid "File name"
 msgstr ""
 
-#: admin/class-admin.php:458
+#: admin/class-admin.php:462
 msgid "Date"
 msgstr ""
 
-#: admin/class-admin.php:461
+#: admin/class-admin.php:465
 msgid "Delete Selected"
 msgstr ""
 
-#: admin/class-admin.php:463
+#: admin/class-admin.php:467
 msgid "item"
 msgid_plural "items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/class-admin.php:466
+#: admin/class-admin.php:470
 msgid "Go to the first page"
 msgstr ""
 
-#: admin/class-admin.php:467
+#: admin/class-admin.php:471
 msgid "Go to the previous page"
 msgstr ""
 
-#: admin/class-admin.php:469
+#: admin/class-admin.php:473
 msgid "Current page"
 msgstr ""
 
-#: admin/class-admin.php:469
+#: admin/class-admin.php:473
 msgid "of"
 msgstr ""
 
-#: admin/class-admin.php:470
+#: admin/class-admin.php:474
 msgid "Go to the next page"
 msgstr ""
 
-#: admin/class-admin.php:471
+#: admin/class-admin.php:475
 msgid "Go to the last page"
 msgstr ""
 
-#: admin/class-admin.php:473
+#: admin/class-admin.php:477
 msgid "items per page"
 msgstr ""
 
-#: admin/class-admin.php:579
+#: admin/class-admin.php:583
 msgid "Invalid Ghostscript path given: "
 msgstr ""
 
