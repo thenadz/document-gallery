@@ -470,11 +470,11 @@ switch($currentTab) {
                '<a class="first-page'.( $sheet==1 ? ' disabled' : '').'" title="'.__('Go to the first page', 'document-gallery').'"'.( $sheet==1 ? '' : ' href="?'.http_build_query($URL_params).'"').'>«</a>'.
                '<a class="prev-page'.( $sheet==1 ? ' disabled' : '').'" title="'.__('Go to the previous page', 'document-gallery').'"'.( $sheet==1 ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$sheet-1))).'"').'>‹</a>'.
                '<span class="paging-input">'.
-                  '<input class="current-page" title="'.__('Current page').'" type="text" name="paged" value="'.$sheet.'" size="'.strlen($sheet).'" maxlength="'.strlen($sheet).'"> '.__('of').' <span class="total-pages">'.$lastsheet.'</span></span>'.
-               '<a class="next-page'.( $sheet==$lastsheet ? ' disabled' : '').'" title="'.__('Go to the next page').'"'.( $sheet==$lastsheet ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$sheet+1))).'"').'>›</a>'.
-               '<a class="last-page'.( $sheet==$lastsheet ? ' disabled' : '').'" title="'.__('Go to the last page').'"'.( $sheet==$lastsheet ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$lastsheet))).'"').'>»</a>'.
+                  '<input class="current-page" title="'.__('Current page', 'document-gallery').'" type="text" name="paged" value="'.$sheet.'" size="'.strlen($sheet).'" maxlength="'.strlen($sheet).'"> '.__('of', 'document-gallery').' <span class="total-pages">'.$lastsheet.'</span></span>'.
+               '<a class="next-page'.( $sheet==$lastsheet ? ' disabled' : '').'" title="'.__('Go to the next page', 'document-gallery').'"'.( $sheet==$lastsheet ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$sheet+1))).'"').'>›</a>'.
+               '<a class="last-page'.( $sheet==$lastsheet ? ' disabled' : '').'" title="'.__('Go to the last page', 'document-gallery').'"'.( $sheet==$lastsheet ? '' : ' href="?'.http_build_query(array_merge($URL_params, array('sheet'=>$lastsheet))).'"').'>»</a>'.
             '</span>':' <b>|</b> ').
-            '<span class="displaying-num"><select dir="rtl" class="limit_per_page">'.$select_limit.'</select> '.__('items per page').'</span>'.
+            '<span class="displaying-num"><select dir="rtl" class="limit_per_page">'.$select_limit.'</select> '.__('items per page', 'document-gallery').'</span>'.
          '</div>'.
          '<br class="clear" />';
       ?>
