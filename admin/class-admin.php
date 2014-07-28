@@ -14,10 +14,14 @@ class DG_Admin {
 <div class="wrap">
 <h2>Document Gallery Settings</h2>
 
-<?php $tabs = array('settings' => __('Settings', 'document-gallery'), 'thumbs-list' => __('List of Generated Thumbnails', 'document-gallery'));
+<?php $tabs = array(
+    'settings' => __('Settings', 'document-gallery'),
+    'thumbs-list' => __('List of Generated Thumbnails', 'document-gallery'));
 $currentTab = $_REQUEST['tab'];
-if (!array_key_exists($currentTab, $tabs))
-   $currentTab = 'settings'; ?>
+if (!array_key_exists($currentTab, $tabs)) {
+   $currentTab = 'settings';
+} ?>
+
 <h2 class="nav-tab-wrapper">
 <?php foreach ($tabs as $tab => $name) {
    $class = ($tab == $currentTab) ? ' nav-tab-active' : '';
