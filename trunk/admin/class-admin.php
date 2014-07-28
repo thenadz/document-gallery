@@ -494,14 +494,14 @@ switch($currentTab) {
             <tbody><?php
                $WP_date_format = get_option('date_format').' '.get_option('time_format');
                $i = 0;
-               foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
+               foreach ($dg_options['thumber']['thumbs'] as $v) {
                   if ($i < $offset) { $i++; continue; }
                   if (++$i > $offset + $limit) { break; }
                   echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="ids[]" value="' .
-                          $dg_options['thumber']['thumbs'][$k]['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
-                          $dg_options['thumber']['thumbs'][$k]['thumb_url'].'" />'.'</td><td class="title column-title">' .
-                          basename($dg_options['thumber']['thumbs'][$k]['thumb_path']).'</td><td class="date column-date">' .
-                          date($WP_date_format, $dg_options['thumber']['thumbs'][$k]['created_timestamp']).'</td></tr>'."\n";
+                          $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
+                          $v['thumb_url'].'" />'.'</td><td class="title column-title">' .
+                          basename($v['thumb_path']).'</td><td class="date column-date">' .
+                          date($WP_date_format, $v['created_timestamp']).'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
          </table>
