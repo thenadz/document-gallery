@@ -37,7 +37,7 @@ class DG_Thumber {
       $options = self::getOptions();
 
       // if we haven't saved a thumb, generate one
-      if (!isset($options['thumbs'][$ID])) {
+      if (empty($options['thumbs'][$ID])) {
          // prevent page timing out -- generate for no more than 30 sec
          if ((time() - $timeout) > 30) {
             return self::getDefaultThumbnail($ID, $pg);
@@ -58,7 +58,7 @@ class DG_Thumber {
                
                if ($thumb = self::getThumbnailTemplate($thumber, $ID, $pg)) {
                   $options['thumbs'][$ID] = array(
-                      'created_timestamp' => time(),
+                      'timestamp'         => time(),
                       'thumb_url'         => $thumb['url'],
                       'thumb_path'        => $thumb['path'],
                       'thumber'           => $thumber
@@ -70,9 +70,10 @@ class DG_Thumber {
          }
       }
 
-      if (!isset($options['thumbs'][$ID]) || false === $options['thumbs'][$ID]) {
-         if (!isset($options['thumbs'][$ID])) {
-            $options['thumbs'][$ID] = false;
+      $new = empty($options['thumbs'][$ID]);
+      if ($new || empty($options['thumbs'][$ID]['thumber'])) {
+         if ($new) {
+            $options['thumbs'][$ID] = array('timestamp' => time());
             self::setOptions($options);
          }
 
@@ -540,7 +541,7 @@ class DG_Thumber {
    /**
     * Key: Attachment ID
     * Val: array
-    *      + created_timestamp - When the thumbnail was generated.
+    *      + timestamp - When the thumbnail was generated (or generation failed).
     *      + thumb_path - System path to thumbnail image.
     *      + thumb_url - URL pointing to the thumbnail for this document.
     *      + thumber - Generator used to create thumb OR false if failed to gen.
@@ -554,7 +555,7 @@ class DG_Thumber {
    /**
     * Key: Attachment ID
     * Val: array
-    *      + created_timestamp - When the thumbnail was generated.
+    *      + timestamp - When the thumbnail was generated (or generation failed).
     *      + thumb_path - System path to thumbnail image.
     *      + thumb_url - URL pointing to the thumbnail for this document.
     *      + thumber - Generator used to create thumb OR false if failed to gen.
@@ -734,7 +735,7 @@ class DG_Thumber {
 
       foreach ((array)$ids as $id) {
          if (isset($options['thumbs'][$id])) {
-            if (false !== $options['thumbs'][$id]) {
+            if (isset($options['thumbs'][$id]['thumber'])) {
                @unlink($options['thumbs'][$id]['thumb_path']);
             }
 
