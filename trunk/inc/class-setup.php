@@ -80,11 +80,14 @@ class DG_Setup {
       $options = DocumentGallery::getOptions($blog);
       if (is_null($options)) return;
 
+      // version-specific updates
+      self::twoPointTwo($options);
+      
       // update plugin version
       $options['version'] = DG_VERSION;
 
       // setup CSS
-      if (!empty($options['css']['text'])) {
+      if (isset($options['css']['text'])) {
          // Only populate minified if it will be used
          $options['css']['minified'] =
                  DocumentGallery::compileCustomCss($options['css']['text']);
@@ -95,12 +98,37 @@ class DG_Setup {
       // remove previously-failed thumbs
       $thumbs = $options['thumber']['thumbs'];
       foreach ($thumbs as $k => $v) {
-         if (false === $v) {
+         if (empty($v['thumber'])) {
             unset($options['thumber']['thumbs'][$k]);
          }
       }
 
       DocumentGallery::setOptions($options, $blog);
+   }
+   
+   /**
+    * The 'created_timestamp' key in each thumb record is being moved
+    * to 'timestamp' as part of a move to store timestamp for failed
+    * thumbnails in addition to successful ones.
+    * @param array $options
+    */
+   private static function twoPointTwo(&$options) {
+      if (version_compare($options['version'], '2.2', '<')) {
+         $thumbs = array();
+         
+         foreach ($options['thumber']['thumbs'] as $id => $thumb) {
+            if (false === $thumb) continue;
+            
+            $thumbs[$id] = array(
+                'timestamp'   => $thumb['created_timestamp'],
+                'thumb_url'   => $thumb['thumb_url'],
+                'thumb_path'  => $thumb['thumb_path'],
+                'thumber'     => $thumb['thumber']
+            );
+         }
+         
+         $options['thumber']['thumbs'] = $thumbs;
+      }
    }
    
    /**
@@ -174,7 +202,7 @@ class DG_Setup {
       if (is_null($options)) return;
 
       foreach ($options['thumbs'] as $val) {
-         if (false !== $val) {
+         if (isset($val['thumber'])) {
             @unlink($val['thumb_path']);
          }
       }

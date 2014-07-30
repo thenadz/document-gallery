@@ -389,7 +389,7 @@ switch($currentTab) {
     * Render the Thumbnail table.
     */
    public static function renderThumbsTable() {
-      global $dg_options;
+      $options = DG_Thumber::getOptions();
 
       $URL_params = array('page' => 'document_gallery', 'tab' => 'thumbs-list');
       
@@ -398,16 +398,16 @@ switch($currentTab) {
          $URL_params['orderby'] = $orderby;
          
          if ($orderby == 'date') {
-            foreach ($dg_options['thumber']['thumbs'] as $key => $node) {
-               $keyArray[$key] = $node['created_timestamp'];
-               $dg_options['thumber']['thumbs'][$key]['thumb_id'] = $key;
+            foreach ($options['thumbs'] as $key => $node) {
+               $keyArray[$key] = $node['timestamp'];
+               $options['thumbs'][$key]['thumb_id'] = $key;
             }
          }
          
          if ($orderby == 'title') {
-            foreach ($dg_options['thumber']['thumbs'] as $key => $node) {
+            foreach ($options['thumbs'] as $key => $node) {
                $keyArray[$key] = basename($node['thumb_path']);
-               $dg_options['thumber']['thumbs'][$key]['thumb_id'] = $key;
+               $options['thumbs'][$key]['thumb_id'] = $key;
             }
          }
          
@@ -420,14 +420,14 @@ switch($currentTab) {
          $URL_params['order'] = $order;
 
          if ($order == 'asc') {
-            array_multisort($keyArray, SORT_ASC, $dg_options['thumber']['thumbs']);
+            array_multisort($keyArray, SORT_ASC, $options['thumbs']);
          } else {
-            array_multisort($keyArray, SORT_DESC, $dg_options['thumber']['thumbs']);
+            array_multisort($keyArray, SORT_DESC, $options['thumbs']);
          }
       } else {
          $orderby = '';
-         foreach ($dg_options['thumber']['thumbs'] as $key => $node) {
-            $dg_options['thumber']['thumbs'][$key]['thumb_id'] = $key;
+         foreach ($options['thumbs'] as $key => $node) {
+            $options['thumbs'][$key]['thumb_id'] = $key;
          }
       }
 
@@ -443,7 +443,7 @@ switch($currentTab) {
       foreach ($limit_options as $l_o) {
          $select_limit .= '<option value="'.$l_o.'"'.selected($limit, $l_o, false).'>'.$l_o.'</option>'.PHP_EOL;
       }
-      $thumbs_number = count($dg_options['thumber']['thumbs']);
+      $thumbs_number = count($options['thumbs']);
       $lastsheet = ceil($thumbs_number/$limit);
       $sheet = isset($_REQUEST['sheet']) ? intval($_REQUEST['sheet']) : 1;
       if ($sheet <= 0 || $sheet > $lastsheet) {
@@ -494,14 +494,14 @@ switch($currentTab) {
             <tbody><?php
                $WP_date_format = get_option('date_format').' '.get_option('time_format');
                $i = 0;
-               foreach ($dg_options['thumber']['thumbs'] as $v) {
+               foreach ($options['thumbs'] as $v) {
                   if ($i < $offset) { $i++; continue; }
                   if (++$i > $offset + $limit) { break; }
                   echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="ids[]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
                           $v['thumb_url'].'" />'.'</td><td class="title column-title">' .
                           basename($v['thumb_path']).'</td><td class="date column-date">' .
-                          date($WP_date_format, $v['created_timestamp']).'</td></tr>'.PHP_EOL;
+                          date($WP_date_format, $v['timestamp']).'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
          </table>
@@ -550,7 +550,7 @@ switch($currentTab) {
       foreach ($dg_options['thumber']['active'] as $k => $v) {
          if (!$v && $ret['thumber']['active'][$k]) {
             foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
-               if (false === $v) {
+               if (empty($v['thumber'])) {
                   unset($ret['thumber']['thumbs'][$k]);
                }
             }
