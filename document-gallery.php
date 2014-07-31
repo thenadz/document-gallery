@@ -39,6 +39,10 @@ add_action('plugins_loaded', array('DocumentGallery', 'loadTextDomain'));
 // cleanup cached data when thumbed attachment deleted
 include_once DG_PATH . 'inc/class-thumber.php';
 add_action('delete_attachment', array('DG_Thumber', 'deleteThumbMeta'));
+   
+// AJAX action used for thumbanil tail in admin
+// NOTE: using within is_admin() check works unreliably
+add_action('wp_ajax_DG_multipleDeletion', array('DG_Admin', 'multipleDeletion'));
 
 if (is_admin()) {
    // admin house keeping
@@ -53,9 +57,6 @@ if (is_admin()) {
    if (DG_Admin::doRegisterSettings()) {
       add_action('admin_init', array('DG_Admin', 'registerSettings'));
    }
-   
-   // delete multiple thumbs
-   add_action('wp_ajax_DG_multipleDeletion', array('DG_Admin', 'multipleDeletion'));
 } else {
    // styling for gallery
    if (empty($dg_options['css']['text'])) {
