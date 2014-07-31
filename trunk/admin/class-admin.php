@@ -17,10 +17,13 @@ class DG_Admin {
 <?php $tabs = array(
     'settings' => __('Settings', 'document-gallery'),
     'thumbs-list' => __('List of Generated Thumbnails', 'document-gallery'));
-$currentTab = $_REQUEST['tab'];
-if (!array_key_exists($currentTab, $tabs)) {
+
+if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], $tabs)) {
    $currentTab = 'settings';
-} ?>
+} else {
+   $currentTab = $_REQUEST['tab'];
+}
+?>
 
 <h2 class="nav-tab-wrapper">
 <?php foreach ($tabs as $tab => $name) {
@@ -392,31 +395,33 @@ switch($currentTab) {
       $options = DG_Thumber::getOptions();
 
       $URL_params = array('page' => 'document_gallery', 'tab' => 'thumbs-list');
+      $att_ids = array();
       
       if (isset($_REQUEST['orderby']) && in_array(strtolower($_REQUEST['orderby']), array('title', 'date'))) {
          $orderby = strtolower($_REQUEST['orderby']);
          $URL_params['orderby'] = $orderby;
          
-         if ($orderby == 'date') {
-            foreach ($options['thumbs'] as $key => $node) {
-               $keyArray[$key] = $node['timestamp'];
-               $options['thumbs'][$key]['thumb_id'] = $key;
-            }
+         switch ($orderby)
+         {
+            case 'date':
+               foreach ($options['thumbs'] as $key => $node) {
+                  $keyArray[$key] = $node['timestamp'];
+                  $options['thumbs'][$key]['thumb_id'] = $att_ids[] = $key;
+               }
+               break;
+               
+            case 'title':
+               foreach ($options['thumbs'] as $key => $node) {
+                  $keyArray[$key] = basename($node['thumb_path']);
+                  $options['thumbs'][$key]['thumb_id'] = $att_ids[] = $key;
+               }
+               break;
          }
          
-         if ($orderby == 'title') {
-            foreach ($options['thumbs'] as $key => $node) {
-               $keyArray[$key] = basename($node['thumb_path']);
-               $options['thumbs'][$key]['thumb_id'] = $key;
-            }
-         }
-         
-         if (!isset($_REQUEST['order']) || !in_array(strtolower($_REQUEST['order']), array('asc', 'desc'))) {
+         $order = strtolower($_REQUEST['order']);
+         if (!isset($_REQUEST['order']) || !in_array($order, array('asc', 'desc'))) {
             $order = 'asc';
-         } else {
-            $order = strtolower($_REQUEST['order']);
          }
-         
          $URL_params['order'] = $order;
 
          if ($order == 'asc') {
@@ -427,7 +432,7 @@ switch($currentTab) {
       } else {
          $orderby = '';
          foreach ($options['thumbs'] as $key => $node) {
-            $options['thumbs'][$key]['thumb_id'] = $key;
+            $options['thumbs'][$key]['thumb_id'] = $att_ids[] = $key;
          }
       }
 
@@ -452,6 +457,22 @@ switch($currentTab) {
       
       $offset = ($sheet - 1) * $limit;
 
+      $att_ids = array_slice($att_ids, $offset, $limit);
+      $atts = get_posts(
+         array(
+            'post_type'   => 'attachment',
+            'post_status' => 'inherit',
+            'numberposts' => -1,
+            'post__in'    => $att_ids,
+            'orderby'     => 'post__in'
+      ));
+      $titles = array();
+      foreach ($atts as $att) {
+         $path_parts = pathinfo($att->guid);
+         $titles[$att->ID] = $att->post_title.'.'.$path_parts['extension'];
+      }
+      unset($atts);
+      
       $thead = '<tr>'.
             '<th scope="col" class="manage-column column-cb check-column %s">'.
                '<label class="screen-reader-text" for="cb-select-all-%d">'.__('Select All', 'document-gallery').'</label>'.
@@ -497,11 +518,17 @@ switch($currentTab) {
                foreach ($options['thumbs'] as $v) {
                   if ($i < $offset) { $i++; continue; }
                   if (++$i > $offset + $limit) { break; }
+                  
+                  $icon = isset($v['thumb_url']) ? $v['thumb_url'] : DG_URL . 'assets/icons/missing.png';
+                  $title = isset($titles[$v['thumb_id']]) ? $titles[$v['thumb_id']] : '';
+                  $date = date($WP_date_format, $v['timestamp']);
+                  
                   echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="ids[]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
-                          $v['thumb_url'].'" />'.'</td><td class="title column-title">' .
-                          basename($v['thumb_path']).'</td><td class="date column-date">' .
-                          date($WP_date_format, $v['timestamp']).'</td></tr>'.PHP_EOL;
+                          $icon.'" />'.'</td><td class="title column-title">' .
+                          ( $title ? '<strong><a href="/?attachment_id='.$v['thumb_id'].'" target="_blank" title="'.__('View', 'document-gallery').' "' .
+                          $title.'" '.__('attachment page', 'document-gallery').'">'.$title.'</a></strong>' : __('Attachment not found', 'document-gallery') ) .
+                          '</td><td class="date column-date">'.$date.'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
          </table>
