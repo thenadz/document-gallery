@@ -30,20 +30,21 @@ class DG_Gallery {
     *=========================================================================*/
 
    /**
-    * Returns whether to link to attachment pg.
-    * @return bool
+    * @return bool Whether to link to attachment pg.
     */
    public function linkToAttachmentPg() {
       return $this->atts['attachment_pg'];
    }
 
+   /**
+    * @return bool Whether to use "fancy" thumbnails.
+    */
    public function useFancyThumbs() {
       return $this->atts['fancy'];
    }
 
    /**
-    * Returns whether descriptions should be included in output.
-    * @return bool
+    * @return bool Whether descriptions should be included in output.
     */
    public function useDescriptions() {
       return $this->atts['descriptions'];
@@ -54,39 +55,50 @@ class DG_Gallery {
     *=========================================================================*/
 
    /**
-    * Gets the DG options specific to Gallery.
-    * @return array
+    * @param int $blog The blog we're retrieving options for (null => current blog).
+    * @return multitype:unknown Gets gallery branch of DG options array.
     */
-   public static function getOptions() {
-      global $dg_options;
-      return $dg_options['gallery'];
+   public static function getOptions($blog = null) {
+      $options = DocumentGallery::getOptions($blog);
+      return $options['gallery'];
    }
 
    /**
-    * Sets the DG options specific to Gallery.
-    * @param array $options
+    * @param multitype:unknown $options New value for gallery branch of DG options array.
+    * @param int $blog The blog we're retrieving options for (null => current blog).
     */
-   public static function setOptions($options) {
-      global $dg_options;
+   public static function setOptions($options, $blog = null) {
+      $dg_options = DocumentGallery::getOptions($blog);
       $dg_options['gallery'] = $options;
-      update_option(DG_OPTION_NAME, $dg_options);
+      DocumentGallery::setOptions($dg_options, $blog);
    }
 
-   public static function getDefaults() {
-      $options = self::getOptions();
+   /**
+    * @param int $blog The blog we're retrieving options for (null => current blog).
+    * @return multitype:unknown The defaults branch of DG options array.
+    */
+   public static function getDefaults($blog = null) {
+      $options = self::getOptions($blog);
       return $options['defaults'];
    }
 
-   public static function setDefaults($defaults) {
-      $options = self::getOptions();
+   /**
+    * @param multitype:unknown $options New value for defaults branch of DG options array.
+    * @param int $blog The blog we're retrieving options for (null => current blog).
+    */
+   public static function setDefaults($defaults, $blog = null) {
+      $options = self::getOptions($blog);
       $options['defaults'] = $defaults;
-      self::setOptions($options);
+      self::setOptions($options, $blog);
    }
 
    /*==========================================================================
     * INIT GALLERY
     *=========================================================================*/
 
+   /**
+    * Initializes static values for this class.
+    */
    public static function init() {
       self::$comment =
          PHP_EOL . '<!-- ' . __('Generated using Document Gallery. Get yours here: ', 'document-gallery') .
@@ -98,7 +110,7 @@ class DG_Gallery {
 
    /**
     * Builds a gallery object with attributes passed.
-    * @param array $atts    Array of attributes used in shortcode.
+    * @param multitype:string $atts Array of attributes used in shortcode.
     */
    public function __construct($atts) {
       // empty string is passed when no arguments are given, but constructor expects an array
@@ -129,7 +141,8 @@ class DG_Gallery {
 
    /**
     * Cleans up user input, making sure we don't pass crap on to WP core.
-    * @global string $wp_version
+    * @param multitype:string $defaults The defaults array to sanitize.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
     */
    public static function sanitizeDefaults($defaults, &$errs) {
       $old_defaults = self::getDefaults();
@@ -207,6 +220,12 @@ class DG_Gallery {
       return $defaults;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The attachment_pg value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized attachment_pg value.
+    */
    private static function sanitizeAttachmentPg($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['attachment_pg'];
@@ -222,6 +241,12 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The descriptions value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized descriptions value.
+    */
    private static function sanitizeDescriptions($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['descriptions'];
@@ -237,6 +262,12 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The fancy value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized fancy value.
+    */
    private static function sanitizeFancy($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['fancy'];
@@ -252,6 +283,12 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The ids value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool|multitype:int The sanitized ids value.
+    */
    private static function sanitizeIds($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['ids'];
@@ -275,6 +312,12 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The images value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized images value.
+    */
    private static function sanitizeImages($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['images'];
@@ -290,6 +333,12 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The localpost value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized localpost value.
+    */
    private static function sanitizeLocalpost($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['localpost'];
@@ -305,6 +354,12 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The order value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return string The sanitized order value.
+    */
    private static function sanitizeOrder($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['order'];
@@ -319,10 +374,19 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * @return multitype:string The valid options for order parameter.
+    */
    public static function getOrderOptions() {
       return array('ASC', 'DESC');
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The orderby value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return string The sanitized orderby value.
+    */
    private static function sanitizeOrderby($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['orderby'];
@@ -339,12 +403,21 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * @return multitype:string The valid options for orderby parameter.
+    */
    public static function getOrderbyOptions() {
       return array('author', 'comment_count', 'date', 'ID',
           'menu_order', 'modified', 'name', 'none',
           'parent', 'post__in', 'rand', 'title');
    }
 
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The relation value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return string The sanitized relation value.
+    */
    private static function sanitizeRelation($value, &$err) {
       $defaults = self::getDefaults();
       $ret = $defaults['relation'];
@@ -359,13 +432,16 @@ class DG_Gallery {
       return $ret;
    }
 
+   /**
+    * @return multitype:string The valid options for relation parameter.
+    */
    public static function getRelationOptions() {
       return array('AND', 'OR');
    }
 
    /**
     * Gets all valid Documents based on the attributes passed by the user.
-    * @return array                    Contains all documents matching the query.
+    * @return multitype:unknown Contains all documents matching the query.
     * @throws InvalidArgumentException Thrown when $this->errs is not empty.
     */
    private function getDocuments() {
@@ -401,8 +477,8 @@ class DG_Gallery {
     * Function loops through all attributes passed that did not match
     * self::$defaults. If they are the name of a taxonomy, they are plugged
     * into the query, otherwise $this->errs is appended with an error string.
-    * @global string $wp_version    Determines which tax query to use.
-    * @param array $query           Query to insert tax query into.
+    * @global string $wp_version Determines which tax query to use.
+    * @param multitype:unknown $query Query to insert tax query into.
     */
    private function setTaxa(&$query) {
       if(!empty($this->taxa)) {
@@ -435,9 +511,9 @@ class DG_Gallery {
    /**
     * Returns an array of term ids when provided with a list of term names.
     * Also appends an entry onto $errs if any invalid names are found.
-    * @param string $taxon
-    * @param array $term_names
-    * @return array
+    * @param string $taxon The taxon these terms are a member of.
+    * @param multitype:string $term_names Terms to retrieve.
+    * @return multitype:string All matched terms.
     */
    private function getTermIdsByNames($taxon, $term_names) {
       return $this->getTermXByNames('term_id', $taxon, $term_names);
@@ -446,9 +522,9 @@ class DG_Gallery {
    /**
     * Returns an array of term slugs when provided with a list of term names.
     * Also appends an entry onto $errs if any invalid names are found.
-    * @param string $taxon
-    * @param array $term_names
-    * @return array
+    * @param string $taxon The taxon these terms are a member of.
+    * @param multitype:string $term_names Terms to retrieve.
+    * @return multitype:string All matched terms.
     */
    private function getTermSlugsByNames($taxon, $term_names) {
       return $this->getTermXByNames('slug', $taxon, $term_names);
@@ -460,10 +536,10 @@ class DG_Gallery {
     * (http://codex.wordpress.org/Function_Reference/get_term_by#Return_Values)
     *
     * Also appends an entry onto $errs if any invalid names are found.
-    * @param string $x
-    * @param string $taxon
-    * @param array $term_names
-    * @return array
+    * @param string $x Field to retrieve from matched term.
+    * @param string $taxon The taxon these terms are a member of.
+    * @param multitype:string $term_names Terms to retrieve.
+    * @return multitype:string All matched terms.
     */
    private function getTermXByNames($x, $taxon, $term_names) {
       $ret = array();
@@ -482,7 +558,7 @@ class DG_Gallery {
 
    /**
     * Given a list of IDs, all attachments represented by these IDs are returned.
-    * @return array        post objects
+    * @return multitype:Post The posts matched.
     */
    private function getAttachmentsByIds() {
       $args = array(
@@ -507,6 +583,11 @@ class DG_Gallery {
              || (int)$var < 0;      // isn't positive
    }
 
+   /**
+    * Converts provided value to bool.
+    * @param unknown $val To be converted.
+    * @return bool|NULL Bool value if can be parsed, else NULL.
+    */
    private static function toBool($val) {
       if (is_bool($val)) {
          return $val;
@@ -535,8 +616,7 @@ class DG_Gallery {
     *=========================================================================*/
 
    /**
-    * Returns HTML representing this Gallery.
-    * @return string
+    * @return string HTML representing this Gallery.
     */
    public function __toString() {
       if(!empty($this->errs)) {

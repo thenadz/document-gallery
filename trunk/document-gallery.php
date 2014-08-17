@@ -91,8 +91,8 @@ class DocumentGallery {
     * Takes values passed from attributes and returns sutable HTML to represent
     * all valid attachments requested.
     *
-    * @param array $atts         Arguments from the user.
-    * @return string             HTML for the Document Gallery.
+    * @param multitype:string $atts Arguments from the user.
+    * @return string HTML for the Document Gallery.
     */
    public static function doShortcode($atts) {
       include_once 'inc/class-gallery.php';
@@ -124,8 +124,8 @@ class DocumentGallery {
    /**
     * Add query custom CSS query string.
     * Taken from here: http://ottopress.com/2010/dont-include-wp-load-please/
-    * @param array $vars
-    * @return array
+    * @param multitype:string $vars Variables to be added.
+    * @return multitype:string All variables to be included in query string.
     */
    public static function addCustomStyleQueryVar($vars) {
       $vars[] = self::$query_var;
@@ -159,7 +159,7 @@ class DocumentGallery {
    /**
     * Appends error log with $entry if WordPress is in debug mode.
     *
-    * @param str $entry
+    * @param string $entry Value to be logged.
     */
    public static function writeLog($entry) {
       if (self::logEnabled()) {
@@ -192,6 +192,9 @@ class DocumentGallery {
     * I18n
     *=========================================================================*/
 
+   /**
+    * Loads language files into WP core.
+    */
    public static function loadTextDomain() {
       load_plugin_textdomain('document-gallery', false, dirname(DG_BASENAME) . '/languages/');
    }
@@ -202,7 +205,7 @@ class DocumentGallery {
    
    /**
     * @param int $blog ID of the blog to be retrieved in multisite env.
-    * @return array Options for the blog.
+    * @return multitype:unknown Options for the blog.
     */
    public static function getOptions($blog = null) {
       global $dg_options;
@@ -211,6 +214,10 @@ class DocumentGallery {
               : get_blog_option($blog, DG_OPTION_NAME, null);
    }
    
+   /**
+    * @param multitype:unknown $options
+    * @param int $blog ID of the blog to be set in multisite env.
+    */
    public static function setOptions($options, $blog = null) {
       if (is_null($blog)) {
          global $dg_options;
@@ -221,6 +228,9 @@ class DocumentGallery {
       }
    }
    
+   /**
+    * @param int $blog ID of the blog to be deleted in multisite env.
+    */
    public static function deleteOptions($blog = null) {
       if (is_null($blog)) {
          delete_option(DG_OPTION_NAME);
@@ -232,8 +242,8 @@ class DocumentGallery {
    /**
     * Compiles any custom CSS plus the default CSS together,
     * minifying in the process.
-    * @param str $custom The custom CSS to compile.
-    * @return str Compiled CSS, including both standard and any custom.
+    * @param string $custom The custom CSS to compile.
+    * @return string Compiled CSS, including both standard and any custom.
     */
    public static function compileCustomCss($custom) {
       $css = file_get_contents(DG_PATH . 'assets/css/style.css');
