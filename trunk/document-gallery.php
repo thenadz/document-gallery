@@ -39,18 +39,13 @@ add_action('plugins_loaded', array('DocumentGallery', 'loadTextDomain'));
 // cleanup cached data when thumbed attachment deleted
 include_once DG_PATH . 'inc/class-thumber.php';
 add_action('delete_attachment', array('DG_Thumber', 'deleteThumbMeta'));
-   
-// AJAX action used for thumbanil tail in admin
-// NOTE: using within is_admin() check works unreliably
-add_action('wp_ajax_DG_multipleDeletion', array('DG_Admin', 'multipleDeletion'));
 
 if (is_admin()) {
    // admin house keeping
    include_once DG_PATH . 'admin/class-admin.php';
 
    // add settings link
-   add_filter('plugin_action_links_' . DG_BASENAME,
-       array('DG_Admin', 'addSettingsLink'));
+   add_filter('plugin_action_links_' . DG_BASENAME, array('DG_Admin', 'addSettingsLink'));
    
    // build options page
    add_action('admin_menu', array('DG_Admin', 'addAdminPage'));

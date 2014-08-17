@@ -25,19 +25,22 @@ jQuery(document).ready(function(){
    jQuery('select.limit_per_page').change(function() {
       jQuery(location).attr('href','?'+jQuery.param(jQuery.extend(URL_params,{ limit: this.value })));
    });
-   jQuery('.deleteSelected').click(function() {
-      var data = {
-         action: 'DG_multipleDeletion',
-         'selectedIDs[]' : []
-      };
-      jQuery('.cb-ids:checked').each(function() {
-         data['selectedIDs[]'].push(jQuery(this).val());
+   jQuery('#tab-Thumbnail').submit(function() {
+      jQuery.ajax({
+          url     : $(this).attr('action'),
+          type    : $(this).attr('method'),
+          data    : $(this).serialize(),
+          success : function( response ) {
+                       console.log( response );
+                    }
       });
-      jQuery.post(ajaxurl, data, function(response) {
+      
+      return false;
+      /*jQuery.post(ajaxurl, data, function(response) {
          var result = eval(response);
          for (var index in result){
             jQuery('input[type=checkbox][value='+result[index]+']').closest('tr').fadeOut('slow', 0.00, function() {jQuery(this).slideUp('slow', function() {jQuery(this).remove();});});
          }
-      });
+      });*/
    });
 });
