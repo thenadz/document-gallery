@@ -25,9 +25,9 @@ class DG_Admin {
    public static function init() {
       if (empty(self::$tabs)) {
          self::$tabs = array(
-            'general'    => __('General',                'document-gallery'),
-            'thumbnail'  => __('Thumbnail Management',   'document-gallery'),
-            'advanced'   => __('Advanced',               'document-gallery'));
+            'General'    => __('General',                'document-gallery'),
+            'Thumbnail'  => __('Thumbnail Management',   'document-gallery'),
+            'Advanced'   => __('Advanced',               'document-gallery'));
       }
    }
    
@@ -36,17 +36,17 @@ class DG_Admin {
     */
    public static function renderOptions() { ?>
 <div class="wrap">
-<h2>Document Gallery Settings</h2>
+	<h2>Document Gallery Settings</h2>
 
-<h2 class="nav-tab-wrapper">
+	<h2 class="nav-tab-wrapper">
 <?php foreach (self::$tabs as $tab => $name) {
    $class = ($tab == self::$current) ? ' nav-tab-active' : '';
    echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=document_gallery&tab='.$tab.'">'.$name.'</a>';
 } ?>
 </h2>
 
-<form method="post" action="options.php" class="tab-<?php echo self::$current?>">
-   <input type="hidden" name="<?php echo DG_OPTION_NAME; ?>[tab]" value="<?php echo self::$current; ?>" />
+	<form method="post" action="options.php" id="tab-<?php echo self::$current?>">
+		<input type="hidden" name="<?php echo DG_OPTION_NAME; ?>[tab]" value="<?php echo self::$current; ?>" />
 <?php
    settings_fields(DG_OPTION_NAME);
    do_settings_sections(DG_OPTION_NAME);
@@ -55,7 +55,7 @@ class DG_Admin {
 </form>
 
 </div>
-   <?php }
+<?php }
 
    /**
     * Adds settings link to main plugin view.
@@ -99,14 +99,15 @@ class DG_Admin {
          self::$current = $_REQUEST['tab'];
       }
 
-      $uc_current = ucfirst(self::$current);
+      register_setting(DG_OPTION_NAME, DG_OPTION_NAME, array(__CLASS__, 'validateSettings'));
       
-      register_setting(DG_OPTION_NAME, DG_OPTION_NAME, array(__CLASS__, "validateSettings"));
-      
-      $funct = "register{$uc_current}Settings";
+      $funct = 'register' . self::$current . 'Settings';
       DG_Admin::$funct();
    }
    
+   /**
+    * Registers settings for the general tab.
+    */
    private static function registerGeneralSettings() {
       global $dg_options;
 
@@ -285,12 +286,18 @@ class DG_Admin {
         ));
    }
    
+   /**
+    * Registers settings for the thumbnail management tab.
+    */
    private static function registerThumbnailSettings() {
       add_settings_section(
           'css', __('Custom CSS', 'document-gallery'),
           array(__CLASS__, 'renderThumbnailSection'), 'document_gallery');
    }
    
+   /**
+    * Registers settings for the advanced tab.
+    */
    private static function registerAdvancedSettings() {
       global $dg_options;
       $gs = $dg_options['thumber']['gs'];
@@ -332,41 +339,43 @@ class DG_Admin {
     * Render the Default Settings section.
     */
    public static function renderDefaultSettingsSection() { ?>
-      <p><?php _e('The following values will be used by default in the shortcode. You can still manually set each of these values in each individual shortcode.', 'document-gallery'); ?></p>
-   <?php }
+<p><?php _e('The following values will be used by default in the shortcode. You can still manually set each of these values in each individual shortcode.', 'document-gallery'); ?></p>
+<?php }
 
    /**
     * Render the Thumber section.
     */
    public static function renderThumberSection() { ?>
-      <p><?php _e('Select which tools to use when generating thumbnails.', 'document-gallery'); ?></p>
-   <?php }
+<p><?php _e('Select which tools to use when generating thumbnails.', 'document-gallery'); ?></p>
+<?php }
 
    public static function renderCssSection() {
       global $dg_options; ?>
-      <p><?php printf(
+<p><?php printf(
           __('Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.'),
           DG_URL . 'assets/css/style.css'); ?></p>
-      <table class="form-table">
-         <tbody>
-            <tr valign="top">
-               <td>
-                  <textarea name="document_gallery[css]" rows="10" cols="50" class="large-text code"><?php echo $dg_options['css']['text']; ?></textarea>
-               </td>
-            </tr>
-         </tbody>
-      </table>
-   <?php }
+<table class="form-table">
+	<tbody>
+		<tr valign="top">
+			<td><textarea name="document_gallery[css]" rows="10" cols="50"
+					class="large-text code"><?php echo $dg_options['css']['text']; ?></textarea>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<?php }
 
    /**
     * Render the Thumber Advanced section.
     */
    public static function renderAdvancedSection() {
       include_once DG_PATH . 'inc/class-thumber.php';?>
-      <p><?php _e('Unless you <em>really</em> know what you\'re doing, you should not touch these values.', 'document-gallery'); ?></p>
-      <?php if (!DG_Thumber::isExecAvailable()) : ?>
-      <p><em><?php _e('NOTE: <code>exec()</code> is not accessible. Ghostscript will not function.', 'document-gallery'); ?></em></p>
-      <?php endif; ?>
+<p><?php _e('Unless you <em>really</em> know what you\'re doing, you should not touch these values.', 'document-gallery'); ?></p>
+<?php if (!DG_Thumber::isExecAvailable()) : ?>
+<p>
+	<em><?php _e('NOTE: <code>exec()</code> is not accessible. Ghostscript will not function.', 'document-gallery'); ?></em>
+</p>
+<?php endif; ?>
    <?php }
 
    /**
@@ -376,7 +385,7 @@ class DG_Admin {
       include_once DG_PATH . 'inc/class-thumber.php';
       $options = DG_Thumber::getOptions();
 
-      $URL_params = array('page' => 'document_gallery', 'tab' => 'thumbnail');
+      $URL_params = array('page' => 'document_gallery', 'tab' => 'Thumbnail');
       $att_ids = array();
       
       if (isset($_REQUEST['orderby']) && in_array(strtolower($_REQUEST['orderby']), array('title', 'date'))) {
@@ -481,20 +490,22 @@ class DG_Admin {
          '</div>'.
          '<br class="clear" />';
       ?>
-      
-      <script type="text/javascript">
+
+<script type="text/javascript">
          var URL_params = <?php echo json_encode($URL_params); ?>;
       </script>
-      <div class="thumbs-list-wrapper"><div>
-         <div class="tablenav top"><?php echo $pagination; ?></div>
-         <table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">
-            <thead>
+<div class="thumbs-list-wrapper">
+	<div>
+		<div class="tablenav top"><?php echo $pagination; ?></div>
+		<table id="ThumbsTable" class="wp-list-table widefat fixed media"
+			cellpadding="0" cellspacing="0">
+			<thead>
                <?php printf($thead, 'topLeft', 1, 1, 'topRight'); ?>
             </thead>
-            <tfoot>
+			<tfoot>
                <?php printf($thead, 'bottomLeft', 2, 2, 'bottomRight'); ?>
             </tfoot>
-            <tbody><?php
+			<tbody><?php
                $WP_date_format = get_option('date_format').' '.get_option('time_format');
                $i = 0;
                foreach ($options['thumbs'] as $v) {
@@ -505,7 +516,7 @@ class DG_Admin {
                   $title = isset($titles[$v['thumb_id']]) ? $titles[$v['thumb_id']] : '';
                   $date = date($WP_date_format, $v['timestamp']);
                   
-                  echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="ids[]" value="' .
+                  echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
                           $icon.'" />'.'</td><td class="title column-title">' .
                           ( $title ? '<strong><a href="/?attachment_id='.$v['thumb_id'].'" target="_blank" title="'.__('View', 'document-gallery').' "' .
@@ -513,10 +524,11 @@ class DG_Admin {
                           '</td><td class="date column-date">'.$date.'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
-         </table>
-         <div class="tablenav bottom"><?php echo $pagination; ?></div>
-      </div></div>
-   <?php }
+		</table>
+		<div class="tablenav bottom"><?php echo $pagination; ?></div>
+	</div>
+</div>
+<?php }
 
    /**
     * Render a checkbox field.
@@ -566,18 +578,6 @@ class DG_Admin {
 
       print '</select> ' . $args['description'];
    }
-
-   /**
-    * Delete multiple thumbnails. Response for AJAX request.
-    */
-   public static function multipleDeletion() {
-      if (is_array($_REQUEST['selectedIDs'])) {
-         $deleted = array_map('intval', $_REQUEST['selectedIDs']);
-         DG_Thumber::deleteThumbMeta($deleted);
-         echo json_encode($deleted);
-         die();
-      }
-   }
    
    /**
     * Validates submitted options, sanitizing any invalid options.
@@ -585,11 +585,16 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      $funct = 'validate' . ucfirst($values['tab']) . 'Settings';
+      $funct = "validate{$values['tab']}Settings";
       unset($values['tab']);
       return DG_Admin::$funct($values);
    }
-   
+
+   /**
+    * Validates general settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
    private static function validateGeneralSettings($values) {
       global $dg_options;
       $ret = $dg_options;
@@ -640,15 +645,35 @@ class DG_Admin {
       return $ret;
    }
    
+   /**
+    * Validates thumbnail management settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
    private static function validateThumbnailSettings($values) {
       global $dg_options;
       $ret = $dg_options;
       
-      // TODO
-
+      if (isset($values['ids'])) {
+         $deleted = array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']);
+   
+         foreach ($deleted as $k) {
+            if (isset($ret['thumber']['thumbs'][$k]['thumber'])) {
+               @unlink($ret['thumber']['thumbs'][$k]['thumb_path']);
+            }
+            
+            unset($ret['thumber']['thumbs'][$k]);
+         }
+      }
+      
       return $ret;
    }
    
+   /**
+    * Validates advanced settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
    private static function validateAdvancedSettings($values) {
       global $dg_options;
       $ret = $dg_options;
