@@ -1,11 +1,35 @@
 <?php
 defined('WPINC') OR exit;
 
+DG_Admin::init();
+
 class DG_Admin {
    /**
-    * @var str The hook for the Document Gallery settings page.
+    * @var string The hook for the Document Gallery settings page.
     */
    private static $hook;
+   
+   /**
+    * @var string The current tab being rendered.
+    */
+   private static $current;
+   
+   /**
+    * @var multitype:string Associative array containing all tab names, keyed by tab slug.
+    */
+   private static $tabs;
+   
+   /**
+    * Initializes static values for this class.
+    */
+   public static function init() {
+      if (empty(self::$tabs)) {
+         self::$tabs = array(
+            'general'    => __('General',                'document-gallery'),
+            'thumbnail'  => __('Thumbnail Management',   'document-gallery'),
+            'advanced'   => __('Advanced',               'document-gallery'));
+      }
+   }
    
    /**
     * Renders Document Gallery options page.
@@ -14,39 +38,21 @@ class DG_Admin {
 <div class="wrap">
 <h2>Document Gallery Settings</h2>
 
-<?php $tabs = array(
-    'settings' => __('Settings', 'document-gallery'),
-    'thumbs-list' => __('List of Generated Thumbnails', 'document-gallery'));
-
-if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], $tabs)) {
-   $currentTab = 'settings';
-} else {
-   $currentTab = $_REQUEST['tab'];
-}
-?>
-
 <h2 class="nav-tab-wrapper">
-<?php foreach ($tabs as $tab => $name) {
-   $class = ($tab == $currentTab) ? ' nav-tab-active' : '';
+<?php foreach (self::$tabs as $tab => $name) {
+   $class = ($tab == self::$current) ? ' nav-tab-active' : '';
    echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=document_gallery&tab='.$tab.'">'.$name.'</a>';
-}
-echo '</h2>';
-switch($currentTab) {
-   case 'thumbs-list':
-      self::renderThumbsTable();
-      break;
-   
-   case 'settings':
-   default:
-?>
-      <form method="post" action="options.php">
-         <?php settings_fields(DG_OPTION_NAME); ?>
-         <?php do_settings_sections('document_gallery'); ?>
-         <?php submit_button(); ?>
-      </form>
-<?php
-      break;
 } ?>
+</h2>
+
+<form method="post" action="options.php" class="tab-<?php echo self::$current?>">
+   <input type="hidden" name="<?php echo DG_OPTION_NAME; ?>[tab]" value="<?php echo self::$current; ?>" />
+<?php
+   settings_fields(DG_OPTION_NAME);
+   do_settings_sections(DG_OPTION_NAME);
+   submit_button();
+?>
+</form>
 
 </div>
    <?php }
@@ -86,6 +92,22 @@ switch($currentTab) {
     * Registers settings for the Document Gallery options page.
     */
    public static function registerSettings() {
+      if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], self::$tabs)) {
+         reset(self::$tabs);
+         self::$current = key(self::$tabs);
+      } else {
+         self::$current = $_REQUEST['tab'];
+      }
+
+      $uc_current = ucfirst(self::$current);
+      
+      register_setting(DG_OPTION_NAME, DG_OPTION_NAME, array(__CLASS__, "validateSettings"));
+      
+      $funct = "register{$uc_current}Settings";
+      DG_Admin::$funct();
+   }
+   
+   private static function registerGeneralSettings() {
       global $dg_options;
 
       include_once DG_PATH . 'inc/class-gallery.php';
@@ -93,9 +115,6 @@ switch($currentTab) {
 
       $defaults = $dg_options['gallery']['defaults'];
       $thumber_active = $dg_options['thumber']['active'];
-      $thumber_gs = $dg_options['thumber']['gs'];
-
-      register_setting(DG_OPTION_NAME, DG_OPTION_NAME, array(__CLASS__, 'validateSettings'));
 
       add_settings_section(
         'gallery_defaults', __('Default Settings', 'document-gallery'),
@@ -108,10 +127,6 @@ switch($currentTab) {
       add_settings_section(
           'css', __('Custom CSS', 'document-gallery'),
           array(__CLASS__, 'renderCssSection'), 'document_gallery');
-
-      add_settings_section(
-        'thumber_advanced', __('Advanced Thumbnail Generation', 'document-gallery'),
-        array(__CLASS__, 'renderThumberAdvancedSection'), 'document_gallery');
 
       add_settings_field(
         'gallery_defaults_attachment_pg', 'attachment_pg',
@@ -268,17 +283,32 @@ switch($currentTab) {
                               : __('Your server does not allow remote HTTP access.', 'document-gallery'),
             'disabled'    => !DG_Thumber::isGoogleDriveAvailable()
         ));
+   }
+   
+   private static function registerThumbnailSettings() {
+      add_settings_section(
+          'css', __('Custom CSS', 'document-gallery'),
+          array(__CLASS__, 'renderThumbnailSection'), 'document_gallery');
+   }
+   
+   private static function registerAdvancedSettings() {
+      global $dg_options;
+      $gs = $dg_options['thumber']['gs'];
+      
+      add_settings_section(
+         'advanced', __('Advanced Thumbnail Generation', 'document-gallery'),
+         array(__CLASS__, 'renderAdvancedSection'), 'document_gallery');
 
       add_settings_field(
-        'thumber_advanced_gs', 'Ghostscript Absolute Path',
+        'advanced_gs', 'Ghostscript Absolute Path',
         array(__CLASS__, 'renderTextField'),
-        'document_gallery', 'thumber_advanced',
+        'document_gallery', 'advanced',
         array (
-            'label_for'   => 'label_thumber_advanced_gs',
-            'name'        => 'thumber_advanced][gs',
-            'value'       => esc_attr($thumber_gs),
+            'label_for'   => 'label_advanced_gs',
+            'name'        => 'gs',
+            'value'       => esc_attr($gs),
             'option_name' => DG_OPTION_NAME,
-            'description' => $thumber_gs
+            'description' => $gs
                ? __('Successfully auto-detected the location of Ghostscript.', 'document-gallery')
                : __('Failed to auto-detect the location of Ghostscript.', 'document-gallery')
         ));
@@ -331,7 +361,7 @@ switch($currentTab) {
    /**
     * Render the Thumber Advanced section.
     */
-   public static function renderThumberAdvancedSection() {
+   public static function renderAdvancedSection() {
       include_once DG_PATH . 'inc/class-thumber.php';?>
       <p><?php _e('Unless you <em>really</em> know what you\'re doing, you should not touch these values.', 'document-gallery'); ?></p>
       <?php if (!DG_Thumber::isExecAvailable()) : ?>
@@ -340,61 +370,13 @@ switch($currentTab) {
    <?php }
 
    /**
-    * Render a checkbox field.
-    * @param array $args
-    */
-   public static function renderCheckboxField($args) {
-      $args['disabled'] = isset($args['disabled']) ? $args['disabled'] : false;
-      printf('<input type="checkbox" value="1" name="%1$s[%2$s]" id="%3$s" %4$s %5$s/> %6$s',
-          $args['option_name'],
-          $args['name'],
-          $args['label_for'],
-          checked($args['value'], 1, false),
-          $args['disabled'] ? 'disabled="disabled"' : '',
-          $args['description']);
-   }
-
-   /**
-    * Render a text field.
-    * @param array $args
-    */
-   public static function renderTextField($args) {
-      printf('<input type="text" value="%1$s" name="%2$s[%3$s]" id="%4$s" /> %5$s',
-          $args['value'],
-          $args['option_name'],
-          $args['name'],
-          $args['label_for'],
-          $args['description']);
-   }
-
-   /**
-    * Render a select field.
-    * @param array $args
-    */
-   public static function renderSelectField($args) {
-      printf('<select name="%1$s[%2$s]" id="%3$s">',
-          $args['option_name'],
-          $args['name'],
-          $args['label_for']);
-
-      foreach ($args['options'] as $val) {
-         printf('<option value="%1$s" %2$s>%3$s</option>',
-             $val,
-             selected($val, $args['value'], false),
-             $val,
-             $args['description']);
-      }
-
-      print '</select> ' . $args['description'];
-   }
-
-   /**
     * Render the Thumbnail table.
     */
-   public static function renderThumbsTable() {
+   public static function renderThumbnailSection() {
+      include_once DG_PATH . 'inc/class-thumber.php';
       $options = DG_Thumber::getOptions();
 
-      $URL_params = array('page' => 'document_gallery', 'tab' => 'thumbs-list');
+      $URL_params = array('page' => 'document_gallery', 'tab' => 'thumbnail');
       $att_ids = array();
       
       if (isset($_REQUEST['orderby']) && in_array(strtolower($_REQUEST['orderby']), array('title', 'date'))) {
@@ -537,6 +519,55 @@ switch($currentTab) {
    <?php }
 
    /**
+    * Render a checkbox field.
+    * @param array $args
+    */
+   public static function renderCheckboxField($args) {
+      $args['disabled'] = isset($args['disabled']) ? $args['disabled'] : false;
+      printf('<input type="checkbox" value="1" name="%1$s[%2$s]" id="%3$s" %4$s %5$s/> %6$s',
+          $args['option_name'],
+          $args['name'],
+          $args['label_for'],
+          checked($args['value'], 1, false),
+          $args['disabled'] ? 'disabled="disabled"' : '',
+          $args['description']);
+   }
+
+   /**
+    * Render a text field.
+    * @param array $args
+    */
+   public static function renderTextField($args) {
+      printf('<input type="text" value="%1$s" name="%2$s[%3$s]" id="%4$s" /> %5$s',
+          $args['value'],
+          $args['option_name'],
+          $args['name'],
+          $args['label_for'],
+          $args['description']);
+   }
+
+   /**
+    * Render a select field.
+    * @param array $args
+    */
+   public static function renderSelectField($args) {
+      printf('<select name="%1$s[%2$s]" id="%3$s">',
+          $args['option_name'],
+          $args['name'],
+          $args['label_for']);
+
+      foreach ($args['options'] as $val) {
+         printf('<option value="%1$s" %2$s>%3$s</option>',
+             $val,
+             selected($val, $args['value'], false),
+             $val,
+             $args['description']);
+      }
+
+      print '</select> ' . $args['description'];
+   }
+
+   /**
     * Delete multiple thumbnails. Response for AJAX request.
     */
    public static function multipleDeletion() {
@@ -554,10 +585,16 @@ switch($currentTab) {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      include_once DG_PATH . 'inc/class-gallery.php';
-
+      $funct = 'validate' . ucfirst($values['tab']) . 'Settings';
+      unset($values['tab']);
+      return DG_Admin::$funct($values);
+   }
+   
+   private static function validateGeneralSettings($values) {
       global $dg_options;
       $ret = $dg_options;
+      
+      include_once DG_PATH . 'inc/class-gallery.php';
 
       // handle gallery shortcode defaults
       $errs = array();
@@ -600,18 +637,33 @@ switch($currentTab) {
          }
       }
 
+      return $ret;
+   }
+   
+   private static function validateThumbnailSettings($values) {
+      global $dg_options;
+      $ret = $dg_options;
+      
+      // TODO
+
+      return $ret;
+   }
+   
+   private static function validateAdvancedSettings($values) {
+      global $dg_options;
+      $ret = $dg_options;
+      
       // handle setting the Ghostscript path
-      if (isset($values['thumber_advanced']['gs']) &&
-          0 != strcmp($values['thumber_advanced']['gs'], $ret['thumber']['gs'])) {
-         if (false === strpos($values['thumber_advanced']['gs'], ';')) {
-            $ret['thumber']['gs'] = $values['thumber_advanced']['gs'];
+      if (isset($values['gs']) &&
+         0 != strcmp($values['gs'], $ret['thumber']['gs'])) {
+         if (false === strpos($values['gs'], ';')) {
+            $ret['thumber']['gs'] = $values['gs'];
          } else {
             add_settings_error(DG_OPTION_NAME, 'thumber-gs',
-                __('Invalid Ghostscript path given: ', 'document-gallery')
-                . $values['thumber_advanced']['gs']);
+            __('Invalid Ghostscript path given: ', 'document-gallery') . $values['gs']);
          }
       }
-
+      
       return $ret;
    }
 
