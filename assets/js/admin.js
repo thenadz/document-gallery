@@ -26,21 +26,21 @@ jQuery(document).ready(function(){
       jQuery(location).attr('href','?'+jQuery.param(jQuery.extend(URL_params,{ limit: this.value })));
    });
    jQuery('#tab-Thumbnail').submit(function() {
-      jQuery.ajax({
-          url     : $(this).attr('action'),
-          type    : $(this).attr('method'),
-          data    : $(this).serialize(),
-          success : function( response ) {
-                       console.log( response );
-                    }
-      });
-      
-      return false;
-      /*jQuery.post(ajaxurl, data, function(response) {
+      var a = jQuery(this).attr('action');
+      var b = jQuery(this).serialize();
+      jQuery.post(a, b, function(data) {
+         var response = data.substr(0, data.indexOf("\n"));
          var result = eval(response);
          for (var index in result){
             jQuery('input[type=checkbox][value='+result[index]+']').closest('tr').fadeOut('slow', 0.00, function() {jQuery(this).slideUp('slow', function() {jQuery(this).remove();});});
          }
-      });*/
+      } ).fail(function() {
+         console.log( 'Problem in reaching the server' );
+      });
+      return false;
+   });
+   jQuery('.deleteSelected').click(function(event) {
+      jQuery('#tab-Thumbnail').submit();
+      event.stopPropagation();
    });
 });

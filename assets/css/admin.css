@@ -68,11 +68,14 @@ th.bottomRight{
    vertical-align: text-bottom;
    padding-right: 5px;
 }
-.settings-tab:before{
+.General-tab:before{
    content: '\f108';
 }
-.thumbs-list-tab:before{
+.Thumbnail-tab:before{
    content: '\f233';
+}
+.Advanced-tab:before{
+   content: '\f332';
 }
 .deleteSelected:before{
    content: '\f182';
