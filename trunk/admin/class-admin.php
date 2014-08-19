@@ -50,7 +50,9 @@ class DG_Admin {
 <?php
    settings_fields(DG_OPTION_NAME);
    do_settings_sections(DG_OPTION_NAME);
-   submit_button();
+   if (self::$current != 'Thumbnail') {
+      submit_button();
+   }
 ?>
 </form>
 
@@ -585,7 +587,11 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      $funct = "validate{$values['tab']}Settings";
+      if (empty($values['tab']) || !array_key_exists($values['tab'], self::$tabs)) {
+         reset(self::$tabs);
+         $values['tab'] = key(self::$tabs);
+      }
+      $funct = 'validate'.$values['tab'].'Settings';
       unset($values['tab']);
       return DG_Admin::$funct($values);
    }
@@ -656,7 +662,7 @@ class DG_Admin {
       
       if (isset($values['ids'])) {
          $deleted = array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']);
-   
+         
          foreach ($deleted as $k) {
             if (isset($ret['thumber']['thumbs'][$k]['thumber'])) {
                @unlink($ret['thumber']['thumbs'][$k]['thumb_path']);
@@ -664,6 +670,8 @@ class DG_Admin {
             
             unset($ret['thumber']['thumbs'][$k]);
          }
+         
+         echo json_encode($deleted) . "\n";
       }
       
       return $ret;
