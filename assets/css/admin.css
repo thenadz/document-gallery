@@ -6,6 +6,7 @@ table.wp-list-table.widefat.fixed.media{
 }
 div.thumbs-list-wrapper{
    text-align:center;
+   margin-top: 1.5em;
 }
 div.thumbs-list-wrapper>div{
    margin: 0 auto;
