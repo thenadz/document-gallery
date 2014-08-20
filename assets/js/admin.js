@@ -25,22 +25,25 @@ jQuery(document).ready(function(){
    jQuery('select.limit_per_page').change(function() {
       jQuery(location).attr('href','?'+jQuery.param(jQuery.extend(URL_params,{ limit: this.value })));
    });
-   jQuery('#tab-Thumbnail').submit(function() {
-      var a = jQuery(this).attr('action');
-      var b = jQuery(this).serialize();
-      jQuery.post(a, b, function(data) {
-         var response = data.substr(0, data.indexOf("\n"));
-         var result = eval(response);
-         for (var index in result){
-            jQuery('input[type=checkbox][value='+result[index]+']').closest('tr').fadeOut('slow', 0.00, function() {jQuery(this).slideUp('slow', function() {jQuery(this).remove();});});
-         }
-      } ).fail(function() {
-         console.log( 'Problem in reaching the server' );
-      });
+   jQuery('#tab-Thumbnail').submit( function (event) {
+	  event.preventDefault();
+	  if (jQuery('.cb-ids:checked').length > 0) {
+         var a = jQuery(this).attr('action');
+         var b = jQuery(this).serialize() + '&document_gallery%5Bajax%5D=true';
+         jQuery.post(a, b, function(response) {
+    	    if (response.indexOf("\n") == -1) {
+    		   var result = eval(response);
+    	       for (var index in result) {
+    	          jQuery('input[type=checkbox][value='+result[index]+']').closest('tr').fadeOut('slow', 0.00, function() {jQuery(this).slideUp('slow', function() {jQuery(this).remove();});});
+    	       }
+    	    } else {
+    		   console.log('Invalid response from server:');
+    		   console.log(response);
+    	    }
+         } ).fail(function() {
+            console.log( 'Problem in reaching the server' );
+         });
+	  }
       return false;
-   });
-   jQuery('.deleteSelected').click(function(event) {
-      jQuery('#tab-Thumbnail').submit();
-      event.stopPropagation();
    });
 });

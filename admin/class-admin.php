@@ -293,8 +293,8 @@ class DG_Admin {
     */
    private static function registerThumbnailSettings() {
       add_settings_section(
-          'css', __('Custom CSS', 'document-gallery'),
-          array(__CLASS__, 'renderThumbnailSection'), 'document_gallery');
+          'thumbnail_table', '',
+         array(__CLASS__, 'renderThumbnailSection'), 'document_gallery');
    }
    
    /**
@@ -661,7 +661,7 @@ class DG_Admin {
       $ret = $dg_options;
       
       if (isset($values['ids'])) {
-         $deleted = array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']);
+         $deleted = array_values(array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']));
          
          foreach ($deleted as $k) {
             if (isset($ret['thumber']['thumbs'][$k]['thumber'])) {
@@ -671,7 +671,10 @@ class DG_Admin {
             unset($ret['thumber']['thumbs'][$k]);
          }
          
-         echo json_encode($deleted) . "\n";
+         if ( isset($values['ajax']) ) {
+            echo json_encode($deleted);
+            add_action('init', 'die');
+         }
       }
       
       return $ret;
