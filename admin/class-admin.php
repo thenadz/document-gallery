@@ -302,11 +302,32 @@ class DG_Admin {
     */
    private static function registerAdvancedSettings() {
       global $dg_options;
-      $gs = $dg_options['thumber']['gs'];
       
       add_settings_section(
          'advanced', __('Advanced Thumbnail Generation', 'document-gallery'),
          array(__CLASS__, 'renderAdvancedSection'), 'document_gallery');
+      
+      add_settings_field(
+         'advanced_dimensions', 'Max Thumbnail Dimensions',
+         array(__CLASS__, 'renderMultiTextField'),
+         'document_gallery', 'advanced',
+         array (
+            array (
+               'label_for'   => 'label_advanced_width',
+               'name'        => 'width',
+               'value'       => $dg_options['thumber']['width'],
+               'type'        => 'number" min="1" step="1',
+               'option_name' => DG_OPTION_NAME,
+               'description' => ' x '),
+            array (
+               'label_for'   => 'label_advanced_height',
+               'name'        => 'height',
+               'value'       => $dg_options['thumber']['height'],
+               'type'        => 'number" min="1" step="1',
+               'option_name' => DG_OPTION_NAME,
+               'description' => __('The max width and height that thumbnails will be generated at.', 'document-gallery')
+            )
+      ));
 
       add_settings_field(
         'advanced_gs', 'Ghostscript Absolute Path',
@@ -315,12 +336,16 @@ class DG_Admin {
         array (
             'label_for'   => 'label_advanced_gs',
             'name'        => 'gs',
-            'value'       => esc_attr($gs),
+            'value'       => esc_attr($dg_options['thumber']['gs']),
             'option_name' => DG_OPTION_NAME,
-            'description' => $gs
+            'description' => $dg_options['thumber']['gs']
                ? __('Successfully auto-detected the location of Ghostscript.', 'document-gallery')
                : __('Failed to auto-detect the location of Ghostscript.', 'document-gallery')
         ));
+
+      add_settings_section(
+         'advanced_options_dump', __('Options Array Dump', 'document-gallery'),
+         array(__CLASS__, 'renderOptionsDumpSection'), 'document_gallery');
    }
    
    /**
@@ -351,6 +376,9 @@ class DG_Admin {
 <p><?php _e('Select which tools to use when generating thumbnails.', 'document-gallery'); ?></p>
 <?php }
 
+   /**
+    * Renders a text field for use when modifying the CSS to be printed in addition to the default CSS.
+    */
    public static function renderCssSection() {
       global $dg_options; ?>
 <p><?php printf(
@@ -359,8 +387,10 @@ class DG_Admin {
 <table class="form-table">
 	<tbody>
 		<tr valign="top">
-			<td><textarea name="document_gallery[css]" rows="10" cols="50"
-					class="large-text code"><?php echo $dg_options['css']['text']; ?></textarea>
+			<td>
+			   <textarea name="document_gallery[css]" rows="10" cols="50" class="large-text code">
+			      <?php echo $dg_options['css']['text']; ?>
+			   </textarea>
 			</td>
 		</tr>
 	</tbody>
@@ -378,6 +408,25 @@ class DG_Admin {
 	<em><?php _e('NOTE: <code>exec()</code> is not accessible. Ghostscript will not function.', 'document-gallery'); ?></em>
 </p>
 <?php endif; ?>
+   <?php }
+   
+   /**
+    * Renders a readonly textfield containing a dump of current DG options.
+    */
+   public static function renderOptionsDumpSection() {
+         global $dg_options; ?>
+   <p><?php _e('The following should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'documet-gallery'); ?></p>
+   <table class="form-table">
+   	<tbody>
+   		<tr valign="top">
+   			<td>
+   			   <textarea readonly="true" rows="10" cols="50" class="large-text code">
+   			      <?php var_dump($dg_options); ?>
+   			   </textarea>
+   			</td>
+   		</tr>
+   	</tbody>
+   </table>
    <?php }
 
    /**
@@ -552,12 +601,23 @@ class DG_Admin {
     * @param array $args
     */
    public static function renderTextField($args) {
-      printf('<input type="text" value="%1$s" name="%2$s[%3$s]" id="%4$s" /> %5$s',
-          $args['value'],
-          $args['option_name'],
-          $args['name'],
-          $args['label_for'],
-          $args['description']);
+      printf('<input type="%1$s" value="%2$s" name="%3$s[%4$s]" id="%5$s" /> %6$s',
+         isset($args['type']) ? $args['type'] : 'text',
+         $args['value'],
+         $args['option_name'],
+         $args['name'],
+         $args['label_for'],
+         $args['description']);
+   }
+   
+   /**
+    * Accepts a two-dimensional array where each inner array consists of valid arguments for renderTextField.
+    * @param array $args
+    */
+   public static function renderMultiTextField($args) {
+      foreach ($args as $arg) {
+         self::renderTextField($arg);
+      }
    }
 
    /**
@@ -698,6 +758,38 @@ class DG_Admin {
             add_settings_error(DG_OPTION_NAME, 'thumber-gs',
             __('Invalid Ghostscript path given: ', 'document-gallery') . $values['gs']);
          }
+      }
+      
+      // handle setting width
+      if (isset($values['width'])) {
+         $width = (int)$values['width'];
+         if ($width > 0) {
+            $ret['thumber']['width'] = $width;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-width', __('Invalid width given: ' . $values['width']));
+         }
+      }
+      
+      // handle setting height
+      if (isset($values['height'])) {
+         $height = (int)$values['height'];
+         if ($height > 0) {
+            $ret['thumber']['height'] = $height;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-height', __('Invalid height given: ' . $values['width']));
+         }
+      }
+      
+      // delete thumb cache to force regeneration if max dimensions changed
+      if ($ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
+          $ret['thumber']['height'] !== $dg_options['thumber']['height']) {
+         foreach ($ret['thumber']['thumbs'] as $v) {
+            if (isset($v['thumber'])) {
+               @unlink($v['thumb_path']);
+            }
+         }
+         
+         $ret['thumber']['thumbs'] = array();
       }
       
       return $ret;
