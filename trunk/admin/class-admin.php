@@ -733,7 +733,7 @@ class DG_Admin {
          
          if ( isset($values['ajax']) ) {
             echo json_encode($deleted);
-            add_action('init', 'die');
+            add_filter('wp_redirect', function(){ die; }, 1, 0);
          }
       }
       
