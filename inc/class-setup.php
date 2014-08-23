@@ -9,6 +9,8 @@ defined('WPINC') OR exit;
 class DG_Setup {
 
    /**
+    * Note that changes to the structure of the default options require also
+    * changing the schema in options-schema.php
     * @return array Contains default options for DG.
     */
    public static function getDefaultOptions() {
@@ -24,21 +26,19 @@ class DG_Setup {
               'height' => 200
           ),
           'gallery' => array(
-              'defaults' => array(
-                  // default: link directly to file (true to link to attachment pg)
-                  'attachment_pg'  => false,
-                  'descriptions'   => false,
-                  // include thumbnail of actual document in gallery display
-                  'fancy'          => true,
-                  // comma-separated list of attachment ids
-                  'ids'            => false,
-                  // if true, all images attached to current page will be included also
-                  'images'         => false,
-                  'localpost'      => true,
-                  'order'          => 'ASC',
-                  'orderby'        => 'menu_order',
-                  'relation'       => 'AND'
-              )
+              // default: link directly to file (true to link to attachment pg)
+              'attachment_pg'  => false,
+              'descriptions'   => false,
+              // include thumbnail of actual document in gallery display
+              'fancy'          => true,
+              // comma-separated list of attachment ids
+              'ids'            => false,
+              // if true, all images attached to current page will be included also
+              'images'         => false,
+              'localpost'      => true,
+              'order'          => 'ASC',
+              'orderby'        => 'menu_order',
+              'relation'       => 'AND'
           ),
           'css' => array(
               'text' => '',
@@ -46,7 +46,8 @@ class DG_Setup {
               'etag' => $etag,
               'version' => 0
           ),
-          'version' => DG_VERSION
+          'version' => DG_VERSION,
+          'validation' => false
       );
    }
 
@@ -110,12 +111,16 @@ class DG_Setup {
     * The 'created_timestamp' key in each thumb record is being moved
     * to 'timestamp' as part of a move to store timestamp for failed
     * thumbnails in addition to successful ones.
-    * @param array $options
+    * 
+    * The defaults sub-branch in the gallery branch is being flattened into its parent.
+    * 
+    * @param array $options The options to be modified.
     */
    private static function twoPointTwo(&$options) {
       if (version_compare($options['version'], '2.2', '<')) {
          $thumbs = array();
          
+         // "created_timestamp" moving to just "timestamp"
          foreach ($options['thumber']['thumbs'] as $id => $thumb) {
             if (false === $thumb) continue;
             
@@ -128,6 +133,12 @@ class DG_Setup {
          }
          
          $options['thumber']['thumbs'] = $thumbs;
+         
+         // flatten out "defaults" level
+         $options['gallery'] = $options['gallery']['defaults'];
+         
+         // adding "validation" branch
+         $options['validation'] = false;
       }
    }
    

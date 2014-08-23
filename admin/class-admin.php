@@ -41,7 +41,7 @@ class DG_Admin {
 	<h2 class="nav-tab-wrapper">
 <?php foreach (self::$tabs as $tab => $name) {
    $class = ($tab == self::$current) ? ' nav-tab-active' : '';
-   echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=document_gallery&tab='.$tab.'">'.$name.'</a>';
+   echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=' . DG_OPTION_NAME . '&tab='.$tab.'">'.$name.'</a>';
 } ?>
 </h2>
 
@@ -63,7 +63,7 @@ class DG_Admin {
     * Adds settings link to main plugin view.
     */
    public static function addSettingsLink($links) {
-      $settings = '<a href="options-general.php?page=document_gallery">' .
+      $settings = '<a href="options-general.php?page=' . DG_OPTION_NAME . '">' .
           __('Settings', 'document-gallery') . '</a>';
       array_unshift($links, $settings);
       return $links;
@@ -76,7 +76,7 @@ class DG_Admin {
       DG_Admin::$hook = add_options_page(
           __('Document Gallery Settings', 'document-gallery'),
           __('Document Gallery', 'document-gallery'),
-          'manage_options', 'document_gallery', array(__CLASS__, 'renderOptions'));
+          'manage_options', DG_OPTION_NAME, array(__CLASS__, 'renderOptions'));
       add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueueScriptsAndStyles'));
    }
    
@@ -116,25 +116,25 @@ class DG_Admin {
       include_once DG_PATH . 'inc/class-gallery.php';
       include_once DG_PATH . 'inc/class-thumber.php';
 
-      $defaults = $dg_options['gallery']['defaults'];
-      $thumber_active = $dg_options['thumber']['active'];
+      $defaults = $dg_options['gallery'];
+      $active = $dg_options['thumber']['active'];
 
       add_settings_section(
         'gallery_defaults', __('Default Settings', 'document-gallery'),
-        array(__CLASS__, 'renderDefaultSettingsSection'), 'document_gallery');
+        array(__CLASS__, 'renderDefaultSettingsSection'), DG_OPTION_NAME);
 
       add_settings_section(
-        'thumber_active', __('Thumbnail Generation', 'document-gallery'),
-        array(__CLASS__, 'renderThumberSection'), 'document_gallery');
+        'thumbnail_generation', __('Thumbnail Generation', 'document-gallery'),
+        array(__CLASS__, 'renderThumberSection'), DG_OPTION_NAME);
 
       add_settings_section(
           'css', __('Custom CSS', 'document-gallery'),
-          array(__CLASS__, 'renderCssSection'), 'document_gallery');
+          array(__CLASS__, 'renderCssSection'), DG_OPTION_NAME);
 
       add_settings_field(
         'gallery_defaults_attachment_pg', 'attachment_pg',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_attachment_pg',
             'name'        => 'gallery_defaults][attachment_pg',
@@ -146,7 +146,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_descriptions', 'descriptions',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_descriptions',
             'name'        => 'gallery_defaults][descriptions',
@@ -158,7 +158,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_fancy', 'fancy',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_fancy',
             'name'        => 'gallery_defaults][fancy',
@@ -170,7 +170,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_images', 'images',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_images',
             'name'        => 'gallery_defaults][images',
@@ -182,7 +182,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_localpost', 'localpost',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_localpost',
             'name'        => 'gallery_defaults][localpost',
@@ -194,7 +194,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_order', 'order',
         array(__CLASS__, 'renderSelectField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_order',
             'name'        => 'gallery_defaults][order',
@@ -207,7 +207,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_orderby', 'orderby',
         array(__CLASS__, 'renderSelectField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_orderby',
             'name'        => 'gallery_defaults][orderby',
@@ -220,7 +220,7 @@ class DG_Admin {
       add_settings_field(
         'gallery_defaults_relation', 'relation',
         array(__CLASS__, 'renderSelectField'),
-        'document_gallery', 'gallery_defaults',
+        DG_OPTION_NAME, 'gallery_defaults',
         array (
             'label_for'   => 'label_gallery_defaults_relation',
             'name'        => 'gallery_defaults][relation',
@@ -229,27 +229,27 @@ class DG_Admin {
             'option_name' => DG_OPTION_NAME,
             'description' => __('Whether matched documents must have all taxa_names (AND) or at least one (OR)', 'document-gallery')
         ));
-
+      
       add_settings_field(
-        'thumber_active_av', 'Audio/Video',
+        'thumbnail_generation_av', 'Audio/Video',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'thumber_active',
+        DG_OPTION_NAME, 'thumbnail_generation',
         array (
-            'label_for'   => 'label_thumber_active_av',
-            'name'        => 'thumber_active][av',
-            'value'       => esc_attr($thumber_active['av']),
+            'label_for'   => 'label_thumbnail_generation_av',
+            'name'        => 'thumbnail_generation][av',
+            'value'       => esc_attr($active['av']),
             'option_name' => DG_OPTION_NAME,
             'description' => esc_html__('Locally generate thumbnails for audio & video files.', 'document-gallery')
         ));
 
       add_settings_field(
-        'thumber_active_gs', 'Ghostscript',
+        'thumbnail_generation_gs', 'Ghostscript',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'thumber_active',
+        DG_OPTION_NAME, 'thumbnail_generation',
         array (
-            'label_for'   => 'label_thumber_active_gs',
-            'name'        => 'thumber_active][gs',
-            'value'       => esc_attr($thumber_active['gs']),
+            'label_for'   => 'label_thumbnail_generation_gs',
+            'name'        => 'thumbnail_generation][gs',
+            'value'       => esc_attr($active['gs']),
             'option_name' => DG_OPTION_NAME,
             'description' => DG_Thumber::isGhostscriptAvailable()
                               ? __('Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a> for faster local PDF processing (compared to Imagick).', 'document-gallery')
@@ -258,13 +258,13 @@ class DG_Admin {
         ));
 
       add_settings_field(
-        'thumber_active_imagick', 'Imagick',
+        'thumbnail_generation_imagick', 'Imagick',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'thumber_active',
+        DG_OPTION_NAME, 'thumbnail_generation',
         array (
-            'label_for'   => 'label_thumber_active_imagick',
-            'name'        => 'thumber_active][imagick',
-            'value'       => esc_attr($thumber_active['imagick']),
+            'label_for'   => 'label_thumbnail_generation_imagick',
+            'name'        => 'thumbnail_generation][imagick',
+            'value'       => esc_attr($active['imagick']),
             'option_name' => DG_OPTION_NAME,
             'description' => DG_Thumber::isImagickAvailable()
                               ? __('Use <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
@@ -273,19 +273,40 @@ class DG_Admin {
         ));
 
       add_settings_field(
-        'thumber_active_google', 'Google Drive Viewer',
+        'thumbnail_generation_google', 'Google Drive Viewer',
         array(__CLASS__, 'renderCheckboxField'),
-        'document_gallery', 'thumber_active',
+        DG_OPTION_NAME, 'thumbnail_generation',
         array (
-            'label_for'   => 'label_thumber_active_google',
-            'name'        => 'thumber_active][google',
-            'value'       => esc_attr($thumber_active['google']),
+            'label_for'   => 'label_thumbnail_generation_google',
+            'name'        => 'thumbnail_generation][google',
+            'value'       => esc_attr($active['google']),
             'option_name' => DG_OPTION_NAME,
             'description' => DG_Thumber::isGoogleDriveAvailable()
                               ? __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
                               : __('Your server does not allow remote HTTP access.', 'document-gallery'),
             'disabled'    => !DG_Thumber::isGoogleDriveAvailable()
         ));
+
+      add_settings_field(
+         'thumbnail_generation_width', 'Max Thumbnail Dimensions',
+         array(__CLASS__, 'renderMultiTextField'),
+         DG_OPTION_NAME, 'thumbnail_generation',
+         array (
+            array (
+               'label_for'   => 'label_advanced_width',
+               'name'        => 'thumbnail_generation][width',
+               'value'       => $dg_options['thumber']['width'],
+               'type'        => 'number" min="1" step="1',
+               'option_name' => DG_OPTION_NAME,
+               'description' => ' x '),
+            array (
+               'label_for'   => 'label_advanced_height',
+               'name'        => 'thumbnail_generation][height',
+               'value'       => $dg_options['thumber']['height'],
+               'type'        => 'number" min="1" step="1',
+               'option_name' => DG_OPTION_NAME,
+               'description' => __('The max width and height (in pixels) that thumbnails will be generated.', 'document-gallery'))
+         ));
    }
    
    /**
@@ -294,7 +315,7 @@ class DG_Admin {
    private static function registerThumbnailSettings() {
       add_settings_section(
           'thumbnail_table', '',
-         array(__CLASS__, 'renderThumbnailSection'), 'document_gallery');
+         array(__CLASS__, 'renderThumbnailSection'), DG_OPTION_NAME);
    }
    
    /**
@@ -305,34 +326,24 @@ class DG_Admin {
       
       add_settings_section(
          'advanced', __('Advanced Thumbnail Generation', 'document-gallery'),
-         array(__CLASS__, 'renderAdvancedSection'), 'document_gallery');
+         array(__CLASS__, 'renderAdvancedSection'), DG_OPTION_NAME);
       
       add_settings_field(
-         'advanced_dimensions', 'Max Thumbnail Dimensions',
-         array(__CLASS__, 'renderMultiTextField'),
-         'document_gallery', 'advanced',
+         'advanced_validation', 'Option Validation',
+         array(__CLASS__, 'renderCheckboxField'),
+         DG_OPTION_NAME, 'advanced',
          array (
-            array (
-               'label_for'   => 'label_advanced_width',
-               'name'        => 'width',
-               'value'       => $dg_options['thumber']['width'],
-               'type'        => 'number" min="1" step="1',
-               'option_name' => DG_OPTION_NAME,
-               'description' => ' x '),
-            array (
-               'label_for'   => 'label_advanced_height',
-               'name'        => 'height',
-               'value'       => $dg_options['thumber']['height'],
-               'type'        => 'number" min="1" step="1',
-               'option_name' => DG_OPTION_NAME,
-               'description' => __('The max width and height that thumbnails will be generated at.', 'document-gallery')
-            )
-      ));
+            'label_for'   => 'label_advanced_validation',
+            'name'        => 'validation',
+            'value'       => esc_attr($dg_options['validation']),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Whether option structure should be validated before save. This is not generally necessary.', 'document-gallery')
+         ));
 
       add_settings_field(
         'advanced_gs', 'Ghostscript Absolute Path',
         array(__CLASS__, 'renderTextField'),
-        'document_gallery', 'advanced',
+        DG_OPTION_NAME, 'advanced',
         array (
             'label_for'   => 'label_advanced_gs',
             'name'        => 'gs',
@@ -345,7 +356,7 @@ class DG_Admin {
 
       add_settings_section(
          'advanced_options_dump', __('Options Array Dump', 'document-gallery'),
-         array(__CLASS__, 'renderOptionsDumpSection'), 'document_gallery');
+         array(__CLASS__, 'renderOptionsDumpSection'), DG_OPTION_NAME);
    }
    
    /**
@@ -388,7 +399,7 @@ class DG_Admin {
 	<tbody>
 		<tr valign="top">
 			<td>
-			   <textarea name="document_gallery[css]" rows="10" cols="50" class="large-text code">
+			   <textarea name=<?php echo DG_OPTION_NAME; ?>'[css]' rows="10" cols="50" class="large-text code">
 			      <?php echo $dg_options['css']['text']; ?>
 			   </textarea>
 			</td>
@@ -415,14 +426,14 @@ class DG_Admin {
     */
    public static function renderOptionsDumpSection() {
          global $dg_options; ?>
-   <p><?php _e('The following should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'documet-gallery'); ?></p>
+   <p><?php
+      _e('The following <em>readonly text</em> should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'documet-gallery');
+   ?></p>
    <table class="form-table">
    	<tbody>
    		<tr valign="top">
    			<td>
-   			   <textarea readonly="true" rows="10" cols="50" class="large-text code">
-   			      <?php var_dump($dg_options); ?>
-   			   </textarea>
+   			   <textarea readonly="true" rows="10" cols="50" id="options-dump" class="large-text code"><?php var_dump($dg_options); ?></textarea>
    			</td>
    		</tr>
    	</tbody>
@@ -436,7 +447,7 @@ class DG_Admin {
       include_once DG_PATH . 'inc/class-thumber.php';
       $options = DG_Thumber::getOptions();
 
-      $URL_params = array('page' => 'document_gallery', 'tab' => 'Thumbnail');
+      $URL_params = array('page' => DG_OPTION_NAME, 'tab' => 'Thumbnail');
       $att_ids = array();
       
       if (isset($_REQUEST['orderby']) && in_array(strtolower($_REQUEST['orderby']), array('title', 'date'))) {
@@ -543,7 +554,7 @@ class DG_Admin {
       ?>
 
 <script type="text/javascript">
-         var URL_params = <?php echo json_encode($URL_params); ?>;
+         var URL_params = <?php echo '["' . implode('","', $URL_params) . '"]'; ?>;
       </script>
 <div class="thumbs-list-wrapper">
 	<div>
@@ -570,7 +581,7 @@ class DG_Admin {
                   echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
                           $icon.'" />'.'</td><td class="title column-title">' .
-                          ( $title ? '<strong><a href="/?attachment_id='.$v['thumb_id'].'" target="_blank" title="'.__('View', 'document-gallery').' "' .
+                          ( $title ? '<strong><a href="' . home_url('/?attachment_id='.$v['thumb_id']).'" target="_blank" title="'.__('View', 'document-gallery').' "' .
                           $title.'" '.__('attachment page', 'document-gallery').'">'.$title.'</a></strong>' : __('Attachment not found', 'document-gallery') ) .
                           '</td><td class="date column-date">'.$date.'</td></tr>'.PHP_EOL;
                } ?>
@@ -666,30 +677,72 @@ class DG_Admin {
       $ret = $dg_options;
       
       include_once DG_PATH . 'inc/class-gallery.php';
+      
+      $thumbs_cleared = false;
 
       // handle gallery shortcode defaults
       $errs = array();
-      $ret['gallery']['defaults'] =
-          DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs);
+      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs);
 
       foreach ($errs as $k => $v) {
          add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
       }
+      
+      // handle setting width
+      if (isset($values['thumbnail_generation']['width'])) {
+         $width = (int)$values['thumbnail_generation']['width'];
+         if ($width > 0) {
+            $ret['thumber']['width'] = $width;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-width',
+               __('Invalid width given: ' . $values['thumbnail_generation']['width']));
+         }
+         
+         unset($values['thumbnail_generation']['width']);
+      }
+      
+      // handle setting height
+      if (isset($values['thumbnail_generation']['height'])) {
+         $height = (int)$values['thumbnail_generation']['height'];
+         if ($height > 0) {
+            $ret['thumber']['height'] = $height;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-height',
+               __('Invalid height given: ' . $values['thumbnail_generation']['height']));
+         }
+         
+         unset($values['thumbnail_generation']['width']);
+      }
+      
+      // delete thumb cache to force regeneration if max dimensions changed
+      if ($ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
+         $ret['thumber']['height'] !== $dg_options['thumber']['height']) {
+         foreach ($ret['thumber']['thumbs'] as $v) {
+            if (isset($v['thumber'])) {
+               @unlink($v['thumb_path']);
+            }
+         }
+          
+         $ret['thumber']['thumbs'] = array();
+         $thumbs_cleared = true;
+      }
 
       // handle setting the active thumbers
       foreach (array_keys($ret['thumber']['active']) as $k) {
-         $ret['thumber']['active'][$k] = isset($values['thumber_active'][$k]);
+         $ret['thumber']['active'][$k] = isset($values['thumbnail_generation'][$k]);
       }
 
       // if new thumbers available, clear failed thumbnails for retry
-      foreach ($dg_options['thumber']['active'] as $k => $v) {
-         if (!$v && $ret['thumber']['active'][$k]) {
-            foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
-               if (empty($v['thumber'])) {
-                  unset($ret['thumber']['thumbs'][$k]);
+      if (!$thumbs_cleared) {
+         foreach ($dg_options['thumber']['active'] as $k => $v) {
+            if (!$v && $ret['thumber']['active'][$k]) {
+               foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
+                  if (empty($v['thumber'])) {
+                     unset($ret['thumber']['thumbs'][$k]);
+                  }
                }
+               break;
             }
-            break;
          }
       }
 
@@ -703,8 +756,7 @@ class DG_Admin {
          if (empty($ret['css']['text'])) {
             unset($ret['css']['minified']);
          } else {
-            $ret['css']['minified'] =
-                    DocumentGallery::compileCustomCss($ret['css']['text']);
+            $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
          }
       }
 
@@ -731,8 +783,8 @@ class DG_Admin {
             unset($ret['thumber']['thumbs'][$k]);
          }
          
-         if ( isset($values['ajax']) ) {
-            echo json_encode($deleted);
+         if (isset($values['ajax'])) {
+            echo '[' . implode(',', $deleted) . ']';
             add_filter('wp_redirect', function(){ die; }, 1, 0);
          }
       }
@@ -760,37 +812,8 @@ class DG_Admin {
          }
       }
       
-      // handle setting width
-      if (isset($values['width'])) {
-         $width = (int)$values['width'];
-         if ($width > 0) {
-            $ret['thumber']['width'] = $width;
-         } else {
-            add_settings_error(DG_OPTION_NAME, 'thumber-width', __('Invalid width given: ' . $values['width']));
-         }
-      }
-      
-      // handle setting height
-      if (isset($values['height'])) {
-         $height = (int)$values['height'];
-         if ($height > 0) {
-            $ret['thumber']['height'] = $height;
-         } else {
-            add_settings_error(DG_OPTION_NAME, 'thumber-height', __('Invalid height given: ' . $values['width']));
-         }
-      }
-      
-      // delete thumb cache to force regeneration if max dimensions changed
-      if ($ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
-          $ret['thumber']['height'] !== $dg_options['thumber']['height']) {
-         foreach ($ret['thumber']['thumbs'] as $v) {
-            if (isset($v['thumber'])) {
-               @unlink($v['thumb_path']);
-            }
-         }
-         
-         $ret['thumber']['thumbs'] = array();
-      }
+      // validation checkbox
+      $ret['validation'] = isset($values['validation']);
       
       return $ret;
    }
