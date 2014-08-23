@@ -101,3 +101,7 @@ th input{
 td input{
    margin-right: 0 !important;
 }
+
+textarea[readonly], input[readonly], select[readonly] {
+   background-color: #dcdcdc;
+}

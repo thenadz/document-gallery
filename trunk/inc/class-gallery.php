@@ -73,25 +73,6 @@ class DG_Gallery {
       DocumentGallery::setOptions($dg_options, $blog);
    }
 
-   /**
-    * @param int $blog The blog we're retrieving options for (null => current blog).
-    * @return multitype:unknown The defaults branch of DG options array.
-    */
-   public static function getDefaults($blog = null) {
-      $options = self::getOptions($blog);
-      return $options['defaults'];
-   }
-
-   /**
-    * @param multitype:unknown $options New value for defaults branch of DG options array.
-    * @param int $blog The blog we're retrieving options for (null => current blog).
-    */
-   public static function setDefaults($defaults, $blog = null) {
-      $options = self::getOptions($blog);
-      $options['defaults'] = $defaults;
-      self::setOptions($options, $blog);
-   }
-
    /*==========================================================================
     * INIT GALLERY
     *=========================================================================*/
@@ -115,7 +96,7 @@ class DG_Gallery {
    public function __construct($atts) {
       // empty string is passed when no arguments are given, but constructor expects an array
       $atts = empty($atts) ? array() : $atts;
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
 
       // values used to construct tax query (may be empty)
       $this->taxa = array_diff_key($atts, $defaults);
@@ -145,7 +126,7 @@ class DG_Gallery {
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
     */
    public static function sanitizeDefaults($defaults, &$errs) {
-      $old_defaults = self::getDefaults();
+      $old_defaults = self::getOptions();
 
       // remove invalid keys
       $defaults = array_intersect_key($defaults, $old_defaults);
@@ -227,7 +208,7 @@ class DG_Gallery {
     * @return bool The sanitized attachment_pg value.
     */
    private static function sanitizeAttachmentPg($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['attachment_pg'];
 
       $attachment_pg = self::toBool($value);
@@ -248,7 +229,7 @@ class DG_Gallery {
     * @return bool The sanitized descriptions value.
     */
    private static function sanitizeDescriptions($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['descriptions'];
 
       $descriptions = self::toBool($value);
@@ -269,7 +250,7 @@ class DG_Gallery {
     * @return bool The sanitized fancy value.
     */
    private static function sanitizeFancy($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['fancy'];
 
       $fancy = self::toBool($value);
@@ -290,7 +271,7 @@ class DG_Gallery {
     * @return bool|multitype:int The sanitized ids value.
     */
    private static function sanitizeIds($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['ids'];
 
       if(false === self::toBool($value)) {
@@ -319,7 +300,7 @@ class DG_Gallery {
     * @return bool The sanitized images value.
     */
    private static function sanitizeImages($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['images'];
 
       $images = self::toBool($value);
@@ -340,7 +321,7 @@ class DG_Gallery {
     * @return bool The sanitized localpost value.
     */
    private static function sanitizeLocalpost($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['localpost'];
 
       $localpost = self::toBool($value);
@@ -361,7 +342,7 @@ class DG_Gallery {
     * @return string The sanitized order value.
     */
    private static function sanitizeOrder($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['order'];
 
       $order = strtoupper($value);
@@ -388,7 +369,7 @@ class DG_Gallery {
     * @return string The sanitized orderby value.
     */
    private static function sanitizeOrderby($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['orderby'];
 
       $orderby = 'ID' === strtoupper($value) ? 'ID' : strtolower($value);
@@ -419,7 +400,7 @@ class DG_Gallery {
     * @return string The sanitized relation value.
     */
    private static function sanitizeRelation($value, &$err) {
-      $defaults = self::getDefaults();
+      $defaults = self::getOptions();
       $ret = $defaults['relation'];
 
       $relation = strtoupper($value);

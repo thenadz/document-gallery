@@ -46,4 +46,8 @@ jQuery(document).ready(function(){
 	  }
       return false;
    });
+   
+   jQuery('#tab-Advanced #options-dump').click(function() {
+      jQuery(this).select();
+   });
 });
