@@ -33,6 +33,14 @@ add_action('wpmu_new_blog', array('DG_Setup','activateNewBlog'));
 register_uninstall_hook(__FILE__, array('DG_Setup', 'uninstall'));
 DG_Setup::maybeUpdate();
 
+// validate options if desired
+if ($dg_options['validation']) {
+   add_action('init', function(){
+      add_filter('pre_update_option_' . DG_OPTION_NAME,
+         array('DocumentGallery', 'validateOptionsStructure'), 10, 2);
+   });
+}
+
 // I18n
 add_action('plugins_loaded', array('DocumentGallery', 'loadTextDomain'));
 
@@ -156,9 +164,10 @@ class DocumentGallery {
     *
     * @param string $entry Value to be logged.
     * @param bool $stacktrace Whether to include full stack trace.
+    * @param bool $force Whether to ignore WP_DEBUG and log no matter what.
     */
-   public static function writeLog($entry, $stacktrace = false) {
-      if (self::logEnabled()) {
+   public static function writeLog($entry, $stacktrace = false, $force = false) {
+      if ($force || self::logEnabled()) {
          
          // build log entry, removing any extra spaces
          $err = preg_replace('/\s+/', ' ', trim(print_r($entry, true)));
@@ -253,6 +262,57 @@ class DocumentGallery {
       } else {
          delete_blog_option($blog, DG_OPTION_NAME);
       }
+   }
+   
+   /**
+    * Checks whether the given options match the option schema.
+    * @param multivar $new The new options to be validated.
+    * @param multivar $old The old options.
+    * @return array The options to be saved.
+    */
+   public static function validateOptionsStructure($new, $old) {
+      if (self::isValidOptionsStructure($new)) {
+         $ret = $new;
+      } else {
+         $ret = $old;
+         self::writeLog('Attempted to save invalid options.' . PHP_EOL . print_r($new, true), true, true);
+      }
+      
+      return $ret;
+   }
+   
+   /**
+    * @param multivar|unknown $o The options structure to validate.
+    * @param multivar $schema The schema to validate against.
+    * @return bool Whether the given options structure matches the schema.
+    */
+   private static function isValidOptionsStructure($o, $schema = null) {
+      if (is_null($schema)) {
+         include_once DG_PATH . 'inc/options-schema.php';
+         global $options_schema;
+         $schema = $options_schema;
+      }
+      
+      // simple checks first
+      $valid = is_array($o) && (count($schema) === count($o));
+      
+      if ($valid) {
+         foreach ($schema as $sk => $sv) {
+            if (is_string($sk)) {
+               // branch state
+               $valid = array_key_exists($sk, $o) && self::isValidOptionsStructure($o[$sk], $sv);
+            } else {
+               // leaf state
+               $valid = array_key_exists($sv, $o);
+            }
+            
+            if (!$valid) {
+               break;
+            }
+         }
+      }
+      
+      return $valid;
    }
    
    /**
