@@ -42,10 +42,10 @@ class DG_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
          // log anything on failure...
          try {
             if (!$this->image->setIteratorIndex($this->pg)) {
-               DocumentGallery::writeLog($err . '.');
+               DG_Logger::writeLog(DG_LogLevel::Error, $err . '.');
             }
          } catch(Exception $e) {
-            DocumentGallery::writeLog($err . ': ' . $e->getMessage());
+            DG_Logger::writeLog(DG_LogLevel::Error, $err . ': ' . $e->getMessage());
          }
       }
 
