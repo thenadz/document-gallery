@@ -623,7 +623,7 @@ class DG_Admin {
 	<tbody>
 		<tr valign="top">
 			<td>
-			   <textarea name=<?php echo DG_OPTION_NAME; ?>'[css]' rows="10" cols="50" class="large-text code">
+			   <textarea name="<?php echo DG_OPTION_NAME; ?>[css]" rows="10" cols="50" class="large-text code">
 			      <?php echo $dg_options['css']['text']; ?>
 			   </textarea>
 			</td>
