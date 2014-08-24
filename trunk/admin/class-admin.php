@@ -27,6 +27,7 @@ class DG_Admin {
          self::$tabs = array(
             'General'    => __('General',                'document-gallery'),
             'Thumbnail'  => __('Thumbnail Management',   'document-gallery'),
+            'Logging'    => __('Logging',                'document-gallery'),
             'Advanced'   => __('Advanced',               'document-gallery'));
       }
    }
@@ -295,14 +296,14 @@ class DG_Admin {
             array (
                'label_for'   => 'label_advanced_width',
                'name'        => 'thumbnail_generation][width',
-               'value'       => $dg_options['thumber']['width'],
+               'value'       => esc_attr($dg_options['thumber']['width']),
                'type'        => 'number" min="1" step="1',
                'option_name' => DG_OPTION_NAME,
                'description' => ' x '),
             array (
                'label_for'   => 'label_advanced_height',
                'name'        => 'thumbnail_generation][height',
-               'value'       => $dg_options['thumber']['height'],
+               'value'       => esc_attr($dg_options['thumber']['height']),
                'type'        => 'number" min="1" step="1',
                'option_name' => DG_OPTION_NAME,
                'description' => __('The max width and height (in pixels) that thumbnails will be generated.', 'document-gallery'))
@@ -316,6 +317,13 @@ class DG_Admin {
       add_settings_section(
           'thumbnail_table', '',
          array(__CLASS__, 'renderThumbnailSection'), DG_OPTION_NAME);
+   }
+   
+   /**
+    * Registers settings for the logging tab.
+    */
+   private static function registerLoggingSettings() {
+      // TODO
    }
    
    /**
@@ -353,6 +361,19 @@ class DG_Admin {
          ));
 
       add_settings_field(
+         'advanced_thumb_timeout', 'Thumbnail Generation Timeout',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'advanced',
+         array (
+            'label_for'   => 'label_advanced_thumb_timeout',
+            'name'        => 'timeout',
+            'value'       => esc_attr($dg_options['thumber']['timeout']),
+            'type'        => 'number" min="1" step="1',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Max number of seconds to wait for thumbnail generation before defaulting to filetype icons.', 'document-gallery') .
+                             ' <em>' . __('Note that generation will continue where timeout happened next time the gallery is loaded.', 'document-gallery') . '</em>'));
+
+      add_settings_field(
         'advanced_gs', 'Ghostscript Absolute Path',
         array(__CLASS__, 'renderTextField'),
         DG_OPTION_NAME, 'advanced',
@@ -369,6 +390,197 @@ class DG_Admin {
       add_settings_section(
          'advanced_options_dump', __('Options Array Dump', 'document-gallery'),
          array(__CLASS__, 'renderOptionsDumpSection'), DG_OPTION_NAME);
+   }
+   
+   /**
+    * Validates submitted options, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
+   public static function validateSettings($values) {
+      if (empty($values['tab']) || !array_key_exists($values['tab'], self::$tabs)) {
+         reset(self::$tabs);
+         $values['tab'] = key(self::$tabs);
+      }
+      $funct = 'validate'.$values['tab'].'Settings';
+      unset($values['tab']);
+      return DG_Admin::$funct($values);
+   }
+
+   /**
+    * Validates general settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
+   private static function validateGeneralSettings($values) {
+      global $dg_options;
+      $ret = $dg_options;
+      
+      include_once DG_PATH . 'inc/class-gallery.php';
+      
+      $thumbs_cleared = false;
+
+      // handle gallery shortcode defaults
+      $errs = array();
+      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs);
+
+      foreach ($errs as $k => $v) {
+         add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
+      }
+      
+      // handle setting width
+      if (isset($values['thumbnail_generation']['width'])) {
+         $width = (int)$values['thumbnail_generation']['width'];
+         if ($width > 0) {
+            $ret['thumber']['width'] = $width;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-width',
+               __('Invalid width given: ', 'document-gallery') . $values['thumbnail_generation']['width']);
+         }
+         
+         unset($values['thumbnail_generation']['width']);
+      }
+      
+      // handle setting height
+      if (isset($values['thumbnail_generation']['height'])) {
+         $height = (int)$values['thumbnail_generation']['height'];
+         if ($height > 0) {
+            $ret['thumber']['height'] = $height;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-height',
+               __('Invalid height given: ', 'document-gallery') . $values['thumbnail_generation']['height']);
+         }
+         
+         unset($values['thumbnail_generation']['width']);
+      }
+      
+      // delete thumb cache to force regeneration if max dimensions changed
+      if ($ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
+         $ret['thumber']['height'] !== $dg_options['thumber']['height']) {
+         foreach ($ret['thumber']['thumbs'] as $v) {
+            if (isset($v['thumber'])) {
+               @unlink($v['thumb_path']);
+            }
+         }
+          
+         $ret['thumber']['thumbs'] = array();
+         $thumbs_cleared = true;
+      }
+
+      // handle setting the active thumbers
+      foreach (array_keys($ret['thumber']['active']) as $k) {
+         $ret['thumber']['active'][$k] = isset($values['thumbnail_generation'][$k]);
+      }
+
+      // if new thumbers available, clear failed thumbnails for retry
+      if (!$thumbs_cleared) {
+         foreach ($dg_options['thumber']['active'] as $k => $v) {
+            if (!$v && $ret['thumber']['active'][$k]) {
+               foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
+                  if (empty($v['thumber'])) {
+                     unset($ret['thumber']['thumbs'][$k]);
+                  }
+               }
+               break;
+            }
+         }
+      }
+
+      // handle modified CSS
+      if (trim($ret['css']['text']) !== trim($values['css'])) {
+         $ret['css']['text'] = trim($values['css']);
+         $ret['css']['version']++;
+         $ret['css']['last-modified'] = gmdate('D, d M Y H:i:s');
+         $ret['css']['etag'] = md5($ret['css']['last-modified']);
+         
+         if (empty($ret['css']['text'])) {
+            unset($ret['css']['minified']);
+         } else {
+            $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
+         }
+      }
+
+      return $ret;
+   }
+   
+   /**
+    * Validates thumbnail management settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
+   private static function validateThumbnailSettings($values) {
+      global $dg_options;
+      $ret = $dg_options;
+      
+      if (isset($values['ids'])) {
+         $deleted = array_values(array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']));
+         
+         foreach ($deleted as $k) {
+            if (isset($ret['thumber']['thumbs'][$k]['thumber'])) {
+               @unlink($ret['thumber']['thumbs'][$k]['thumb_path']);
+            }
+            
+            unset($ret['thumber']['thumbs'][$k]);
+         }
+         
+         if (isset($values['ajax'])) {
+            echo '[' . implode(',', $deleted) . ']';
+            add_filter('wp_redirect', function(){ die; }, 1, 0);
+         }
+      }
+      
+      return $ret;
+   }
+   
+   /**
+    * Validates logging settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
+   private static function validateLoggingSettings($values) {
+      // TODO
+      global $dg_options;
+      return $dg_options;
+   }
+   
+   /**
+    * Validates advanced settings, sanitizing any invalid options.
+    * @param array $values User-submitted new options.
+    * @return array Sanitized new options.
+    */
+   private static function validateAdvancedSettings($values) {
+      global $dg_options;
+      $ret = $dg_options;
+      
+      // handle setting the Ghostscript path
+      if (isset($values['gs']) &&
+         0 != strcmp($values['gs'], $ret['thumber']['gs'])) {
+         if (false === strpos($values['gs'], ';')) {
+            $ret['thumber']['gs'] = $values['gs'];
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-gs',
+               __('Invalid Ghostscript path given: ', 'document-gallery') . $values['gs']);
+         }
+      }
+      
+      // handle setting timeout
+      if (isset($values['timeout'])) {
+         $timeout = (int)$values['timeout'];
+         if ($timeout > 0) {
+            $ret['thumber']['timeout'] = $timeout;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-timeout',
+               __('Invalid timeout given: ', 'document-gallery') . $values['timeout']);
+         }
+      }
+      
+      // validation checkbox
+      $ret['validation'] = isset($values['validation']);
+      
+      // logging checkbox
+      $ret['logging'] = isset($values['logging']);
+      
+      return $ret;
    }
    
    /**
@@ -662,175 +874,6 @@ class DG_Admin {
       }
 
       print '</select> ' . $args['description'];
-   }
-   
-   /**
-    * Validates submitted options, sanitizing any invalid options.
-    * @param array $values User-submitted new options.
-    * @return array Sanitized new options.
-    */
-   public static function validateSettings($values) {
-      if (empty($values['tab']) || !array_key_exists($values['tab'], self::$tabs)) {
-         reset(self::$tabs);
-         $values['tab'] = key(self::$tabs);
-      }
-      $funct = 'validate'.$values['tab'].'Settings';
-      unset($values['tab']);
-      return DG_Admin::$funct($values);
-   }
-
-   /**
-    * Validates general settings, sanitizing any invalid options.
-    * @param array $values User-submitted new options.
-    * @return array Sanitized new options.
-    */
-   private static function validateGeneralSettings($values) {
-      global $dg_options;
-      $ret = $dg_options;
-      
-      include_once DG_PATH . 'inc/class-gallery.php';
-      
-      $thumbs_cleared = false;
-
-      // handle gallery shortcode defaults
-      $errs = array();
-      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs);
-
-      foreach ($errs as $k => $v) {
-         add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
-      }
-      
-      // handle setting width
-      if (isset($values['thumbnail_generation']['width'])) {
-         $width = (int)$values['thumbnail_generation']['width'];
-         if ($width > 0) {
-            $ret['thumber']['width'] = $width;
-         } else {
-            add_settings_error(DG_OPTION_NAME, 'thumber-width',
-               __('Invalid width given: ' . $values['thumbnail_generation']['width']));
-         }
-         
-         unset($values['thumbnail_generation']['width']);
-      }
-      
-      // handle setting height
-      if (isset($values['thumbnail_generation']['height'])) {
-         $height = (int)$values['thumbnail_generation']['height'];
-         if ($height > 0) {
-            $ret['thumber']['height'] = $height;
-         } else {
-            add_settings_error(DG_OPTION_NAME, 'thumber-height',
-               __('Invalid height given: ' . $values['thumbnail_generation']['height']));
-         }
-         
-         unset($values['thumbnail_generation']['width']);
-      }
-      
-      // delete thumb cache to force regeneration if max dimensions changed
-      if ($ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
-         $ret['thumber']['height'] !== $dg_options['thumber']['height']) {
-         foreach ($ret['thumber']['thumbs'] as $v) {
-            if (isset($v['thumber'])) {
-               @unlink($v['thumb_path']);
-            }
-         }
-          
-         $ret['thumber']['thumbs'] = array();
-         $thumbs_cleared = true;
-      }
-
-      // handle setting the active thumbers
-      foreach (array_keys($ret['thumber']['active']) as $k) {
-         $ret['thumber']['active'][$k] = isset($values['thumbnail_generation'][$k]);
-      }
-
-      // if new thumbers available, clear failed thumbnails for retry
-      if (!$thumbs_cleared) {
-         foreach ($dg_options['thumber']['active'] as $k => $v) {
-            if (!$v && $ret['thumber']['active'][$k]) {
-               foreach ($dg_options['thumber']['thumbs'] as $k => $v) {
-                  if (empty($v['thumber'])) {
-                     unset($ret['thumber']['thumbs'][$k]);
-                  }
-               }
-               break;
-            }
-         }
-      }
-
-      // handle modified CSS
-      if (trim($ret['css']['text']) !== trim($values['css'])) {
-         $ret['css']['text'] = trim($values['css']);
-         $ret['css']['version']++;
-         $ret['css']['last-modified'] = gmdate('D, d M Y H:i:s');
-         $ret['css']['etag'] = md5($ret['css']['last-modified']);
-         
-         if (empty($ret['css']['text'])) {
-            unset($ret['css']['minified']);
-         } else {
-            $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
-         }
-      }
-
-      return $ret;
-   }
-   
-   /**
-    * Validates thumbnail management settings, sanitizing any invalid options.
-    * @param array $values User-submitted new options.
-    * @return array Sanitized new options.
-    */
-   private static function validateThumbnailSettings($values) {
-      global $dg_options;
-      $ret = $dg_options;
-      
-      if (isset($values['ids'])) {
-         $deleted = array_values(array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']));
-         
-         foreach ($deleted as $k) {
-            if (isset($ret['thumber']['thumbs'][$k]['thumber'])) {
-               @unlink($ret['thumber']['thumbs'][$k]['thumb_path']);
-            }
-            
-            unset($ret['thumber']['thumbs'][$k]);
-         }
-         
-         if (isset($values['ajax'])) {
-            echo '[' . implode(',', $deleted) . ']';
-            add_filter('wp_redirect', function(){ die; }, 1, 0);
-         }
-      }
-      
-      return $ret;
-   }
-   
-   /**
-    * Validates advanced settings, sanitizing any invalid options.
-    * @param array $values User-submitted new options.
-    * @return array Sanitized new options.
-    */
-   private static function validateAdvancedSettings($values) {
-      global $dg_options;
-      $ret = $dg_options;
-      
-      // handle setting the Ghostscript path
-      if (isset($values['gs']) &&
-         0 != strcmp($values['gs'], $ret['thumber']['gs'])) {
-         if (false === strpos($values['gs'], ';')) {
-            $ret['thumber']['gs'] = $values['gs'];
-         } else {
-            add_settings_error(DG_OPTION_NAME, 'thumber-gs',
-            __('Invalid Ghostscript path given: ', 'document-gallery') . $values['gs']);
-         }
-      }
-      
-      // validation checkbox
-      $ret['validation'] = isset($values['validation']);
-      
-      // logging checkbox
-      $ret['logging'] = isset($values['logging']);
-      
-      return $ret;
    }
 
    /**

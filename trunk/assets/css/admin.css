@@ -75,6 +75,9 @@ th.bottomRight{
 .Thumbnail-tab:before{
    content: '\f233';
 }
+.Logging-tab:before{
+   content: '\f163';
+}
 .Advanced-tab:before{
    content: '\f332';
 }
