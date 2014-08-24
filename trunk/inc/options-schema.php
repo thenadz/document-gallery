@@ -30,5 +30,6 @@ $options_schema = array (
             'version' 
       ),
       'version',
-      'validation'
+      'validation',
+      'logging'
 );

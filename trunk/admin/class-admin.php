@@ -329,6 +329,18 @@ class DG_Admin {
          array(__CLASS__, 'renderAdvancedSection'), DG_OPTION_NAME);
       
       add_settings_field(
+         'advanced_logging', 'Logging',
+         array(__CLASS__, 'renderCheckboxField'),
+         DG_OPTION_NAME, 'advanced',
+         array (
+            'label_for'   => 'label_advanced_logging',
+            'name'        => 'logging',
+            'value'       => esc_attr($dg_options['logging']),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Whether to log debug and error information related to Document Gallery.', 'document-gallery')
+         ));
+      
+      add_settings_field(
          'advanced_validation', 'Option Validation',
          array(__CLASS__, 'renderCheckboxField'),
          DG_OPTION_NAME, 'advanced',
@@ -814,6 +826,9 @@ class DG_Admin {
       
       // validation checkbox
       $ret['validation'] = isset($values['validation']);
+      
+      // logging checkbox
+      $ret['logging'] = isset($values['logging']);
       
       return $ret;
    }

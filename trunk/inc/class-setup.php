@@ -47,7 +47,8 @@ class DG_Setup {
               'version' => 0
           ),
           'version' => DG_VERSION,
-          'validation' => false
+          'validation' => false,
+          'logging' => false
       );
    }
 
@@ -139,6 +140,9 @@ class DG_Setup {
          
          // adding "validation" branch
          $options['validation'] = false;
+         
+         // adding "logging" branch
+         $options['logging'] = false;
       }
    }
    

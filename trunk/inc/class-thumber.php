@@ -50,10 +50,10 @@ class DG_Thumber {
             $ext_preg = '!\.(' . $ext_preg . ')$!i';
 
             if (preg_match($ext_preg, $file)) {
-               if (DocumentGallery::logEnabled()) {
+               if (DG_Logger::logEnabled()) {
                   $toLog = sprintf(__('Attempting to generate thumbnail for attachment #%d with \'%s\'',
                           'document-gallery'), $ID, print_r($thumber, true));
-                  DocumentGallery::writeLog($toLog);
+                  DG_Logger::writeLog(DG_LogLevel::Detail, $toLog);
                }
                
                if ($thumb = self::getThumbnailTemplate($thumber, $ID, $pg)) {
@@ -130,12 +130,12 @@ class DG_Thumber {
       $temp_file = self::getTempFile($ext);
 
       if (!$fp = @fopen($temp_file, 'wb')) {
-         DocumentGallery::writeLog(__('Could not open file: ', 'document-gallery') . $temp_file);
+         DG_Logger::writeLog(DG_LogLevel::Error, __('Could not open file: ', 'document-gallery') . $temp_file);
          return false;
       }
 
       if (!@fwrite($fp, $metadata['image']['data'])) {
-         DocumentGallery::writeLog(__('Could not write file: ', 'document-gallery') . $temp_file);
+         DG_Logger::writeLog(DG_LogLevel::Error, __('Could not write file: ', 'document-gallery') . $temp_file);
          fclose($fp);
          return false;
       }
@@ -170,9 +170,10 @@ class DG_Thumber {
       $img = new DG_Image_Editor_Imagick($doc_path, $pg - 1);
       $err = $img->load();
       if(is_wp_error($err)) {
-         DocumentGallery::writeLog(
-             __('Failed to open file in Imagick: ', 'document-gallery') .
-             $err->get_error_message());
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Failed to open file in Imagick: ', 'document-gallery') .
+            $err->get_error_message());
          return false;
       }
 
@@ -180,9 +181,10 @@ class DG_Thumber {
 
       $err = $img->save($temp_file, 'image/png');
       if (is_wp_error($err)) {
-         DocumentGallery::writeLog(
-             __('Failed to save image in Imagick: ', 'document-gallery') .
-             $err->get_error_message());
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Failed to save image in Imagick: ', 'document-gallery') .
+            $err->get_error_message());
          return false;
       }
 
@@ -239,7 +241,7 @@ class DG_Thumber {
       exec(sprintf($gs, $pg, $pg, $temp_path, $doc_path), $out, $ret);
 
       if ($ret != 0) {
-         DocumentGallery::writeLog(__('Ghostscript failed: ', 'document-gallery') . print_r($out));
+         DG_Logger::writeLog(DG_LogLevel::Error, __('Ghostscript failed: ', 'document-gallery') . print_r($out));
          @unlink($temp_path);
          return false;
       }
@@ -377,7 +379,7 @@ class DG_Thumber {
       $response = wp_remote_get($google_viewer, $args);
 
       if (is_wp_error($response) || !preg_match('/[23][0-9]{2}/', $response['response']['code'])) {
-         DocumentGallery::writeLog(__('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
+         DG_Logger::writeLog(DG_LogLevel::Error, __('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
              (is_wp_error($response)
                ? $response->get_error_message()
                : $response['response']['message']));
@@ -619,7 +621,7 @@ class DG_Thumber {
          $thumbers = array_filter($thumbers, 'is_callable');
          
          // log which thumbers are being used
-         if (DocumentGallery::logEnabled()) {
+         if (DG_Logger::logEnabled()) {
             if (count($thumbers) > 0) {
                $entry = __('Thumbnail Generators: ', 'document-gallery');
                foreach ($thumbers as $k => $v) {
@@ -628,7 +630,7 @@ class DG_Thumber {
             } else {
                $entry = __('No thumbnail generators enabled.', 'document-gallery');
             }
-            DocumentGallery::writeLog($entry);
+            DG_Logger::writeLog(DG_LogLevel::Detail, $entry);
          }
       }
 
@@ -667,9 +669,10 @@ class DG_Thumber {
       $img = wp_get_image_editor($temp_path);
 
       if (is_wp_error($img)) {
-         DocumentGallery::writeLog(
-             __('Failed to get image editor: ', 'document-gallery') .
-             $img->get_error_message());
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Failed to get image editor: ', 'document-gallery') .
+            $img->get_error_message());
          return false;
       }
 
@@ -678,9 +681,10 @@ class DG_Thumber {
       $err = $img->save($thumb_path);
 
       if (is_wp_error($err)) {
-         DocumentGallery::writeLog(
-             __('Failed to save image: ', 'document-gallery') .
-             $err->get_error_message());
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Failed to save image: ', 'document-gallery') .
+            $err->get_error_message());
          return false;
       }
 
