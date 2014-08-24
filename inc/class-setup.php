@@ -19,11 +19,12 @@ class DG_Setup {
       $etag = md5($date);
       return array(
           'thumber' => array(
-              'thumbs' => array(),
-              'gs'     => DG_Thumber::getGhostscriptExecutable(),
-              'active' => DG_Thumber::getDefaultThumbers(),
-              'width'  => 200,
-              'height' => 200
+              'thumbs'  => array(),
+              'gs'      => DG_Thumber::getGhostscriptExecutable(),
+              'active'  => DG_Thumber::getDefaultThumbers(),
+              'width'   => 200,
+              'height'  => 200,
+              'timeout' => 30
           ),
           'gallery' => array(
               // default: link directly to file (true to link to attachment pg)
@@ -134,6 +135,9 @@ class DG_Setup {
          }
          
          $options['thumber']['thumbs'] = $thumbs;
+         
+         // adding default thumbnail generation timeout
+         $options['thumber']['timeout'] = 30;
          
          // flatten out "defaults" level
          $options['gallery'] = $options['gallery']['defaults'];
