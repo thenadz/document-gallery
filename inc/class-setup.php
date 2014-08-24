@@ -11,17 +11,25 @@ class DG_Setup {
    /**
     * Note that changes to the structure of the default options require also
     * changing the schema in options-schema.php
+    * @param $skeleton bool When true, values that require computation will be
+    *        skipped. Useful when only structure of options is needed.
     * @return array Contains default options for DG.
     */
-   public static function getDefaultOptions() {
+   public static function getDefaultOptions($skeleton = false) {
       include_once DG_PATH . 'inc/class-thumber.php';
-      $date = gmdate('D, d M Y H:i:s');
-      $etag = md5($date);
+      
+      $date = $etag = $gs = null;
+      if (!$skeleton) {
+         $date = gmdate('D, d M Y H:i:s');
+         $etag = md5($date);
+         $gs = DG_Thumber::getGhostscriptExecutable();
+      }
+      
       return array(
           'thumber' => array(
               'thumbs'  => array(),
-              'gs'      => DG_Thumber::getGhostscriptExecutable(),
-              'active'  => DG_Thumber::getDefaultThumbers(),
+              'gs'      => $gs,
+              'active'  => DG_Thumber::getDefaultThumbers($skeleton),
               'width'   => 200,
               'height'  => 200,
               'timeout' => 30
