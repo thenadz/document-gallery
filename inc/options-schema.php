@@ -10,7 +10,8 @@ $options_schema = array (
             'gs',
             'active',
             'width',
-            'height' 
+            'height',
+            'timeout'
       ),
       'gallery' => array (
             'attachment_pg',
