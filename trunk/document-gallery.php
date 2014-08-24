@@ -233,9 +233,8 @@ class DocumentGallery {
     */
    private static function isValidOptionsStructure($o, $schema = null) {
       if (is_null($schema)) {
-         include_once DG_PATH . 'inc/options-schema.php';
-         global $options_schema;
-         $schema = $options_schema;
+         include_once DG_PATH . 'inc/class-setup.php';
+         $schema = DG_Setup::getDefaultOptions(true);
       }
       
       // simple checks first
@@ -243,12 +242,9 @@ class DocumentGallery {
       
       if ($valid) {
          foreach ($schema as $sk => $sv) {
-            if (is_string($sk)) {
-               // branch state
-               $valid = array_key_exists($sk, $o) && self::isValidOptionsStructure($o[$sk], $sv);
-            } else {
-               // leaf state
-               $valid = array_key_exists($sv, $o);
+            $valid = array_key_exists($sk, $o);
+            if (is_array($sv) && !empty($sv)) {
+               $valid = $valid && self::isValidOptionsStructure($o[$sk], $sv);
             }
             
             if (!$valid) {
