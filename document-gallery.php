@@ -26,6 +26,9 @@ global $dg_options;
 define('DG_OPTION_NAME', 'document_gallery');
 $dg_options = get_option(DG_OPTION_NAME, null);
 
+// logging functionality
+include_once DG_PATH . 'inc/class-logger.php';
+
 // handle activation, updates, and uninstallation
 include_once DG_PATH . 'inc/class-setup.php';
 register_activation_hook(__FILE__, array('DG_Setup', 'activate'));
@@ -102,7 +105,7 @@ class DocumentGallery {
 
       $start = microtime(true);
       $gallery = (string)new DG_Gallery($atts);
-      DocumentGallery::writeLog('Generation Time: ' . (microtime(true) - $start) . ' s');
+      DG_Logger::writeLog(DG_LogLevel::Detail, 'Generation Time: ' . (microtime(true) - $start) . ' s');
 
       return $gallery;
    }
@@ -153,64 +156,6 @@ class DocumentGallery {
             echo $dg_options['css']['minified'];
             exit;
       }
-   }
-
-   /*==========================================================================
-    * Logging
-    *=========================================================================*/
-
-   /**
-    * Appends error log with $entry if WordPress is in debug mode.
-    *
-    * @param string $entry Value to be logged.
-    * @param bool $stacktrace Whether to include full stack trace.
-    * @param bool $force Whether to ignore WP_DEBUG and log no matter what.
-    */
-   public static function writeLog($entry, $stacktrace = false, $force = false) {
-      if ($force || self::logEnabled()) {
-         
-         // build log entry, removing any extra spaces
-         $err = preg_replace('/\s+/', ' ', trim(print_r($entry, true)));
-         
-         if ($stacktrace) {
-            ob_start();
-            debug_print_backtrace();
-            $trace = ob_get_contents();
-            ob_end_clean();
-            
-            // Remove first item from backtrace as it's this function which is redundant.
-            $trace = preg_replace('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $trace, 1);
-            
-            // Renumber backtrace items.
-            $trace = preg_replace('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
-            
-            // convert to relative path from WP root
-            $trace = str_replace(ABSPATH, '', $trace);
-            
-            $err = 'DG: ' . $entry . PHP_EOL . $trace;
-         } else {
-            $callers = debug_backtrace();
-
-            // Remove first item from backtrace as it's this function which is redundant.
-            $caller = $callers[1];
-            $caller = (isset($caller['class']) ? $caller['class'] : '') . $caller['type'] . $caller['function'];
-            $err = 'DG (' . $caller . '): ' . $err . PHP_EOL;
-         }
-         
-         // insert log entry
-         if (defined('ERRORLOGFILE')) {
-            error_log($err, 3, ERRORLOGFILE);
-         } else {
-            error_log($err);
-         }
-      }
-   }
-   
-   /**
-    * @return bool Whether debug logging is currently enabled.
-    */
-   public static function logEnabled() {
-      return defined('WP_DEBUG') && WP_DEBUG;
    }
 
    /*==========================================================================
@@ -275,7 +220,7 @@ class DocumentGallery {
          $ret = $new;
       } else {
          $ret = $old;
-         self::writeLog('Attempted to save invalid options.' . PHP_EOL . print_r($new, true), true, true);
+         DG_Logger::writeLog(DG_LogLevel::Error, 'Attempted to save invalid options.' . PHP_EOL . print_r($new, true), true, true);
       }
       
       return $ret;
