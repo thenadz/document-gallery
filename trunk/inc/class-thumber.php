@@ -11,11 +11,16 @@ class DG_Thumber {
 
    /**
     * Returns the default mapping of thumber slug to whether it is active or not.
+    * @param $skeleton bool When true, values that require computation will be
+    *        skipped. Useful when only structure of options is needed.
     * @return array
     */
-   public static function getDefaultThumbers() {
-      $gs_active = (bool)self::getGhostscriptExecutable();
-      $imagick_active = self::isImagickAvailable();
+   public static function getDefaultThumbers($skeleton = false) {
+      $gs_active = $imagick_active = null;
+      if (!$skeleton) {
+         $gs_active = (bool)self::getGhostscriptExecutable();
+         $imagick_active = self::isImagickAvailable();
+      }
 
       return array('av' => true, 'gs' => $gs_active,
           'imagick' => $imagick_active, 'google' => false);
