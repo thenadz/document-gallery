@@ -29,17 +29,17 @@ class DG_Thumber {
     * @return str     URL to the thumbnail.
     */
    public static function getThumbnail($ID, $pg = 1) {
-      static $timeout = null;
-      if (is_null($timeout)) {
-         $timeout = time();
+      static $start = null;
+      if (is_null($start)) {
+         $start = time();
       }
 
       $options = self::getOptions();
 
       // if we haven't saved a thumb, generate one
       if (empty($options['thumbs'][$ID])) {
-         // prevent page timing out -- generate for no more than 30 sec
-         if ((time() - $timeout) > 30) {
+         // prevent page timing out or user waiting too long for page
+         if ((time() - $start) > $options['timeout']) {
             return self::getDefaultThumbnail($ID, $pg);
          }
 
