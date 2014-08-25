@@ -228,7 +228,7 @@ class DocumentGallery {
    
    /**
     * @param multivar|unknown $o The options structure to validate.
-    * @param multivar $schema The schema to validate against.
+    * @param multivar $schema The schema to validate against (note that only keys matter -- non-array values are ignored).
     * @return bool Whether the given options structure matches the schema.
     */
    private static function isValidOptionsStructure($o, $schema = null) {
