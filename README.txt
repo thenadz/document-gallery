@@ -26,11 +26,11 @@ Read more in the **Installation** tab!
 
 Document Gallery has to-date been translated into **5** languages, listed below.
 
-1. **French** — *Thanks, Marc Liotard!*
-1. **Russian** — *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
-1. **Spanish** — *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
-1. **Swedish** — *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
-1. **Ukrainian** — *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+1. **French** &#8212; *Thanks, Marc Liotard!*
+1. **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+1. **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
+1. **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
+1. **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
 
 = Developers =
 
