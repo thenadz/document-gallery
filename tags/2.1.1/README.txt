@@ -22,6 +22,16 @@ Watch the following video for a brief demonstration of Document Gallery in actio
 
 Read more in the **Installation** tab!
 
+= Translation =
+
+Document Gallery has to-date been translated into **5** languages, listed below.
+
+1. **French** — *Thanks, Marc Liotard!*
+1. **Russian** — *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+1. **Spanish** — *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
+1. **Swedish** — *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
+1. **Ukrainian** — *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+
 = Developers =
 
 Document Gallery includes features intended to make integration with other plugins
@@ -367,6 +377,17 @@ Note that the display inherits styling from your active theme.
 * Whatever else **you** would like (post on the [support
   forum](http://wordpress.org/support/plugin/document-gallery) if you have
   ideas)!
+
+= 2.1.1 =
+* **Translation:** Thanks to [mepmepmep](http://wordpress.org/support/profile/mepmepmep)
+  who has translated Document Gallery into Swedish!
+* **Translation:** Thanks to Marc Liotard who has translated Document Gallery into French!
+* **Note:** If you would like to help translate Document Gallery into another language,
+  get started [here](http://wordpress.org/support/topic/seeking-translators)!
+* **Note:** This is an extremely minor release, but big changes are on the
+  way in version `2.2`! Stay tuned as it should be going live in the very
+  near future. Look for a complete makeover of the admin options including
+  lots of new ways to configure DG to best meet your needs!
 
 = 2.1 =
 * **Enhancement:** Document Gallery now supports
