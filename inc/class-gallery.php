@@ -512,7 +512,7 @@ class DG_Gallery {
    }
 
    /**
-    * (WP >= 2.3) Returns a list of x, where x may be any of the fields within a
+    * Returns a list of x, where x may be any of the fields within a
     * term object, when provided with a list of term names (not slugs).
     * (http://codex.wordpress.org/Function_Reference/get_term_by#Return_Values)
     *
