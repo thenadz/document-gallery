@@ -53,18 +53,25 @@ class DG_Logger {
    }
    
    /**
-    * Reads the current blog's log file, placint the values in to a 2-dimensional array.
+    * Reads the current blog's log file, placing the values in to a 2-dimensional array.
+    * @param int $skip How many lines to skip before returning rows.
     * @param int $limit Max number of lines to read.
     * @return multitype:multitype:string|null The rows from the log file or null if no entries exist.
     */
-   public static function readLog($limit = PHP_INT_MAX) {
+   public static function readLog($skip = 0, $limit = PHP_INT_MAX) {
       $fp = fopen(self::getLogFileName(), 'r');
-      $ret = null;
+      $ret = array();
       
       if ($fp !== false) {
-         $ret = array();
          while (count($ret) < $limit && ($fields = fgetcsv($fp)) !== false) {
-            $ret[] = $fields;
+            if ($start > 0) {
+               $start--;
+               continue;
+            }
+            
+            if (!is_null($fields)) {
+               $ret[] = $fields;
+            }
          }
       }
       
@@ -98,7 +105,7 @@ class DG_Logger {
 /**
  * LogLevel acts as an enumeration of all possible log levels.
  */
-abstract class DG_LogLevel {
+class DG_LogLevel {
    /**
     * @var int Log level for anything that doesn't indicate a problem.
     */
@@ -108,4 +115,78 @@ abstract class DG_LogLevel {
     * @var int Log level for when something went wrong.
     */
    const Error = 1;
+
+   /**
+    * @var ReflectionClass Backs the getter.
+    */
+   private static $ref = null;
+    
+   /**
+    * @return ReflectionClass Instance of reflection class for this class.
+    */
+   private static function getReflectionClass() {
+      if (is_null(self::$ref)) {
+         self::$ref = new ReflectionClass(__CLASS__);
+      }
+   
+      return self::$ref;
+   }
+    
+   /**
+    * @var multitype Backs the getter.
+    */
+   private static $levels = null;
+   
+   /**
+    * @return multitype Associative array containing all log level names mapped to their int value.
+    */
+   public static function getLogLevels() {
+      if (is_null(self::$levels)) {
+         $ref = self::getReflectionClass();
+         self::$levels = $ref->getConstants();
+      }
+      
+      return self::$levels;
+   }
+   
+   /**
+    * @param string $name Name to be checked for validity.
+    * @return bool Whether given name represents valid log level.
+    */
+   public static function isValidName($name) {
+      return array_key_exists($name, self::getLogLevels());
+   }
+   
+   /**
+    * @param int $value Value to be checked for validity.
+    * @return bool Whether given value represents valid log level.
+    */
+   public static function isValidValue($value) {
+      return (false !== array_search($value, self::getLogLevels()));
+   }
+   
+   /**
+    * @param string $name The name for which to retrieve a value.
+    * @return int|null The value associated with the given name.
+    */
+   public static function getValueByName($name) {
+      $levels = self::getLogLevels();
+      return array_key_exists($name, self::getLogLevels()) ? $levels[$name] : null;
+   }
+   
+   /**
+    * @param int $value The value for which to retrieve a name.
+    * @return string|null The name associated with the given value.
+    */
+   public static function getNameByValue($value) {
+      $ret = array_search($value, self::getLogLevels());
+      return (false !== $ret) ? $ret : null;
+   }
+   
+   /**
+    * Blocks instantiation. All functions are static.
+    */
+   private function __construct() {
+
+   }
 }
