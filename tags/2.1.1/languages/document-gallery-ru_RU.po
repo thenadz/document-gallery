@@ -1,0 +1,268 @@
+# Copyright (C) 2014 Document Gallery
+# This file is distributed under the same license as the Document Gallery package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Document Gallery 2.0.9\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
+"POT-Creation-Date: 2014-04-21 02:57:10+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-04-21 17:59-0600\n"
+"Last-Translator: Dan Rossiter <dan.rossiters@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ru\n"
+
+#: admin/class-admin.php:27
+msgid "Settings"
+msgstr "Настройки"
+
+#: admin/class-admin.php:37
+msgid "Document Gallery Settings"
+msgstr "Настройки Document Gallery"
+
+#. Plugin Name of the plugin/theme
+#: admin/class-admin.php:38
+msgid "Document Gallery"
+msgstr "Document Gallery"
+
+#: admin/class-admin.php:58
+msgid "Default Settings"
+msgstr "Настройки По Умолчанию"
+
+#: admin/class-admin.php:62
+msgid "Thumbnail Generation"
+msgstr "Создание Миниатюр"
+
+#: admin/class-admin.php:66
+msgid "Custom CSS"
+msgstr "Индивидуальные CSS"
+
+#: admin/class-admin.php:70
+msgid "Advanced Thumbnail Generation"
+msgstr "Настройки Создания Миниатюр для Опытных Пользователей"
+
+#: admin/class-admin.php:82
+msgid "Link to attachment page rather than to file"
+msgstr "Ссылка на страницу вложения, а не на сам файл"
+
+#: admin/class-admin.php:94
+msgid "Include document descriptions"
+msgstr "Включать описания документов"
+
+#: admin/class-admin.php:106
+msgid "Use auto-generated document thumbnails"
+msgstr "Использовать автоматически создаваемые миниатюры документов"
+
+#: admin/class-admin.php:118
+msgid "Include image attachments in gallery"
+msgstr "Включать прикрепленные к посту картинки в галерею"
+
+#: admin/class-admin.php:130
+msgid "Only look for attachments in post where [dg] is used"
+msgstr "Искать вложения только в постах, где используется [dg]"
+
+#: admin/class-admin.php:143
+msgid "Ascending or descending sorting of documents"
+msgstr "Сортировка документов по возрастанию или по убыванию"
+
+#: admin/class-admin.php:156
+msgid "Which field to order documents by"
+msgstr "По какому полю сортировать документы"
+
+#: admin/class-admin.php:169
+msgid ""
+"Whether matched documents must have all taxa_names (AND) or at least one (OR)"
+msgstr ""
+"Искать документы, принадлежащие всем категориям (AND) перечисленным в "
+"параметре category, также возмозжно использование taxon_name, или хотя бы "
+"одной (OR)"
+
+#: admin/class-admin.php:181
+msgid "Locally generate thumbnails for audio & video files."
+msgstr "Локально создавать миниатюры для аудио и видео файлов."
+
+#: admin/class-admin.php:194
+msgid ""
+"Use <a href=\"http://www.ghostscript.com/\" target=\"_blank\">Ghostscript</"
+"a> for faster local PDF processing (compared to Imagick)."
+msgstr ""
+"Использовать <a href=\"http://www.ghostscript.com/\" target=\"_blank"
+"\">Ghostscript</a> для более быстрой локальной обработки PDF (в сравнении с "
+"Imagick)."
+
+#: admin/class-admin.php:195
+msgid ""
+"Your server is not configured to run <a href=\"http://www.ghostscript.com/\" "
+"target=\"_blank\">Ghostscript</a>."
+msgstr ""
+"Ваш сервер не настроен для использования <a href=\"http://www.ghostscript."
+"com/\" target=\"_blank\">Ghostscript</a>."
+
+#: admin/class-admin.php:209
+msgid ""
+"Use <a href=\"http://www.php.net/manual/en/book.imagick.php\" target=\"_blank"
+"\">Imagick</a> to handle lots of filetypes locally."
+msgstr ""
+"Использовать <a href=\"http://www.php.net/manual/ru/book.imagick.php\" "
+"target=\"_blank\">Imagick</a> для локальной обработки множества типов файлов."
+
+#: admin/class-admin.php:210
+msgid ""
+"Your server is not configured to run <a href=\"http://www.php.net/manual/en/"
+"book.imagick.php\" target=\"_blank\">Imagick</a>."
+msgstr ""
+"Ваш сервер не настроен для использования <a href=\"http://www.php.net/manual/"
+"ru/book.imagick.php\" target=\"_blank\">Imagick</a>."
+
+#: admin/class-admin.php:224
+msgid ""
+"Use <a href=\"https://drive.google.com/viewer\" target=\"_blank\">Google "
+"Drive Viewer</a> to generate thumbnails for MS Office files and many other "
+"file types remotely."
+msgstr ""
+"Использовать <a href=\"https://drive.google.com/viewer\" target=\"_blank"
+"\">Google Drive Viewer</a> для создания миниатюр файлов MS Office и многих "
+"других типов файлов удалённо."
+
+#: admin/class-admin.php:225
+msgid "Your server does not allow remote HTTP access."
+msgstr "Ваш сервер не разрешает удаленные HTTP обращения."
+
+#: admin/class-admin.php:239
+msgid "Successfully auto-detected the location of Ghostscript."
+msgstr "Успешно автоматически определено местонахождение Ghostscript."
+
+#: admin/class-admin.php:240
+msgid "Failed to auto-detect the location of Ghostscript."
+msgstr "Не удалось автоматически определить местонахождение Ghostscript."
+
+#: admin/class-admin.php:248
+msgid ""
+"The following values will be used by default in the shortcode. You can still "
+"manually set each of these values in each individual shortcode."
+msgstr ""
+"Следующие значения будут использоваться шорткодом [dg] по умолчанию. При "
+"этом вручную можно установить любые из этих значений в каждом конкретном "
+"экземпляре шорткода."
+
+#: admin/class-admin.php:255
+msgid "Select which tools to use when generating thumbnails."
+msgstr "Выберите, какие инструменты использовать для создании миниатюр."
+
+#: admin/class-admin.php:261
+msgid ""
+"Enter custom CSS styling for use with document galleries. To see which ids "
+"and classes you can style, take a look at <a href=\"%s\" target=\"_blank"
+"\">style.css</a>."
+msgstr ""
+"Введите индивидуальные CSS стили для использования с галереями документов. "
+"Чтобы увидеть, какие селекторы стоит использовать, посмотрите на <a href=\"%s"
+"\" target=\"_blank\">style.css</a>."
+
+#: admin/class-admin.php:279
+msgid ""
+"Unless you <em>really</em> know what you're doing, you should not touch "
+"these values."
+msgstr ""
+"Не стоит менять этих значений, за исключением случаев когда Вы "
+"<em>действительно</em> знаете что делаете."
+
+#: admin/class-admin.php:281
+msgid ""
+"NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
+msgstr ""
+"ВНИМАНИЕ: <code>exec()</code> недоступный. Ghostscript не будет работать."
+
+#: admin/class-admin.php:388
+msgid "Invalid Ghostscript path given: "
+msgstr "Задан неверный путь Ghostscript: "
+
+#: inc/class-gallery.php:92
+msgid "Generated using Document Gallery. Get yours here: "
+msgstr ""
+"Сгенерировано используя Document Gallery. Понравилось? Получите Вашу копию "
+"здесь: "
+
+#: inc/class-gallery.php:95
+msgid "No attachments to display. How boring! :("
+msgstr "Ни одного вложения для отображения. Скукотища! :("
+
+#: inc/class-gallery.php:96
+msgid "The %s parameter may only be \"%s\" or \"%s.\" You entered \"%s.\""
+msgstr ""
+"Параметр %s может принимать только значения \"%s\" или \"%s.\" Вы же ввели "
+"\"%s.\""
+
+#: inc/class-gallery.php:267
+msgid "The following ID is invalid: "
+msgid_plural "The following IDs are invalid: "
+msgstr[0] "Следующий идентификатор (ID) недействительный: "
+msgstr[1] "Следующие идентификаторы (IDs) недействительны: "
+
+#: inc/class-gallery.php:333
+msgid "The orderby value entered, \"%s,\" is not valid."
+msgstr "Указанное значение параметра orderby, \"%s,\" недопустимо."
+
+#: inc/class-gallery.php:475
+msgid "%s is not a valid term name in %s."
+msgstr "Определение %s не является допустимым значением параметра %s."
+
+#: inc/class-image-editor-imagick.php:37
+msgid "Failed to set Imagick page number"
+msgstr "Не удалось установить номер страницы в Imagick"
+
+#: inc/class-thumber.php:125
+msgid "Could not open file: "
+msgstr "Не удалось открыть файл: "
+
+#: inc/class-thumber.php:130
+msgid "Could not write file: "
+msgstr "Не удалось записать файл: "
+
+#: inc/class-thumber.php:166
+msgid "Failed to open file in Imagick: "
+msgstr "Не удалось открыть файл в Imagick: "
+
+#: inc/class-thumber.php:176
+msgid "Failed to save image in Imagick: "
+msgstr "Не удалось сохранить изображение в Imagick: "
+
+#: inc/class-thumber.php:234
+msgid "Ghostscript failed: "
+msgstr "Сбой в Ghostscript: "
+
+#: inc/class-thumber.php:364
+msgid "Failed to retrieve thumbnail from Google: "
+msgstr "Не удалось получить от Google миниатюру: "
+
+#: inc/class-thumber.php:644
+msgid "Failed to get image editor: "
+msgstr ""
+"Сбой при попытке использовании графического редактора (WP_Image_Editor): "
+
+#: inc/class-thumber.php:655
+msgid "Failed to save image: "
+msgstr "Не удалось сохранить изображение: "
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/extend/plugins/document-gallery/"
+msgstr "http://wordpress.org/extend/plugins/document-gallery/"
+
+#. Description of the plugin/theme
+msgid ""
+"Display non-images (and images) in gallery format on a page or post with the "
+"[dg] shortcode."
+msgstr ""
+"Отображение не-изображений (а также изображений) в виде галерей на страницах "
+"и в записях с помощью шорткода [dg]."
+
+#. Author of the plugin/theme
+msgid "Dan Rossiter"
+msgstr "Dan Rossiter"
+
+#. Author URI of the plugin/theme
+msgid "http://danrossiter.org/"
+msgstr "http://danrossiter.org/"
