@@ -9,10 +9,8 @@ defined('WPINC') OR exit;
 class DG_Setup {
 
    /**
-    * Note that changes to the structure of the default options require also
-    * changing the schema in options-schema.php
-    * @param $skeleton bool When true, values that require computation will be
-    *        skipped. Useful when only structure of options is needed.
+    * The default DG options to be used on install and when validating structure of options.
+    * @param $skeleton bool When true, expensive values are not calculated. Only keys may be trusted when returning skeleton.
     * @return array Contains default options for DG.
     */
    public static function getDefaultOptions($skeleton = false) {
