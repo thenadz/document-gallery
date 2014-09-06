@@ -22,6 +22,16 @@ Watch the following video for a brief demonstration of Document Gallery in actio
 
 Read more in the **Installation** tab!
 
+= Translation =
+
+Document Gallery has to-date been translated into **5** languages, listed below.
+
+1. **French** &#8212; *Thanks, Marc Liotard!*
+1. **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+1. **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
+1. **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
+1. **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+
 = Developers =
 
 Document Gallery includes features intended to make integration with other plugins
@@ -359,14 +369,41 @@ Note that the display inherits styling from your active theme.
 
 = Features For The Future =
 
-* Full integration with the new [Wordpress 3.5 Media
-  Manager](http://codex.wordpress.org/Version_3.5#Highlights).
-* Option to open music or video files directly from your gallery.
-* Option to open documents directly from your gallery (&#224; la [Google Drive
-  Viewer](https://drive.google.com/viewer)).
-* Whatever else **you** would like (post on the [support
-  forum](http://wordpress.org/support/plugin/document-gallery) if you have
-  ideas)!
+To see a list of features planned for the future as well as to propose your own
+ideas for future Document Gallery development, take a look at our
+[issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 2.2 =
+* **Note:** This release is the first release where development has been done by
+  multiple people. I would like to give a massive thank you to
+  [demur](http://wordpress.org/support/profile/demur) who has been an equal
+  partner throughout the development of this version. Couldn't have done it without you!
+* **Note:** With multiple developing this project, it made sense to setup
+  a formal method to track issues and possible future enhancements. With this in mind
+  we've begun to maintain an [issue tracker](https://github.com/thenadz/document-gallery/issues).
+  Feel free to read through possible future features and even suggest new features
+  you would like to see!
+* **Enhancement:** You can now view which thumbnails have been generated and manually
+  delete individual thumbnails from the Document Gallery settings page.
+* **Enhancement:* The logging for Document Gallery is now **much** more advanced.
+  Logging can be configured and viewed directly from the Document Gallery settings
+  page.
+* **Enhancement:** Max width and height of generated thumbnails is now configurable.
+* **Enhancement:** We had a couple of reports of the Document Gallery options
+  being corrupted in some installs, so we added functionality to force validation
+  of option structure on save. This will not be of much use to most users, but
+  will help us track down some of the more difficult to reproduce bugs.
+
+= 2.1.1 =
+* **Translation:** Thanks to [mepmepmep](http://wordpress.org/support/profile/mepmepmep)
+  who has translated Document Gallery into Swedish!
+* **Translation:** Thanks to Marc Liotard who has translated Document Gallery into French!
+* **Note:** If you would like to help translate Document Gallery into another language,
+  get started [here](http://wordpress.org/support/topic/seeking-translators)!
+* **Note:** This is an extremely minor release, but big changes are on the
+  way in version `2.2`! Stay tuned as it should be going live in the very
+  near future. Look for a complete makeover of the admin options including
+  lots of new ways to configure DG to best meet your needs!
 
 = 2.1 =
 * **Enhancement:** Document Gallery now supports
