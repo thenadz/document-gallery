@@ -113,9 +113,14 @@ class DG_LogLevel {
    const Detail = 0;
    
    /**
+    * @var int Log level for anything that is a minor issue.
+    */
+   const Warning = 1;
+   
+   /**
     * @var int Log level for when something went wrong.
     */
-   const Error = 1;
+   const Error = 2;
 
    /**
     * @var ReflectionClass Backs the getter.
