@@ -59,13 +59,14 @@ class DG_Logger {
     * @return multitype:multitype:string|null The rows from the log file or null if no entries exist.
     */
    public static function readLog($skip = 0, $limit = PHP_INT_MAX) {
-      $fp = fopen(self::getLogFileName(), 'r');
-      $ret = array();
+      $ret = null;
+      $fp = @fopen(self::getLogFileName(), 'r');
       
       if ($fp !== false) {
+         $ret = array();
          while (count($ret) < $limit && ($fields = fgetcsv($fp)) !== false) {
-            if ($start > 0) {
-               $start--;
+            if ($skip > 0) {
+               $skip--;
                continue;
             }
             

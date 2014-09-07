@@ -51,7 +51,7 @@ class DG_Admin {
 <?php
    settings_fields(DG_OPTION_NAME);
    do_settings_sections(DG_OPTION_NAME);
-   if (self::$current != 'Thumbnail') {
+   if (self::$current != 'Thumbnail' && self::$current != 'Logging') {
       submit_button();
    }
 ?>
@@ -323,7 +323,9 @@ class DG_Admin {
     * Registers settings for the logging tab.
     */
    private static function registerLoggingSettings() {
-      // TODO
+      add_settings_section(
+          'logging_table', '',
+         array(__CLASS__, 'renderLoggingSection'), DG_OPTION_NAME);
    }
    
    /**
@@ -538,8 +540,10 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    private static function validateLoggingSettings($values) {
-      // TODO
       global $dg_options;
+      if (isset($values['clearLog'])) {
+         DG_Logger::clearLog();
+      }
       return $dg_options;
    }
    
@@ -760,7 +764,7 @@ class DG_Admin {
             '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).' %s"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
          '</tr>';
 
-      $pagination = '<div class="alignleft actions bulkactions"><button class="button action deleteSelected">'.__('Delete Selected', 'document-gallery').'</button></div><div class="tablenav-pages">'.
+      $pagination = '<div class="alignleft bulkactions"><button class="button action deleteSelected">'.__('Delete Selected', 'document-gallery').'</button></div><div class="tablenav-pages">'.
             '<span class="displaying-num">'.
             $thumbs_number.' '._n('item', 'items', $thumbs_number).
             '</span>'.($lastsheet>1?
@@ -775,10 +779,16 @@ class DG_Admin {
             '<span class="displaying-num"><select dir="rtl" class="limit_per_page">'.$select_limit.'</select> '.__('items per page', 'document-gallery').'</span>'.
          '</div>'.
          '<br class="clear" />';
+
+      // Avoiding json_encode to avoid compatibility issues on some systems
+      $json_like = '';
+      foreach ($URL_params as $k => $v) {
+         $json_like .= '"'.$k.'":"'.$v.'",';
+      }
       ?>
 
 <script type="text/javascript">
-         var URL_params = <?php echo '["' . implode('","', $URL_params) . '"]'; ?>;
+var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
       </script>
 <div class="thumbs-list-wrapper">
 	<div>
@@ -815,6 +825,85 @@ class DG_Admin {
 	</div>
 </div>
 <?php }
+   /**
+    * Render the Logging table.
+    */
+   public static function renderLoggingSection() {
+      $log_list = DG_Logger::readLog();
+      if ($log_list) {
+         $levels = array_map(
+            function($e) { return '<span class="logLabel ' . strtolower($e) . '">' . strtoupper($e) . '</span>'; },
+            array_keys(DG_LogLevel::getLogLevels()));
+
+         $thead = '<tr>'.
+               '<th scope="col" class="manage-column column-date %s"><span>'.__('Date', 'document-gallery').'</span></th>'.
+               '<th scope="col" class="manage-column column-level"><span>'.__('Level', 'document-gallery').'</span></th>'.
+               '<th scope="col" class="manage-column column-message %s"><span>'.__('Message', 'document-gallery').'</span></th>'.
+            '</tr>';
+
+         ?>
+<div class="log-list-wrapper">
+   <div>
+      <div class="tablenav top">
+         <div class="alignleft bulkactions">
+            <button class="action expandAll">
+               <?php echo __('Expand All', 'document-gallery'); ?>
+            </button>
+            <button class="action collapseAll">
+               <?php echo __('Collapse All', 'document-gallery'); ?>
+            </button>
+         </div>
+         <div class="levelSelector">
+            <input type="checkbox" id="allLevels" name="lswitch" value="all" checked />
+            <label for="allLevels" class="allLevels">ALL</label>
+            <?php
+               foreach (array_keys(DG_LogLevel::getLogLevels()) as $k) { ?>
+                  <?php
+                     $lower = strtolower($k);
+                     $upper = strtoupper($k);
+                  ?>
+                  <input type="checkbox" id="<?php echo $lower; ?>Level" name="lswitch" value="<?php echo $lower; ?>" checked />
+                  <label for="<?php echo $lower; ?>Level" class="<?php echo $lower; ?>Level"><?php echo $upper; ?></label>
+               <?php }
+            ?>
+         </div>
+      </div>
+      <table id="LogTable" class="wp-list-table media" cellpadding="0" cellspacing="0">
+         <thead>
+            <?php printf($thead, 'topLeft', 'topRight'); ?>
+         </thead>
+         <tfoot>
+            <?php printf($thead, 'bottomLeft', 'bottomRight'); ?>
+         </tfoot>
+         <tbody><?php
+            $WP_date_format = get_option('date_format').' '.get_option('time_format');
+            $i = 0;
+            foreach ($log_list as $v) {
+               $date = date($WP_date_format, $v[0]);
+               $v[2] = preg_replace('/ (attachment #)(\d+) /', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
+               $v[2] = preg_replace('/^(\(\w+::\w+\)) /', '<strong>\1</strong> ', $v[2]);
+               $v[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $v[2]);
+
+               echo '<tr><td class="date column-date" data-sort-value="'.$v[0].'"><span class="logLabel date">'.$date.'</span></td>' .
+                  '<td class="column-level">'.$levels[$v[1]].'</td>' .
+                  '<td class="column-entry">'.(empty($v[3]) ? '<pre>'.$v[2].'</pre>' : '<div class="expander" title="Click to Expand"><pre>'.$v[2].'</pre><div><span class="dashicons dashicons-arrow-down-alt2"></span></div></div><div class="spoiler-body"><pre>'.$v[3].'</pre></div>').'</td>' .
+                  '</tr>'.PHP_EOL;
+            } ?>
+         </tbody>
+      </table>
+      <div class="tablenav bottom">
+         <div class="alignright bulkactions">
+            <button class="button action clearLog" name = '<?php echo DG_OPTION_NAME; ?>[clearLog]' value = 'true'>
+               <?php echo __('Clear Log', 'document-gallery'); ?>
+            </button>
+         </div>
+      </div>
+   </div>
+</div>
+<?php } else {
+         echo '<div class="noLog">'.__('There are no log entries at this time.', 'document-gallery').'<br />'.__('For Your information:', 'document-gallery').' <strong><i>'.__('Logging', 'document-gallery').'</i></strong> '.(DG_Logger::logEnabled()?'<span class="loggingON">'.__('is turned ON', 'document-gallery').'!</span>':'<span class="loggingOFF">'.__('is turned OFF', 'document-gallery').'!</span>').'</div>';
+      }
+   }
 
    /**
     * Render a checkbox field.
@@ -822,7 +911,7 @@ class DG_Admin {
     */
    public static function renderCheckboxField($args) {
       $args['disabled'] = isset($args['disabled']) ? $args['disabled'] : false;
-      printf('<input type="checkbox" value="1" name="%1$s[%2$s]" id="%3$s" %4$s %5$s/> %6$s',
+      printf('<label><input type="checkbox" value="1" name="%1$s[%2$s]" id="%3$s" %4$s %5$s/> %6$s</label>',
           $args['option_name'],
           $args['name'],
           $args['label_for'],
