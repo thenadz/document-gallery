@@ -384,7 +384,7 @@ class DG_Thumber {
       $response = wp_remote_get($google_viewer, $args);
 
       if (is_wp_error($response) || !preg_match('/[23][0-9]{2}/', $response['response']['code'])) {
-         DG_Logger::writeLog(DG_LogLevel::Error, __('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
+         DG_Logger::writeLog(DG_LogLevel::Warning, __('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
              (is_wp_error($response)
                ? $response->get_error_message()
                : $response['response']['message']));
