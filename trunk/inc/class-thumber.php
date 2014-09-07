@@ -56,8 +56,8 @@ class DG_Thumber {
 
             if (preg_match($ext_preg, $file)) {
                if (DG_Logger::logEnabled()) {
-                  $toLog = sprintf(__('Attempting to generate thumbnail for attachment #%d with \'%s\'',
-                          'document-gallery'), $ID, print_r($thumber, true));
+                  $toLog = sprintf(__('Attempting to generate thumbnail for attachment #%d with (%s)',
+                          'document-gallery'), $ID, is_array($thumber) ? implode('::',$thumber) : print_r($thumber, true));
                   DG_Logger::writeLog(DG_LogLevel::Detail, $toLog);
                }
                
@@ -375,7 +375,7 @@ class DG_Thumber {
       );
 
       // prevent PHP timeout before HTTP completes
-      set_time_limit($timeout);
+      @set_time_limit($timeout);
 
       $options = self::getOptions();
       $google_viewer = sprintf($google_viewer, urlencode($doc_url), (int)$pg, $options['width']);
@@ -630,7 +630,7 @@ class DG_Thumber {
             if (count($thumbers) > 0) {
                $entry = __('Thumbnail Generators: ', 'document-gallery');
                foreach ($thumbers as $k => $v) {
-                  $entry .= '{' . $k . ' => ' . print_r($v, true) . '} ';
+                  $entry .= PHP_EOL . (is_array($v) ? implode('::',$v) : print_r($v, true)).' for {'. $k .'}';
                }
             } else {
                $entry = __('No thumbnail generators enabled.', 'document-gallery');
