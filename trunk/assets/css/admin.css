@@ -142,10 +142,10 @@ th.bottomRight{
    border-radius: 100px;
    cursor: context-menu;
 }
-.logLabel.warn {
+.logLabel.warning {
    background: #F89406;
 }
-.logLabel.info {
+.logLabel.detail {
    background: #3A87AD;
 }
 .logLabel.error {
@@ -249,17 +249,17 @@ th.bottomRight{
    background-color: #CC0000;
    color: #fff;
 }
-.levelSelector > input[type=checkbox] + label.warnLevel {
+.levelSelector > input[type=checkbox] + label.warningLevel {
    color: #F89406;
 }
-.levelSelector > input[type=checkbox]:checked + label.warnLevel {
+.levelSelector > input[type=checkbox]:checked + label.warningLevel {
    background-color: #F89406;
    color: #fff;
 }
-.levelSelector > input[type=checkbox] + label.infoLevel {
+.levelSelector > input[type=checkbox] + label.detailLevel {
    color: #3A87AD;
 }
-.levelSelector > input[type=checkbox]:checked + label.infoLevel {
+.levelSelector > input[type=checkbox]:checked + label.detailLevel {
    background-color: #3A87AD;
    color: #fff;
 }
