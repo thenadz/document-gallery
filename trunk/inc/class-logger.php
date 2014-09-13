@@ -21,22 +21,43 @@ class DG_Logger {
             $fields = array(time(), $level, $entry);
             
             if ($stacktrace) {
-               ob_start();
-               debug_print_backtrace();
-               $trace = ob_get_contents();
-               ob_end_clean();
-            
-               // Remove first item from backtrace as it's this function which is redundant.
-               $trace = preg_replace('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $trace, 1);
+               $trace = debug_backtrace(false);
+               unset($trace[0]);
                
-               // Renumber backtrace items.
-               $trace = preg_replace_callback(
-                  '/^#(\d+)/m',
-                  function ($m) { return '#' . ($m[1] - 1); },
-                  $trace);
-            
-               // convert to relative path from WP root
-               $fields[] = str_replace(ABSPATH, '', $trace);
+               $trace_str = '';
+               $i = 1;
+               
+               foreach($trace as $node) {
+                  $trace_str .= "#$i ";
+                  
+                  // convert to relative path from WP root
+                  $file = array_key_exists('file', $node)
+                     ? str_replace(ABSPATH, '', $node['file']) : '';
+                  $file .= array_key_exists('line', $node)
+                     ? "({$node['line']})" : '';
+                  
+                  if ($file) {
+                     $trace_str .= "$file: ";
+                  }
+                  
+                  if(array_key_exists('class', $node)) {
+                     $trace_str .= "{$node['class']}{$node['type']}";
+                  }
+                  
+                  if (array_key_exists('function', $node)) {
+                     $args = '';
+                     if (array_key_exists('args', $node)) {
+                        $args = implode(', ', array_map(
+                           function($v) { return print_r($v, true); },
+                           $node['args']));
+                     }
+                     
+                     $trace_str .= "{$node['function']}($args)" . PHP_EOL;
+                  }
+                  $i++;
+               }
+               
+               $fields[] = $trace_str;
             } else {
                $callers = debug_backtrace();
             
