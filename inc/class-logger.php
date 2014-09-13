@@ -19,9 +19,9 @@ class DG_Logger {
          $fp = fopen(self::getLogFileName(), 'a');
          if (false !== $fp) {
             $fields = array(time(), $level, $entry);
-            
+
+            $trace = debug_backtrace(false);
             if ($stacktrace) {
-               $trace = debug_backtrace(false);
                unset($trace[0]);
                
                $trace_str = '';
@@ -59,10 +59,8 @@ class DG_Logger {
                
                $fields[] = $trace_str;
             } else {
-               $callers = debug_backtrace();
-            
                // Remove first item from backtrace as it's this function which is redundant.
-               $caller = $callers[1];
+               $caller = $trace[1];
                $caller = (isset($caller['class']) ? $caller['class'] : '') . $caller['type'] . $caller['function'];
                $fields[2] = '(' . $caller . ') ' . $fields[2];
             }
