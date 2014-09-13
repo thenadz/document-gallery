@@ -30,23 +30,27 @@ class DG_Logger {
                foreach($trace as $node) {
                   $trace_str .= "#$i ";
                   
-                  // convert to relative path from WP root
-                  $file = array_key_exists('file', $node)
-                     ? str_replace(ABSPATH, '', $node['file']) : '';
-                  $file .= array_key_exists('line', $node)
-                     ? "({$node['line']})" : '';
+                  $file = '';
+                  if (isset($node['file'])) {
+                     // convert to relative path from WP root
+                     $file = str_replace(ABSPATH, '', $node['file']);
+                  }
+                  
+                  if (isset($node['line'])) {
+                     $file .= "({$node['line']})";
+                  }
                   
                   if ($file) {
                      $trace_str .= "$file: ";
                   }
                   
-                  if(array_key_exists('class', $node)) {
+                  if(isset($node['class'])) {
                      $trace_str .= "{$node['class']}{$node['type']}";
                   }
                   
-                  if (array_key_exists('function', $node)) {
+                  if (isset($node['function'])) {
                      $args = '';
-                     if (array_key_exists('args', $node)) {
+                     if (isset($node['args'])) {
                         $args = implode(', ', array_map(
                            function($v) { return print_r($v, true); },
                            $node['args']));
