@@ -1,9 +1,3 @@
-table.wp-list-table.widefat.fixed.media{
-   background:transparent;
-   border: none;
-   -webkit-box-shadow: none;
-   box-shadow: none;
-}
 div.thumbs-list-wrapper, div.log-list-wrapper{
    text-align:center;
    margin-top: 1.5em;
@@ -13,8 +7,29 @@ div.thumbs-list-wrapper>div, div.log-list-wrapper>div{
    display: inline-block;
 }
 #ThumbsTable, #LogTable{
+   border: none;
+   box-shadow: none;
+   -webkit-box-shadow: none;
+   -moz-box-shadow: none;
+   border-radius: 10px;
+   -webkit-border-radius: 10px;
+   -moz-border-radius: 10px;
+   background: #B9C9FE;
+   color: #039;
    width: auto;
    margin: 10px auto;
+}
+#ThumbsTable tbody, #LogTable tbody {
+   background: #e8edff;
+   color: #669;
+}
+#ThumbsTable>tbody>tr:hover, #LogTable>tbody>tr:hover {
+   background: #d0dafd;
+}
+#LogTable>tbody>tr:not(:last-child) td {
+   border-bottom-color: #b9c9fe;
+   border-bottom-style: solid;
+   border-bottom-width: 1px;
 }
 #ThumbsTable td, #ThumbsTable th, #LogTable td, #LogTable th{
    text-align: center;
@@ -28,17 +43,6 @@ div.thumbs-list-wrapper>div, div.log-list-wrapper>div{
 td.title.column-title{
    text-align: left !important;
 }
-#ThumbsTable tbody, #LogTable tbody{
-   background: #e8edff;
-   color: #669;
-}
-#ThumbsTable thead, #ThumbsTable tfoot, #LogTable thead, #LogTable tfoot{
-   background: #b9c9fe;
-   color: #039;
-}
-#ThumbsTable>tbody>tr:hover, #LogTable>tbody>tr:hover{
-   background: #d0dafd;
-}
 #ThumbsTable img{
    display: block;
    margin: 0 auto;
@@ -46,6 +50,7 @@ td.title.column-title{
 #LogTable td > pre, .spoiler-body > pre, .expander pre, .collapser pre {
    margin: 0;
    display: inline-block;
+   white-space: pre-line;
 }
 tr.selected{
    background: #B6ADCE;
@@ -53,21 +58,11 @@ tr.selected{
 tr.selected:hover{
    background: #D8D3E5 !important;
 }
-th.topLeft{
-   border-top-left-radius: 10px;
-   -moz-border-top-left-radius: 10px;
+.column-date, .column-level, .check-column, .column-icon {
+   white-space: nowrap;
 }
-th.topRight{
-   border-top-right-radius: 10px;
-   -moz-border-top-right-radius: 10px;
-}
-th.bottomLeft{
-   border-bottom-left-radius: 10px;
-   -moz-border-bottom-left-radius: 10px;
-}
-th.bottomRight{
-   border-bottom-right-radius: 10px;
-   -moz-border-bottom-right-radius: 10px;
+.column-entry, .column-title {
+   width: 100%;
 }
 .nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after{
    display: inline-block;

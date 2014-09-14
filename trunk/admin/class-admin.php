@@ -755,13 +755,13 @@ class DG_Admin {
       unset($atts);
       
       $thead = '<tr>'.
-            '<th scope="col" class="manage-column column-cb check-column %s">'.
-               '<label class="screen-reader-text" for="cb-select-all-%d">'.__('Select All', 'document-gallery').'</label>'.
-               '<input id="cb-select-all-%d" type="checkbox">'.
+            '<th scope="col" class="manage-column column-cb check-column">'.
+               '<label class="screen-reader-text" for="cb-select-all-%1$d">'.__('Select All', 'document-gallery').'</label>'.
+               '<input id="cb-select-all-%1$d" type="checkbox">'.
             '</th>'.
             '<th scope="col" class="manage-column column-icon">'.__('Thumbnail', 'document-gallery').'</th>'.
             '<th scope="col" class="manage-column column-title '.(($orderby != 'title')?'sortable desc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'title','order'=>(($orderby != 'title')?'asc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('File name', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
-            '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).' %s"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
+            '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
          '</tr>';
 
       $pagination = '<div class="alignleft bulkactions"><button class="button action deleteSelected">'.__('Delete Selected', 'document-gallery').'</button></div><div class="tablenav-pages">'.
@@ -796,10 +796,10 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
 		<table id="ThumbsTable" class="wp-list-table widefat fixed media"
 			cellpadding="0" cellspacing="0">
 			<thead>
-               <?php printf($thead, 'topLeft', 1, 1, 'topRight'); ?>
+               <?php printf($thead, 1); ?>
             </thead>
 			<tfoot>
-               <?php printf($thead, 'bottomLeft', 2, 2, 'bottomRight'); ?>
+               <?php printf($thead, 2); ?>
             </tfoot>
 			<tbody><?php
                $WP_date_format = get_option('date_format').' '.get_option('time_format');
@@ -836,9 +836,9 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
             array_keys(DG_LogLevel::getLogLevels()));
 
          $thead = '<tr>'.
-               '<th scope="col" class="manage-column column-date %s"><span>'.__('Date', 'document-gallery').'</span></th>'.
+               '<th scope="col" class="manage-column column-date"><span>'.__('Date', 'document-gallery').'</span></th>'.
                '<th scope="col" class="manage-column column-level"><span>'.__('Level', 'document-gallery').'</span></th>'.
-               '<th scope="col" class="manage-column column-message %s"><span>'.__('Message', 'document-gallery').'</span></th>'.
+               '<th scope="col" class="manage-column column-message"><span>'.__('Message', 'document-gallery').'</span></th>'.
             '</tr>';
 
          ?>
@@ -868,12 +868,12 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
             ?>
          </div>
       </div>
-      <table id="LogTable" class="wp-list-table media" cellpadding="0" cellspacing="0">
+      <table id="LogTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">
          <thead>
-            <?php printf($thead, 'topLeft', 'topRight'); ?>
+            <?php echo $thead; ?>
          </thead>
          <tfoot>
-            <?php printf($thead, 'bottomLeft', 'bottomRight'); ?>
+            <?php echo $thead; ?>
          </tfoot>
          <tbody><?php
             $WP_date_format = get_option('date_format').' '.get_option('time_format');
