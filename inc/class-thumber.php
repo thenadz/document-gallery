@@ -630,7 +630,13 @@ class DG_Thumber {
             if (count($thumbers) > 0) {
                $entry = __('Thumbnail Generators: ', 'document-gallery');
                foreach ($thumbers as $k => $v) {
-                  $entry .= PHP_EOL . (is_array($v) ? implode('::',$v) : print_r($v, true)).' for {'. $k .'}';
+                  $thumber = is_array($v) ? implode('::', $v) : print_r($v, true);
+                  
+                  // TODO: The following works for all internal regexes, but may have unpredictable
+                  // results if developer adds additional thumbnail generators using different regexes
+                  $filetypes = str_replace('|', ', ', $k);
+                  
+                  $entry .= PHP_EOL . "$thumber for: $filetypes";
                }
             } else {
                $entry = __('No thumbnail generators enabled.', 'document-gallery');
