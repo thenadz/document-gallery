@@ -636,7 +636,7 @@ class DG_Thumber {
                   // results if developer adds additional thumbnail generators using different regexes
                   $filetypes = str_replace('|', ', ', $k);
                   
-                  $entry .= PHP_EOL . "$thumber for: $filetypes";
+                  $entry .= PHP_EOL . "$thumber: $filetypes";
                }
             } else {
                $entry = __('No thumbnail generators enabled.', 'document-gallery');
