@@ -26,7 +26,7 @@ div.thumbs-list-wrapper>div, div.log-list-wrapper>div{
 #ThumbsTable>tbody>tr:hover, #LogTable>tbody>tr:hover {
    background: #d0dafd;
 }
-#LogTable>tbody>tr:not(:last-child) td {
+#ThumbsTable>tbody>tr:not(:last-child) td, #LogTable>tbody>tr:not(:last-child) td {
    border-bottom-color: #b9c9fe;
    border-bottom-style: solid;
    border-bottom-width: 1px;
@@ -45,7 +45,7 @@ td.title.column-title{
 }
 #ThumbsTable img{
    display: block;
-   margin: 0 auto;
+   margin: 5px auto;
 }
 #LogTable td > pre, .spoiler-body > pre, .expander pre, .collapser pre {
    margin: 0;
