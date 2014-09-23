@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Document Gallery 2.2\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
-"POT-Creation-Date: 2014-09-04 02:15:50+00:00\n"
+"POT-Creation-Date: 2014-09-23 02:11:20+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,7 +20,7 @@ msgstr ""
 msgid "Thumbnail Management"
 msgstr ""
 
-#: admin/class-admin.php:30
+#: admin/class-admin.php:30 admin/class-admin.php:904
 msgid "Logging"
 msgstr ""
 
@@ -130,159 +130,195 @@ msgstr ""
 msgid "The max width and height (in pixels) that thumbnails will be generated."
 msgstr ""
 
-#: admin/class-admin.php:336
+#: admin/class-admin.php:338
 msgid "Advanced Thumbnail Generation"
 msgstr ""
 
-#: admin/class-admin.php:348
+#: admin/class-admin.php:350
 msgid "Whether to log debug and error information related to Document Gallery."
 msgstr ""
 
-#: admin/class-admin.php:360
+#: admin/class-admin.php:362
 msgid ""
 "Whether option structure should be validated before save. This is not "
 "generally necessary."
 msgstr ""
 
-#: admin/class-admin.php:373
+#: admin/class-admin.php:375
 msgid ""
 "Max number of seconds to wait for thumbnail generation before defaulting to "
 "filetype icons."
 msgstr ""
 
-#: admin/class-admin.php:374
+#: admin/class-admin.php:376
 msgid ""
 "Note that generation will continue where timeout happened next time the "
 "gallery is loaded."
 msgstr ""
 
-#: admin/class-admin.php:386
+#: admin/class-admin.php:388
 msgid "Successfully auto-detected the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:387
+#: admin/class-admin.php:389
 msgid "Failed to auto-detect the location of Ghostscript."
 msgstr ""
 
-#: admin/class-admin.php:391
+#: admin/class-admin.php:393
 msgid "Options Array Dump"
 msgstr ""
 
-#: admin/class-admin.php:438
+#: admin/class-admin.php:440
 msgid "Invalid width given: "
 msgstr ""
 
-#: admin/class-admin.php:451
+#: admin/class-admin.php:453
 msgid "Invalid height given: "
 msgstr ""
 
-#: admin/class-admin.php:562
+#: admin/class-admin.php:566
 msgid "Invalid Ghostscript path given: "
 msgstr ""
 
-#: admin/class-admin.php:573
+#: admin/class-admin.php:577
 msgid "Invalid timeout given: "
 msgstr ""
 
-#: admin/class-admin.php:604
+#: admin/class-admin.php:608
 msgid ""
 "The following values will be used by default in the shortcode. You can still "
 "manually set each of these values in each individual shortcode."
 msgstr ""
 
-#: admin/class-admin.php:611
+#: admin/class-admin.php:615
 msgid "Select which tools to use when generating thumbnails."
 msgstr ""
 
-#: admin/class-admin.php:620
+#: admin/class-admin.php:624
 msgid ""
 "Enter custom CSS styling for use with document galleries. To see which ids "
 "and classes you can style, take a look at <a href=\"%s\" target=\"_blank"
 "\">style.css</a>."
 msgstr ""
 
-#: admin/class-admin.php:640
+#: admin/class-admin.php:644
 msgid ""
 "Unless you <em>really</em> know what you're doing, you should not touch "
 "these values."
 msgstr ""
 
-#: admin/class-admin.php:643
+#: admin/class-admin.php:647
 msgid ""
 "NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
 msgstr ""
 
-#: admin/class-admin.php:654
+#: admin/class-admin.php:658
 msgid ""
 "The following <em>readonly text</em> should be provided when <a href="
 "\"http://wordpress.org/support/plugin/document-gallery\" target=\"_blank"
 "\">reporting a bug</a>:"
 msgstr ""
 
-#: admin/class-admin.php:755
+#: admin/class-admin.php:759
 msgid "Select All"
 msgstr ""
 
-#: admin/class-admin.php:758
+#: admin/class-admin.php:762
 msgid "Thumbnail"
 msgstr ""
 
-#: admin/class-admin.php:759
+#: admin/class-admin.php:763
 msgid "File name"
 msgstr ""
 
-#: admin/class-admin.php:760
+#: admin/class-admin.php:764 admin/class-admin.php:839
 msgid "Date"
 msgstr ""
 
-#: admin/class-admin.php:763
+#: admin/class-admin.php:767
 msgid "Delete Selected"
 msgstr ""
 
-#: admin/class-admin.php:765
+#: admin/class-admin.php:769
 msgid "item"
 msgid_plural "items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/class-admin.php:768
+#: admin/class-admin.php:772
 msgid "Go to the first page"
 msgstr ""
 
-#: admin/class-admin.php:769
+#: admin/class-admin.php:773
 msgid "Go to the previous page"
 msgstr ""
 
-#: admin/class-admin.php:771
+#: admin/class-admin.php:775
 msgid "Current page"
 msgstr ""
 
-#: admin/class-admin.php:771
+#: admin/class-admin.php:775
 msgid "of"
 msgstr ""
 
-#: admin/class-admin.php:772
+#: admin/class-admin.php:776
 msgid "Go to the next page"
 msgstr ""
 
-#: admin/class-admin.php:773
+#: admin/class-admin.php:777
 msgid "Go to the last page"
 msgstr ""
 
-#: admin/class-admin.php:775
+#: admin/class-admin.php:779
 msgid "items per page"
 msgstr ""
 
-#: admin/class-admin.php:808
+#: admin/class-admin.php:818
 msgid "View"
 msgstr ""
 
-#: admin/class-admin.php:809
+#: admin/class-admin.php:819
 msgid "attachment page"
 msgstr ""
 
-#: admin/class-admin.php:809
+#: admin/class-admin.php:819
 msgid "Attachment not found"
+msgstr ""
+
+#: admin/class-admin.php:840
+msgid "Level"
+msgstr ""
+
+#: admin/class-admin.php:841
+msgid "Message"
+msgstr ""
+
+#: admin/class-admin.php:850
+msgid "Expand All"
+msgstr ""
+
+#: admin/class-admin.php:853
+msgid "Collapse All"
+msgstr ""
+
+#: admin/class-admin.php:897
+msgid "Clear Log"
+msgstr ""
+
+#: admin/class-admin.php:904
+msgid "There are no log entries at this time."
+msgstr ""
+
+#: admin/class-admin.php:904
+msgid "For Your information:"
+msgstr ""
+
+#: admin/class-admin.php:904
+msgid "is turned ON"
+msgstr ""
+
+#: admin/class-admin.php:904
+msgid "is turned OFF"
 msgstr ""
 
 #: inc/class-gallery.php:85
@@ -316,7 +352,7 @@ msgid "Failed to set Imagick page number"
 msgstr ""
 
 #: inc/class-thumber.php:59
-msgid "Attempting to generate thumbnail for attachment #%d with '%s'"
+msgid "Attempting to generate thumbnail for attachment #%d with (%s)"
 msgstr ""
 
 #: inc/class-thumber.php:138
@@ -347,15 +383,15 @@ msgstr ""
 msgid "Thumbnail Generators: "
 msgstr ""
 
-#: inc/class-thumber.php:636
+#: inc/class-thumber.php:642
 msgid "No thumbnail generators enabled."
 msgstr ""
 
-#: inc/class-thumber.php:679
+#: inc/class-thumber.php:685
 msgid "Failed to get image editor: "
 msgstr ""
 
-#: inc/class-thumber.php:691
+#: inc/class-thumber.php:697
 msgid "Failed to save image: "
 msgstr ""
 
