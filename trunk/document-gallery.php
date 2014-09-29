@@ -257,6 +257,23 @@ class DocumentGallery {
    }
    
    /**
+    * Function takes a GMT timestamp and returns a date/time string in the
+    * current timezone and WP format.
+    * @param int $timestamp The GMT timestamp to translate.
+    * @return string The local time in the WP date/time format.
+    */
+   public static function localDateTimeFromTimestamp($timestamp) {
+      static $gmt_offet = null;
+      static $wp_format = null;
+      if (is_null($gmt_offet)) {
+         $gmt_offet = get_option('gmt_offset');
+         $wp_format = get_option('date_format').' '.get_option('time_format');
+      }
+      
+      return date($wp_format, $timestamp + $gmt_offet * 3600);
+   }
+   
+   /**
     * Compiles any custom CSS plus the default CSS together,
     * minifying in the process.
     * @param string $custom The custom CSS to compile.
