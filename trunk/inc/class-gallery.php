@@ -19,11 +19,10 @@ class DG_Gallery {
    private $errs = array();
 
    // templates for HTML output
-   private static $no_docs = false;
-   private static $icon_wrapper = false;
-   private static $comment = false;
+   private static $no_docs = null;
+   private static $comment = null;
 
-   private static $binary_err = false;
+   private static $binary_err = null;
 
    /*==========================================================================
     * PUBLIC FUNCTIONS
@@ -81,12 +80,14 @@ class DG_Gallery {
     * Initializes static values for this class.
     */
    public static function init() {
-      self::$comment =
-         PHP_EOL . '<!-- ' . __('Generated using Document Gallery. Get yours here: ', 'document-gallery') .
-         'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
-      self::$icon_wrapper = '<div class="%s">'. PHP_EOL . '%s</div>' . PHP_EOL;
-      self::$no_docs = '<!-- ' . __('No attachments to display. How boring! :(', 'document-gallery') . ' -->';
-      self::$binary_err = __('The %s parameter may only be "%s" or "%s." You entered "%s."', 'document-gallery');
+      if (is_null(self::$comment))
+      {
+         self::$comment =
+            PHP_EOL . '<!-- ' . __('Generated using Document Gallery. Get yours here: ', 'document-gallery') .
+            'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
+         self::$no_docs = '<!-- ' . __('No attachments to display. How boring! :(', 'document-gallery') . ' -->';
+         self::$binary_err = __('The %s parameter may only be "%s" or "%s." You entered "%s."', 'document-gallery');
+      }
    }
 
    /**
@@ -597,9 +598,17 @@ class DG_Gallery {
     *=========================================================================*/
 
    /**
+    * @filter dg_gallery_template Allows the user to filter anything content surrounding the generated gallery.
+    * @filter dg_row_template Filters the outer DG wrapper HTML. Passes a single
+    *    bool value indicating whether the gallery is using descriptions or not.
     * @return string HTML representing this Gallery.
     */
    public function __toString() {
+      static $find = null;
+      if (is_null($find)) {
+         $find = array('%class%', '%icons%');
+      }
+      
       if(!empty($this->errs)) {
          return '<p>' . implode('</p><p>', $this->errs) . '</p>';
       }
@@ -607,6 +616,11 @@ class DG_Gallery {
       if(empty($this->docs)) {
          return self::$no_docs;
       }
+      
+      $icon_wrapper = apply_filters(
+         'dg_row_template',
+         '<div class="%class%">'. PHP_EOL . '%icons%' . PHP_EOL . '</div>' . PHP_EOL,
+         $this->useDescriptions());
 
       $core = '';
       $classes = array('document-icon-wrapper');
@@ -614,26 +628,28 @@ class DG_Gallery {
          $classes[] = 'descriptions';
       }
 
-      $icon_wrapper = sprintf(self::$icon_wrapper, implode(' ', $classes), '%s');
-
+      $repl = array(implode(' ', $classes));
       if($this->useDescriptions()) {
          foreach($this->docs as $doc) {
-            $core .= sprintf($icon_wrapper, $doc);
+            $repl[1] = $doc;
+            $core .= str_replace($find, $repl, $icon_wrapper);
          }
       } else {
          for($i = 0; $i < count($this->docs); $i+=4) {
-            $row = '';
+            $repl[1] = '';
 
             $min = min($i+4, count($this->docs));
             for($x = $i; $x < $min; $x++) {
-               $row .= $this->docs[$x];
+               $repl[1] .= $this->docs[$x];
             }
 
-            $core .= sprintf($icon_wrapper, $row);
+            $core .= str_replace($find, $repl, $icon_wrapper);
          }
       }
 
-      return self::$comment . $core;
+      // allow user to wrap gallery output
+      $gallery = apply_filters('dg_gallery_template', '%rows%', $this->useDescriptions());
+      return self::$comment . str_replace('%rows%', $core, $gallery);
    }
 }
 

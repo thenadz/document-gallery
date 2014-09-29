@@ -12,10 +12,6 @@ class DG_Document {
     * PRIVATE FIELDS
     *=========================================================================*/
 
-   // templates for HTML output
-   private static $doc_icon = false;
-   private static $img_string = '<img src="%s" title="%s" alt="%s" />';
-
    // general document data
    private $description, $gallery, $ID, $link, $title, $title_attribute;
 
@@ -30,16 +26,7 @@ class DG_Document {
     */
    public function __construct($attachment, $gallery) {
       include_once DG_PATH . 'inc/class-thumber.php';
-
-      // init template for HTML output
-      if(false === self::$doc_icon)
-      {
-         self::$doc_icon =
-            '   <div class="document-icon">' . PHP_EOL .
-            '      <a href="%s">%s<br>%s</a>' . PHP_EOL .
-            '   </div>' . PHP_EOL;
-      }
-
+      
       // init general document data
       $this->gallery = $gallery;
       $this->description = $attachment->post_content;
@@ -57,22 +44,39 @@ class DG_Document {
 
    /**
     * Returns HTML representing this Document.
+    * @filter dg_icon_template Filters the DG icon HTML. Passes a single
+    *    bool value indicating whether the gallery is using descriptions or not.
+    * @filter dg_doc_icon Deprecated. To be removed in a future relesase.
     * @return string
     */
    public function __toString() {
+      static $find = null;
+      if (is_null($find)) {
+         $find = array("%link%", "%img%", "%title_attribute%", "%title%");
+      }
+      
       $thumb = $this->gallery->useFancyThumbs()
           ? DG_Thumber::getThumbnail($this->ID)
           : DG_Thumber::getDefaultThumbnail($this->ID);
-      $icon = sprintf(self::$img_string, $thumb,
-          $this->title_attribute, $this->title_attribute);
-      $core = sprintf(self::$doc_icon, $this->link, $icon, $this->title);
 
+      $repl = array($this->link, $thumb, $this->title_attribute, $this->title);
+      
+      $doc_icon = apply_filters(
+         'dg_icon_template',
+         '   <div class="document-icon">' . PHP_EOL .
+         '      <a href="%link%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
+         '   </div>' . PHP_EOL,
+         $this->gallery->useDescriptions(),
+         $this->ID);
+      
+      $core = str_replace($find, $repl, $doc_icon);
+      
       if($this->gallery->useDescriptions()) {
          $core .= "   <p>$this->description</p>" . PHP_EOL;
       }
 
       // users may filter icon here
-      return apply_filters('dg_doc_icon', $core, $this->ID);
+      return apply_filters('dg_doc_icon', $core, $this->ID, $this->gallery->useDescriptions());
    }
 }
 
