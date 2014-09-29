@@ -105,7 +105,7 @@ class DocumentGallery {
 
       $start = microtime(true);
       $gallery = (string)new DG_Gallery($atts);
-      DG_Logger::writeLog(DG_LogLevel::Detail, 'Generation Time: ' . (microtime(true) - $start) . ' s');
+      DG_Logger::writeLog(DG_LogLevel::Detail, 'Generation Time: ' . sprintf('%.2f', (microtime(true) - $start)) . ' s');
 
       return $gallery;
    }
