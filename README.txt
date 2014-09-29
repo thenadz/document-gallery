@@ -205,42 +205,61 @@ For those unfamiliar with content filters, [here is some
 documentation](http://codex.wordpress.org/Plugin_API/Filter_Reference) that you
 should read before continuing.
 
-**Filter .document-icon Content**
+**Filter HTML Output**
 
-Document Gallery provides a filter allowing developers to customize
-the HTML returned. Specifically, the `div.document-icon` content, including
-the div itself, the URL to the attachment, the attachment icon, and the
-attachment title. Hooking into the `dg_doc_icon` filter will allow you to
-modify any of this content before it reaches your users.
+In Documnet Gallery version 2.2, we've released a more powerful HTML
+templating framework, making all generated output filterable, and thus
+configurable, by developers wishing to control the gallery output. Three
+different filters are provided in order to access the various segments
+of a gallery: `dg_gallery_template`, `dg_row_template`, and `dg_icon_template`.
+These filtered templates are used when dynamically generating output for each
+gallery.
 
-Any function using this filter will receive two parameters, the content to be
-filtered and the ID number of the file represented by the icon in question.
-If you are implementing something to override the plugin default functionality,
-it may be useful to be able to query various attributes of the attachment with
-this value.
+*NOTE: The `dg_doc_icon` has been deprecated with the release and is
+scheduled to be removed in a future release. If you are using this
+filter, you are encouraged to replace its usages with `dg_icon_template`.*
 
-One example use for this filter, which I have personally used in a project I
-am working on, will add a query parameter to the end of each attachment URL.
-This parameter, `rid`, specifies the referring page and allows the page
-receiving the URL to dynamically detect which page ID the link came from.
+Each of the following filters provides an bool argument which indicates
+whither the gallery being generated will display descriptions, which
+allows you to handle galleries with and without descriptions differently.
 
-`function dg_doc_icon( $icon, $id ){
-   $ptn = '/(.* href=")([^"]+)(".*)/s';
+If you wish to wrap your galleries in some additional content, the 
+`dg_gallery_template` is the tool for the job. With it you can include
+content prior to or following your document galleries. The filter
+exposes 1 special tag which is replaced during gallery generation
+with data specific to that gallery. The tag is described below:
 
-   if( !preg_match( $ptn, $icon, $matches ) || count( $matches ) !== 4 )
-      return $icon;
+* **%rows%**: This tag is replaced by all of the document gallery rows.
+Everything before this string will be rendered before the gallery and
+everything after this string will be rendered following the gallery.
 
-   if( strpos( $matches[2], '?' ) !== false )
-      return "{$matches[1]}{$matches[2]}&rid=".get_the_ID().$matches[3];
 
-   return "{$matches[1]}{$matches[2]}?rid=".get_the_ID().$matches[3];
-}
-add_filter( 'dg_doc_icon', 'dg_doc_icon', null, 2 );`
+If you wish to modify how gallery rows are generated, `dg_row_template`,
+is provided for this purpose. This filter gives you control at the row
+level for how a gallery will be generated. The filter exposes 2 special tags
+which are replaced during gallery generation with row-specific data.
+These tags are as follows:
 
-Obviously this is just one very specific example, but anything that requires
-modifying the image tag, the anchor tag, or the title can be handled with this
-filter. Note that this function does not use the $id value it receives, which
-is perfectly alright.
+* **%class%**: The class attribute value for this row.
+* **%icons%**: The icon data for this row.
+
+
+If you wish to modify the HTML that wraps individual icons, the 
+`dg_icon_template` filter is what you will use. The filter is passed
+two arguments which may be used to gain additional information about
+the document that will be used in generating this icon. The first
+argument is a bool value which indicates whether descriptions will
+be used along with the icon and the second value is an integer WordPress
+attachment ID which may be used to lookup any relevant information
+you need specific to that document. The filter exposes 4 special tags
+which are replaced during gallery generation with document-specific data.
+These tags are as follows:
+
+* **%link%**: The URL that will be loaded when the user clicks the icon.
+* **%img%**: The URL pointing the the image that will be displayed.
+* **%title%**: The human-readable title of the attachment.
+* **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
+
 
 **Filter Thumbnail Generation Methods**
 

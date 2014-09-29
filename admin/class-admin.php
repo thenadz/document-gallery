@@ -802,7 +802,6 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
                <?php printf($thead, 2); ?>
             </tfoot>
 			<tbody><?php
-               $WP_date_format = get_option('date_format').' '.get_option('time_format');
                $i = 0;
                foreach ($options['thumbs'] as $v) {
                   if ($i < $offset) { $i++; continue; }
@@ -810,7 +809,7 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
                   
                   $icon = isset($v['thumb_url']) ? $v['thumb_url'] : DG_URL . 'assets/icons/missing.png';
                   $title = isset($titles[$v['thumb_id']]) ? $titles[$v['thumb_id']] : '';
-                  $date = date($WP_date_format, $v['timestamp']);
+                  $date = DocumentGallery::localDateTimeFromTimestamp($v['timestamp']);
                   
                   echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
@@ -876,10 +875,9 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
             <?php echo $thead; ?>
          </tfoot>
          <tbody><?php
-            $WP_date_format = get_option('date_format').' '.get_option('time_format');
             $i = 0;
             foreach ($log_list as $v) {
-               $date = date($WP_date_format, $v[0]);
+               $date = DocumentGallery::localDateTimeFromTimestamp($v[0]);
                $v[2] = preg_replace('/ (attachment #)(\d+) /', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
                $v[2] = preg_replace('/^(\(\w+::\w+\)) /', '<strong>\1</strong> ', $v[2]);
                $v[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $v[2]);
