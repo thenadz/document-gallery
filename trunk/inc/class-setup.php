@@ -25,36 +25,76 @@ class DG_Setup {
       
       return array(
           'thumber' => array(
-              'thumbs'  => array(),
-              'gs'      => $gs,
-              'active'  => DG_Thumber::getDefaultThumbers($skeleton),
-              'width'   => 200,
-              'height'  => 200,
-              'timeout' => 30
+              // cached thumbnails, keyed by post ID
+              'thumbs'         => array(),
+                
+              // Ghostscript path
+              'gs'             => $gs,
+                
+              // which thumbnail generation methods are available
+              'active'         => DG_Thumber::getDefaultThumbers($skeleton),
+                
+              // max width to generate thumbnails
+              'width'          => 200,
+                
+              // max height to generate thumbnails
+              'height'         => 200,
+                
+              // time after which to quite trying to generate new thumbanils for gallery
+              'timeout'        => 30
           ),
           'gallery' => array(
               // default: link directly to file (true to link to attachment pg)
               'attachment_pg'  => false,
+                
+              // include the attachment description in output
               'descriptions'   => false,
+                
               // include thumbnail of actual document in gallery display
               'fancy'          => true,
+                
               // comma-separated list of attachment ids
               'ids'            => false,
+                
               // if true, all images attached to current page will be included also
               'images'         => false,
+                
+              // include just attached to the post using shortcode
               'localpost'      => true,
+                
+              // ascending/descending order for included documents
               'order'          => 'ASC',
+                
+              // which property to order by
               'orderby'        => 'menu_order',
+              
+               // AND or OR
               'relation'       => 'AND'
           ),
           'css' => array(
-              'text' => '',
-              'last-modified' => $date,
-              'etag' => $etag,
-              'version' => 0
+              // plain text of CSS to be edited by user
+              'text'           => '',
+                
+              // "minified" text to be rendered on pages
+              'minified'       => '',
+                
+              // date/time last modified
+              'last-modified'  => $date,
+                
+              // used when telling browser whether to load from cache
+              'etag'           => $etag,
+                
+              // used in cache busting after user modifies CSS
+              'version'        => 0
           ),
+            
+          // current DG version
           'version' => DG_VERSION,
+            
+          // whether to validate DG option structure on save
           'validation' => false,
+            
+          // whether to logging DG activity
           'logging' => false
       );
    }
@@ -96,11 +136,9 @@ class DG_Setup {
       $options['version'] = DG_VERSION;
 
       // setup CSS
-      if (isset($options['css']['text'])) {
-         // Only populate minified if it will be used
-         $options['css']['minified'] =
-                 DocumentGallery::compileCustomCss($options['css']['text']);
-      }
+      $options['css']['minified'] = isset($options['css']['text'])
+         ? DocumentGallery::compileCustomCss($options['css']['text'])
+         : '';
       $options['css']['last-modified'] = gmdate('D, d M Y H:i:s');
       $options['css']['etag'] = md5($options['css']['last-modified']);
 
