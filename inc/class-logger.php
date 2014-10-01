@@ -51,9 +51,7 @@ class DG_Logger {
                   if (isset($node['function'])) {
                      $args = '';
                      if (isset($node['args'])) {
-                        $args = implode(', ', array_map(
-                           function($v) { return print_r($v, true); },
-                           $node['args']));
+                        $args = implode(', ', array_map(array(__CLASS__, 'print_r'), $node['args']));
                      }
                      
                      $trace_str .= "{$node['function']}($args)" . PHP_EOL;
@@ -73,6 +71,15 @@ class DG_Logger {
             fclose($fp);
          } // TODO: else
       }
+   }
+   
+   /**
+    * Wraps print_r passing true for the return argument.
+    * @param unknown $v
+    * @return mixed
+    */
+   private static function print_r($v) {
+      return print_r($v, true);
    }
    
    /**

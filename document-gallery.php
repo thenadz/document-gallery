@@ -5,14 +5,14 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.2
+  Version: 2.2.1
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
   Text Domain: document-gallery
  */
 
-define('DG_VERSION', '2.2');
+define('DG_VERSION', '2.2.1');
 
 // define helper paths & URLs
 define('DG_BASENAME', plugin_basename(__FILE__));
@@ -38,10 +38,7 @@ DG_Setup::maybeUpdate();
 
 // validate options if desired
 if ($dg_options['validation']) {
-   add_action('init', function(){
-      add_filter('pre_update_option_' . DG_OPTION_NAME,
-         array('DocumentGallery', 'validateOptionsStructure'), 10, 2);
-   });
+   add_action('init', array('DocumentGallery', 'addValidation'));
 }
 
 // I18n
@@ -207,6 +204,13 @@ class DocumentGallery {
       } else {
          delete_blog_option($blog, DG_OPTION_NAME);
       }
+   }
+   
+   /**
+    * Adds hook to validate DG options every time save is attempted.
+    */
+   public static function addValidation() {
+      add_filter('pre_update_option_' . DG_OPTION_NAME, array('DocumentGallery', 'validateOptionsStructure'), 10, 2);
    }
    
    /**
