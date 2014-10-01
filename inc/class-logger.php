@@ -74,19 +74,10 @@ class DG_Logger {
    }
    
    /**
-    * Wraps print_r passing true for the return argument.
-    * @param unknown $v
-    * @return mixed
-    */
-   private static function print_r($v) {
-      return print_r($v, true);
-   }
-   
-   /**
     * Reads the current blog's log file, placing the values in to a 2-dimensional array.
     * @param int $skip How many lines to skip before returning rows.
     * @param int $limit Max number of lines to read.
-    * @return multitype:multitype:string|null The rows from the log file or null if no entries exist.
+    * @return multitype:multitype:string|null The rows from the log file or null if failed to open log.
     */
    public static function readLog($skip = 0, $limit = PHP_INT_MAX) {
       $ret = null;
@@ -130,6 +121,15 @@ class DG_Logger {
     */
    private static function getLogFileName() {
       return DG_PATH . 'log/' . get_current_blog_id() . '.log';
+   }
+   
+   /**
+    * Wraps print_r passing true for the return argument.
+    * @param unknown $v Value to be printed.
+    * @return string Printed value.
+    */
+   private static function print_r($v) {
+      return print_r($v, true);
    }
 }
 
