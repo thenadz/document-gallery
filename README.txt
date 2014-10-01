@@ -392,6 +392,11 @@ To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
+= 2.2.2 =
+* **Bug Fix:** Resolves minor issue in `2.2.1` that resulted in a warning being
+  logged while interacting with the new thumbnail management table in the
+  Document Gallery settings.
+
 = 2.2.1 =
 * **Bug Fix:** PHP installs older than 5.3 were crashing with version 2.2. This release
   patches the issue.

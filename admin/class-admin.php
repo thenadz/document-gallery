@@ -971,7 +971,7 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
    /**
     * Wraps the PHP exit language construct.
     */
-   private static function _exit() {
+   public static function _exit() {
       exit;
    }
 
