@@ -527,7 +527,7 @@ class DG_Admin {
          
          if (isset($values['ajax'])) {
             echo '[' . implode(',', $deleted) . ']';
-            add_filter('wp_redirect', function(){ die; }, 1, 0);
+            add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
          }
       }
       
@@ -828,9 +828,7 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
    public static function renderLoggingSection() {
       $log_list = DG_Logger::readLog();
       if ($log_list) {
-         $levels = array_map(
-            function($e) { return '<span class="logLabel ' . strtolower($e) . '">' . strtoupper($e) . '</span>'; },
-            array_keys(DG_LogLevel::getLogLevels()));
+         $levels = array_map(array(__CLASS__, 'getLogLabelSpan'), array_keys(DG_LogLevel::getLogLevels()));
 
          $thead = '<tr>'.
                '<th scope="col" class="manage-column column-date"><span>'.__('Date', 'document-gallery').'</span></th>'.
@@ -900,6 +898,15 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
          echo '<div class="noLog">'.__('There are no log entries at this time.', 'document-gallery').'<br />'.__('For Your information:', 'document-gallery').' <strong><i>'.__('Logging', 'document-gallery').'</i></strong> '.(DG_Logger::logEnabled()?'<span class="loggingON">'.__('is turned ON', 'document-gallery').'!</span>':'<span class="loggingOFF">'.__('is turned OFF', 'document-gallery').'!</span>').'</div>';
       }
    }
+   
+   /**
+    * Takes label name and returns SPAN tag.
+    * @param string $e label name.
+    * @return string SPAN tag
+    */
+   private static function getLogLabelSpan($e) {
+   	return '<span class="logLabel ' . strtolower($e) . '">' . strtoupper($e) . '</span>';
+   }
 
    /**
     * Render a checkbox field.
@@ -959,6 +966,13 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
       }
 
       print '</select> ' . $args['description'];
+   }
+   
+   /**
+    * Wraps the PHP exit language construct.
+    */
+   private static function _exit() {
+      exit;
    }
 
    /**
