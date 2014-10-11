@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
 Tested up to: 4.0
-Stable tag: 2.2.1
+Stable tag: 2.2.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -251,7 +251,7 @@ the document that will be used in generating this icon. The first
 argument is a bool value which indicates whether descriptions will
 be used along with the icon and the second value is an integer WordPress
 attachment ID which may be used to lookup any relevant information
-you need specific to that document. The filter exposes 4 special tags
+you need specific to that document. The filter exposes 5 special tags
 which are replaced during gallery generation with document-specific data.
 These tags are as follows:
 
@@ -259,6 +259,7 @@ These tags are as follows:
 * **%img%**: The URL pointing the the image that will be displayed.
 * **%title%**: The human-readable title of the attachment.
 * **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
+* **%description%**: The attachment description (only present when rendering descriptions).
 
 
 **Filter Thumbnail Generation Methods**
@@ -391,6 +392,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 2.2.3 =
+* **Enhancement:** This will only be relevant to developers. `%descriptions%` tag
+  is now available in the `dg_icon_template` filter.
 
 = 2.2.2 =
 * **Bug Fix:** Resolves minor issue in `2.2.1` that resulted in a warning being
