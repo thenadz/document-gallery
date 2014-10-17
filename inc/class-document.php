@@ -70,8 +70,8 @@ class DG_Document {
          'dg_icon_template',
          '   <div class="document-icon">' . PHP_EOL .
          '      <a href="%link%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
-         $description .
-         '   </div>' . PHP_EOL,
+         '   </div>' . PHP_EOL .
+         $description,
          $this->gallery->useDescriptions(),
          $this->ID);
 
