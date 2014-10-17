@@ -26,11 +26,11 @@ Read more in the **Installation** tab!
 
 Document Gallery has to-date been translated into **5** languages, listed below.
 
-1. **French** &#8212; *Thanks, Marc Liotard!*
-1. **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
-1. **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
-1. **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
-1. **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+* **French** &#8212; *Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)!*
+* **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+* **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
+* **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
+* **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
 
 = Developers =
 
@@ -396,6 +396,8 @@ ideas for future Document Gallery development, take a look at our
 = 2.2.5 =
 * **Bug Fix:** Resolves a bug where document descriptions were not being displayed
   correctly.
+* **Translation:** Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)
+  for updating the French translation to include new phrases throughout the plugin!
 
 = 2.2.4 =
 * **Translation:**: Thanks to [mepmepmep](http://wordpress.org/support/profile/mepmepmep)
