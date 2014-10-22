@@ -275,17 +275,23 @@ class DG_Thumber {
       if (is_null($executable)) {
          // we must be able to exec()
          $executable = self::isExecAvailable();
-         if (!$executable) return $executable;
+         if (!$executable) {
+            return $executable;
+         }
 
          // find on Windows system
          if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
             // look for environment variable
             $executable = getenv('GSC');
-            if ($executable) return $executable;
+            if ($executable) {
+               return $executable;
+            }
 
             // hope GS in the path
             $executable = exec('where gswin*c.exe');
-            if (!empty($executable)) return $executable;
+            if (!empty($executable)) {
+               return $executable;
+            }
 
             // look directly in filesystem
             // 64- or 32-bit binary
@@ -308,8 +314,9 @@ class DG_Thumber {
          
          // GoDaddy and others aren't setup in such a way that
          // the above works so we need to fallback to a direct
-         // filesystem check
-         $executable = file_exists('/usr/bin/gs') ? '/usr/bin/gs' : false;
+         // filesystem check in most common location
+         exec('test -e /usr/bin/gs', $dummy, $ret);
+         $executable = ($ret === 0) ? '/usr/bin/gs' : false;
          
          return $executable;
       }
