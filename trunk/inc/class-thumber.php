@@ -414,11 +414,37 @@ class DG_Thumber {
    }
 
    /**
-    * TODO: Currently always returns true.
     * @return bool Whether Google Drive can access files on this system.
     */
    public static function isGoogleDriveAvailable() {
-      return true;
+      static $available = null;
+      
+      if (is_null($available)) {
+         // to check if we're visible externally, retrieve image for file we know exists.
+         $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
+         $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=1&w=1';
+         $google_viewer = sprintf($google_viewer, urlencode(DG_URL . 'LICENSE.txt'));
+         
+         // args for use in HTTP request
+         $args = array(
+             'redirection' => 5,
+             'httpversion' => '1.0',
+             'user-agent' => $user_agent,
+             'blocking' => true,
+             'headers' => array(),
+             'cookies' => array(),
+             'body' => null,
+             'compress' => false,
+             'decompress' => true,
+             'sslverify' => true
+         );
+         
+         $response = wp_remote_get($google_viewer, $args);
+
+         $available = ($response['response']['code'] != 404);
+      }
+      
+      return $available;
    }
 
    /*==========================================================================
