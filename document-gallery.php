@@ -5,14 +5,14 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.2.6
+  Version: 2.2.7
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
   Text Domain: document-gallery
  */
 
-define('DG_VERSION', '2.2.6');
+define('DG_VERSION', '2.2.7');
 
 // define helper paths & URLs
 define('DG_BASENAME', plugin_basename(__FILE__));
@@ -274,7 +274,7 @@ class DocumentGallery {
          $wp_format = get_option('date_format').' '.get_option('time_format');
       }
       
-      return date($wp_format, $timestamp + $gmt_offet * 3600);
+      return date_i18n($wp_format, $timestamp + $gmt_offet * 3600);
    }
    
    /**

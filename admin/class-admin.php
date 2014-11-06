@@ -1,8 +1,6 @@
 <?php
 defined('WPINC') OR exit;
 
-DG_Admin::init();
-
 class DG_Admin {
    /**
     * @var string The hook for the Document Gallery settings page.
@@ -15,21 +13,27 @@ class DG_Admin {
    private static $current;
    
    /**
+    * NOTE: This should only ever be accessed through getTabs().
+    * 
     * @var multitype:string Associative array containing all tab names, keyed by tab slug.
     */
    private static $tabs;
    
    /**
-    * Initializes static values for this class.
+    * Returns reference to tabs array, initializing if needed.
+    * 
+    * NOTE: This cannot be done in a static constructor due to timing with i18n.
     */
-   public static function init() {
-      if (empty(self::$tabs)) {
+   public static function &getTabs() {
+      if (!isset(self::$tabs)) {
          self::$tabs = array(
             'General'    => __('General',                'document-gallery'),
             'Thumbnail'  => __('Thumbnail Management',   'document-gallery'),
             'Logging'    => __('Logging',                'document-gallery'),
             'Advanced'   => __('Advanced',               'document-gallery'));
       }
+      
+      return self::$tabs;
    }
    
    /**
@@ -37,10 +41,10 @@ class DG_Admin {
     */
    public static function renderOptions() { ?>
 <div class="wrap">
-	<h2>Document Gallery Settings</h2>
+	<h2><?php echo __('Document Gallery Settings', 'document-gallery'); ?></h2>
 
 	<h2 class="nav-tab-wrapper">
-<?php foreach (self::$tabs as $tab => $name) {
+<?php foreach (self::getTabs() as $tab => $name) {
    $class = ($tab == self::$current) ? ' nav-tab-active' : '';
    echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=' . DG_OPTION_NAME . '&tab='.$tab.'">'.$name.'</a>';
 } ?>
@@ -95,9 +99,9 @@ class DG_Admin {
     * Registers settings for the Document Gallery options page.
     */
    public static function registerSettings() {
-      if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], self::$tabs)) {
-         reset(self::$tabs);
-         self::$current = key(self::$tabs);
+      if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], self::getTabs())) {
+         reset(self::getTabs());
+         self::$current = key(self::getTabs());
       } else {
          self::$current = $_REQUEST['tab'];
       }
@@ -400,9 +404,9 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      if (empty($values['tab']) || !array_key_exists($values['tab'], self::$tabs)) {
-         reset(self::$tabs);
-         $values['tab'] = key(self::$tabs);
+      if (empty($values['tab']) || !array_key_exists($values['tab'], self::getTabs())) {
+         reset(self::getTabs());
+         $values['tab'] = key(self::getTabs());
       }
       $funct = 'validate'.$values['tab'].'Settings';
       unset($values['tab']);
