@@ -19,10 +19,7 @@ class DG_Gallery {
    private $errs = array();
 
    // templates for HTML output
-   private static $no_docs = null;
-   private static $comment = null;
-
-   private static $binary_err = null;
+   private static $no_docs, $comment, $binary_err;
 
    /*==========================================================================
     * PUBLIC FUNCTIONS
@@ -80,7 +77,7 @@ class DG_Gallery {
     * Initializes static values for this class.
     */
    public static function init() {
-      if (is_null(self::$comment))
+      if (!isset(self::$comment))
       {
          self::$comment =
             PHP_EOL . '<!-- ' . __('Generated using Document Gallery. Get yours here: ', 'document-gallery') .
@@ -459,26 +456,22 @@ class DG_Gallery {
     * Function loops through all attributes passed that did not match
     * self::$defaults. If they are the name of a taxonomy, they are plugged
     * into the query, otherwise $this->errs is appended with an error string.
-    * @global string $wp_version Determines which tax query to use.
     * @param multitype:unknown $query Query to insert tax query into.
     */
    private function setTaxa(&$query) {
       if(!empty($this->taxa)) {
-         $taxa = array();
-
-         // only include relation if we have multiple taxa
-         if(count($this->taxa) > 1) {
-            $taxa['relation'] = $this->atts['relation'];
-         }
+         $taxa = array('relation' => $this->atts['relation']);
 
          foreach ($this->taxa as $taxon => $terms) {
             $terms = $this->getTermIdsByNames($taxon, explode(',', $terms));
 
-            $taxa[] = array(
-               'taxonomy' => $taxon,
-               'field' => 'id',
-               'terms' => $terms
-            );
+            foreach ($terms as $term) {
+               $taxa[] = array(
+                     'taxonomy' => $taxon,
+                     'field' => 'id',
+                     'terms' => $term
+               );
+            }
          }
 
          // create nested structure
