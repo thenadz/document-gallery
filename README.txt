@@ -26,11 +26,12 @@ Read more in the **Installation** tab!
 
 Document Gallery has to-date been translated into **5** languages, listed below.
 
-1. **French** &#8212; *Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)!*
-1. **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
-1. **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
-1. **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
-1. **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+* **Finnish** &#8212; *Thanks, [villevetela](https://wordpress.org/support/profile/villevetela)!*
+* **French** &#8212; *Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)!*
+* **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+* **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
+* **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
+* **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
 
 = Developers =
 
@@ -87,7 +88,8 @@ their assigned category or any other
 [custom taxon](http://codex.wordpress.org/Taxonomies). Categories
 or any custom taxon can be referenced simply by including `category=category_value`
 or `taxon_name=taxon_value`. Multiple values for a single taxon may be separated
-by commas.
+by commas. Note that if a taxon value contains spaces then the entire comma-
+delimited list must be quoted.
 
 **Descriptions Option**
 
@@ -164,13 +166,11 @@ or taxonomy* option, though it can be used with any options you chose.
 **Relation Option** *(New in Version 1.4)*
 
 The relation option should only be used when also using the *category or custom
-taxonomy* option (see above). Additionally, this option is only effective in
-WordPress installs version 3.1 or higher. Older versions cannot use this value
-and will ignore it.
+taxonomy* option (see above).
 
-When using multiple taxa, this option allows you to decide whether the attachments
-returned must meet all of the taxa_names specified (AND) or a minimum of one
-match (OR).
+When using multiple taxa, or multiple terms for a single taxon, this option allows
+you to decide whether the attachments returned must meet all of the taxa_names 
+specified (AND) or a minimum of one match (OR).
 
 = Customize Appearance =
 
@@ -374,6 +374,17 @@ would recommend enabling it, since it's currently the only way to generate a
 thumbnail for any of the Microsoft Office files, as well as some less common
 file types.
 
+= Q: Ghostscript is installed on my server, but it's not working! =
+
+A: Document Gallery does a pretty good job of detecting where Ghostscript is installed,
+but on some installs it may need a little help. To check whether this is the case,
+navigate to `Dashboard -> Settings -> Document Gallery` and see if there is a notice
+next to the Ghostscript checkbox indicating that your server is not properly configured.
+If that notice does exist, the next step is to go to the `Advanced` tab on that same page
+and see if the Ghostscript path is set. If it is not, you'll need to manually fill it
+with the location for your Ghostscript install (eg: `/usr/local/bin/gs`). Once that
+change is saved, the Ghostscript checkbox should be enabled on the first tab.
+
 == Screenshots ==
 
 1. This is an example of "fancy" thumbnails. The images are a copy of the front
@@ -392,6 +403,22 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 2.3 =
+* **Enhancement:** Taxonomy *relation* parameter now not only affects the relationship
+  between different taxons, but also the relationship between different terms for the
+  same taxon. In other words, `[dg category=do,re,mi category2=abc,123 relation=AND]`
+  would have returned anything in (do, re, OR mi) AND anything in (abc OR 123). Now,
+  this will return anything in do, re, mi, abc, AND 123. This change was made because
+  we've found that in most cases people only have a single taxonomy that they are
+  working with and these same people have been requesting almost since taxonomies
+  were first included into DG for a way to specify relation between terms in a single
+  taxon. For those working with advanced taxon-based setups, this may make this upgrade
+  a bit challenging. Feel free to post on the 
+  [support forum](https://wordpress.org/support/plugin/document-gallery) if you
+  encounter any issues.
+* **Enhancement:** Support was added for detecting when your site is running behind a
+  firewall or on a local network where Google Drive Viewer will not be able to function.
 
 = 2.2.7 =
 * **Bug Fix:** There was an issue with a few phrases not being translated in the
