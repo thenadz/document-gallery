@@ -168,9 +168,16 @@ or taxonomy* option, though it can be used with any options you chose.
 The relation option should only be used when also using the *category or custom
 taxonomy* option (see above).
 
-When using multiple taxa, or multiple terms for a single taxon, this option allows
-you to decide whether the attachments returned must meet all of the taxa_names 
-specified (AND) or a minimum of one match (OR).
+When using multiple taxa this option allows you to decide whether the attachments 
+returned must match all of the different taxa specified (AND) or a minimum of one 
+taxa match (OR).
+
+*NOTE: This has no bearing on the relationship between different terms for a single
+taxon (eg: `[dg category=x,y,z relation=AND]` will return any attachments where the
+category is x, y, OR z). If you wish to return only attachments with all 3 categories,
+you will instead need to use the following syntax: 
+`[dg category=x,y,z category_relation=AND]`. This syntax of *taxon*_relation will
+work for any taxon, not just "category."*
 
 = Customize Appearance =
 
@@ -405,20 +412,13 @@ ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
 = 2.3 =
-* **Enhancement:** Taxonomy *relation* parameter now not only affects the relationship
-  between different taxons, but also the relationship between different terms for the
-  same taxon. In other words, `[dg category=do,re,mi category2=abc,123 relation=AND]`
-  would have returned anything in (do, re, OR mi) AND anything in (abc OR 123). Now,
-  this will return anything in do, re, mi, abc, AND 123. This change was made because
-  we've found that in most cases people only have a single taxonomy that they are
-  working with and these same people have been requesting almost since taxonomies
-  were first included into DG for a way to specify relation between terms in a single
-  taxon. For those working with advanced taxon-based setups, this may make this upgrade
-  a bit challenging. Feel free to post on the 
-  [support forum](https://wordpress.org/support/plugin/document-gallery) if you
-  encounter any issues.
+* **Enhancement:** Taxonomy support now includes handling for both relationships
+  between different taxons and relationships between different terms within a single
+  taxon. See installation tab for more details.
 * **Enhancement:** Support was added for detecting when your site is running behind a
   firewall or on a local network where Google Drive Viewer will not be able to function.
+* **Enhancement:** Handling of custom CSS was improved. Page load speed should be improved
+  in some cases.
 
 = 2.2.7 =
 * **Bug Fix:** There was an issue with a few phrases not being translated in the
