@@ -63,7 +63,7 @@ if (is_admin()) {
 } else {
    // styling for gallery
    add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
-   add_action('wp_print_scripts',array('DocumentGallery', 'printCustomStyle'));
+   add_action('wp_print_scripts', array('DocumentGallery', 'printCustomStyle'));
 }
 
 // adds 'dg' shortcode
@@ -75,12 +75,7 @@ add_shortcode('dg', array('DocumentGallery', 'doShortcode'));
  * @author drossiter
  */
 class DocumentGallery {
-
-   /**
-    * @var str Name of the query var used to check whether we should print custom CSS.
-    */
-   private static $query_var = 'document-gallery-css';
-
+   
    /*==========================================================================
     * THE SHORTCODE
     *=========================================================================*/
