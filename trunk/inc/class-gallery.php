@@ -427,12 +427,12 @@ class DG_Gallery {
       $operator = strtoupper($operator);
       
       if (!in_array($operator, self::getOperatorOptions())) {
-         $this->errs[] = sprintf(self::$binary_err, $key, 'IN", "NOT IN", "OR', 'AND', $this->taxa[$key]);
+         $this->errs[] = sprintf(self::$binary_err, $key, 'IN", "NOT IN", "OR', 'AND', $operator);
       } else if ($operator === 'OR') {
          $operator = 'IN';
       }
 
-      return $ret;
+      return $operator;
    }
 
    /**
@@ -490,7 +490,8 @@ class DG_Gallery {
          $pattern = '/(.+)_(?:' . implode('|', $suffix) . ')$/i';
          
          // find any relations for taxa
-         foreach ($this->taxa as $key => $value) {
+         $iterable = $this->taxa;
+         foreach ($iterable as $key => $value) {
             if (preg_match($pattern, $key, $matches)) {
                $base = $matches[1];
                if (array_key_exists($base, $this->taxa)) {
@@ -602,8 +603,22 @@ class DG_Gallery {
     * @return bool|NULL Bool value if can be parsed, else NULL.
     */
    private static function toBool($val) {
+      if (is_null($val)) {
+         return false;
+      }
+      
       if (is_bool($val)) {
          return $val;
+      }
+      
+      if (is_int($val)) {
+         if (1 === $val) {
+            return true;
+         }
+         
+         if (0 === $val) {
+            return false;
+         }
       }
 
       if (is_string($val)) {
@@ -615,10 +630,6 @@ class DG_Gallery {
          if ('false' === $val || '0' === $val) {
             return false;
          }
-      }
-
-      if (is_null($val)) {
-         return false;
       }
 
       return null;
