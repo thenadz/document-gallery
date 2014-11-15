@@ -495,15 +495,7 @@ class DG_Admin {
       // handle modified CSS
       if (trim($ret['css']['text']) !== trim($values['css'])) {
          $ret['css']['text'] = trim($values['css']);
-         $ret['css']['version']++;
-         $ret['css']['last-modified'] = gmdate('D, d M Y H:i:s');
-         $ret['css']['etag'] = md5($ret['css']['last-modified']);
-         
-         if (empty($ret['css']['text'])) {
-            unset($ret['css']['minified']);
-         } else {
-            $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
-         }
+         $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
       }
 
       return $ret;
