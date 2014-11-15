@@ -52,7 +52,7 @@ class DG_Thumber {
          $file = get_attached_file($ID);
 
          foreach (self::getThumbers() as $ext_preg => $thumber) {
-            $ext_preg = '!\.(' . $ext_preg . ')$!i';
+            $ext_preg = '!\.(?:' . $ext_preg . ')$!i';
 
             if (preg_match($ext_preg, $file)) {
                if (DG_Logger::logEnabled()) {
