@@ -5,14 +5,14 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.2.7
+  Version: 2.3
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
   Text Domain: document-gallery
  */
 
-define('DG_VERSION', '2.2.7');
+define('DG_VERSION', '2.3');
 
 // define helper paths & URLs
 define('DG_BASENAME', plugin_basename(__FILE__));
@@ -62,13 +62,8 @@ if (is_admin()) {
    }
 } else {
    // styling for gallery
-   if (empty($dg_options['css']['text'])) {
-      add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
-   } else {
-      add_action('template_redirect', array('DocumentGallery', 'buildCustomCss'));
-      add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueCustomStyle'));
-      add_filter('query_vars', array('DocumentGallery', 'addCustomStyleQueryVar'));
-   }
+   add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
+   add_action('wp_print_scripts',array('DocumentGallery', 'printCustomStyle'));
 }
 
 // adds 'dg' shortcode
@@ -115,43 +110,13 @@ class DocumentGallery {
    }
 
    /**
-    * Enqueue user's custom DG CSS.
+    * Prints user's custom CSS.
     */
-   public static function enqueueCustomStyle() {
+   public static function printCustomStyle() {
       global $dg_options;
-      wp_register_style('document-gallery', add_query_arg(self::$query_var, 1, home_url('/')),
-              null, DG_VERSION . ':' . $dg_options['css']['version']);
-      wp_enqueue_style('document-gallery');
-   }
 
-   /**
-    * Add query custom CSS query string.
-    * Taken from here: http://ottopress.com/2010/dont-include-wp-load-please/
-    * @param multitype:string $vars Variables to be added.
-    * @return multitype:string All variables to be included in query string.
-    */
-   public static function addCustomStyleQueryVar($vars) {
-      $vars[] = self::$query_var;
-      return $vars;
-   }
-
-   /**
-    * Constructs user's custom CSS dynamically, then instructs
-    * browser to cache for a year. Cache is busted by versioning
-    * CSS any time the user makes a change.
-    */
-   public static function buildCustomCss() {
-      if (1 == intval(get_query_var(self::$query_var))) {
-            global $dg_options;
-            
-            header('Content-type: text/css');
-            header('Cache-Control: no-transform,public,maxage=' . 31536000);
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT');
-            header('Last-Modified: ' . $dg_options['css']['last-modified']);
-            header('ETag: ' . $dg_options['css']['etag']);
-            
-            echo $dg_options['css']['minified'];
-            exit;
+      if (!empty($dg_options['css']['minified'])) {
+         echo "<style type='text/css'>{$dg_options['css']['minified']}</style>" . PHP_EOL;
       }
    }
 
@@ -278,25 +243,22 @@ class DocumentGallery {
    }
    
    /**
-    * Compiles any custom CSS plus the default CSS together,
-    * minifying in the process.
+    * Compiles any custom CSS, including minification and escaping HTML.
     * @param string $custom The custom CSS to compile.
-    * @return string Compiled CSS, including both standard and any custom.
+    * @return string Compiled CSS.
     */
    public static function compileCustomCss($custom) {
-      $css = file_get_contents(DG_PATH . 'assets/css/style.css');
-      $css .= str_replace('&gt;', '>', esc_html($custom));
-      
-      return $css;
+      $css = str_replace('&gt;', '>', esc_html($custom));
+      return self::minifyCss($css);
    }
    
    /**
-    * Removes all comments & space from CSS string.
+    * Minifies CSS string.
     * Source: http://stackoverflow.com/a/15195752/866618
     */
    private static function minifyCss($css) {
       # remove comments first (simplifies the other regex)
-      $re1 = <<<EOS
+      $re1 = <<<'EOS'
 (?sx)
   # quotes
   (
@@ -308,7 +270,7 @@ class DocumentGallery {
   /\* (?> .*? \*/ )
 EOS;
 
-      $re2 = <<<EOS
+      $re2 = <<<'EOS'
 (?six)
   # quotes
   (
