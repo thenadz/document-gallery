@@ -419,6 +419,30 @@ class DG_Gallery {
    }
 
    /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $operator The operator value to be sanitized.
+    * @return string The sanitized operator value.
+    */
+   private function sanitizeOperator($operator) {
+      $operator = strtoupper($operator);
+      
+      if (!in_array($operator, self::getOperatorOptions())) {
+         $this->errs[] = sprintf(self::$binary_err, $key, 'IN", "NOT IN", "OR', 'AND', $this->taxa[$key]);
+      } else if ($operator === 'OR') {
+         $operator = 'IN';
+      }
+
+      return $ret;
+   }
+
+   /**
+    * @return multitype:string The valid options for *_relation/*_operator parameter.
+    */
+   public static function getOperatorOptions() {
+      return array('IN', 'NOT IN', 'AND', 'OR');
+   }
+   
+   /**
     * Gets all valid Documents based on the attributes passed by the user.
     * @return multitype:unknown Contains all documents matching the query.
     * @throws InvalidArgumentException Thrown when $this->errs is not empty.
@@ -459,19 +483,33 @@ class DG_Gallery {
     * @param multitype:unknown $query Query to insert tax query into.
     */
    private function setTaxa(&$query) {
-      if(!empty($this->taxa)) {
+      if (!empty($this->taxa)) {
          $taxa = array('relation' => $this->atts['relation']);
-
+         $operator = array();
+         $suffix = array('relation', 'operator');
+         $pattern = '/(.+)_(?:' . implode('|', $suffix) . ')$/i';
+         
+         // find any relations for taxa
+         foreach ($this->taxa as $key => $value) {
+            if (preg_match($pattern, $key, $matches)) {
+               $base = $matches[1];
+               if (array_key_exists($base, $this->taxa)) {
+                  $operator[$base] = self::sanitizeOperator($value, $this->errs);
+                  unset($this->taxa[$key]);
+               }
+            }
+         }
+         
+         // build tax query
          foreach ($this->taxa as $taxon => $terms) {
             $terms = $this->getTermIdsByNames($taxon, explode(',', $terms));
 
-            foreach ($terms as $term) {
-               $taxa[] = array(
-                     'taxonomy' => $taxon,
-                     'field' => 'id',
-                     'terms' => $term
-               );
-            }
+            $taxa[] = array(
+                  'taxonomy' => $taxon,
+                  'field'    => 'id',
+                  'terms'    => $terms,
+                  'operator' => isset($operator[$taxon]) ? $operator[$taxon] : 'IN'
+            );
          }
 
          // create nested structure
