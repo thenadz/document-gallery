@@ -494,7 +494,7 @@ class DG_Gallery {
             if (preg_match($pattern, $key, $matches)) {
                $base = $matches[1];
                if (array_key_exists($base, $this->taxa)) {
-                  $operator[$base] = self::sanitizeOperator($value, $this->errs);
+                  $operator[$base] = self::sanitizeOperator($value);
                   unset($this->taxa[$key]);
                }
             }
