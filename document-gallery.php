@@ -258,7 +258,7 @@ class DocumentGallery {
     */
    private static function minifyCss($css) {
       # remove comments first (simplifies the other regex)
-      $re1 = <<<'EOS'
+      $re1 = <<<EOS
 (?sx)
   # quotes
   (
@@ -270,7 +270,7 @@ class DocumentGallery {
   /\* (?> .*? \*/ )
 EOS;
 
-      $re2 = <<<'EOS'
+      $re2 = <<<EOS
 (?six)
   # quotes
   (
