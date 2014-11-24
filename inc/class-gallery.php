@@ -557,13 +557,29 @@ class DG_Gallery {
     */
    private function getTermXByNames($x, $taxon, $term_names) {
       $ret = array();
-
-      foreach ($term_names as $name) {
-         if (($term = get_term_by('name', $name, $taxon))) {
-            $ret[] = $term->{$x};
+      $valid = true;
+      
+      // taxons may be prefixed by 'tax_' --
+      // this is only useful when avoiding collisions with other attributes
+      if (!taxonomy_exists($taxon)) {
+         $tmp = preg_replace('^tax_(.*)', '$1', $taxon, 1, $count);
+         if ($count > 0 && taxonomy_exists($tmp)) {
+            $taxon = $tmp;
          } else {
-            $this->errs[] = sprintf(__('%s is not a valid term name in %s.',
-                'document-gallery'), $name, $taxon);
+            $this->errs[] = sprintf(__('%s is not a valid taxon.', 'document-gallery'), $taxon);
+            $valid = false;
+         }
+      }
+
+      // only check terms if we first have a valid taxon
+      if ($valid) {
+         foreach ($term_names as $name) {
+            if (($term = get_term_by('name', $name, $taxon))) {
+               $ret[] = $term->{$x};
+            } else {
+               $this->errs[] = sprintf(__('%s is not a valid term name in %s.',
+                   'document-gallery'), $name, $taxon);
+            }
          }
       }
 
