@@ -559,7 +559,7 @@ class DG_Gallery {
       $ret = array();
       $valid = true;
       
-      // taxons may be prefixed by 'tax_' --
+      // taxons may optionally be prefixed by 'tax_' --
       // this is only useful when avoiding collisions with other attributes
       if (!taxonomy_exists($taxon)) {
          $tmp = preg_replace('^tax_(.*)', '$1', $taxon, 1, $count);

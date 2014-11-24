@@ -190,6 +190,12 @@ class DG_Setup {
 
          // need to recalculate minified, excluding static CSS which was previously included
          $options['css']['minified'] = DocumentGallery::compileCustomCss($options['css']['text']);
+         
+         // if user inadvertantly enabled google drive viewer on system where it's not supported
+         // then avoid locking it in the on state
+         if ($options['thumber']['active']['google']) {
+            $options['thumber']['active']['google'] = DG_Thumber::isGoogleDriveAvailable();
+         }
       }
    }
    

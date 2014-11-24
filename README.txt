@@ -24,7 +24,7 @@ Read more in the **Installation** tab!
 
 = Translation =
 
-Document Gallery has to-date been translated into **5** languages, listed below.
+Document Gallery has to-date been translated into **6** languages, listed below.
 
 * **Finnish** &#8212; *Thanks, [villevetela](https://wordpress.org/support/profile/villevetela)!*
 * **French** &#8212; *Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)!*
