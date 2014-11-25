@@ -67,7 +67,16 @@ class DG_Setup {
               'orderby'        => 'menu_order',
               
                // AND or OR
-              'relation'       => 'AND'
+              'relation'       => 'AND',
+                
+               // the status the post must be in when returned by DG
+              'post_status'    => 'any',
+
+              // the type of post to be returned
+              'post_type'      => 'attachment',
+                
+              // the max number of thumbnails to return
+              'limit'          => -1,
           ),
           'css' => array(
               // plain text of CSS to be edited by user
@@ -196,6 +205,10 @@ class DG_Setup {
          if ($options['thumber']['active']['google']) {
             $options['thumber']['active']['google'] = DG_Thumber::isGoogleDriveAvailable();
          }
+
+         $options['gallery']['post_status'] = 'any';
+         $options['gallery']['post_type'] = 'attachment';
+         $options['gallery']['limit'] = -1;
       }
    }
    
