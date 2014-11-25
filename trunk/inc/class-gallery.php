@@ -19,7 +19,7 @@ class DG_Gallery {
    private $errs = array();
 
    // templates for HTML output
-   private static $no_docs, $comment, $binary_err;
+   private static $no_docs, $comment, $unary_err, $binary_err;
 
    /*==========================================================================
     * PUBLIC FUNCTIONS
@@ -83,6 +83,7 @@ class DG_Gallery {
             PHP_EOL . '<!-- ' . __('Generated using Document Gallery. Get yours here: ', 'document-gallery') .
             'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
          self::$no_docs = '<!-- ' . __('No attachments to display. How boring! :(', 'document-gallery') . ' -->';
+         self::$unary_err = __('The %s value entered, "%s", is not valid.', 'document-gallery');
          self::$binary_err = __('The %s parameter may only be "%s" or "%s." You entered "%s."', 'document-gallery');
       }
    }
@@ -122,81 +123,62 @@ class DG_Gallery {
     * Cleans up user input, making sure we don't pass crap on to WP core.
     * @param multitype:string $defaults The defaults array to sanitize.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @param bool $isDefaults Whether we're sanitizing the defaults array (from DG_Admin).
     */
-   public static function sanitizeDefaults($defaults, &$errs) {
+   public static function sanitizeDefaults($defaults, &$errs, $isDefaults = false) {
       $old_defaults = self::getOptions();
-
+      
       // remove invalid keys
-      $defaults = array_intersect_key($defaults, $old_defaults);
-
+      $sanitized = array_intersect_key($defaults, $old_defaults);
+      
       // add any missing keys
       foreach ($old_defaults as $k => $v) {
-         if (!isset($defaults[$k])) {
+         if (!isset($sanitized[$k])) {
             if (is_bool($v)) {
                // checkbox
-               $defaults[$k] = false;
+               $sanitized[$k] = false;
             } else {
                // missing value
-               $defaults[$k] = $v;
+               $sanitized[$k] = $v;
             }
+         }
+         
+         // all sanitize methods must be in the following form: sanitize<CammelCaseKey>
+         $callback = self::getSanitizeCallable($k);
+         $sanitized[$k] = call_user_func_array($callback, array($sanitized[$k], &$err));
+         if (isset($err)) {
+            $errs[$k] = $err;
+            unset($err);
+         }
+      }
+      
+      // process mime_types attribute separately since default value varies depending on images attribute
+      // TODO: Cleaner way to handle this?
+      if (!$isDefaults) {
+         if (isset($defaults['mime_types'])) {
+            $sanitized['mime_types'] = self::sanitizeMimeTypes($defaults['mime_types'], $err);
+            if (isset($err)) {
+               $errs['mime_types'] = $err;
+               unset($err);
+            }
+         } else {
+            $sanitized['mime_types'] = self::getDefaultMimeTypes($sanitized['images']);
          }
       }
 
-      $defaults['attachment_pg'] = self::sanitizeAttachmentPg($defaults['attachment_pg'], $err);
-      if (isset($err)) {
-         $errs['attachment_pg'] = $err;
-         unset($err);
-      }
-
-      $defaults['descriptions'] = self::sanitizeDescriptions($defaults['descriptions'], $err);
-      if (isset($err)) {
-         $errs['descriptions'] = $err;
-         unset($err);
-      }
-
-      $defaults['fancy'] = self::sanitizeFancy($defaults['fancy'], $err);
-      if (isset($err)) {
-         $errs['fancy'] = $err;
-         unset($err);
-      }
-
-      $defaults['ids'] = self::sanitizeIds($defaults['ids'], $err);
-      if (isset($err)) {
-         $errs['ids'] = $err;
-         unset($err);
-      }
-
-      $defaults['images'] = self::sanitizeImages($defaults['images'], $err);
-      if (isset($err)) {
-         $errs['images'] = $err;
-         unset($err);
-      }
-
-      $defaults['localpost'] = self::sanitizeLocalpost($defaults['localpost'], $err);
-      if (isset($err)) {
-         $errs['localpost'] = $err;
-         unset($err);
-      }
-
-      $defaults['order'] = self::sanitizeOrder($defaults['order'], $err);
-      if (isset($err)) {
-         $errs['order'] = $err;
-         unset($err);
-      }
-
-      $defaults['orderby'] = self::sanitizeOrderby($defaults['orderby'], $err);
-      if (isset($err)) {
-         $errs['orderby'] = $err;
-         unset($err);
-      }
-
-      $defaults['relation'] = self::sanitizeRelation($defaults['relation'], $err);
-      if (isset($err)) {
-         $errs['relation'] = $err;
-         unset($err);
-      }
-
-      return $defaults;
+      return $sanitized;
+   }
+   
+   /**
+    * Generates a callable based on the given param name.
+    * NOTE: all sanitize methods must be in the following form: sanitize<CammelCaseParam>
+    * @param string $param The name of the param to be sanitized.
+    * @return callable The function that when called will sanitize the value at the given param name.
+    */
+   private static function getSanitizeCallable($param) {
+      $param[0] = strtoupper($param[0]);
+      $funct = 'sanitize' . preg_replace_callback('/_([a-z])/', array(__CLASS__, 'charToUpper'), $param);
+      return  array(__CLASS__, $funct);
    }
 
    /**
@@ -314,6 +296,27 @@ class DG_Gallery {
 
    /**
     * Takes the provided value and returns a sanitized value.
+    * @param string $value The limit value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return int The sanitized limit value.
+    */
+   private static function sanitizeLimit($value, &$err) {
+      $defaults = self::getOptions();
+      $ret = $defaults['limit'];
+      
+      $limit = self::toInt($value);
+      
+      if (is_null($limit) || $limit < -1) {
+         $err = sprintf(self::$unary_err, 'limit', '>= -1');
+      } else {
+         $ret = $limit;
+      }
+      
+      return $ret;
+   }
+
+   /**
+    * Takes the provided value and returns a sanitized value.
     * @param string $value The localpost value to be sanitized.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
     * @return bool The sanitized localpost value.
@@ -331,6 +334,31 @@ class DG_Gallery {
       }
 
       return $ret;
+   }
+
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The mime_types value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return string The sanitized mime_types value.
+    */
+   private static function sanitizeMimeTypes($value, &$err) {
+      // TODO: do some actual sanitization...
+      return $value;
+   }
+   
+   /**
+    * Gets the default mime types if no attribute is set.
+    * @param bool $ingImages Whether images are included in this gallery.
+    * @return string The comma-delimited mime types.
+    */
+   private static function getDefaultMimeTypes($incImages) {
+      $mime_types = array('application', 'video', 'text', 'audio');
+      if ($incImages) {
+         $mime_types[] = 'image';
+      }
+      
+      return implode(',', $mime_types);
    }
 
    /**
@@ -372,9 +400,7 @@ class DG_Gallery {
 
       $orderby = 'ID' === strtoupper($value) ? 'ID' : strtolower($value);
       if (!in_array($orderby, self::getOrderbyOptions())) {
-         $err = sprintf(
-            __('The orderby value entered, "%s," is not valid.', 'document-gallery'),
-            $value);
+         $err = sprintf(self::$unary_err, 'orderby', $value);
       } else {
          $ret = $orderby;
       }
@@ -389,6 +415,76 @@ class DG_Gallery {
       return array('author', 'comment_count', 'date', 'ID',
           'menu_order', 'modified', 'name', 'none',
           'parent', 'post__in', 'rand', 'title');
+   }
+   
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The post_status value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return string The sanitized post_status value.
+    */
+   private static function sanitizePostStatus($value, &$err) {
+      $defaults = self::getOptions();
+      $ret = $defaults['orderby'];
+      
+      if (!in_array($value, self::getPostStatuses())) {
+         $err = sprintf(
+            __(self::$unary_err, 'post_status', $value, 'document-gallery'),
+            $value);
+      } else {
+         $ret = $value;
+      }
+      
+      return $ret;
+   }
+   
+   /**
+    * @return multitype:string All registered post statuses.
+    */
+   public static function getPostStatuses() {
+      static $statuses;
+      if (!isset($statuses)) {
+         $statuses = get_post_stati();
+         $statuses[] = 'any';
+         asort($statuses);
+      }
+      
+      return $statuses;
+   }
+   
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The post_type value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return string The sanitized post_type value.
+    */
+   private static function sanitizePostType($value, &$err) {
+      $defaults = self::getOptions();
+      $ret = $defaults['post_type'];
+      
+      if (!in_array($value, self::getPostTypes())) {
+         $err = sprintf(
+            __(self::$unary_err, 'post_type', $value, 'document-gallery'),
+            $value);
+      } else {
+         $ret = $value;
+      }
+      
+      return $ret;
+   }
+   
+   /**
+    * @return multitype:string All registered post types.
+    */
+   public static function getPostTypes() {
+      static $types;
+      if (!isset($types)) {
+         $types = get_post_types();
+         $types[] = 'any';
+         asort($types);
+      }
+      
+      return $types;
    }
 
    /**
@@ -448,18 +544,13 @@ class DG_Gallery {
     * @throws InvalidArgumentException Thrown when $this->errs is not empty.
     */
    private function getDocuments() {
-      $mime_types = array('application', 'video', 'text', 'audio');
-      if ($this->atts['images']) {
-         $mime_types[] = 'image';
-      }
-
       $query = array(
-          'numberposts'    => -1,
+          'numberposts'    => $this->atts['limit'],
           'orderby'        => $this->atts['orderby'],
           'order'          => $this->atts['order'],
-          'post_status'    => 'any',
-          'post_type'      => 'attachment',
-          'post_mime_type' => implode(',', $mime_types));
+          'post_status'    => $this->atts['post_status'],
+          'post_type'      => $this->atts['post_type'],
+          'post_mime_type' => $this->atts['mime_types']);
 
       $query['post_parent'] =
           $this->atts['localpost']
@@ -592,9 +683,9 @@ class DG_Gallery {
     */
    private function getAttachmentsByIds() {
       $args = array(
-         'post_type'     => 'attachment',
-         'post_status'   => 'inherit',
-         'numberposts'   => -1,
+         'post_type'     => $this->atts['post_type'],
+         'post_status'   => $this->atts['post_status'],
+         'numberposts'   => $this->atts['limit'],
          'post__in'      => $this->atts['ids'],
          'orderby'       => 'post__in'
       );
@@ -602,6 +693,14 @@ class DG_Gallery {
       return count($args['post__in']) ? get_posts($args) : array();
    }
 
+   /**
+    * @param string $string To take second char from.
+    * @return char Capitalized second char of given string.
+    */
+   private static function charToUpper($string) {
+      return strtoupper($string[1]);
+   }
+   
    /**
     * Function returns false for positive ints, true otherwise.
     * @param string $var could be anything.
@@ -649,6 +748,21 @@ class DG_Gallery {
       }
 
       return null;
+   }
+
+   /**
+    * Converts provided value to int.
+    * @param unknown $val To be converted.
+    * @return int|NULL Int value if can be parsed, else NULL.
+    */
+   private static function toInt($val) {
+      $ret = null;
+      
+      if ((int)$val == $val) {
+         $ret = (int)$val;
+      }
+      
+      return $ret;
    }
 
    /*==========================================================================

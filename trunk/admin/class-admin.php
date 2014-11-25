@@ -234,6 +234,44 @@ class DG_Admin {
             'option_name' => DG_OPTION_NAME,
             'description' => __('Whether matched documents must have all taxa_names (AND) or at least one (OR)', 'document-gallery')
         ));
+
+      add_settings_field(
+         'gallery_defaults_limit', 'limit',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'gallery_defaults',
+         array (
+            'label_for'   => 'label_gallery_defaults_limit',
+            'name'        => 'gallery_defaults][limit',
+            'value'       => esc_attr($defaults['limit']),
+            'type'        => 'number" min="-1" step="1',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Limit the number of documents included. -1 means no limit.', 'document-gallery')));
+
+      add_settings_field(
+        'gallery_defaults_post_status', 'post_status',
+        array(__CLASS__, 'renderSelectField'),
+        DG_OPTION_NAME, 'gallery_defaults',
+        array (
+            'label_for'   => 'label_gallery_defaults_post_status',
+            'name'        => 'gallery_defaults][post_status',
+            'value'       => esc_attr($defaults['post_status']),
+            'options'     => DG_Gallery::getPostStatuses(),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Which post status to look for when querying documents.', 'document-gallery')
+        ));
+
+      add_settings_field(
+        'gallery_defaults_post_type', 'post_type',
+        array(__CLASS__, 'renderSelectField'),
+        DG_OPTION_NAME, 'gallery_defaults',
+        array (
+            'label_for'   => 'label_gallery_defaults_post_type',
+            'name'        => 'gallery_defaults][post_type',
+            'value'       => esc_attr($defaults['post_type']),
+            'options'     => DG_Gallery::getPostTypes(),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Which post type to look for when querying documents.', 'document-gallery')
+        ));
       
       add_settings_field(
         'thumbnail_generation_av', 'Audio/Video',
@@ -428,7 +466,7 @@ class DG_Admin {
 
       // handle gallery shortcode defaults
       $errs = array();
-      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs);
+      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs, true);
 
       foreach ($errs as $k => $v) {
          add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
@@ -735,8 +773,8 @@ class DG_Admin {
       $att_ids = array_slice($att_ids, $offset, $limit);
       $atts = get_posts(
          array(
-            'post_type'   => 'attachment',
-            'post_status' => 'inherit',
+            'post_type'   => 'any',
+            'post_status' => 'any',
             'numberposts' => -1,
             'post__in'    => $att_ids,
             'orderby'     => 'post__in'
