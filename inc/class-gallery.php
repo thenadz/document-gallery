@@ -304,7 +304,7 @@ class DG_Gallery {
       $defaults = self::getOptions();
       $ret = $defaults['limit'];
       
-      $limit = self::toInt($value);
+      $limit = intval($value);
       
       if (is_null($limit) || $limit < -1) {
          $err = sprintf(self::$unary_err, 'limit', '>= -1');
@@ -425,7 +425,7 @@ class DG_Gallery {
     */
    private static function sanitizePostStatus($value, &$err) {
       $defaults = self::getOptions();
-      $ret = $defaults['orderby'];
+      $ret = $defaults['post_status'];
       
       if (!in_array($value, self::getPostStatuses())) {
          $err = sprintf(
@@ -748,21 +748,6 @@ class DG_Gallery {
       }
 
       return null;
-   }
-
-   /**
-    * Converts provided value to int.
-    * @param unknown $val To be converted.
-    * @return int|NULL Int value if can be parsed, else NULL.
-    */
-   private static function toInt($val) {
-      $ret = null;
-      
-      if ((int)$val == $val) {
-         $ret = (int)$val;
-      }
-      
-      return $ret;
    }
 
    /*==========================================================================
