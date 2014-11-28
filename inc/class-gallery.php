@@ -131,7 +131,7 @@ class DG_Gallery {
       // remove invalid keys
       $sanitized = array_intersect_key($defaults, $old_defaults);
       
-      // add any missing keys
+      // add any missing keys & sanitize each value
       foreach ($old_defaults as $k => $v) {
          if (!isset($sanitized[$k])) {
             if (is_bool($v)) {
@@ -143,13 +143,8 @@ class DG_Gallery {
             }
          }
          
-         // all sanitize methods must be in the following form: sanitize<CammelCaseKey>
-         $callback = self::getSanitizeCallable($k);
-         $sanitized[$k] = call_user_func_array($callback, array($sanitized[$k], &$err));
-         if (isset($err)) {
-            $errs[$k] = $err;
-            unset($err);
-         }
+         // sanitize value
+         $sanitized[$k] = self::sanitizeParameter($k, $sanitized[$k], $errs);
       }
       
       // process mime_types attribute separately since default value varies depending on images attribute
@@ -170,15 +165,39 @@ class DG_Gallery {
    }
    
    /**
-    * Generates a callable based on the given param name.
-    * NOTE: all sanitize methods must be in the following form: sanitize<CammelCaseParam>
-    * @param string $param The name of the param to be sanitized.
-    * @return callable The function that when called will sanitize the value at the given param name.
+    * 
+    * @param string $key The key to reference the current value in the defaults array.
+    * @param unknown $value The value to be sanitized.
+    * @param unknown $errs multitype:string The array of errors, which will be appended with any errors found.
+    * @return unknown The sanitized value, falling back to the current default value when invalid value given.
     */
-   private static function getSanitizeCallable($param) {
-      $param[0] = strtoupper($param[0]);
-      $funct = 'sanitize' . preg_replace_callback('/_([a-z])/', array(__CLASS__, 'charToUpper'), $param);
-      return  array(__CLASS__, $funct);
+   private static function sanitizeParameter($key, $value, &$errs) {
+      // all sanitize methods must be in the following form: sanitize<UpperCammelCaseKey>
+      $funct = $key;
+      $funct[0] = strtoupper($funct[0]);
+      $funct = 'sanitize' . preg_replace_callback('/_([a-z])/', array(__CLASS__, 'secondCharToUpper'), $funct);
+      
+      $callable = array(__CLASS__, $funct);
+      
+      if (DG_Logger::logEnabled() && !method_exists(__CLASS__, $funct)) {
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Attempted to call invalid function: ', 'document-gallery') . implode('::', $callable),
+            true);
+      }
+
+      // call param-specific sanitization
+      $ret = call_user_func_array($callable, array($value, &$err));
+      
+      // check for error and return default
+      if (is_null($ret)) {
+         $defaults = self::getOptions();
+         $ret = $defaults[$key];
+         
+         $errs[$key] = $err;
+      }
+      
+      return $ret;
    }
 
    /**
@@ -188,15 +207,10 @@ class DG_Gallery {
     * @return bool The sanitized attachment_pg value.
     */
    private static function sanitizeAttachmentPg($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['attachment_pg'];
+      $ret = self::toBool($value);
 
-      $attachment_pg = self::toBool($value);
-
-      if(is_null($attachment_pg)) {
+      if(is_null($ret)) {
          $err = sprintf(self::$binary_err, 'attachment_pg', 'true', 'false', $value);
-      } else {
-         $ret = $attachment_pg;
       }
 
       return $ret;
@@ -209,15 +223,10 @@ class DG_Gallery {
     * @return bool The sanitized descriptions value.
     */
    private static function sanitizeDescriptions($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['descriptions'];
+      $ret = self::toBool($value);
 
-      $descriptions = self::toBool($value);
-
-      if(is_null($descriptions)) {
+      if(is_null($ret)) {
          $err = sprintf(self::$binary_err, 'descriptions', 'true', 'false', $value);
-      } else {
-         $ret = $descriptions;
       }
 
       return $ret;
@@ -230,15 +239,10 @@ class DG_Gallery {
     * @return bool The sanitized fancy value.
     */
    private static function sanitizeFancy($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['fancy'];
+      $ret = self::toBool($value);
 
-      $fancy = self::toBool($value);
-
-      if(is_null($fancy)) {
+      if(is_null($ret)) {
          $err = sprintf(self::$binary_err, 'fancy', 'true', 'false', $value);
-      } else {
-         $ret = $fancy;
       }
 
       return $ret;
@@ -251,22 +255,18 @@ class DG_Gallery {
     * @return bool|multitype:int The sanitized ids value.
     */
    private static function sanitizeIds($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['ids'];
-
       if(false === self::toBool($value)) {
          $ret = false;
       } else {
          $value = trim($value);
-         $ids = $value ? explode(',', $value) : array();
+         $ret = $value ? explode(',', $value) : array();
          $bad = array_filter($ids, array(__CLASS__, 'negativeInt'));
 
          if(!empty($bad)) {
             $err = _n('The following ID is invalid: ',
                 'The following IDs are invalid: ',
                 count($bad), 'document-gallery') . implode(', ', $bad);
-         } else {
-            $ret = $ids;
+            $ret = null;
          }
       }
 
@@ -280,15 +280,10 @@ class DG_Gallery {
     * @return bool The sanitized images value.
     */
    private static function sanitizeImages($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['images'];
+      $ret = self::toBool($value);
 
-      $images = self::toBool($value);
-
-      if(is_null($images)) {
+      if(is_null($ret)) {
          $err = sprintf(self::$binary_err, 'images', 'true', 'false', $value);
-      } else {
-         $ret = $images;
       }
 
       return $ret;
@@ -301,15 +296,11 @@ class DG_Gallery {
     * @return int The sanitized limit value.
     */
    private static function sanitizeLimit($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['limit'];
+      $ret = intval($value);
       
-      $limit = intval($value);
-      
-      if (is_null($limit) || $limit < -1) {
+      if (is_null($ret) || $ret < -1) {
          $err = sprintf(self::$unary_err, 'limit', '>= -1');
-      } else {
-         $ret = $limit;
+         $ret = null;
       }
       
       return $ret;
@@ -322,15 +313,10 @@ class DG_Gallery {
     * @return bool The sanitized localpost value.
     */
    private static function sanitizeLocalpost($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['localpost'];
+      $ret = self::toBool($value);
 
-      $localpost = self::toBool($value);
-
-      if(is_null($localpost)) {
+      if(is_null($ret)) {
          $err = sprintf(self::$binary_err, 'localpost', 'true', 'false', $value);
-      } else {
-         $ret = $localpost;
       }
 
       return $ret;
@@ -368,14 +354,11 @@ class DG_Gallery {
     * @return string The sanitized order value.
     */
    private static function sanitizeOrder($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['order'];
-
-      $order = strtoupper($value);
-      if(!in_array($order, self::getOrderOptions())) {
+      $ret = strtoupper($value);
+      
+      if(!in_array($ret, self::getOrderOptions())) {
          $err = sprintf(self::$binary_err, 'order', 'ASC', 'DESC', $value);
-      } else {
-         $ret = $order;
+         $ret = null;
       }
 
       return $ret;
@@ -395,14 +378,11 @@ class DG_Gallery {
     * @return string The sanitized orderby value.
     */
    private static function sanitizeOrderby($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['orderby'];
-
-      $orderby = 'ID' === strtoupper($value) ? 'ID' : strtolower($value);
-      if (!in_array($orderby, self::getOrderbyOptions())) {
+      $ret = ('ID' === strtoupper($value)) ? 'ID' : strtolower($value);
+      
+      if (!in_array($ret, self::getOrderbyOptions())) {
          $err = sprintf(self::$unary_err, 'orderby', $value);
-      } else {
-         $ret = $orderby;
+         $ret = null;
       }
 
       return $ret;
@@ -424,15 +404,13 @@ class DG_Gallery {
     * @return string The sanitized post_status value.
     */
    private static function sanitizePostStatus($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['post_status'];
+      $ret = $value;
       
-      if (!in_array($value, self::getPostStatuses())) {
+      if (!in_array($ret, self::getPostStatuses())) {
          $err = sprintf(
             __(self::$unary_err, 'post_status', $value, 'document-gallery'),
             $value);
-      } else {
-         $ret = $value;
+         $ret = null;
       }
       
       return $ret;
@@ -459,15 +437,13 @@ class DG_Gallery {
     * @return string The sanitized post_type value.
     */
    private static function sanitizePostType($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['post_type'];
+      $ret = $value;
       
-      if (!in_array($value, self::getPostTypes())) {
+      if (!in_array($ret, self::getPostTypes())) {
          $err = sprintf(
             __(self::$unary_err, 'post_type', $value, 'document-gallery'),
             $value);
-      } else {
-         $ret = $value;
+         $ret = null;
       }
       
       return $ret;
@@ -494,14 +470,11 @@ class DG_Gallery {
     * @return string The sanitized relation value.
     */
    private static function sanitizeRelation($value, &$err) {
-      $defaults = self::getOptions();
-      $ret = $defaults['relation'];
-
-      $relation = strtoupper($value);
-      if(!in_array($relation, self::getRelationOptions())) {
+      $ret = strtoupper($value);
+      
+      if(!in_array($ret, self::getRelationOptions())) {
          $err = sprintf(self::$binary_err, 'relation', 'AND', 'OR', $value);
-      } else {
-         $ret = $relation;
+         $ret = null;
       }
 
       return $ret;
@@ -520,15 +493,16 @@ class DG_Gallery {
     * @return string The sanitized operator value.
     */
    private function sanitizeOperator($operator) {
-      $operator = strtoupper($operator);
+      $ret = strtoupper($operator);
       
-      if (!in_array($operator, self::getOperatorOptions())) {
+      if (!in_array($ret, self::getOperatorOptions())) {
          $this->errs[] = sprintf(self::$binary_err, $key, 'IN", "NOT IN", "OR', 'AND', $operator);
-      } else if ($operator === 'OR') {
-         $operator = 'IN';
+         $ret = null;
+      } else if ($ret === 'OR') {
+         $ret = 'IN';
       }
 
-      return $operator;
+      return $ret;
    }
 
    /**
@@ -657,7 +631,7 @@ class DG_Gallery {
          if ($count > 0 && taxonomy_exists($tmp)) {
             $taxon = $tmp;
          } else {
-            $this->errs[] = sprintf(__('%s is not a valid taxon.', 'document-gallery'), $taxon);
+            $this->errs[] = sprintf(self::$unary_err, 'taxon', $taxon);
             $valid = false;
          }
       }
@@ -697,7 +671,7 @@ class DG_Gallery {
     * @param string $string To take second char from.
     * @return char Capitalized second char of given string.
     */
-   private static function charToUpper($string) {
+   private static function secondCharToUpper($string) {
       return strtoupper($string[1]);
    }
    
