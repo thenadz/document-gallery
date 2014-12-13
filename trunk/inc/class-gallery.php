@@ -404,13 +404,13 @@ class DG_Gallery {
     * @return string The sanitized post_status value.
     */
    private static function sanitizePostStatus($value, &$err) {
-      $ret = $value;
+      $ret = preg_grep('/' . preg_quote($value) .'/i', self::getPostStatuses());
+      $ret = !empty($ret) ? $ret[0] : null;
       
-      if (!in_array($ret, self::getPostStatuses())) {
+      if(is_null($ret)) {
          $err = sprintf(
             __(self::$unary_err, 'post_status', $value, 'document-gallery'),
             $value);
-         $ret = null;
       }
       
       return $ret;
@@ -437,13 +437,13 @@ class DG_Gallery {
     * @return string The sanitized post_type value.
     */
    private static function sanitizePostType($value, &$err) {
-      $ret = $value;
+      $ret = preg_grep('/' . preg_quote($value) .'/i', self::getPostTypes());
+      $ret = !empty($ret) ? $ret[0] : null;
       
-      if (!in_array($ret, self::getPostTypes())) {
+      if(is_null($ret)) {
          $err = sprintf(
             __(self::$unary_err, 'post_type', $value, 'document-gallery'),
             $value);
-         $ret = null;
       }
       
       return $ret;
