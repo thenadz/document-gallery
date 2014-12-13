@@ -3,7 +3,7 @@ Contributors: dan.rossiter, demur
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
-Tested up to: 4.0
+Tested up to: 4.0.1
 Stable tag: 2.2.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -99,7 +99,7 @@ alongside it.
 *Note: this will use the `description` field, **not** the `caption`. Be
 careful when entering your document data.*
 
-**Fancy** *(New in Version 2.0)*
+**Fancy Option** *(New in Version 2.0)*
 
 If `true`, we will try to generate a thumbnail for each document in the gallery.
 The success in generating thumbs will depend mostly on what your server supports.
@@ -111,6 +111,11 @@ in your site's dashboard.
 in order to protect your privacy, since using it requires sending your documents
 to Google's servers. If you're not working with confidential documents, you are
 encouraged to enable this for optimum performance.*
+
+**Limit Option** *(New in Version 2.3)*
+
+As the name suggests, this value will limit how many results are returned in the gallery.
+If set to *-1*, the limit is infinite.
 
 **Order Option**
 
@@ -415,6 +420,11 @@ ideas for future Document Gallery development, take a look at our
 * **Enhancement:** Taxonomy support now includes handling for both relationships
   between different taxons and relationships between different terms within a single
   taxon. See installation tab for more details.
+* **Enhancement:** You can now limit how many results are displayed in the gallery with
+  the *limit* attribute.
+* **Enhancement:** The *post_type* and *post_status* used when generating
+  a gallery are now configurable. (In most cases, these should be left at their default
+  values, however advanced users may find a use case for this functionality.)
 * **Enhancement:** Support was added for detecting when your site is running behind a
   firewall or on a local network where Google Drive Viewer will not be able to function.
 * **Enhancement:** Handling of custom CSS was improved. Page load speed should be improved
