@@ -1,10 +1,10 @@
 === Document Gallery ===
-Contributors: dan.rossiter
+Contributors: dan.rossiter, demur
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
-Tested up to: 4.0
-Stable tag: 2.2.1
+Tested up to: 4.0.1
+Stable tag: 2.3.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,13 +24,14 @@ Read more in the **Installation** tab!
 
 = Translation =
 
-Document Gallery has to-date been translated into **5** languages, listed below.
+Document Gallery has to-date been translated into **6** languages, listed below.
 
-1. **French** &#8212; *Thanks, Marc Liotard!*
-1. **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
-1. **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
-1. **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
-1. **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+* **Finnish** &#8212; *Thanks, [villevetela](https://wordpress.org/support/profile/villevetela)!*
+* **French** &#8212; *Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)!*
+* **Russian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
+* **Spanish** &#8212; *Thanks, Andrew Kurtis and [WebHostingHub](http://www.webhostinghub.com/)!*
+* **Swedish** &#8212; *Thanks, [mepmepmep](http://wordpress.org/support/profile/mepmepmep)!*
+* **Ukrainian** &#8212; *Thanks, [demur](http://wordpress.org/support/profile/demur)!*
 
 = Developers =
 
@@ -87,7 +88,8 @@ their assigned category or any other
 [custom taxon](http://codex.wordpress.org/Taxonomies). Categories
 or any custom taxon can be referenced simply by including `category=category_value`
 or `taxon_name=taxon_value`. Multiple values for a single taxon may be separated
-by commas.
+by commas. Note that if a taxon value contains spaces then the entire comma-
+delimited list must be quoted.
 
 **Descriptions Option**
 
@@ -97,7 +99,7 @@ alongside it.
 *Note: this will use the `description` field, **not** the `caption`. Be
 careful when entering your document data.*
 
-**Fancy** *(New in Version 2.0)*
+**Fancy Option** *(New in Version 2.0)*
 
 If `true`, we will try to generate a thumbnail for each document in the gallery.
 The success in generating thumbs will depend mostly on what your server supports.
@@ -109,6 +111,11 @@ in your site's dashboard.
 in order to protect your privacy, since using it requires sending your documents
 to Google's servers. If you're not working with confidential documents, you are
 encouraged to enable this for optimum performance.*
+
+**Limit Option** *(New in Version 2.3)*
+
+As the name suggests, this value will limit how many results are returned in the gallery.
+If set to *-1*, the limit is infinite.
 
 **Order Option**
 
@@ -164,13 +171,18 @@ or taxonomy* option, though it can be used with any options you chose.
 **Relation Option** *(New in Version 1.4)*
 
 The relation option should only be used when also using the *category or custom
-taxonomy* option (see above). Additionally, this option is only effective in
-WordPress installs version 3.1 or higher. Older versions cannot use this value
-and will ignore it.
+taxonomy* option (see above).
 
-When using multiple taxa, this option allows you to decide whether the attachments
-returned must meet all of the taxa_names specified (AND) or a minimum of one
-match (OR).
+When using multiple taxa this option allows you to decide whether the attachments 
+returned must match all of the different taxa specified (AND) or a minimum of one 
+taxa match (OR).
+
+*NOTE: This has no bearing on the relationship between different terms for a single
+taxon (eg: `[dg category=x,y,z relation=AND]` will return any attachments where the
+category is x, y, OR z). If you wish to return only attachments with all 3 categories,
+you will instead need to use the following syntax: 
+`[dg category=x,y,z category_relation=AND]`. This syntax of *taxon*_relation will
+work for any taxon, not just "category."*
 
 = Customize Appearance =
 
@@ -251,7 +263,7 @@ the document that will be used in generating this icon. The first
 argument is a bool value which indicates whether descriptions will
 be used along with the icon and the second value is an integer WordPress
 attachment ID which may be used to lookup any relevant information
-you need specific to that document. The filter exposes 4 special tags
+you need specific to that document. The filter exposes 5 special tags
 which are replaced during gallery generation with document-specific data.
 These tags are as follows:
 
@@ -259,6 +271,7 @@ These tags are as follows:
 * **%img%**: The URL pointing the the image that will be displayed.
 * **%title%**: The human-readable title of the attachment.
 * **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
+* **%description%**: The attachment description (only present when rendering descriptions).
 
 
 **Filter Thumbnail Generation Methods**
@@ -373,6 +386,17 @@ would recommend enabling it, since it's currently the only way to generate a
 thumbnail for any of the Microsoft Office files, as well as some less common
 file types.
 
+= Q: Ghostscript is installed on my server, but it's not working! =
+
+A: Document Gallery does a pretty good job of detecting where Ghostscript is installed,
+but on some installs it may need a little help. To check whether this is the case,
+navigate to `Dashboard -> Settings -> Document Gallery` and see if there is a notice
+next to the Ghostscript checkbox indicating that your server is not properly configured.
+If that notice does exist, the next step is to go to the `Advanced` tab on that same page
+and see if the Ghostscript path is set. If it is not, you'll need to manually fill it
+with the location for your Ghostscript install (eg: `/usr/local/bin/gs`). Once that
+change is saved, the Ghostscript checkbox should be enabled on the first tab.
+
 == Screenshots ==
 
 1. This is an example of "fancy" thumbnails. The images are a copy of the front
@@ -391,6 +415,49 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 2.3.2 =
+* **Translation:** Russian and Ukrainian translations have been updated.
+
+= 2.3.1 =
+* **Bug Fix:** Resolved a couple of bugs introduced with new `2.3` functionality.
+
+= 2.3 =
+* **Enhancement:** Taxonomy support now includes handling for both relationships
+  between different taxons and relationships between different terms within a single
+  taxon. See installation tab for more details.
+* **Enhancement:** You can now limit how many results are displayed in the gallery with
+  the *limit* attribute.
+* **Enhancement:** The *post_type* and *post_status* used when generating
+  a gallery are now configurable. (In most cases, these should be left at their default
+  values, however advanced users may find a use case for this functionality.)
+* **Enhancement:** Support was added for detecting when your site is running behind a
+  firewall or on a local network where Google Drive Viewer will not be able to function.
+* **Enhancement:** Handling of custom CSS was improved. Page load speed should be improved
+  in some cases.
+* **Bug Fix:** When Ghostscript chokes on a PDF, it will no longer print the error message
+  in the Document Gallery output (instead it will end up in Document Gallery Logging).
+
+= 2.2.7 =
+* **Bug Fix:** There was an issue with a few phrases not being translated in the
+  admin dialogs. Dates in the logs were also not being properly translated.
+
+= 2.2.6 =
+* **Enhancement:** Improved how Ghostscript executable is detected.
+
+= 2.2.5 =
+* **Bug Fix:** Resolves a bug where document descriptions were not being displayed
+  correctly.
+* **Translation:** Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)
+  for updating the French translation to include new phrases throughout the plugin!
+
+= 2.2.4 =
+* **Translation:**: Thanks to [mepmepmep](http://wordpress.org/support/profile/mepmepmep)
+  who has just updated the Document Gallery Swedish translation!
+
+= 2.2.3 =
+* **Enhancement:** This will only be relevant to developers. `%descriptions%` tag
+  is now available in the `dg_icon_template` filter.
 
 = 2.2.2 =
 * **Bug Fix:** Resolves minor issue in `2.2.1` that resulted in a warning being

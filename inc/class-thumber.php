@@ -52,7 +52,7 @@ class DG_Thumber {
          $file = get_attached_file($ID);
 
          foreach (self::getThumbers() as $ext_preg => $thumber) {
-            $ext_preg = '!\.(' . $ext_preg . ')$!i';
+            $ext_preg = '!\.(?:' . $ext_preg . ')$!i';
 
             if (preg_match($ext_preg, $file)) {
                if (DG_Logger::logEnabled()) {
@@ -232,7 +232,7 @@ class DG_Thumber {
          
          if (false !== $gs) {
             $gs = escapeshellarg($gs) . ' -sDEVICE=png16m -dFirstPage=%d'
-                . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
+                . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s 2>&1';
          }
       }
 
@@ -275,17 +275,23 @@ class DG_Thumber {
       if (is_null($executable)) {
          // we must be able to exec()
          $executable = self::isExecAvailable();
-         if (!$executable) return $executable;
+         if (!$executable) {
+            return $executable;
+         }
 
          // find on Windows system
          if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
             // look for environment variable
             $executable = getenv('GSC');
-            if ($executable) return $executable;
+            if ($executable) {
+               return $executable;
+            }
 
             // hope GS in the path
             $executable = exec('where gswin*c.exe');
-            if (!empty($executable)) return $executable;
+            if (!empty($executable)) {
+               return $executable;
+            }
 
             // look directly in filesystem
             // 64- or 32-bit binary
@@ -308,8 +314,9 @@ class DG_Thumber {
          
          // GoDaddy and others aren't setup in such a way that
          // the above works so we need to fallback to a direct
-         // filesystem check
-         $executable = file_exists('/usr/bin/gs') ? '/usr/bin/gs' : false;
+         // filesystem check in most common location
+         exec('test -e /usr/bin/gs', $dummy, $ret);
+         $executable = ($ret === 0) ? '/usr/bin/gs' : false;
          
          return $executable;
       }
@@ -407,11 +414,37 @@ class DG_Thumber {
    }
 
    /**
-    * TODO: Currently always returns true.
     * @return bool Whether Google Drive can access files on this system.
     */
    public static function isGoogleDriveAvailable() {
-      return true;
+      static $available = null;
+      
+      if (is_null($available)) {
+         // to check if we're visible externally, retrieve image for file we know exists.
+         $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
+         $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=1&w=1';
+         $google_viewer = sprintf($google_viewer, urlencode(DG_URL . 'LICENSE.txt'));
+         
+         // args for use in HTTP request
+         $args = array(
+             'redirection' => 5,
+             'httpversion' => '1.0',
+             'user-agent' => $user_agent,
+             'blocking' => true,
+             'headers' => array(),
+             'cookies' => array(),
+             'body' => null,
+             'compress' => false,
+             'decompress' => true,
+             'sslverify' => true
+         );
+         
+         $response = wp_remote_get($google_viewer, $args);
+
+         $available = ($response['response']['code'] != 404);
+      }
+      
+      return $available;
    }
 
    /*==========================================================================

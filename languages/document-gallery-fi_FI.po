@@ -2,42 +2,42 @@
 # This file is distributed under the same license as the Document Gallery package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Document Gallery 2.2\n"
+"Project-Id-Version: Document Gallery 2.2.5\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
-"POT-Creation-Date: 2014-09-23 02:11:20+00:00\n"
-"PO-Revision-Date: 2014-10-13 16:57+0100\n"
-"Last-Translator: P. E.\n"
-"Language-Team: P. E.\n"
-"Language: sv_SE\n"
+"POT-Creation-Date: 2014-10-17 04:20:59+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-11-07 23:21+0200\n"
+"Last-Translator: artzi\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.6.10\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.6.9\n"
+"Language: fi\n"
 
 #: admin/class-admin.php:28
 msgid "General"
-msgstr "Generellt"
+msgstr "Yleistä"
 
 #: admin/class-admin.php:29
 msgid "Thumbnail Management"
-msgstr "Miniatyrhantering"
+msgstr "Pikkukuvien halllinta"
 
-#: admin/class-admin.php:30 admin/class-admin.php:904
+#: admin/class-admin.php:30 admin/class-admin.php:898
 msgid "Logging"
-msgstr "Loggning"
+msgstr "Kirjautuminen"
 
 #: admin/class-admin.php:31
 msgid "Advanced"
-msgstr "Avancerat"
+msgstr "Lisäasetukset"
 
 #: admin/class-admin.php:68
 msgid "Settings"
-msgstr "Inställningar"
+msgstr "Asetukset"
 
 #: admin/class-admin.php:78
 msgid "Document Gallery Settings"
-msgstr "Document Gallery Inställningar"
+msgstr "Document Gallery asetukset"
 
 #. Plugin Name of the plugin/theme
 #: admin/class-admin.php:79
@@ -46,84 +46,86 @@ msgstr "Document Gallery"
 
 #: admin/class-admin.php:124
 msgid "Default Settings"
-msgstr "Standardinställningar"
+msgstr "Oletusasetukset"
 
 #: admin/class-admin.php:128
 msgid "Thumbnail Generation"
-msgstr "Miniatyrgenerering"
+msgstr "Pikkukuvien teko"
 
 #: admin/class-admin.php:132
 msgid "Custom CSS"
-msgstr "Anpassad CSS"
+msgstr "Omat CSS tyylit"
 
 #: admin/class-admin.php:144
 msgid "Link to attachment page rather than to file"
-msgstr "Länka till sida för bilaga istället för direkt till filen"
+msgstr "Linkitä kytketty sivu, ei tiedosto"
 
 #: admin/class-admin.php:156
 msgid "Include document descriptions"
-msgstr "Ta med dokumentbeskrivningar"
+msgstr "Lisää dokumentin esittely"
 
 #: admin/class-admin.php:168
 msgid "Use auto-generated document thumbnails"
-msgstr "Använd autogenererade dokumentminiatyrer"
+msgstr "Käytä automaattisesti tehtyjä pikkukuvia"
 
 #: admin/class-admin.php:180
 msgid "Include image attachments in gallery"
-msgstr "Ta med bildbilagor i galleriet"
+msgstr "Sisällytä myös kuvat galleriaan"
 
 #: admin/class-admin.php:192
 msgid "Only look for attachments in post where [dg] is used"
-msgstr "Sök endast efter bilagor i inlägg där kortkoden [dg] har använts"
+msgstr "Etsi liitteitä vain artikkeileihin joissa [dg] on käytössä"
 
 #: admin/class-admin.php:205
 msgid "Ascending or descending sorting of documents"
-msgstr "Stigande eller fallande dokumentsortering"
+msgstr "Nouseva vai laskeva lajittelu dokumenteille"
 
 #: admin/class-admin.php:218
 msgid "Which field to order documents by"
-msgstr "Det fält som dokumenten skall sorteras efter"
+msgstr "Mitä kenttää käytetään dokumenttien lajitteluun"
 
 #: admin/class-admin.php:231
 msgid ""
 "Whether matched documents must have all taxa_names (AND) or at least one (OR)"
 msgstr ""
-"Ifall matchade dokument måste ha alla taxa_names (AND) eller minst ett (OR)"
+"Löytyvissä documenteissä pitää olla kaikki hakusanat (JA) tai vähintään yksi "
+"(TAI)"
 
 #: admin/class-admin.php:243
 msgid "Locally generate thumbnails for audio & video files."
-msgstr "Generera miniatyrer för audio- & videofiler lokalt."
+msgstr "Luo paikallisesti pikkukuvat äänille ja videoille."
 
 #: admin/class-admin.php:256
 msgid ""
 "Use <a href=\"http://www.ghostscript.com/\" target=\"_blank\">Ghostscript</"
 "a> for faster local PDF processing (compared to Imagick)."
 msgstr ""
-"Använd <a href=\"http://www.ghostscript.com/\" target=\"_blank"
-"\">Ghostscript</a> för snabbare lokal PDF-behandling (jämfört med Imagick)."
+"Käytä  <a href=\"http://www.ghostscript.com/\" target=\"_blank"
+"\">Ghostscript</a> jotta paikallinen PDF prosessoidaan nopeammin (vertailuna "
+"Imagick)."
 
 #: admin/class-admin.php:257
 msgid ""
 "Your server is not configured to run <a href=\"http://www.ghostscript.com/\" "
 "target=\"_blank\">Ghostscript</a>."
 msgstr ""
-"Din server är inte konfigurerad att köra <a href=\"http://www.ghostscript."
-"com/\" target=\"_blank\">Ghostscript</a>."
+"Palvelimesi ei ole asetettu toimimaan <a href=\"http://www.ghostscript.com/"
+"\" target=\"_blank\">Ghostscript</a> kanssa."
 
 #: admin/class-admin.php:271
 msgid ""
 "Use <a href=\"http://www.php.net/manual/en/book.imagick.php\" target=\"_blank"
 "\">Imagick</a> to handle lots of filetypes locally."
 msgstr ""
-"Anänd <a href=\"http://www.php.net/manual/en/book.imagick.php\" target="
-"\"_blank\">Imagick</a> för att hantera mängder av filtyper lokalt."
+"Käytä <a href=\"http://www.php.net/manual/en/book.imagick.php\" target="
+"\"_blank\">Imagick</a> käsittelemään paljon tiedostotyyppejä paikallisesti."
 
 #: admin/class-admin.php:272
 msgid ""
 "Your server is not configured to run <a href=\"http://www.php.net/manual/en/"
 "book.imagick.php\" target=\"_blank\">Imagick</a>."
 msgstr ""
-"Din server är inte konfigurerad att köra <a href=\"http://www.php.net/manual/"
+"Palvelimesi ei ole asetettu käyttämään <a href=\"http://www.php.net/manual/"
 "en/book.imagick.php\" target=\"_blank\">Imagick</a>."
 
 #: admin/class-admin.php:286
@@ -132,90 +134,89 @@ msgid ""
 "Drive Viewer</a> to generate thumbnails for MS Office files and many other "
 "file types remotely."
 msgstr ""
-"Använd <a href=\"https://drive.google.com/viewer\" target=\"_blank\">Google "
-"Drive Viewer</a> för att generera miniatyrer för MS Office-dokument samt "
-"många andra filtyper externt."
+"Käytä <a href=\"https://drive.google.com/viewer\" target=\"_blank\">Google "
+"Drive Viewer</a> pikkukuvien tekemiseen MS Office sekä joihinkin muihinkin "
+"tiedostoihin."
 
 #: admin/class-admin.php:287
 msgid "Your server does not allow remote HTTP access."
-msgstr "Din server tillåter inte externt HTTP-tillträde."
+msgstr "Palvelimesi ei salli ulkoista HTTP yhteyttä."
 
 #: admin/class-admin.php:309
 msgid "The max width and height (in pixels) that thumbnails will be generated."
-msgstr "Max bredd och höjd (i pixlar) för genererade miniatyrer."
+msgstr "Pikkukuvien maksimi leveys ja korkeus (pisteinä)."
 
 #: admin/class-admin.php:338
 msgid "Advanced Thumbnail Generation"
-msgstr "Avancerad Miniatyrgenerering"
+msgstr "Pikkukuvien tekemisen lisäasetukset"
 
 #: admin/class-admin.php:350
 msgid "Whether to log debug and error information related to Document Gallery."
-msgstr ""
-"Ifall debug- och felinformation relaterat till Document Gallery skall loggas."
+msgstr "Tallennetaanko testi- ja virhetiedot joita Document Gallery antaa."
 
 #: admin/class-admin.php:362
 msgid ""
 "Whether option structure should be validated before save. This is not "
 "generally necessary."
 msgstr ""
-"Ifall alternativstruktur skall valideras innan nedsparning. Detta är "
-"generellt ej nödvändigt."
+"Tarkistetaanko valinnan rakenne ennen tallennusta. Tämä ei yleensä ole "
+"tarpeen."
 
 #: admin/class-admin.php:375
 msgid ""
 "Max number of seconds to wait for thumbnail generation before defaulting to "
 "filetype icons."
 msgstr ""
-"Max antal sekunder att vänta på miniatyrgenerering innan standard "
-"filtypsikoner används."
+"Kuinka kauan odotetaan pikkukuvien valkmistumista, ennenkuin käytetään "
+"oletuskuvia."
 
 #: admin/class-admin.php:376
 msgid ""
 "Note that generation will continue where timeout happened next time the "
 "gallery is loaded."
 msgstr ""
-"Notera att genereringen kommer att fortsätta därifrån den avbröts av "
-"tidsgränsen nästa gång galleriet laddas."
+"Huomio että luominen jatkuu keskeytyksen kohdasta seuraavalla kerralla kun "
+"galleria ladataan."
 
 #: admin/class-admin.php:388
 msgid "Successfully auto-detected the location of Ghostscript."
-msgstr "Hittade platsen för Ghostscript automatiskt."
+msgstr "Ghostscript löydetty automaattisesti."
 
 #: admin/class-admin.php:389
 msgid "Failed to auto-detect the location of Ghostscript."
-msgstr "Kunde inte hitta platsen för Ghostscript automatiskt."
+msgstr "Ghostscript ei onnistuttu löytämään."
 
 #: admin/class-admin.php:393
 msgid "Options Array Dump"
-msgstr "Dumpning av Alternativmatris"
+msgstr "Valintataulukon vedos"
 
 #: admin/class-admin.php:440
 msgid "Invalid width given: "
-msgstr "Ogiltig bredd angiven:"
+msgstr "Väärä leveys:"
 
 #: admin/class-admin.php:453
 msgid "Invalid height given: "
-msgstr "Ogiltig höjd angiven:"
+msgstr "Väärä korkeus:"
 
 #: admin/class-admin.php:566
 msgid "Invalid Ghostscript path given: "
-msgstr "Ogiltig sökväg till Ghostscript angiven:"
+msgstr "Ghostscript polku väärä:"
 
 #: admin/class-admin.php:577
 msgid "Invalid timeout given: "
-msgstr "Ogiltig tidsgräns angiven:"
+msgstr "Virheellinen aikakatkaisuarvo:"
 
 #: admin/class-admin.php:608
 msgid ""
 "The following values will be used by default in the shortcode. You can still "
 "manually set each of these values in each individual shortcode."
 msgstr ""
-"Följande värden kommer att användas som standard i kortkoden. Du kan "
-"fortfarande sätta varje värde, i varje kortkod, manuellt."
+"Näitä arvoja käytetään oletuksena lyhytkoodeissa. Voit silti asettaa näitä "
+"myös manuaalisesti lyhytkoodiin."
 
 #: admin/class-admin.php:615
 msgid "Select which tools to use when generating thumbnails."
-msgstr "Välj vilka verktyg som skall användas vid miniatyrgenerering."
+msgstr "Valitse millä työkaluilla pikkkukuvat tehdään."
 
 #: admin/class-admin.php:624
 msgid ""
@@ -223,210 +224,206 @@ msgid ""
 "and classes you can style, take a look at <a href=\"%s\" target=\"_blank"
 "\">style.css</a>."
 msgstr ""
-"Ange anpassad CSS-stil att använda för dokumentgallerier. För att se vilka "
-"ID:n och klasser du kan använda, ta en titt på <a href=\"%s\" target=\"_blank"
-"\">style.css</a>."
+"Lisää omat CSS-tyylit gallerioiden kayttöön. Näet mahdolliset id:t ja luokat "
+"katsomalla  <a href=\"%s\" target=\"_blank\">style.css</a>."
 
-#: admin/class-admin.php:644
+#: admin/class-admin.php:642
 msgid ""
 "Unless you <em>really</em> know what you're doing, you should not touch "
 "these values."
 msgstr ""
-"Om du inte <em>verkligen</em> vet vad du gör så bör du lämna dessa värden "
-"orörda."
+"Jollet <em>todella</em> tarkkaan tiedä mitä teet, älä muuta näitä asetuksia."
 
-#: admin/class-admin.php:647
+#: admin/class-admin.php:645
 msgid ""
 "NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
-msgstr ""
-"NOTERA: <code>exec()</code> är ej tillgängligt. Ghostscript kommer inte att "
-"fungera."
+msgstr "HUOM: <code>exec()</code> ei ole käytettävissä. Ghostscript ei toimi."
 
-#: admin/class-admin.php:658
+#: admin/class-admin.php:656
 msgid ""
 "The following <em>readonly text</em> should be provided when <a href="
 "\"http://wordpress.org/support/plugin/document-gallery\" target=\"_blank"
 "\">reporting a bug</a>:"
 msgstr ""
-"Följande <em>skrivskyddade text</em> skall skickas med vid <a href=\"http://"
-"wordpress.org/support/plugin/document-gallery\" target=\"_blank"
-"\">buggrapportering</a>:"
+"Seuraava <em>kirjoitussuojattu teksti</em> pitää antaa kun  <a href=\"http://"
+"wordpress.org/support/plugin/document-gallery\" target=\"_blank\"> ilmoittaa "
+"virheestä</a>:"
 
-#: admin/class-admin.php:759
+#: admin/class-admin.php:757
 msgid "Select All"
-msgstr "Välj Alla"
+msgstr "Valitse kaikki"
 
-#: admin/class-admin.php:762
+#: admin/class-admin.php:760
 msgid "Thumbnail"
-msgstr "Miniatyr"
+msgstr "Pikkukuva"
 
-#: admin/class-admin.php:763
+#: admin/class-admin.php:761
 msgid "File name"
-msgstr "Filnamn"
+msgstr "Tiedoston nimi"
 
-#: admin/class-admin.php:764 admin/class-admin.php:839
+#: admin/class-admin.php:762 admin/class-admin.php:834
 msgid "Date"
-msgstr "Datum"
+msgstr "Päiväys"
+
+#: admin/class-admin.php:765
+msgid "Delete Selected"
+msgstr "Poista valitut"
 
 #: admin/class-admin.php:767
-msgid "Delete Selected"
-msgstr "Ta Bort Valda"
-
-#: admin/class-admin.php:769
 msgid "item"
 msgid_plural "items"
-msgstr[0] "objekt"
-msgstr[1] "objekt"
+msgstr[0] "kohde"
+msgstr[1] "kohteet"
 
-#: admin/class-admin.php:772
+#: admin/class-admin.php:770
 msgid "Go to the first page"
-msgstr "Gå till första sidan"
+msgstr "Ensimmäiselle sivulle"
+
+#: admin/class-admin.php:771
+msgid "Go to the previous page"
+msgstr "Edelliselle sivulle"
 
 #: admin/class-admin.php:773
-msgid "Go to the previous page"
-msgstr "Gå till föregående sida"
-
-#: admin/class-admin.php:775
 msgid "Current page"
-msgstr "Aktuell sida"
+msgstr "Nykyinen sivu"
+
+#: admin/class-admin.php:773
+msgid "of"
+msgstr " "
+
+#: admin/class-admin.php:774
+msgid "Go to the next page"
+msgstr "Seuraavalle sivulle"
 
 #: admin/class-admin.php:775
-msgid "of"
-msgstr "av"
-
-#: admin/class-admin.php:776
-msgid "Go to the next page"
-msgstr "Gå till nästa sida"
+msgid "Go to the last page"
+msgstr "Viimeiselle sivulle"
 
 #: admin/class-admin.php:777
-msgid "Go to the last page"
-msgstr "Gå till sista sidan"
-
-#: admin/class-admin.php:779
 msgid "items per page"
-msgstr "objekt per sida"
+msgstr "kohdetta sivulla"
 
-#: admin/class-admin.php:818
+#: admin/class-admin.php:815
 msgid "View"
-msgstr "Visa"
+msgstr "Näytä"
 
-#: admin/class-admin.php:819
+#: admin/class-admin.php:816
 msgid "attachment page"
-msgstr "sida för bilaga"
+msgstr "liitteen sivu"
 
-#: admin/class-admin.php:819
+#: admin/class-admin.php:816
 msgid "Attachment not found"
-msgstr "Bilaga hittades ej"
+msgstr "Liitettä ei löytynyt"
 
-#: admin/class-admin.php:840
+#: admin/class-admin.php:835
 msgid "Level"
-msgstr "Nivå"
+msgstr "Taso"
 
-#: admin/class-admin.php:841
+#: admin/class-admin.php:836
 msgid "Message"
-msgstr "Meddelande"
+msgstr "Viesti"
 
-#: admin/class-admin.php:850
+#: admin/class-admin.php:845
 msgid "Expand All"
-msgstr "Expandera Alla"
+msgstr "Laajenna kaikki"
 
-#: admin/class-admin.php:853
+#: admin/class-admin.php:848
 msgid "Collapse All"
-msgstr "Fäll ihop Alla"
+msgstr "Tiivistä kaikki"
 
-#: admin/class-admin.php:897
+#: admin/class-admin.php:891
 msgid "Clear Log"
-msgstr "Rensa Logg"
+msgstr "Tyhjennä loki"
 
-#: admin/class-admin.php:904
+#: admin/class-admin.php:898
 msgid "There are no log entries at this time."
-msgstr "Det finns för närvarande inga loggposter."
+msgstr "Lokitiedosto on tyhjä"
 
-#: admin/class-admin.php:904
+#: admin/class-admin.php:898
 msgid "For Your information:"
-msgstr "För Din vetskap:"
+msgstr "Tiedoksi:"
 
-#: admin/class-admin.php:904
+#: admin/class-admin.php:898
 msgid "is turned ON"
-msgstr "är PÅSLAGEN"
+msgstr "ON päällä"
 
-#: admin/class-admin.php:904
+#: admin/class-admin.php:898
 msgid "is turned OFF"
-msgstr "är AVSTÄNGD"
+msgstr "EI ole päällä"
 
-#: inc/class-gallery.php:85
+#: inc/class-gallery.php:86
 msgid "Generated using Document Gallery. Get yours here: "
-msgstr "Genererat med Document Gallery. Skaffa det här: "
+msgstr "Luotu käyttäen Document Gallery. Hanki omasi täältä:"
 
 #: inc/class-gallery.php:88
 msgid "No attachments to display. How boring! :("
-msgstr "Inga bilagor att visa. Så tråkigt! :("
+msgstr "Liitteitä ei löytynyt. Onpas tylsää!  :("
 
 #: inc/class-gallery.php:89
 msgid "The %s parameter may only be \"%s\" or \"%s.\" You entered \"%s.\""
-msgstr "Parametern %s får endast vara \"%s\" eller \"%s.\" Du angav \"%s.\""
+msgstr "Antamasi %s voi olla vain  \"%s\" tai  \"%s.\" antamastasi \"%s.\""
 
-#: inc/class-gallery.php:285
+#: inc/class-gallery.php:286
 msgid "The following ID is invalid: "
 msgid_plural "The following IDs are invalid: "
-msgstr[0] "Följande ID är ogiltigt:"
-msgstr[1] "Följande ID:n är ogiltiga:"
+msgstr[0] "Seuraava ID on väärä: "
+msgstr[1] "Seuraavat ID:t ovat vääriä: "
 
-#: inc/class-gallery.php:378
+#: inc/class-gallery.php:379
 msgid "The orderby value entered, \"%s,\" is not valid."
-msgstr "Värdet som angävs för sortering, \"%s,\" är ogiltigt."
+msgstr "Lajittelumääritys jonka annoit, \"%s,\"  ei ole oikeanlainen."
 
-#: inc/class-gallery.php:532
+#: inc/class-gallery.php:533
 msgid "%s is not a valid term name in %s."
-msgstr "%s är ej ett giltigt termnamn i %s."
+msgstr "%s ei ole oikeantyyppinen termi %s ssa."
 
 #: inc/class-image-editor-imagick.php:37
 msgid "Failed to set Imagick page number"
-msgstr "Kunde inte sätta Imagick sidnummer"
+msgstr "Imagick sivunumeron asettaminen epäonnnistui"
 
 #: inc/class-thumber.php:59
 msgid "Attempting to generate thumbnail for attachment #%d with (%s)"
-msgstr "Försöker generera miniatyr för bilagan #%d med (%s)"
+msgstr "Yritetään luoda pikkukuva,  #%d (%s):lla "
 
 #: inc/class-thumber.php:138
 msgid "Could not open file: "
-msgstr "Kunde inte öppna fil:"
+msgstr "Tiedoston avaus epäonnistui:"
 
 #: inc/class-thumber.php:143
 msgid "Could not write file: "
-msgstr "Kunde inte skriva till fil:"
+msgstr "Tiedostoon ei voi kirjoittaa:"
 
 #: inc/class-thumber.php:180
 msgid "Failed to open file in Imagick: "
-msgstr "Kunde inte öppna fil i Imagick:"
+msgstr "Tiedoston avaus epäonnistui, Imagick: "
 
 #: inc/class-thumber.php:191
 msgid "Failed to save image in Imagick: "
-msgstr "Kunde inte spara bild i Imagick:"
+msgstr "Kuvan tallennus epäonnistui, Imagick: "
 
 #: inc/class-thumber.php:249
 msgid "Ghostscript failed: "
-msgstr "Ghostscript misslyckades:"
+msgstr "Ghostscript virhe:"
 
 #: inc/class-thumber.php:387
 msgid "Failed to retrieve thumbnail from Google: "
-msgstr "Kunde inte hämta miniatyr från Google:"
+msgstr "Pikkukuvan tuonti Googlesta epäonnistui:"
 
 #: inc/class-thumber.php:631
 msgid "Thumbnail Generators: "
-msgstr "Miniatyrgeneratorer:"
+msgstr "Pikkukuvién ohjelmat."
 
 #: inc/class-thumber.php:642
 msgid "No thumbnail generators enabled."
-msgstr "Inga miniatyrgeneratorer aktiverade."
+msgstr "Pikkukuvien tekoon ei löytynyt ohjelmaa."
 
 #: inc/class-thumber.php:685
 msgid "Failed to get image editor: "
-msgstr "Kunde inte hämta bildredigerare:"
+msgstr "Kuvaeditoria ei löytynyt:"
 
 #: inc/class-thumber.php:697
 msgid "Failed to save image: "
-msgstr "Kunde inte spara bild:"
+msgstr "Kuvan tallennus epäonnistui:"
 
 #. Plugin URI of the plugin/theme
 msgid "http://wordpress.org/extend/plugins/document-gallery/"
@@ -437,8 +434,8 @@ msgid ""
 "Display non-images (and images) in gallery format on a page or post with the "
 "[dg] shortcode."
 msgstr ""
-"Visa dokument (och bilder) i galleriformat på en sida eller i ett inlägg med "
-"kortkoden [dg]."
+"Näytä tiedostot (myös kuvat) galleriana sivulla tai artikkelissa [dg] "
+"koodilla. "
 
 #. Author of the plugin/theme
 msgid "Dan Rossiter"
