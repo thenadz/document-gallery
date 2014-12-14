@@ -1,8 +1,6 @@
 <?php
 defined('WPINC') OR exit;
 
-DG_Admin::init();
-
 class DG_Admin {
    /**
     * @var string The hook for the Document Gallery settings page.
@@ -15,21 +13,27 @@ class DG_Admin {
    private static $current;
    
    /**
+    * NOTE: This should only ever be accessed through getTabs().
+    * 
     * @var multitype:string Associative array containing all tab names, keyed by tab slug.
     */
    private static $tabs;
    
    /**
-    * Initializes static values for this class.
+    * Returns reference to tabs array, initializing if needed.
+    * 
+    * NOTE: This cannot be done in a static constructor due to timing with i18n.
     */
-   public static function init() {
-      if (empty(self::$tabs)) {
+   public static function &getTabs() {
+      if (!isset(self::$tabs)) {
          self::$tabs = array(
             'General'    => __('General',                'document-gallery'),
             'Thumbnail'  => __('Thumbnail Management',   'document-gallery'),
             'Logging'    => __('Logging',                'document-gallery'),
             'Advanced'   => __('Advanced',               'document-gallery'));
       }
+      
+      return self::$tabs;
    }
    
    /**
@@ -37,10 +41,10 @@ class DG_Admin {
     */
    public static function renderOptions() { ?>
 <div class="wrap">
-	<h2>Document Gallery Settings</h2>
+	<h2><?php echo __('Document Gallery Settings', 'document-gallery'); ?></h2>
 
 	<h2 class="nav-tab-wrapper">
-<?php foreach (self::$tabs as $tab => $name) {
+<?php foreach (self::getTabs() as $tab => $name) {
    $class = ($tab == self::$current) ? ' nav-tab-active' : '';
    echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=' . DG_OPTION_NAME . '&tab='.$tab.'">'.$name.'</a>';
 } ?>
@@ -95,9 +99,9 @@ class DG_Admin {
     * Registers settings for the Document Gallery options page.
     */
    public static function registerSettings() {
-      if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], self::$tabs)) {
-         reset(self::$tabs);
-         self::$current = key(self::$tabs);
+      if (empty($_REQUEST['tab']) || !array_key_exists($_REQUEST['tab'], self::getTabs())) {
+         reset(self::getTabs());
+         self::$current = key(self::getTabs());
       } else {
          self::$current = $_REQUEST['tab'];
       }
@@ -229,6 +233,44 @@ class DG_Admin {
             'options'     => DG_Gallery::getRelationOptions(),
             'option_name' => DG_OPTION_NAME,
             'description' => __('Whether matched documents must have all taxa_names (AND) or at least one (OR)', 'document-gallery')
+        ));
+
+      add_settings_field(
+         'gallery_defaults_limit', 'limit',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'gallery_defaults',
+         array (
+            'label_for'   => 'label_gallery_defaults_limit',
+            'name'        => 'gallery_defaults][limit',
+            'value'       => esc_attr($defaults['limit']),
+            'type'        => 'number" min="-1" step="1',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Limit the number of documents included. -1 means no limit.', 'document-gallery')));
+
+      add_settings_field(
+        'gallery_defaults_post_status', 'post_status',
+        array(__CLASS__, 'renderSelectField'),
+        DG_OPTION_NAME, 'gallery_defaults',
+        array (
+            'label_for'   => 'label_gallery_defaults_post_status',
+            'name'        => 'gallery_defaults][post_status',
+            'value'       => esc_attr($defaults['post_status']),
+            'options'     => DG_Gallery::getPostStatuses(),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Which post status to look for when querying documents.', 'document-gallery')
+        ));
+
+      add_settings_field(
+        'gallery_defaults_post_type', 'post_type',
+        array(__CLASS__, 'renderSelectField'),
+        DG_OPTION_NAME, 'gallery_defaults',
+        array (
+            'label_for'   => 'label_gallery_defaults_post_type',
+            'name'        => 'gallery_defaults][post_type',
+            'value'       => esc_attr($defaults['post_type']),
+            'options'     => DG_Gallery::getPostTypes(),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Which post type to look for when querying documents.', 'document-gallery')
         ));
       
       add_settings_field(
@@ -400,9 +442,9 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      if (empty($values['tab']) || !array_key_exists($values['tab'], self::$tabs)) {
-         reset(self::$tabs);
-         $values['tab'] = key(self::$tabs);
+      if (empty($values['tab']) || !array_key_exists($values['tab'], self::getTabs())) {
+         reset(self::getTabs());
+         $values['tab'] = key(self::getTabs());
       }
       $funct = 'validate'.$values['tab'].'Settings';
       unset($values['tab']);
@@ -424,7 +466,7 @@ class DG_Admin {
 
       // handle gallery shortcode defaults
       $errs = array();
-      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs);
+      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs, true);
 
       foreach ($errs as $k => $v) {
          add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
@@ -491,15 +533,7 @@ class DG_Admin {
       // handle modified CSS
       if (trim($ret['css']['text']) !== trim($values['css'])) {
          $ret['css']['text'] = trim($values['css']);
-         $ret['css']['version']++;
-         $ret['css']['last-modified'] = gmdate('D, d M Y H:i:s');
-         $ret['css']['etag'] = md5($ret['css']['last-modified']);
-         
-         if (empty($ret['css']['text'])) {
-            unset($ret['css']['minified']);
-         } else {
-            $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
-         }
+         $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
       }
 
       return $ret;
@@ -739,8 +773,8 @@ class DG_Admin {
       $att_ids = array_slice($att_ids, $offset, $limit);
       $atts = get_posts(
          array(
-            'post_type'   => 'attachment',
-            'post_status' => 'inherit',
+            'post_type'   => 'any',
+            'post_status' => 'any',
             'numberposts' => -1,
             'post__in'    => $att_ids,
             'orderby'     => 'post__in'
