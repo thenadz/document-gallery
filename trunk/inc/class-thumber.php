@@ -232,7 +232,7 @@ class DG_Thumber {
          
          if (false !== $gs) {
             $gs = escapeshellarg($gs) . ' -sDEVICE=png16m -dFirstPage=%d'
-                . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s';
+                . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s 2>&1';
          }
       }
 
