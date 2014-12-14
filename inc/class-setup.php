@@ -16,10 +16,8 @@ class DG_Setup {
    public static function getDefaultOptions($skeleton = false) {
       include_once DG_PATH . 'inc/class-thumber.php';
       
-      $date = $etag = $gs = null;
+      $gs = null;
       if (!$skeleton) {
-         $date = gmdate('D, d M Y H:i:s');
-         $etag = md5($date);
          $gs = DG_Thumber::getGhostscriptExecutable();
       }
       
@@ -69,23 +67,23 @@ class DG_Setup {
               'orderby'        => 'menu_order',
               
                // AND or OR
-              'relation'       => 'AND'
+              'relation'       => 'AND',
+                
+               // the status the post must be in when returned by DG
+              'post_status'    => 'any',
+
+              // the type of post to be returned
+              'post_type'      => 'attachment',
+                
+              // the max number of thumbnails to return
+              'limit'          => -1,
           ),
           'css' => array(
               // plain text of CSS to be edited by user
               'text'           => '',
                 
               // "minified" text to be rendered on pages
-              'minified'       => '',
-                
-              // date/time last modified
-              'last-modified'  => $date,
-                
-              // used when telling browser whether to load from cache
-              'etag'           => $etag,
-                
-              // used in cache busting after user modifies CSS
-              'version'        => 0
+              'minified'       => ''
           ),
             
           // current DG version
@@ -106,7 +104,7 @@ class DG_Setup {
       global $dg_options;
 
       // do update
-      if (null != $dg_options && DG_VERSION !== $dg_options['version']) {
+      if (!is_null($dg_options) && DG_VERSION !== $dg_options['version']) {
          $blogs = array(null);
          
          if (is_multisite()) {
@@ -131,16 +129,10 @@ class DG_Setup {
 
       // version-specific updates
       self::twoPointTwo($options);
+      self::twoPointThree($options);
       
       // update plugin version
       $options['version'] = DG_VERSION;
-
-      // setup CSS
-      $options['css']['minified'] = isset($options['css']['text'])
-         ? DocumentGallery::compileCustomCss($options['css']['text'])
-         : '';
-      $options['css']['last-modified'] = gmdate('D, d M Y H:i:s');
-      $options['css']['etag'] = md5($options['css']['last-modified']);
 
       // remove previously-failed thumbs
       $thumbs = $options['thumber']['thumbs'];
@@ -191,6 +183,32 @@ class DG_Setup {
          
          // adding "logging" branch
          $options['logging'] = false;
+      }
+   }
+   
+   /**
+    * Some of the data previously stored along with custom CSS is no longer needed.
+    * 
+    * @param array $options The options to be modified.
+    */
+   private static function twoPointThree(&$options) {
+      if (version_compare($options['version'], '2.3', '<')) {
+         unset($options['css']['last-modified']);
+         unset($options['css']['etag']);
+         unset($options['css']['version']);
+
+         // need to recalculate minified, excluding static CSS which was previously included
+         $options['css']['minified'] = DocumentGallery::compileCustomCss($options['css']['text']);
+         
+         // if user inadvertantly enabled google drive viewer on system where it's not supported
+         // then avoid locking it in the on state
+         if ($options['thumber']['active']['google']) {
+            $options['thumber']['active']['google'] = DG_Thumber::isGoogleDriveAvailable();
+         }
+
+         $options['gallery']['post_status'] = 'any';
+         $options['gallery']['post_type'] = 'attachment';
+         $options['gallery']['limit'] = -1;
       }
    }
    

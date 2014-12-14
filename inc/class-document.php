@@ -50,32 +50,34 @@ class DG_Document {
     * @return string
     */
    public function __toString() {
-      static $find = null;
-      if (is_null($find)) {
-         $find = array("%link%", "%img%", "%title_attribute%", "%title%");
-      }
-      
       $thumb = $this->gallery->useFancyThumbs()
           ? DG_Thumber::getThumbnail($this->ID)
           : DG_Thumber::getDefaultThumbnail($this->ID);
 
       $repl = array($this->link, $thumb, $this->title_attribute, $this->title);
+      $find = array('%link%', '%img%', '%title_attribute%', '%title%');
+      $description = '';
       
+      // if descriptions then add filterable tag and value to replaced tag
+      if ($this->gallery->useDescriptions()) {
+         $repl[] = $this->description;
+         $find[] = '%description%';
+         $description = '   <p>%description%</p>';
+      }
+      
+      // allow developers to filter icon output
       $doc_icon = apply_filters(
          'dg_icon_template',
          '   <div class="document-icon">' . PHP_EOL .
          '      <a href="%link%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
-         '   </div>' . PHP_EOL,
+         '   </div>' . PHP_EOL .
+         $description,
          $this->gallery->useDescriptions(),
          $this->ID);
-      
-      $core = str_replace($find, $repl, $doc_icon);
-      
-      if($this->gallery->useDescriptions()) {
-         $core .= "   <p>$this->description</p>" . PHP_EOL;
-      }
 
-      // users may filter icon here
+      $core = str_replace($find, $repl, $doc_icon);
+
+      // deprecated: users may filter icon here
       return apply_filters('dg_doc_icon', $core, $this->ID, $this->gallery->useDescriptions());
    }
 }
