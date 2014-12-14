@@ -416,6 +416,9 @@ To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
+= 2.3.1 =
+* **Bug Fix:** Resolved a couple of bugs introduced with new `2.3` functionality.
+
 = 2.3 =
 * **Enhancement:** Taxonomy support now includes handling for both relationships
   between different taxons and relationships between different terms within a single
