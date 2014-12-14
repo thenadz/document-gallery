@@ -405,12 +405,10 @@ class DG_Gallery {
     */
    private static function sanitizePostStatus($value, &$err) {
       $ret = preg_grep('/' . preg_quote($value) .'/i', self::getPostStatuses());
-      $ret = !empty($ret) ? $ret[0] : null;
+      $ret = reset($ret);
       
-      if(is_null($ret)) {
-         $err = sprintf(
-            __(self::$unary_err, 'post_status', $value, 'document-gallery'),
-            $value);
+      if($ret === false) {
+         $err = sprintf(self::$unary_err, 'post_status', $value);
       }
       
       return $ret;
@@ -438,12 +436,10 @@ class DG_Gallery {
     */
    private static function sanitizePostType($value, &$err) {
       $ret = preg_grep('/' . preg_quote($value) .'/i', self::getPostTypes());
-      $ret = !empty($ret) ? $ret[0] : null;
+      $ret = reset($ret);
       
-      if(is_null($ret)) {
-         $err = sprintf(
-            __(self::$unary_err, 'post_type', $value, 'document-gallery'),
-            $value);
+      if($ret === false) {
+         $err = sprintf(self::$unary_err, 'post_type', $value);
       }
       
       return $ret;
