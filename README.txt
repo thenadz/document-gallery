@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
 Tested up to: 4.0.1
-Stable tag: 2.2.7
+Stable tag: 2.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -429,6 +429,8 @@ ideas for future Document Gallery development, take a look at our
   firewall or on a local network where Google Drive Viewer will not be able to function.
 * **Enhancement:** Handling of custom CSS was improved. Page load speed should be improved
   in some cases.
+* **Bug Fix:** When Ghostscript chokes on a PDF, it will no longer print the error message
+  in the Document Gallery output (instead it will end up in Document Gallery Logging).
 
 = 2.2.7 =
 * **Bug Fix:** There was an issue with a few phrases not being translated in the
