@@ -193,6 +193,8 @@ class DG_Setup {
     */
    private static function twoPointThree(&$options) {
       if (version_compare($options['version'], '2.3', '<')) {
+         include_once DG_PATH . 'inc/class-thumber.php';
+         
          unset($options['css']['last-modified']);
          unset($options['css']['etag']);
          unset($options['css']['version']);
