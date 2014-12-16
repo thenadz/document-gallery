@@ -16,9 +16,10 @@ class DG_Setup {
    public static function getDefaultOptions($skeleton = false) {
       include_once DG_PATH . 'inc/class-thumber.php';
       
-      $gs = null;
+      $gs = $donate_link = null;
       if (!$skeleton) {
          $gs = DG_Thumber::getGhostscriptExecutable();
+         $donate_link = self::getDonateLink();
       }
       
       return array(
@@ -85,9 +86,14 @@ class DG_Setup {
               // "minified" text to be rendered on pages
               'minified'       => ''
           ),
-            
-          // current DG version
-          'version' => DG_VERSION,
+          
+          'meta' => array(
+              // current DG version
+              'version'        => DG_VERSION,
+                
+              // URL to donate to plugin development
+              'donate_link'    => $donate_link
+          ),
             
           // whether to validate DG option structure on save
           'validation' => false,
@@ -104,7 +110,7 @@ class DG_Setup {
       global $dg_options;
 
       // do update
-      if (!is_null($dg_options) && DG_VERSION !== $dg_options['version']) {
+      if (!is_null($dg_options) && (!isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
          $blogs = array(null);
          
          if (is_multisite()) {
@@ -130,9 +136,11 @@ class DG_Setup {
       // version-specific updates
       self::twoPointTwo($options);
       self::twoPointThree($options);
+      self::twoPointFour($options);
       
-      // update plugin version
-      $options['version'] = DG_VERSION;
+      // update plugin meta data
+      $options['meta']['version'] = DG_VERSION;
+      $options['meta']['donate_link'] = self::getDonateLink();
 
       // remove previously-failed thumbs
       $thumbs = $options['thumber']['thumbs'];
@@ -155,7 +163,7 @@ class DG_Setup {
     * @param array $options The options to be modified.
     */
    private static function twoPointTwo(&$options) {
-      if (version_compare($options['version'], '2.2', '<')) {
+      if (isset($options['version']) && version_compare($options['version'], '2.2', '<')) {
          $thumbs = array();
          
          // "created_timestamp" moving to just "timestamp"
@@ -192,7 +200,7 @@ class DG_Setup {
     * @param array $options The options to be modified.
     */
    private static function twoPointThree(&$options) {
-      if (version_compare($options['version'], '2.3', '<')) {
+      if (isset($options['version']) && version_compare($options['version'], '2.3', '<')) {
          include_once DG_PATH . 'inc/class-thumber.php';
          
          unset($options['css']['last-modified']);
@@ -211,6 +219,18 @@ class DG_Setup {
          $options['gallery']['post_status'] = 'any';
          $options['gallery']['post_type'] = 'attachment';
          $options['gallery']['limit'] = -1;
+      }
+   }
+   
+   /**
+    * Creating new meta branch in options to store plugin meta information.
+    * 
+    * @param array $options The options to be modified.
+    */
+   private static function twoPointFour(&$options) {
+      if (isset($options['version']) /*&& version_compare($options['version'], '2.4', '<')*/) {
+         $options['meta'] = array('version' => $options['version']);
+         unset($options['version']);
       }
    }
    
@@ -291,6 +311,16 @@ class DG_Setup {
       }
 
       DocumentGallery::deleteOptions($blog);
+   }
+   
+   /**
+    * NOTE: This is expensive as is involves file I/O reading the README. Only use when 
+    * the equivilent value in options array is not viable.
+    * @return string URL where users can donate to plugin.
+    */
+   private static function getDonateLink() {
+      $data = get_file_data(DG_PATH . 'README.txt', array('donate' => 'Donate link'));
+      return $data['donate'];
    }
 
    /**
