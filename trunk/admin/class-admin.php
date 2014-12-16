@@ -71,6 +71,22 @@ class DG_Admin {
       $settings = '<a href="options-general.php?page=' . DG_OPTION_NAME . '">' .
           __('Settings', 'document-gallery') . '</a>';
       array_unshift($links, $settings);
+      
+      return $links;
+   }
+
+   /**
+    * Adds donate link to main plugin view.
+    */
+   public static function addDonateLink($links, $file) {
+      if ($file === DG_BASENAME) {
+         global $dg_options;
+   
+         $donate = '<strong><a href="' . $dg_options['meta']['donate_link'] . '">' .
+               __('Donate', 'document-gallery') . '</a></strong>';
+         $links[] = $donate;
+      }
+      
       return $links;
    }
 
