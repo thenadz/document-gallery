@@ -260,7 +260,7 @@ class DG_Gallery {
       } else {
          $value = trim($value);
          $ret = $value ? explode(',', $value) : array();
-         $bad = array_filter($ids, array(__CLASS__, 'negativeInt'));
+         $bad = array_filter($ret, array(__CLASS__, 'negativeInt'));
 
          if(!empty($bad)) {
             $err = _n('The following ID is invalid: ',
