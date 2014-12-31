@@ -441,7 +441,7 @@ class DG_Thumber {
          
          $response = wp_remote_get($google_viewer, $args);
 
-         $available = ($response['response']['code'] != 404);
+         $available = (!is_wp_error($response) && $response['response']['code'] != 404);
       }
       
       return $available;
