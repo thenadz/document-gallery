@@ -18,7 +18,7 @@ other attached media, much like the gallery option already available for image
 attachments.
 
 Watch the following video for a brief demonstration of Document Gallery in action:
-[youtube https://www.youtube.com/watch?v=pCQsx5z-uOU]
+[youtube http://youtu.be/9IFPEJxrXcA]
 
 Read more in the **Installation** tab!
 
