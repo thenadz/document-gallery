@@ -189,30 +189,6 @@ class DG_Admin {
         ));
 
       add_settings_field(
-        'gallery_defaults_images', 'images',
-        array(__CLASS__, 'renderCheckboxField'),
-        DG_OPTION_NAME, 'gallery_defaults',
-        array (
-            'label_for'   => 'label_gallery_defaults_images',
-            'name'        => 'gallery_defaults][images',
-            'value'       => esc_attr($defaults['images']),
-            'option_name' => DG_OPTION_NAME,
-            'description' => __('Include image attachments in gallery', 'document-gallery')
-        ));
-
-      add_settings_field(
-        'gallery_defaults_localpost', 'localpost',
-        array(__CLASS__, 'renderCheckboxField'),
-        DG_OPTION_NAME, 'gallery_defaults',
-        array (
-            'label_for'   => 'label_gallery_defaults_localpost',
-            'name'        => 'gallery_defaults][localpost',
-            'value'       => esc_attr($defaults['localpost']),
-            'option_name' => DG_OPTION_NAME,
-            'description' => __('Only look for attachments in post where [dg] is used', 'document-gallery')
-        ));
-
-      add_settings_field(
         'gallery_defaults_order', 'order',
         array(__CLASS__, 'renderSelectField'),
         DG_OPTION_NAME, 'gallery_defaults',
@@ -563,8 +539,17 @@ class DG_Admin {
    private static function validateThumbnailSettings($values) {
       global $dg_options;
       $ret = $dg_options;
+      $responseArr = array('result' => false);
       
-      if (isset($values['ids'])) {
+      if (isset($values['entry'])) {
+         $ID = intval($values['entry']);
+      } else {
+         $ID = -1;
+      }
+
+      // Thumbnail(s) cleanup;
+      // cleanup value is a marker
+      if ( isset($values['cleanup']) && isset($values['ids']) ) {
          $deleted = array_values(array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']));
          
          foreach ($deleted as $k) {
@@ -575,11 +560,56 @@ class DG_Admin {
             unset($ret['thumber']['thumbs'][$k]);
          }
          
-         if (isset($values['ajax'])) {
-            echo '[' . implode(',', $deleted) . ']';
-            add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
+         $responseArr['result'] = true;
+         $responseArr['deleted'] = $deleted;
+         //$responseArr['deleted'] = '[' . implode(',', $deleted) . ']';
+      }
+      // Thumbnail generation status change (one at a time);
+      // gen value is a marker
+      elseif ( in_array(strtolower($values['gen']), array('auto', 'manual')) && isset($ret['thumber']['thumbs'][$ID]) ) {
+         $responseArr['result'] = true;
+         $responseArr['entry'] = $ID;
+         if (strtolower($values['gen'])=='manual') {
+            $ret['thumber']['thumbs'][$ID]['thumber'][0] = 'DG_Thumber';
+            $ret['thumber']['thumbs'][$ID]['thumber'][1] = 'manual';
+            $responseArr['checked'] = true;
+         } else {
+            unset($ret['thumber']['thumbs'][$ID]['thumber']);
+            $ret['thumber']['thumbs'][$ID]['thumber'] = array();// NB_concern: how should we populate thumber so thumbnail would be regenerated on the next gallery refresh, or should we trigger this regeneration earlier?
+            $responseArr['checked'] = false;
          }
       }
+      // Thumbnail file manual refresh (one at a time)
+      // upload value is a marker
+      elseif ( isset($values['upload']) && isset($_FILES['file']) && isset($ret['thumber']['thumbs'][$ID]) && $ret['thumber']['thumbs'][$ID]['thumber'][1] == 'manual' ) {
+         $old_path = $ret['thumber']['thumbs'][$ID]['thumb_path'];
+         $upload_filename = !is_array($_FILES['file']['name']) ? $_FILES['file']['name'] : $_FILES['file']['name'][0];
+
+         if ($thumb = DG_Thumber::getThumbnailTemplate(array('DG_Thumber', 'manual'), $ID, $upload_filename)) {
+            $ret['thumber']['thumbs'][$ID] = array(
+                'timestamp'         => time(),// NB_concern: should we preserve preceding timestamp if present?
+                'thumb_url'         => $thumb['url'],
+                'thumb_path'        => $thumb['path'],
+                'thumber'           => array('DG_Thumber', 'manual')
+            );
+            if ($thumb['path'] !== $old_path) {
+               unlink($old_path);
+            }
+            $responseArr['result'] = true;
+            $responseArr['url'] = $thumb['url'];
+         }
+      }
+      
+      if (isset($values['ajax'])) {
+         echo '[' . implode(',', $deleted) . ']';
+         add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
+         $json_like = '';
+         foreach ($responseArr as $k => $v) {
+            $json_like .= '"'.$k.'":'.(!is_bool($v)? (!is_array($v)? '"'.$v.'"' : '[' . implode(',', $v) . ']' ) : ($v? 'true' : 'false')).',';// php changes boolean to integer in arrays - had to use workaround
+         }
+      }
+      echo '{'.trim($json_like,', ').'}';
+      add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
       
       return $ret;
    }
@@ -809,6 +839,7 @@ class DG_Admin {
             '</th>'.
             '<th scope="col" class="manage-column column-icon">'.__('Thumbnail', 'document-gallery').'</th>'.
             '<th scope="col" class="manage-column column-title '.(($orderby != 'title')?'sortable desc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'title','order'=>(($orderby != 'title')?'asc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('File name', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
+            '<th scope="col" class="manage-column column-toggle"></th>'.
             '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
          '</tr>';
 
@@ -859,11 +890,28 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
                   $title = isset($titles[$v['thumb_id']]) ? $titles[$v['thumb_id']] : '';
                   $date = DocumentGallery::localDateTimeFromTimestamp($v['timestamp']);
                   
-                  echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
+                  echo '<tr data-entry="'.$v['thumb_id'].'"><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
                           $icon.'" />'.'</td><td class="title column-title">' .
                           ($title ? '<strong><a href="' . home_url('/?attachment_id='.$v['thumb_id']).'" target="_blank" title="'.__('View', 'document-gallery').' \'' .
                           $title.'\' '.__('attachment page', 'document-gallery').'">'.$title.'</a></strong>' : __('Attachment not found', 'document-gallery')) .
+                           '</td><td class="toggle column-toggle">' .
+                              '<span class="toggleLabel selected">Autogeneration</span>' .
+                              '<div class="toggle-btn">' .
+                                 '<div class="toggle-round">' .
+                                    '<input type="checkbox" name="gen-toggle[]" id="gen-toggle'.$v['thumb_id'].'" value="'.$v['thumb_id'].'"'.($v['thumber'][1] !== 'manual' ? '': ' checked' ).' />' .
+                                    '<label for="gen-toggle'.$v['thumb_id'].'"></label>' .
+                                 '</div>' .
+                              '</div>' .
+                              '<span class="toggleLabel">Manual selection</span>' .
+                              '<span class="manual-download">' .
+                                 '<span class="dashicons dashicons-upload"></span>' .
+                                 '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
+                                 '<span class="buttons-area">' .
+                                    '<input id="upload-button'.$v['thumb_id'].'" type="file" />' .
+                                    '<input id="trigger-button'.$v['thumb_id'].'" type="button" value="Select File" class="button" />' .
+                                 '</span>' .
+                              '</span>' .
                           '</td><td class="date column-date">'.$date.'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
@@ -872,6 +920,70 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
 	</div>
 </div>
 <?php }
+
+   /**
+    * Adds meta box to the attchements' edit pages.
+    */
+   public static function addMetaBox() {
+      $screens = array( 'attachment' );
+      foreach ( $screens as $screen ) {
+         add_meta_box(
+               DG_OPTION_NAME.'_gen_box',
+               __( '<b>Thumbnail</b> for <i><b>Document Gallery</b></i>', 'document-gallery' ),
+               array(__CLASS__, 'renderMetaBox'),
+               $screen,
+               'normal'
+            );
+      }
+      DG_Admin::$hook = 'post.php';
+      add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueueScriptsAndStyles'));
+   }
+
+   /**
+    * Render a Meta Box.
+    */
+   public static function renderMetaBox($post) {
+      global $dg_options;
+      wp_nonce_field( DG_OPTION_NAME.'_meta_box', DG_OPTION_NAME.'_meta_box_nonce' );
+      $ID = $post->ID;
+                  $icon = isset($dg_options['thumber']['thumbs'][$ID]['thumb_url']) ? $dg_options['thumber']['thumbs'][$ID]['thumb_url'] : DG_Thumber::getDefaultThumbnail($ID);
+
+                  echo '<table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">'.
+                     '<tbody><tr data-entry="'.$ID.'"><td class="column-icon media-icon"><img src="' .
+                     $icon.'" />'.'</td><td class="toggle column-toggle">' .
+                        '<span class="toggleLabel selected">Autogeneration</span>' .
+                        '<div class="toggle-btn">' .
+                           '<div class="toggle-round">' .
+                              '<input type="checkbox" name="gen-toggle[]" id="gen-toggle'.$ID.'" value="'.$ID.'"'.((isset($dg_options['thumber']['thumbs'][$ID]['thumber'][1]) && $dg_options['thumber']['thumbs'][$ID]['thumber'][1] !== 'manual') || empty($dg_options['thumber']['thumbs'][$ID]) ? '': ' checked' ).' />' .
+                              '<label for="gen-toggle'.$ID.'"></label>' .
+                           '</div>' .
+                        '</div>' .
+                        '<span class="toggleLabel">Manual selection</span>' .
+                        '<span class="manual-download">' .
+                           '<span class="dashicons dashicons-upload"></span>' .
+                           '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
+                           '<span class="buttons-area">' .
+                              '<input id="upload-button'.$ID.'" type="file" />' .
+                              '<input id="trigger-button'.$ID.'" type="button" value="Select File" class="button" />' .
+                           '</span>' .
+                        '</span>' .
+                     '</td></tr></tbody></table>'.
+                     (empty($dg_options['thumber']['thumbs'][$ID]) ? '<span class="dashicons dashicons-info"></span><span class="">Please note this attachment hasn&#39;t been used in any Document Gallery instance and so there is no autogenerated thumbnail, in the meantime default one is used instead.</span>' : '').PHP_EOL;
+   }
+
+   /**
+    * Save a Meta Box.
+    */
+   public static function saveMetaBox($post_id) {
+      // Check if our nonce is set.
+      // Verify that the nonce is valid.
+      // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+      if ( !isset($_POST[DG_OPTION_NAME.'_meta_box_nonce']) || !wp_verify_nonce($_POST[DG_OPTION_NAME.'_meta_box_nonce'], DG_OPTION_NAME.'_meta_box') || (defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE) ) {
+         return;
+      }
+      // NB_concern: should we check the user's permissions?
+   }
+
    /**
     * Render the Logging table.
     */

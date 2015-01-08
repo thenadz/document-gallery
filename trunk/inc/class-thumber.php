@@ -27,6 +27,18 @@ class DG_Thumber {
    }
 
    /**
+    * Sets the thumbnail for the given attachment ID.
+    * 
+    * @param int $ID Document ID.
+    * @param string $path System path to thumbnail.
+    * @return bool Whether set was successful.
+    */
+   public static function setThumbnail($ID, $path) {
+      self::$setThumbnailDummyPath = $path;
+      return (bool)self::getThumbnailTemplate(array(__CLASS__, 'setThumbnailDummyThumber'), $ID);
+   }
+   
+   /**
     * Wraps generation of thumbnails for various attachment filetypes.
     *
     * @param int $ID  Document ID
@@ -560,6 +572,70 @@ class DG_Thumber {
    }
 
    /*==========================================================================
+    * MANUAL THUMBNAILS
+    *=========================================================================*/
+
+   /**
+    * Set thumbnail for document with given ID from uploaded file.
+    *
+    * @param str $ID     The attachment ID to retrieve thumbnail for.
+    * @param int $pg     The page number to make thumbnail of -- index starts at 1.
+    * @return bool|str   False on failure, URL to thumb on success.
+    */
+   public static function manual($ID, $pg = 1) {
+      // checking if any file was delivered
+      if (!isset($_FILES['file']))
+         return false;
+      // we gonna process only first file
+      if ( !is_array($_FILES['file']['error']) )
+      {
+         $upload_err  = $_FILES['file']['error'];
+         $upload_name = $_FILES['file']['tmp_name'];
+         $upload_size = $_FILES['file']['size'];
+         $upload_type = $_FILES['file']['type'];
+      } else {
+         $upload_err  = $_FILES['file']['error'][0];
+         $upload_name = $_FILES['file']['tmp_name'][0];
+         $upload_size = $_FILES['file']['size'][0];
+         $upload_type = $_FILES['file']['type'][0];
+      }
+      $info = getimagesize($upload_name);
+      if ($info) {
+         if ($info['mime']!=$upload_type) {// NB_concern: Should be a "problem" at all or should we just use right extension for the thumbnail?
+            DG_Logger::writeLog(
+               DG_LogLevel::Warning,
+               __('File extension doesn\'t match the MIME type of the image: ', 'document-gallery') .
+               $pg.' - '.$info['mime']);// NB_concern: should it be Warning or Error? I believe it's not a software problem, it's issue of a user so - Warning
+            return false;
+         }
+         if ($upload_size>5242880) {// NB_concern: What limit should we use? It should correspond with limits in admin JavaScript and Thumbnails generation code
+            DG_Logger::writeLog(
+               DG_LogLevel::Warning,
+               __('Uploaded file size exceeds the allowable limit: ', 'document-gallery') .
+               $pg.' - '.$upload_size.'b');// NB_concern: should it be Warning or Error? I believe it's not a software problem, it's issue of a user so - Warning
+            return false;
+         }
+      } else {
+         DG_Logger::writeLog(
+            DG_LogLevel::Warning,
+            __('Uploaded file is not an image: ', 'document-gallery') .
+            $pg);// NB_concern: should it be Warning or Error? I believe it's not a software problem, it's issue of a user so - Warning
+         return false;
+      }
+      if ($upload_err == UPLOAD_ERR_OK && $upload_size > 0) {
+         $temp_file = $upload_name;
+      } else {
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Failed to get uploaded file: ', 'document-gallery') .
+            $upload_err);
+         return false;
+      }
+
+      return $temp_file;
+   }
+   
+   /*==========================================================================
     * GENERAL THUMBNAIL HELPER FUNCTIONS
     *=========================================================================*/
 
@@ -706,6 +782,11 @@ class DG_Thumber {
       $extless = substr($basename, 0, $len);
       $ext = self::getExt($temp_path);
 
+      // workaround for manually uploaded thumbnails - filename is passed in $pg
+      if (!$ext && $generator[1] === 'manual') {
+        $ext = self::getExt($pg);
+      }
+      
       $thumb_name = self::getUniqueThumbName($dirname, $extless, $ext);
       $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
 
@@ -739,6 +820,22 @@ class DG_Thumber {
       return array(
           'path' => $thumb_path,
           'url'  => preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url));
+   }
+   
+   /**
+    * @var string Dummy value used to pass thumbnail path to setThumbnailDummyThumber.
+    */
+   private static $setThumbnailDummyPath;
+   
+   /**
+    * A dummy method to pass into getThumbnailTemplate() as part of setThumbnail().
+    * 
+    * @param int $ID Unused.
+    * @param int $pg Unused.
+    * @return string Path pointing to thumbnail.
+    */
+   public static function setThumbnailDummyThumber($ID, $pg = 1) {
+      return self::$setThumbnailDummyPath;
    }
 
    /**

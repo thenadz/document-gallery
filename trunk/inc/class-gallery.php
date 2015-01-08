@@ -93,9 +93,24 @@ class DG_Gallery {
     * @param multitype:string $atts Array of attributes used in shortcode.
     */
    public function __construct($atts) {
+      $post = get_post();
+
       // empty string is passed when no arguments are given, but constructor expects an array
       $atts = empty($atts) ? array() : $atts;
-      $defaults = self::getOptions();
+      
+      if (!empty( $atts['ids'])) {
+         // 'ids' is explicitly ordered, unless you specify otherwise.
+         if (empty( $atts['orderby'])) {
+            $atts['orderby'] = 'post__in';
+         }
+         
+         $atts['include'] = $atts['ids'];
+      }
+      
+      // merge options w/ default values not stored in options
+      $defaults = array_merge(
+         array('id' => $post->ID, 'mime_types' => self::getDefaultMimeTypes(), 'include' => '', 'exclude' => ''),
+         self::getOptions());
 
       // values used to construct tax query (may be empty)
       $this->taxa = array_diff_key($atts, $defaults);
@@ -123,9 +138,9 @@ class DG_Gallery {
     * Cleans up user input, making sure we don't pass crap on to WP core.
     * @param multitype:string $defaults The defaults array to sanitize.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
-    * @param bool $isDefaults Whether we're sanitizing the defaults array (from DG_Admin).
+    * @param bool $isDefaults Whether we're sanitizing the defaults array from DG_Admin.
     */
-   public static function sanitizeDefaults($defaults, &$errs, $isDefaults = false) {
+   public static function sanitizeDefaults($defaults, &$errs, $isAdmin = false) {
       $old_defaults = self::getOptions();
       
       // remove invalid keys
@@ -147,21 +162,20 @@ class DG_Gallery {
          $sanitized[$k] = self::sanitizeParameter($k, $sanitized[$k], $errs);
       }
       
-      // process mime_types attribute separately since default value varies depending on images attribute
-      // TODO: Cleaner way to handle this?
-      if (!$isDefaults) {
-         if (isset($defaults['mime_types'])) {
-            $sanitized['mime_types'] = self::sanitizeMimeTypes($defaults['mime_types'], $err);
-            if (isset($err)) {
-               $errs['mime_types'] = $err;
-               unset($err);
-            }
-         } else {
-            $sanitized['mime_types'] = self::getDefaultMimeTypes($sanitized['images']);
-         }
+      // process values outside of DB options
+      if (!$isAdmin) {
+         $sanitized = self::sanitizeNonOptionDefaults($sanitized, $defaults, $errs);
       }
 
       return $sanitized;
+   }
+   
+   private static function sanitizeNonOptionDefaults($sanitized, $defaults, &$errs) {
+         $sanitized['id'] = self::sanitizeId($defaults['id'], $err);
+         
+         // NOTE: Not wasting time sanitizing ids, include, and exclude.
+         
+         return $sanitized;
    }
    
    /**
@@ -179,6 +193,7 @@ class DG_Gallery {
       
       $callable = array(__CLASS__, $funct);
       
+      // avoid looking for method beforehand unless we're running in debug mode -- expensive call
       if (DG_Logger::logEnabled() && !method_exists(__CLASS__, $funct)) {
          DG_Logger::writeLog(
             DG_LogLevel::Error,
@@ -190,7 +205,7 @@ class DG_Gallery {
       $ret = call_user_func_array($callable, array($value, &$err));
       
       // check for error and return default
-      if (is_null($ret)) {
+      if (isset($err)) {
          $defaults = self::getOptions();
          $ret = $defaults[$key];
          
@@ -247,6 +262,16 @@ class DG_Gallery {
 
       return $ret;
    }
+   
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The id value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return int The sanitized id value.
+    */
+   private static function sanitizeId($value, &$err) {
+      return $this->atts['id'] != -1 ? absint($this->atts['id']) : null;
+   }
 
    /**
     * Takes the provided value and returns a sanitized value.
@@ -255,19 +280,13 @@ class DG_Gallery {
     * @return bool|multitype:int The sanitized ids value.
     */
    private static function sanitizeIds($value, &$err) {
-      if(false === self::toBool($value)) {
-         $ret = false;
-      } else {
-         $value = trim($value);
-         $ret = $value ? explode(',', $value) : array();
-         $bad = array_filter($ret, array(__CLASS__, 'negativeInt'));
-
-         if(!empty($bad)) {
-            $err = _n('The following ID is invalid: ',
-                'The following IDs are invalid: ',
-                count($bad), 'document-gallery') . implode(', ', $bad);
-            $ret = null;
-         }
+      static $regex = '/(?:|\d+(?:,\d+)*)/';
+      
+      $ret = value;
+      
+      if (!preg_match($regex, $value)) {
+         $err = 
+         $ret = null;
       }
 
       return $ret;
@@ -331,20 +350,6 @@ class DG_Gallery {
    private static function sanitizeMimeTypes($value, &$err) {
       // TODO: do some actual sanitization...
       return $value;
-   }
-   
-   /**
-    * Gets the default mime types if no attribute is set.
-    * @param bool $ingImages Whether images are included in this gallery.
-    * @return string The comma-delimited mime types.
-    */
-   private static function getDefaultMimeTypes($incImages) {
-      $mime_types = array('application', 'video', 'text', 'audio');
-      if ($incImages) {
-         $mime_types[] = 'image';
-      }
-      
-      return implode(',', $mime_types);
    }
 
    /**
@@ -522,19 +527,32 @@ class DG_Gallery {
           'post_type'      => $this->atts['post_type'],
           'post_mime_type' => $this->atts['mime_types']);
 
-      $query['post_parent'] =
-          $this->atts['localpost']
-          && ($post = get_post()) ? $post->ID : '';
-
       $this->setTaxa($query);
 
       if(!empty($this->errs)) {
          throw new InvalidArgumentException();
       }
+      
+      // NOTE: Derived from gallery shortcode
+      if (!empty($include)) {
+         $query['include'] = $this->atts['include'];
+         $_attachments = get_posts($query);
 
-      return (false !== $this->atts['ids'])
-         ? $this->getAttachmentsByIds()
-         : get_posts($query);
+         $attachments = array();
+         foreach ($_attachments as $key => $val) {
+            $attachments[$val->ID] = $_attachments[$key];
+         }
+      } else {
+         // 0 => all attachments w/o a parent | null => all matched attachments
+         $query['post_parent'] = $this->atts['id'] != -1 ? absint($this->atts['id']) : null;
+         if (!empty($exclude)) {
+            $query['exclude'] = $this->atts['exclude'];
+         }
+         
+         $attachments = get_children($query);
+      }
+
+      return $attachments;
    }
 
    /**
@@ -762,10 +780,13 @@ class DG_Gallery {
             $core .= str_replace($find, $repl, $icon_wrapper);
          }
       } else {
-         for($i = 0; $i < count($this->docs); $i+=4) {
+         $cols = $this->atts['columns'];
+         $count = count($this->docs);
+         
+         for($i = 0; $i < $count; $i += $cols) {
             $repl[1] = '';
 
-            $min = min($i+4, count($this->docs));
+            $min = min($i + $cols, $count);
             for($x = $i; $x < $min; $x++) {
                $repl[1] .= $this->docs[$x];
             }
