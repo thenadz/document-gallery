@@ -58,6 +58,11 @@ if (is_admin()) {
    
    // build options page
    add_action('admin_menu', array('DG_Admin', 'addAdminPage'));
+   
+   // add meta box for managing thumbnail generation to attachment Edit Media page
+   add_action('add_meta_boxes', array('DG_Admin', 'addMetaBox'));
+   add_action('save_post', array('DG_Admin', 'saveMetaBox'));
+   
    if (DG_Admin::doRegisterSettings()) {
       add_action('admin_init', array('DG_Admin', 'registerSettings'));
    }
@@ -229,13 +234,15 @@ class DocumentGallery {
     */
    public static function localDateTimeFromTimestamp($timestamp) {
       static $gmt_offet = null;
-      static $wp_format = null;
+      static $wp_date_format = null;
+      static $wp_time_format = null;
       if (is_null($gmt_offet)) {
          $gmt_offet = get_option('gmt_offset');
-         $wp_format = get_option('date_format').' '.get_option('time_format');
+         $wp_date_format = get_option('date_format');
+         $wp_time_format = get_option('time_format');
       }
       
-      return date_i18n($wp_format, $timestamp + $gmt_offet * 3600);
+      return '<span class="nowrap">'.date_i18n($wp_date_format, $timestamp + $gmt_offet * 3600).'</span> <span class="nowrap">'.date_i18n($wp_time_format, $timestamp + $gmt_offet * 3600).'</span>';
    }
    
    /**

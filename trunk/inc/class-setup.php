@@ -55,11 +55,7 @@ class DG_Setup {
               // comma-separated list of attachment ids
               'ids'            => false,
                 
-              // if true, all images attached to current page will be included also
-              'images'         => false,
-                
-              // include just attached to the post using shortcode
-              'localpost'      => true,
+              'mime_types'     => 'application,video,text,audio',
                 
               // ascending/descending order for included documents
               'order'          => 'ASC',
@@ -78,6 +74,8 @@ class DG_Setup {
                 
               // the max number of thumbnails to return
               'limit'          => -1,
+                
+              'columns'        => 4
           ),
           'css' => array(
               // plain text of CSS to be edited by user
@@ -225,12 +223,18 @@ class DG_Setup {
    /**
     * Creating new meta branch in options to store plugin meta information.
     * 
+    * "Localpost" no longer supported. Replaced by "id" attribute.
+    * 
     * @param array $options The options to be modified.
     */
    private static function twoPointFour(&$options) {
       if (isset($options['version']) /*&& version_compare($options['version'], '2.4', '<')*/) {
          $options['meta'] = array('version' => $options['version']);
          unset($options['version']);
+         
+         unset($options['gallery']['localpost']);
+         unset($options['gallery']['images']);
+         $options['gallery']['columns'] = 4;
       }
    }
    
