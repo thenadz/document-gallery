@@ -34,8 +34,7 @@ class DG_Thumber {
     * @return bool Whether set was successful.
     */
    public static function setThumbnail($ID, $path) {
-      self::$setThumbnailDummyPath = $path;
-      return (bool)self::getThumbnailTemplate(array(__CLASS__, 'setThumbnailDummyThumber'), $ID);
+      return (bool)self::getThumbnailTemplate(null, $path);
    }
    
    /**
@@ -762,12 +761,15 @@ class DG_Thumber {
     *
     * @param callable $generator Takes ID and pg and returns path to temp file or false.
     * @param int $ID      ID for the attachment that we need a thumbnail for.
-    * @param int $pg      Page number of the attachment to get a thumbnail for.
+    * @param int|str $pg  Page number of the attachment to get a thumbnail for or the system path to the image to be used.
     * @return bool|array  Array containing 'url' and 'path' values or false.
     */
    public static function getThumbnailTemplate($generator, $ID, $pg = 1) {
+      if ($generator === null) {
+         $temp_path = $pg;
+      }
       // delegate thumbnail generation to $generator
-      if (false === ($temp_path = call_user_func($generator, $ID, $pg))) {
+      elseif (false === ($temp_path = call_user_func($generator, $ID, $pg))) {
          return false;
       }
 
@@ -781,11 +783,6 @@ class DG_Thumber {
       }
       $extless = substr($basename, 0, $len);
       $ext = self::getExt($temp_path);
-
-      // workaround for manually uploaded thumbnails - filename is passed in $pg
-      if (!$ext && $generator[1] === 'manual') {
-        $ext = self::getExt($pg);
-      }
       
       $thumb_name = self::getUniqueThumbName($dirname, $extless, $ext);
       $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
@@ -820,22 +817,6 @@ class DG_Thumber {
       return array(
           'path' => $thumb_path,
           'url'  => preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url));
-   }
-   
-   /**
-    * @var string Dummy value used to pass thumbnail path to setThumbnailDummyThumber.
-    */
-   private static $setThumbnailDummyPath;
-   
-   /**
-    * A dummy method to pass into getThumbnailTemplate() as part of setThumbnail().
-    * 
-    * @param int $ID Unused.
-    * @param int $pg Unused.
-    * @return string Path pointing to thumbnail.
-    */
-   public static function setThumbnailDummyThumber($ID, $pg = 1) {
-      return self::$setThumbnailDummyPath;
    }
 
    /**
