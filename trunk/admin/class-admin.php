@@ -585,7 +585,9 @@ class DG_Admin {
          $old_path = $ret['thumber']['thumbs'][$ID]['thumb_path'];
          $upload_filename = !is_array($_FILES['file']['name']) ? $_FILES['file']['name'] : $_FILES['file']['name'][0];
 
-         if ($thumb = DG_Thumber::getThumbnailTemplate(array('DG_Thumber', 'manual'), $ID, $upload_filename)) {
+         // TODO: move DG_Thumber::manual into DG_Admin
+         // DG_Thumber::manual() isn't actually "generating" so doesn't really fit inside generation harness -- replace with null and do that logic before calling harness
+         if (DG_Thumber::thumbnailGenerationHarness(array('DG_Thumber', 'manual'), $ID, $upload_filename)) {
             $ret['thumber']['thumbs'][$ID] = array(
                 'timestamp'         => time(),// NB_concern: should we preserve preceding timestamp if present?
                 'thumb_url'         => $thumb['url'],
