@@ -34,7 +34,7 @@ class DG_Thumber {
     * @return bool Whether set was successful.
     */
    public static function setThumbnail($ID, $path) {
-      return (bool)self::getThumbnailTemplate(null, $path);
+      return self::thumbnailGenerationHarness(null, $path);
    }
    
    /**
@@ -72,14 +72,7 @@ class DG_Thumber {
                   DG_Logger::writeLog(DG_LogLevel::Detail, $toLog);
                }
                
-               if ($thumb = self::getThumbnailTemplate($thumber, $ID, $pg)) {
-                  $options['thumbs'][$ID] = array(
-                      'timestamp'         => time(),
-                      'thumb_url'         => $thumb['url'],
-                      'thumb_path'        => $thumb['path'],
-                      'thumber'           => $thumber
-                  );
-                  self::setOptions($options);
+               if (self::thumbnailGenerationHarness($thumber, $ID, $pg)) {
                   break;
                }
             }
@@ -762,10 +755,10 @@ class DG_Thumber {
     * @param callable $generator Takes ID and pg and returns path to temp file or false.
     * @param int $ID      ID for the attachment that we need a thumbnail for.
     * @param int|str $pg  Page number of the attachment to get a thumbnail for or the system path to the image to be used.
-    * @return bool|array  Array containing 'url' and 'path' values or false.
+    * @return bool        Whether generation was successful.
     */
-   public static function getThumbnailTemplate($generator, $ID, $pg = 1) {
-      if ($generator === null) {
+   public static function thumbnailGenerationHarness($generator, $ID, $pg = 1) {
+      if ($generator === null && is_string($pg)) {
          $temp_path = $pg;
       }
       // delegate thumbnail generation to $generator
@@ -814,9 +807,16 @@ class DG_Thumber {
       @unlink($temp_path);
       self::deleteThumbMeta($ID);
 
-      return array(
-          'path' => $thumb_path,
-          'url'  => preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url));
+      // store new thumbnail in DG options
+      $options['thumbs'][$ID] = array(
+            'timestamp'         => time(),
+            'thumb_url'         => preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url),
+            'thumb_path'        => $thumb_path,
+            'thumber'           => $thumber
+      );
+      self::setOptions($options);
+      
+      return true;
    }
 
    /**
