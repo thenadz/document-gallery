@@ -33,8 +33,8 @@ class DG_Thumber {
     * @param string $path System path to thumbnail.
     * @return bool Whether set was successful.
     */
-   public static function setThumbnail($ID, $path) {
-      return self::thumbnailGenerationHarness(null, $path);
+   public static function setThumbnail($ID, $path, $generator = 'unknown') {
+      return self::thumbnailGenerationHarness($generator, $ID, $path);
    }
    
    /**
@@ -751,14 +751,18 @@ class DG_Thumber {
 
    /**
     * Template that handles generating a thumbnail.
+    * 
+    * If image has already been generated through other means, $pg may be set to the system path where the
+    * thumbnail is located. In this case, $generator will not be invoked, but *will* be kept for historical purposes.
     *
     * @param callable $generator Takes ID and pg and returns path to temp file or false.
     * @param int $ID      ID for the attachment that we need a thumbnail for.
     * @param int|str $pg  Page number of the attachment to get a thumbnail for or the system path to the image to be used.
     * @return bool        Whether generation was successful.
     */
-   public static function thumbnailGenerationHarness($generator, $ID, $pg = 1) {
-      if ($generator === null && is_string($pg)) {
+   private static function thumbnailGenerationHarness($generator, $ID, $pg = 1) {
+      // handle system page in $pg variable
+      if (is_string($pg) && !is_numeric($pg)) {
          $temp_path = $pg;
       }
       // delegate thumbnail generation to $generator
@@ -812,7 +816,7 @@ class DG_Thumber {
             'timestamp'         => time(),
             'thumb_url'         => preg_replace('#'.preg_quote($basename).'$#', $thumb_name, $doc_url),
             'thumb_path'        => $thumb_path,
-            'thumber'           => $thumber
+            'thumber'           => $generator
       );
       self::setOptions($options);
       
