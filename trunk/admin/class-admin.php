@@ -587,6 +587,7 @@ class DG_Admin {
 
          // TODO: move DG_Thumber::manual into DG_Admin
          // DG_Thumber::manual() isn't actually "generating" so doesn't really fit inside generation harness -- replace with null and do that logic before calling harness
+         // TODO2: Replace with call to DG_Thumber::setThumbnail(). DG_Thumber::thumbnailGenerationHarness is now private.
          if (DG_Thumber::thumbnailGenerationHarness(array('DG_Thumber', 'manual'), $ID, $upload_filename)) {
             $ret['thumber']['thumbs'][$ID] = array(
                 'timestamp'         => time(),// NB_concern: should we preserve preceding timestamp if present?
