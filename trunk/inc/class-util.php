@@ -7,8 +7,17 @@ defined('WPINC') OR exit;
  * @author drossiter
  */
 class DG_Document {
+   /**
+    * @var callable Either native JSON encode or custom JSON encode if needed.
+    */
    private static $jsonEncode;
    
+   /**
+    * Wraps JSON encoding functionality, utilizing native functions if available.
+    * 
+    * @param unknown $decoded Value to be encoded.
+    * @return string The JSON string.
+    */
    public static function jsonEncode($decoded) {
       if (!isset(self::$jsonEncode)) {
          self::$jsonEncode = 'json_encode';
@@ -26,10 +35,14 @@ class DG_Document {
       return $ret;
    }
    
+   /**
+    * Home-made JSON encode to replace mssing json_encode when needed.
+    * 
+    * @param unknown $decoded Value to be encoded.
+    * @return string The JSON string.
+    */
    private static function _jsonEncode($decoded) {
-      $isJsonObj = is_object($decoded) || isAssociativeArray($decoded);
-      
-      if ($isJsonObj) {
+      if (self::isJsonObj($decoded)) {
          $ret = '';
          $first = true;
          foreach ($decoded as $k => $v) {
@@ -42,21 +55,27 @@ class DG_Document {
       } elseif (is_array($decoded)) {
          return '[' . implode(',', array_map(array(__CLASS__, __FUNCTION__), $decoded)) . ']';
       } elseif (is_bool($decoded)) {
-         static $boolMap = array('false', 'true');
-         return $boolMap[(int)$decoded];
+         static $boolMap = array(false => 'false', true => 'true');
+         return $boolMap[$decoded];
       } elseif (is_string($decoded)) {
          return '"' . str_replace(array('\\', '"'), array('\\\\', '\\"'), $decoded) . '"';
-      } else {
-         return (string)$decoded;
       }
+      
+      return (string)$decoded;
    }
    
-   private static function isAssociativeArray($array) {
-      $ret = false;
+   /**
+    * Returns true for PHP objects and associative arrays.
+    * 
+    * @param unknown $decoded Value to be checked.
+    * @return bool Whether passed value should be encoded as a JSON object.
+    */
+   private static function isJsonObj($decoded) {
+      $ret = is_object($decoded);
       
-      if (is_array($array)) {
+      if (!$ret && is_array($decoded)) {
          $next = 0;
-         foreach (array_keys($array) as $k) {
+         foreach (array_keys($decoded) as $k) {
             if ($next++ !== $k) {
                $ret = true;
                break;
