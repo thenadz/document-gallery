@@ -10,7 +10,7 @@ class DG_Document {
    /**
     * @var callable Either native JSON encode or custom JSON encode if needed.
     */
-   private static $jsonEncode;
+   private static $nativeJsonEncode;
    
    /**
     * Wraps JSON encoding functionality, utilizing native functions if available.
@@ -19,20 +19,12 @@ class DG_Document {
     * @return string The JSON string.
     */
    public static function jsonEncode($decoded) {
-      if (!isset(self::$jsonEncode)) {
-         self::$jsonEncode = 'json_encode';
-         if (!function_exists($getNativeJsonEncode)) {
-            self::$jsonEncode = array(__CLASS__, '_jsonEncode');
-         }
+      if (!isset(self::$nativeJsonEncode)) {
+         self::$nativeJsonEncode = function_exists('json_encode');
       }
       
       // do encoding
-      $ret = call_user_func(self::$jsonEncode, $decoded);
-      if (false === $ret) {
-         DG_Logger::writeLog(DG_LogLevel::Error, 'Failed to encode JSON: ' . var_dump($decoded));
-      }
-      
-      return $ret;
+      return self::$nativeJsonEncode ? json_encode($decoded) : self::_jsonEncode($decoded);
    }
    
    /**
