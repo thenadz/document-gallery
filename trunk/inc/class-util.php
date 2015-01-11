@@ -31,9 +31,13 @@ class DG_Document {
       
       if ($isJsonObj) {
          $ret = '';
-         foreach (array_map(array(__CLASS__, __FUNCTION__), $decoded) as $k => $v) {
-            $ret .= "\"$k\":$v";
+         $first = true;
+         foreach ($decoded as $k => $v) {
+            if (!$first) $ret .= ',';
+            $ret .= "\"$k\":" . self::_jsonEncode($v);
+            $first = false;
          }
+         
          return "\{$ret\}";
       } elseif (is_array($decoded)) {
          return '[' . implode(',', array_map(array(__CLASS__, __FUNCTION__), $decoded)) . ']';
