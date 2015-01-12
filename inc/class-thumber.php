@@ -36,7 +36,7 @@ class DG_Thumber {
    public static function setThumbnail($ID, $path, $generator = 'unknown') {
       return self::thumbnailGenerationHarness($generator, $ID, $path);
    }
-   
+
    /**
     * Wraps generation of thumbnails for various attachment filetypes.
     *
@@ -71,8 +71,9 @@ class DG_Thumber {
                           'document-gallery'), $ID, is_array($thumber) ? implode('::',$thumber) : print_r($thumber, true));
                   DG_Logger::writeLog(DG_LogLevel::Detail, $toLog);
                }
-               
+
                if (self::thumbnailGenerationHarness($thumber, $ID, $pg)) {
+                  $options = self::getOptions();
                   break;
                }
             }
@@ -233,7 +234,7 @@ class DG_Thumber {
       if (is_null($gs)) {
          $options = self::getOptions();
          $gs = $options['gs'];
-         
+
          if (false !== $gs) {
             $gs = escapeshellarg($gs) . ' -sDEVICE=png16m -dFirstPage=%d'
                 . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s 2>&1';
@@ -315,30 +316,30 @@ class DG_Thumber {
          if (!empty($executable)) {
             return $executable;
          }
-         
+
          // GoDaddy and others aren't setup in such a way that
          // the above works so we need to fallback to a direct
          // filesystem check in most common location
          exec('test -e /usr/bin/gs', $dummy, $ret);
          $executable = ($ret === 0) ? '/usr/bin/gs' : false;
-         
+
          return $executable;
       }
 
       return $executable;
    }
-   
+
    /**
     * @return bool Whether we can use the GS executable.
     */
    public static function isGhostscriptAvailable() {
       static $ret = null;
-      
+
       if (is_null($ret)) {
          $options = self::getOptions();
          $ret = $options['gs'] && self::isExecAvailable();
       }
-      
+
       return $ret;
    }
 
@@ -422,13 +423,13 @@ class DG_Thumber {
     */
    public static function isGoogleDriveAvailable() {
       static $available = null;
-      
+
       if (is_null($available)) {
          // to check if we're visible externally, retrieve image for file we know exists.
          $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
          $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=1&w=1';
          $google_viewer = sprintf($google_viewer, urlencode(DG_URL . 'LICENSE.txt'));
-         
+
          // args for use in HTTP request
          $args = array(
              'redirection' => 5,
@@ -442,12 +443,12 @@ class DG_Thumber {
              'decompress' => true,
              'sslverify' => true
          );
-         
+
          $response = wp_remote_get($google_viewer, $args);
 
          $available = (!is_wp_error($response) && $response['response']['code'] != 404);
       }
-      
+
       return $available;
    }
 
@@ -564,70 +565,6 @@ class DG_Thumber {
    }
 
    /*==========================================================================
-    * MANUAL THUMBNAILS
-    *=========================================================================*/
-
-   /**
-    * Set thumbnail for document with given ID from uploaded file.
-    *
-    * @param str $ID     The attachment ID to retrieve thumbnail for.
-    * @param int $pg     The page number to make thumbnail of -- index starts at 1.
-    * @return bool|str   False on failure, URL to thumb on success.
-    */
-   public static function manual($ID, $pg = 1) {
-      // checking if any file was delivered
-      if (!isset($_FILES['file']))
-         return false;
-      // we gonna process only first file
-      if ( !is_array($_FILES['file']['error']) )
-      {
-         $upload_err  = $_FILES['file']['error'];
-         $upload_name = $_FILES['file']['tmp_name'];
-         $upload_size = $_FILES['file']['size'];
-         $upload_type = $_FILES['file']['type'];
-      } else {
-         $upload_err  = $_FILES['file']['error'][0];
-         $upload_name = $_FILES['file']['tmp_name'][0];
-         $upload_size = $_FILES['file']['size'][0];
-         $upload_type = $_FILES['file']['type'][0];
-      }
-      $info = getimagesize($upload_name);
-      if ($info) {
-         if ($info['mime']!=$upload_type) {// NB_concern: Should be a "problem" at all or should we just use right extension for the thumbnail?
-            DG_Logger::writeLog(
-               DG_LogLevel::Warning,
-               __('File extension doesn\'t match the MIME type of the image: ', 'document-gallery') .
-               $pg.' - '.$info['mime']);// NB_concern: should it be Warning or Error? I believe it's not a software problem, it's issue of a user so - Warning
-            return false;
-         }
-         if ($upload_size>5242880) {// NB_concern: What limit should we use? It should correspond with limits in admin JavaScript and Thumbnails generation code
-            DG_Logger::writeLog(
-               DG_LogLevel::Warning,
-               __('Uploaded file size exceeds the allowable limit: ', 'document-gallery') .
-               $pg.' - '.$upload_size.'b');// NB_concern: should it be Warning or Error? I believe it's not a software problem, it's issue of a user so - Warning
-            return false;
-         }
-      } else {
-         DG_Logger::writeLog(
-            DG_LogLevel::Warning,
-            __('Uploaded file is not an image: ', 'document-gallery') .
-            $pg);// NB_concern: should it be Warning or Error? I believe it's not a software problem, it's issue of a user so - Warning
-         return false;
-      }
-      if ($upload_err == UPLOAD_ERR_OK && $upload_size > 0) {
-         $temp_file = $upload_name;
-      } else {
-         DG_Logger::writeLog(
-            DG_LogLevel::Error,
-            __('Failed to get uploaded file: ', 'document-gallery') .
-            $upload_err);
-         return false;
-      }
-
-      return $temp_file;
-   }
-   
-   /*==========================================================================
     * GENERAL THUMBNAIL HELPER FUNCTIONS
     *=========================================================================*/
 
@@ -722,17 +659,17 @@ class DG_Thumber {
 
          // allow users to filter thumbers used
          $thumbers = apply_filters('dg_thumbers', $thumbers);
-         
+
          // strip out anything that can't be called
          $thumbers = array_filter($thumbers, 'is_callable');
-         
+
          // log which thumbers are being used
          if (DG_Logger::logEnabled()) {
             if (count($thumbers) > 0) {
                $entry = __('Thumbnail Generators: ', 'document-gallery');
                foreach ($thumbers as $k => $v) {
                   $thumber = is_array($v) ? implode('::', $v) : print_r($v, true);
-                  
+
                   // TODO: The following works for all internal regexes, but may have unpredictable
                   // results if developer adds additional thumbnail generators using different regexes
                   $filetypes = str_replace('|', ', ', $k);
@@ -780,7 +717,7 @@ class DG_Thumber {
       }
       $extless = substr($basename, 0, $len);
       $ext = self::getExt($temp_path);
-      
+
       $thumb_name = self::getUniqueThumbName($dirname, $extless, $ext);
       $thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
 
@@ -819,7 +756,7 @@ class DG_Thumber {
             'thumber'           => $generator
       );
       self::setOptions($options);
-      
+
       return true;
    }
 
@@ -837,7 +774,7 @@ class DG_Thumber {
          $tmp = untrailingslashit(get_temp_dir());
       }
 
-      return $tmp . DIRECTORY_SEPARATOR . wp_unique_filename($tmp, "$base.$ext");
+      return $tmp . DIRECTORY_SEPARATOR . wp_unique_filename($tmp, $base.'.'.$ext);
    }
 
    /**
@@ -873,7 +810,7 @@ class DG_Thumber {
             $modified = true;
          }
       }
-      
+
       if ($modified) { self::setOptions($options); }
    }
 
@@ -911,12 +848,17 @@ class DG_Thumber {
     * @param str $filename  Name of the file to get extension from.
     * @return str|bool      Returns the file extension on success, false on failure.
     */
-   private static function getExt($filename) {
-      foreach (array_keys(wp_get_mime_types()) as $ext_preg) {
-         $ext_preg = '!\.(' . $ext_preg . ')$!i';
-         if (preg_match($ext_preg, $filename, $ext_matches)) {
-            return $ext_matches[1];
+   private static function getExt($filename, $img = false) {
+      $options = $img ? array('jpg', 'jpeg', 'gif', 'png', 'bmp') : array_keys(wp_get_mime_types());
+      if ($ext = pathinfo($filename, PATHINFO_EXTENSION)) {
+         $res = preg_grep('/^(?:.*\|)?' . $ext . '(?:\|.*)?$/i', $options);
+         $res = reset($res);
+         if ($res!== false) {
+            return $ext;
          }
+      }
+      elseif ( ($info = getimagesize($filename)) && ($ext = image_type_to_extension($info[2], false)) ) {
+         return $ext;
       }
 
       return false;
