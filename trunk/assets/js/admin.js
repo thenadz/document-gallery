@@ -17,7 +17,7 @@ jQuery(document).ready(function(){
    });
    jQuery('input.current-page').bind('keypress', {}, function(e) {
       var code = (e.keyCode ? e.keyCode : e.which);
-      if (code == 13) { //Enter keycode
+      if (code == 13) {//Enter keycode
          e.preventDefault();
          jQuery(location).attr('href','?'+jQuery.param(jQuery.extend(URL_params,{ sheet: this.value })));
       }
@@ -26,25 +26,25 @@ jQuery(document).ready(function(){
       jQuery(location).attr('href','?'+jQuery.param(jQuery.extend(URL_params,{ limit: this.value })));
    });
    jQuery('#tab-Thumbnail').submit( function (event) {
-	  event.preventDefault();
-	  if (jQuery('.cb-ids:checked').length > 0) {
+      event.preventDefault();
+      if (jQuery('.cb-ids:checked').length > 0) {
          var a = jQuery(this).attr('action');
          var b = jQuery(this).serialize() +
             '&document_gallery%5Bajax%5D=true' +
             '&document_gallery%5Bcleanup%5D=true';
          jQuery.post(a, b, function(response) {
-    	    if (response.indexOf("\n") == -1) {
+            if (response.indexOf("\n") == -1) {
                eval('var reply = ' + response + ';');
                if (reply.result) {
                   var result = reply.deleted;
                   for (var index in result) {
-    	             jQuery('input[type=checkbox][value='+result[index]+']').closest('tr').fadeOut('slow', 0.00, function() {jQuery(this).slideUp('slow', function() {jQuery(this).remove();});});
-    	          }
+                     jQuery('input[type=checkbox][value='+result[index]+']').closest('tr').fadeOut('slow', 0.00, function() {jQuery(this).slideUp('slow', function() {jQuery(this).remove();});});
+                  }
                }
-    	    } else {
-    		   console.log('Invalid response from server:');
-    		   console.log(response);
-    	    }
+            } else {
+               console.log('Invalid response from server:');
+               console.log(response);
+            }
          } ).fail(function() {
             console.log( 'Problem in reaching the server' );
          });
@@ -94,7 +94,7 @@ jQuery(document).ready(function(){
          }
       }
    });
-   
+
    function DragDropFilesStop(e) {
       e = e || event;
       if (e.dataTransfer.types) {
@@ -160,7 +160,7 @@ jQuery(document).ready(function(){
             if (e.originalEvent.dataTransfer.types[i] == 'Files') {
                counter[jQuery(this).data('entry')]--;
                if (counter[jQuery(this).data('entry')] === 0) {
-                  this.classList.remove('dragover');  // this / e.target is previous target element.
+                  this.classList.remove('dragover');// this / e.target is previous target element.
                }
                break;
             }
@@ -174,7 +174,7 @@ jQuery(document).ready(function(){
          for (var i = 0; i < e.originalEvent.dataTransfer.types.length; i++) {
             if (e.originalEvent.dataTransfer.types[i] == 'Files') {
 
-               e.stopPropagation(); // Stops some browsers from redirecting.
+               e.stopPropagation();// Stops some browsers from redirecting.
                e.preventDefault();
 
                processFiles(e.originalEvent.dataTransfer.files,jQuery(this).data('entry'));
@@ -195,12 +195,8 @@ jQuery(document).ready(function(){
 
    function processFiles(files,entry) {
       for (var i = 0, f; f = files[i]; i++) {
-
-         //Read the File objects in this FileList.
-         /*console.log('Name: '+f.name + ' ; Filesize: ' + f.size+'b' + ' ; MIME-type: ' + f.type);*/
-
-         //Processing only first qualifying
-         if (f.type.indexOf('image/') == 0 && f.size <= 5242880) {
+         //Processing only first qualifying file
+         if (f.type.indexOf('image/') == 0 && typeof dg_admin_vars.upload_limit != 'undefined' && f.size <= parseInt(dg_admin_vars.upload_limit)) {
             var form = document.getElementById('tab-Thumbnail');
             var formData = new FormData(form);
             formData.append('document_gallery[entry]', entry);
@@ -212,11 +208,9 @@ jQuery(document).ready(function(){
             var theImg = jQuery('[data-entry='+entry+']').find('.column-icon img');
             xhr.onreadystatechange = function() {
                if (xhr.readyState == 4) {
-                  console.log('I`m back!');
                   if (xhr.responseText.indexOf("\n") == -1) {
                      eval('var response = ' + xhr.responseText + ';');
                      if (response.result) {
-                        console.log('Perfect');
                         // check if generated thumbnail has the same url
                         if (response.url === theImg.attr('src')) {
                            theImg.attr('src', theImg.attr('src') + '?' + new Date().getTime());
@@ -231,84 +225,31 @@ jQuery(document).ready(function(){
                }
             }
             xhr.send(formData);
-            console.log('sent');
             break;
          }
       }
    }
 
-   function switchChange(thisObj) {
-      jQuery(thisObj).closest('.column-toggle').find('.toggleLabel').toggleClass('selected');
-      if(jQuery(thisObj).is(':checked')) {
-         jQuery(thisObj).closest('tr')
-            .on('dragenter', handleDragEnter)
-            .on('dragover', handleDragOver)
-            .on('dragleave', handleDragLeave)
-            .on('drop', handleDrop);
-         counter[jQuery(thisObj).val()] = 0;
-         jQuery(thisObj).closest('.column-toggle').find('input:button').on('click', function() {
+   // Prepairing all the drop-zones on page load
+   jQuery('#ThumbsTable tbody tr').each(function() {
+      jQuery(this)
+         .on('dragenter', handleDragEnter)
+         .on('dragover',  handleDragOver)
+         .on('dragleave', handleDragLeave)
+         .on('drop',      handleDrop);
+      counter[jQuery(this).data('entry')] = 0;
+      jQuery(this).find('input:button').on('click', function() {
             jQuery(this).prevAll('input:file').click();
-         });
-         jQuery(thisObj).closest('.column-toggle').find('input:file').on('change', handleBrowseButton);
-      } else {
-         jQuery(thisObj).closest('tr').off();
-         delete counter[jQuery(thisObj).val()];
-         jQuery(thisObj).closest('.column-toggle').find('input').off();
-      }
-   }
-
-   jQuery('.toggle-btn input:checkbox').change(function() {
-      switchChange(this);
-      var gen;
-      if(jQuery(this).is(':checked')) {
-         gen = 'manual';
-      } else {
-         gen = 'auto';
-      }
-      var theForm = jQuery(this).closest('form');
-      var a = theForm.attr('action');
-      var b = theForm.serialize() +
-         '&document_gallery%5Bajax%5D=true' +
-         '&document_gallery%5Bgen%5D=' + gen +
-         '&document_gallery%5Bentry%5D=' + jQuery(this).val();
-      jQuery.post(a, b, function(response) {
-         if (response.indexOf("\n") == -1) {
-            eval('var reply = ' + response + ';');
-            if (reply.result) {
-               var cb = jQuery('#gen-toggle'+reply.entry);
-               if (cb.is(':checked') != reply.checked)
-               {
-                  cb.attr('checked', !cb.is(':checked'));
-                  switchChange(cb);
-               }
-            }
-         } else {
-            console.log('Invalid response from server:');
-            console.log(response);
-         }
-      } ).fail(function() {
-         console.log( 'Problem in reaching the server' );
       });
+      jQuery(this).find('input:file').on('change', handleBrowseButton);
    });
-
-   jQuery('.toggleLabel').click(function() {
-      if (!jQuery(this).hasClass('selected'))
-      {
-         var cb = jQuery(this).siblings('.toggle-btn').find('input:checkbox');
-         cb.attr('checked', !cb.is(':checked')).change();
-      }
-   });
-
-   // Processing checked-stated switches on page load
-   jQuery('.toggle-btn input:checked').each(function() {switchChange(this);});
 
    //Checking Drag&Drop support
    //Structure is Not supported in Chrome's WebKit
    /*if (!('files' in DataTransfer.prototype)) {//Determine presence of HTML5 drag'n'drop file upload API - http://stackoverflow.com/a/2312859/3951387
       jQuery('.html5dndmarker').hide();
    }*/
-   if (!('draggable' in document.createElement('span')))
-   {
+   if (!('draggable' in document.createElement('span'))) {
       jQuery('.html5dndmarker').hide();
    }
 });

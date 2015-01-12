@@ -26,6 +26,9 @@ global $dg_options;
 define('DG_OPTION_NAME', 'document_gallery');
 $dg_options = get_option(DG_OPTION_NAME, null);
 
+// DG general utility functions
+include_once DG_PATH . 'inc/class-util.php';
+
 // logging functionality
 include_once DG_PATH . 'inc/class-logger.php';
 
