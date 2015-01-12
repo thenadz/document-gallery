@@ -77,8 +77,7 @@ class DG_Gallery {
     * Initializes static values for this class.
     */
    public static function init() {
-      if (!isset(self::$comment))
-      {
+      if (!isset(self::$comment)) {
          self::$comment =
             PHP_EOL . '<!-- ' . __('Generated using Document Gallery. Get yours here: ', 'document-gallery') .
             'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
@@ -97,16 +96,16 @@ class DG_Gallery {
 
       // empty string is passed when no arguments are given, but constructor expects an array
       $atts = empty($atts) ? array() : $atts;
-      
+
       if (!empty( $atts['ids'])) {
          // 'ids' is explicitly ordered, unless you specify otherwise.
          if (empty( $atts['orderby'])) {
             $atts['orderby'] = 'post__in';
          }
-         
+
          $atts['include'] = $atts['ids'];
       }
-      
+
       // merge options w/ default values not stored in options
       $defaults = array_merge(
          array('id' => $post->ID, 'mime_types' => self::getDefaultMimeTypes(), 'include' => '', 'exclude' => ''),
@@ -142,10 +141,10 @@ class DG_Gallery {
     */
    public static function sanitizeDefaults($defaults, &$errs, $isAdmin = false) {
       $old_defaults = self::getOptions();
-      
+
       // remove invalid keys
-      $sanitized = array_intersect_key($defaults, $old_defaults);
-      
+      $sanitized = is_array($defaults)? array_intersect_key($defaults, $old_defaults) : array();
+
       // add any missing keys & sanitize each value
       foreach ($old_defaults as $k => $v) {
          if (!isset($sanitized[$k])) {
@@ -157,27 +156,27 @@ class DG_Gallery {
                $sanitized[$k] = $v;
             }
          }
-         
+
          // sanitize value
          $sanitized[$k] = self::sanitizeParameter($k, $sanitized[$k], $errs);
       }
-      
+
       // process values outside of DB options
       if (!$isAdmin) {
          $sanitized = self::sanitizeNonOptionDefaults($sanitized, $defaults, $errs);
+         }
+
+      return $sanitized;
       }
+
+   private static function sanitizeNonOptionDefaults($sanitized, $defaults, &$errs) {
+         $sanitized['id'] = self::sanitizeId($defaults['id'], $err);
+
+         // NOTE: Not wasting time sanitizing ids, include, and exclude.
 
       return $sanitized;
    }
-   
-   private static function sanitizeNonOptionDefaults($sanitized, $defaults, &$errs) {
-         $sanitized['id'] = self::sanitizeId($defaults['id'], $err);
-         
-         // NOTE: Not wasting time sanitizing ids, include, and exclude.
-         
-         return $sanitized;
-   }
-   
+
    /**
     * 
     * @param string $key The key to reference the current value in the defaults array.
@@ -190,9 +189,9 @@ class DG_Gallery {
       $funct = $key;
       $funct[0] = strtoupper($funct[0]);
       $funct = 'sanitize' . preg_replace_callback('/_([a-z])/', array(__CLASS__, 'secondCharToUpper'), $funct);
-      
+
       $callable = array(__CLASS__, $funct);
-      
+
       // avoid looking for method beforehand unless we're running in debug mode -- expensive call
       if (DG_Logger::logEnabled() && !method_exists(__CLASS__, $funct)) {
          DG_Logger::writeLog(
@@ -203,15 +202,15 @@ class DG_Gallery {
 
       // call param-specific sanitization
       $ret = call_user_func_array($callable, array($value, &$err));
-      
+
       // check for error and return default
       if (isset($err)) {
          $defaults = self::getOptions();
          $ret = $defaults[$key];
-         
+
          $errs[$key] = $err;
       }
-      
+
       return $ret;
    }
 
@@ -262,7 +261,7 @@ class DG_Gallery {
 
       return $ret;
    }
-   
+
    /**
     * Takes the provided value and returns a sanitized value.
     * @param string $value The id value to be sanitized.
@@ -281,13 +280,13 @@ class DG_Gallery {
     */
    private static function sanitizeIds($value, &$err) {
       static $regex = '/(?:|\d+(?:,\d+)*)/';
-      
+
       $ret = value;
-      
+
       if (!preg_match($regex, $value)) {
          $err = 
-         $ret = null;
-      }
+            $ret = null;
+         }
 
       return $ret;
    }
@@ -316,12 +315,12 @@ class DG_Gallery {
     */
    private static function sanitizeLimit($value, &$err) {
       $ret = intval($value);
-      
+
       if (is_null($ret) || $ret < -1) {
          $err = sprintf(self::$unary_err, 'limit', '>= -1');
          $ret = null;
       }
-      
+
       return $ret;
    }
 
@@ -360,7 +359,7 @@ class DG_Gallery {
     */
    private static function sanitizeOrder($value, &$err) {
       $ret = strtoupper($value);
-      
+
       if(!in_array($ret, self::getOrderOptions())) {
          $err = sprintf(self::$binary_err, 'order', 'ASC', 'DESC', $value);
          $ret = null;
@@ -384,7 +383,7 @@ class DG_Gallery {
     */
    private static function sanitizeOrderby($value, &$err) {
       $ret = ('ID' === strtoupper($value)) ? 'ID' : strtolower($value);
-      
+
       if (!in_array($ret, self::getOrderbyOptions())) {
          $err = sprintf(self::$unary_err, 'orderby', $value);
          $ret = null;
@@ -401,7 +400,7 @@ class DG_Gallery {
           'menu_order', 'modified', 'name', 'none',
           'parent', 'post__in', 'rand', 'title');
    }
-   
+
    /**
     * Takes the provided value and returns a sanitized value.
     * @param string $value The post_status value to be sanitized.
@@ -409,16 +408,16 @@ class DG_Gallery {
     * @return string The sanitized post_status value.
     */
    private static function sanitizePostStatus($value, &$err) {
-      $ret = preg_grep('/' . preg_quote($value) .'/i', self::getPostStatuses());
+      $ret = preg_grep('/^' . preg_quote($value) .'$/i', self::getPostStatuses());
       $ret = reset($ret);
-      
+
       if($ret === false) {
          $err = sprintf(self::$unary_err, 'post_status', $value);
       }
-      
+
       return $ret;
    }
-   
+
    /**
     * @return multitype:string All registered post statuses.
     */
@@ -429,10 +428,10 @@ class DG_Gallery {
          $statuses[] = 'any';
          asort($statuses);
       }
-      
+
       return $statuses;
    }
-   
+
    /**
     * Takes the provided value and returns a sanitized value.
     * @param string $value The post_type value to be sanitized.
@@ -440,16 +439,16 @@ class DG_Gallery {
     * @return string The sanitized post_type value.
     */
    private static function sanitizePostType($value, &$err) {
-      $ret = preg_grep('/' . preg_quote($value) .'/i', self::getPostTypes());
+      $ret = preg_grep('/^' . preg_quote($value) .'$/i', self::getPostTypes());
       $ret = reset($ret);
-      
+
       if($ret === false) {
          $err = sprintf(self::$unary_err, 'post_type', $value);
       }
-      
+
       return $ret;
    }
-   
+
    /**
     * @return multitype:string All registered post types.
     */
@@ -460,7 +459,7 @@ class DG_Gallery {
          $types[] = 'any';
          asort($types);
       }
-      
+
       return $types;
    }
 
@@ -472,7 +471,7 @@ class DG_Gallery {
     */
    private static function sanitizeRelation($value, &$err) {
       $ret = strtoupper($value);
-      
+
       if(!in_array($ret, self::getRelationOptions())) {
          $err = sprintf(self::$binary_err, 'relation', 'AND', 'OR', $value);
          $ret = null;
@@ -495,7 +494,7 @@ class DG_Gallery {
     */
    private function sanitizeOperator($operator) {
       $ret = strtoupper($operator);
-      
+
       if (!in_array($ret, self::getOperatorOptions())) {
          $this->errs[] = sprintf(self::$binary_err, $key, 'IN", "NOT IN", "OR', 'AND', $operator);
          $ret = null;
@@ -512,7 +511,7 @@ class DG_Gallery {
    public static function getOperatorOptions() {
       return array('IN', 'NOT IN', 'AND', 'OR');
    }
-   
+
    /**
     * Gets all valid Documents based on the attributes passed by the user.
     * @return multitype:unknown Contains all documents matching the query.
@@ -532,7 +531,7 @@ class DG_Gallery {
       if(!empty($this->errs)) {
          throw new InvalidArgumentException();
       }
-      
+
       // NOTE: Derived from gallery shortcode
       if (!empty($include)) {
          $query['include'] = $this->atts['include'];
@@ -548,7 +547,7 @@ class DG_Gallery {
          if (!empty($exclude)) {
             $query['exclude'] = $this->atts['exclude'];
          }
-         
+
          $attachments = get_children($query);
       }
 
@@ -567,7 +566,7 @@ class DG_Gallery {
          $operator = array();
          $suffix = array('relation', 'operator');
          $pattern = '/(.+)_(?:' . implode('|', $suffix) . ')$/i';
-         
+
          // find any relations for taxa
          $iterable = $this->taxa;
          foreach ($iterable as $key => $value) {
@@ -579,7 +578,7 @@ class DG_Gallery {
                }
             }
          }
-         
+
          // build tax query
          foreach ($this->taxa as $taxon => $terms) {
             $terms = $this->getTermIdsByNames($taxon, explode(',', $terms));
@@ -637,7 +636,7 @@ class DG_Gallery {
    private function getTermXByNames($x, $taxon, $term_names) {
       $ret = array();
       $valid = true;
-      
+
       // taxons may optionally be prefixed by 'tax_' --
       // this is only useful when avoiding collisions with other attributes
       if (!taxonomy_exists($taxon)) {
@@ -688,7 +687,7 @@ class DG_Gallery {
    private static function secondCharToUpper($string) {
       return strtoupper($string[1]);
    }
-   
+
    /**
     * Function returns false for positive ints, true otherwise.
     * @param string $var could be anything.
@@ -709,16 +708,16 @@ class DG_Gallery {
       if (is_null($val)) {
          return false;
       }
-      
+
       if (is_bool($val)) {
          return $val;
       }
-      
+
       if (is_int($val)) {
          if (1 === $val) {
             return true;
          }
-         
+
          if (0 === $val) {
             return false;
          }
@@ -753,7 +752,7 @@ class DG_Gallery {
       if (is_null($find)) {
          $find = array('%class%', '%icons%');
       }
-      
+
       if(!empty($this->errs)) {
          return '<p>' . implode('</p><p>', $this->errs) . '</p>';
       }
@@ -761,7 +760,7 @@ class DG_Gallery {
       if(empty($this->docs)) {
          return self::$no_docs;
       }
-      
+
       $icon_wrapper = apply_filters(
          'dg_row_template',
          '<div class="%class%">'. PHP_EOL . '%icons%' . PHP_EOL . '</div>' . PHP_EOL,
