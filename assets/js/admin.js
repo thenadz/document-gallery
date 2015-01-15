@@ -197,14 +197,20 @@ jQuery(document).ready(function(){
       for (var i = 0, f; f = files[i]; i++) {
          //Processing only first qualifying file
          if (f.type.indexOf('image/') == 0 && typeof dg_admin_vars.upload_limit != 'undefined' && f.size <= parseInt(dg_admin_vars.upload_limit)) {
-            var form = document.getElementById('tab-Thumbnail');
-            var formData = new FormData(form);
+            var target;
+            var formData= new FormData(jQuery('[data-entry='+entry+']').closest('form')[0]);
+            if (typeof ajax_object != 'undefined' && typeof ajax_object.ajax_url != 'undefined') {
+               target = ajax_object.ajax_url;
+               formData.append('action', 'dg_upload_thumb');
+            } else {
+               target = jQuery('#tab-Thumbnail').attr('action');
+            }
             formData.append('document_gallery[entry]', entry);
             formData.append('document_gallery[ajax]', 'true');
             formData.append('document_gallery[upload]', 'true');
             formData.append('file', f);
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', jQuery('#tab-Thumbnail').attr('action'));
+            xhr.open('POST', target);
             var theImg = jQuery('[data-entry='+entry+']').find('.column-icon img');
             xhr.onreadystatechange = function() {
                if (xhr.readyState == 4) {
