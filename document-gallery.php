@@ -64,7 +64,7 @@ if (is_admin()) {
    
    // add meta box for managing thumbnail generation to attachment Edit Media page
    add_action('add_meta_boxes', array('DG_Admin', 'addMetaBox'));
-   add_action('save_post', array('DG_Admin', 'saveMetaBox'));
+   add_action('wp_ajax_dg_upload_thumb', array('DG_Admin', 'saveMetaBox'));
    
    if (DG_Admin::doRegisterSettings()) {
       add_action('admin_init', array('DG_Admin', 'registerSettings'));

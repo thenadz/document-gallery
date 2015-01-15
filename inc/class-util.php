@@ -47,8 +47,8 @@ class DG_Document {
       } elseif (is_array($decoded)) {
          return '[' . implode(',', array_map(array(__CLASS__, __FUNCTION__), $decoded)) . ']';
       } elseif (is_bool($decoded)) {
-         static $boolMap = array(false => 'false', true => 'true');
-         return $boolMap[$decoded];
+         static $boolMap = array('false', 'true');
+         return $boolMap[(int)$decoded];
       } elseif (is_string($decoded)) {
          return '"' . str_replace(array('\\', '"'), array('\\\\', '\\"'), $decoded) . '"';
       }

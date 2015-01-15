@@ -55,7 +55,7 @@ class DG_Setup {
               // comma-separated list of attachment ids
               'ids'            => false,
                 
-              'mime_types'     => 'application,video,text,audio',
+              'mime_types'     => implode(',', self::getDefaultMimeTypes()),
                 
               // ascending/descending order for included documents
               'order'          => 'ASC',
@@ -101,6 +101,13 @@ class DG_Setup {
       );
    }
 
+   /**
+    * @return multitype:string The default MIME types to include in gallery.
+    */
+   public static function getDefaultMimeTypes() {
+      return array('application', 'video', 'text', 'audio');
+   }
+   
    /**
     * Runs every page load, updates as needed.
     */
