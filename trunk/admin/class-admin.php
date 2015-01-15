@@ -110,6 +110,9 @@ class DG_Admin {
       wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
       wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
       wp_localize_script('document-gallery-admin', 'dg_admin_vars', array('upload_limit' => wp_max_upload_size()));
+      if ($hook == 'post.php') {
+         wp_localize_script('document-gallery-admin', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+      }
    }
 
    /**
@@ -999,6 +1002,33 @@ class DG_Admin {
       if ( !isset($_POST[DG_OPTION_NAME.'_meta_box_nonce']) || !wp_verify_nonce($_POST[DG_OPTION_NAME.'_meta_box_nonce'], DG_OPTION_NAME.'_meta_box') || (defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE) ) {
          return;
       }
+      
+      global $dg_options;
+      $responseArr = array('result' => false);
+      if (isset($_POST[DG_OPTION_NAME]['entry'])) {
+         $ID = intval($_POST[DG_OPTION_NAME]['entry']);
+      } else {
+         $ID = -1;
+      }
+      if ( isset($_POST[DG_OPTION_NAME]['upload']) && isset($_FILES['file']) && isset($dg_options['thumber']['thumbs'][$ID]) ) {
+         $old_path = $dg_options['thumber']['thumbs'][$ID]['thumb_path'];
+         $uploaded_filename = self::validateUploadedFile();
+         if ($uploaded_filename && DG_Thumber::setThumbnail($ID, $uploaded_filename)) {
+            if ($dg_options['thumber']['thumbs'][$ID]['thumb_path'] !== $old_path) {
+               @unlink($old_path);
+            }
+            $responseArr['result'] = true;
+            $responseArr['url'] = $dg_options['thumber']['thumbs'][$ID]['thumb_url'];
+         }
+      }
+      if (isset($_POST[DG_OPTION_NAME]['ajax'])) {
+         $json_like = '';
+         foreach ($responseArr as $k => $v) {
+            $json_like .= '"'.$k.'":'.(!is_bool($v)? (!is_array($v)? '"'.$v.'"' : '[' . implode(',', $v) . ']' ) : ($v? 'true' : 'false')).',';// php changes boolean to integer in arrays - had to use workaround
+         }
+         echo '{'.trim($json_like,', ').'}';
+         wp_die();
+      }
    }
 
    /**
@@ -1086,7 +1116,7 @@ class DG_Admin {
    private static function getLogLabelSpan($e) {
       return '<span class="logLabel ' . strtolower($e) . '">' . strtoupper($e) . '</span>';
    }
-
+   
    /**
     * Render a checkbox field.
     * @param array $args
@@ -1098,7 +1128,7 @@ class DG_Admin {
           $args['name'],
           $args['label_for'],
           checked($args['value'], 1, false),
-          $args['disabled'] ? 'disabled="disabled"' : '',
+          disabled($args['disabled'], true, false),
           $args['description']);
    }
 
