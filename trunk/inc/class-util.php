@@ -6,7 +6,7 @@ defined('WPINC') OR exit;
  *
  * @author drossiter
  */
-class DG_Document {
+class DG_Util {
    /**
     * @var callable Either native JSON encode or custom JSON encode if needed.
     */
