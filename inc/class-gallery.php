@@ -108,7 +108,7 @@ class DG_Gallery {
 
       // merge options w/ default values not stored in options
       $defaults = array_merge(
-         array('id' => $post->ID, 'mime_types' => self::getDefaultMimeTypes(), 'include' => '', 'exclude' => ''),
+         array('id' => $post->ID, 'include' => '', 'exclude' => ''),
          self::getOptions());
 
       // values used to construct tax query (may be empty)
@@ -132,7 +132,7 @@ class DG_Gallery {
          // errors will be printed in __toString()
       }
    }
-
+   
    /**
     * Cleans up user input, making sure we don't pass crap on to WP core.
     * @param multitype:string $defaults The defaults array to sanitize.
@@ -232,6 +232,23 @@ class DG_Gallery {
 
    /**
     * Takes the provided value and returns a sanitized value.
+    * @param string $value The columns value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return int The sanitized columns value.
+    */
+   public static function sanitizeColumns($value, &$err) {
+      $ret = absint($value);
+      
+      if ($ret != $value || $ret == 0) {
+         $err = sprintf(self::$unary_err, 'columns', '> 0');
+         $ret = null;
+      }
+      
+      return $ret;
+   }
+
+   /**
+    * Takes the provided value and returns a sanitized value.
     * @param string $value The descriptions value to be sanitized.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
     * @return bool The sanitized descriptions value.
@@ -269,7 +286,7 @@ class DG_Gallery {
     * @return int The sanitized id value.
     */
    private static function sanitizeId($value, &$err) {
-      return $this->atts['id'] != -1 ? absint($this->atts['id']) : null;
+      return $value != -1 ? absint($value) : null;
    }
 
    /**
@@ -281,7 +298,7 @@ class DG_Gallery {
    private static function sanitizeIds($value, &$err) {
       static $regex = '/(?:|\d+(?:,\d+)*)/';
 
-      $ret = value;
+      $ret = $value;
 
       if (!preg_match($regex, $value)) {
          $err = 
