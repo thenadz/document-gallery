@@ -242,9 +242,11 @@ class DG_Setup {
     * @param array $options The options to be modified.
     */
    private static function threePointZero(&$options) {
-      if (isset($options['version']) /*&& version_compare($options['version'], '2.4', '<')*/) {
+      if (isset($options['version']) /*&& version_compare($options['version'], '3.0', '<')*/) {
          $options['meta'] = array('version' => $options['version']);
          unset($options['version']);
+         
+         $images = $options['gallery']['images'];
          
          unset($options['gallery']['localpost']);
          unset($options['gallery']['ids']);
@@ -255,6 +257,9 @@ class DG_Setup {
          $defaults = self::getDefaultOptions();
          $options['gallery']['columns'] = $defaults['gallery']['columns'];
          $options['gallery']['mime_types'] = $defaults['gallery']['mime_types'];
+         if ($images) {
+            $options['gallery']['mime_types'] .= ',image';
+         }
       }
    }
    

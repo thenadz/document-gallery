@@ -115,6 +115,22 @@ class DG_Gallery {
          unset($atts['cols']);
       }
       
+      if (!empty($atts['images'])) {
+         $options = self::getOptions();
+         $mimes = trim(isset($atts['mime_types']) ? $atts['mime_types'] : $options['mime_types']);
+         if (!preg_match('/[,^]image[,$]/', $mimes)) {
+            $atts['mime_types'] = empty($mimes) ? 'image' : ($mimes . ',image');
+         }
+      }
+      
+      /**
+       * @deprecated localpost will be removed at some point.
+       */
+      if (!empty($atts['localpost'])) {
+         $atts['id'] = -1;
+         unset($atts['localpost']);
+      }
+      
       // merge options w/ default values not stored in options
       $defaults = array_merge(
          array('id' => $post->ID, 'include' => '', 'exclude' => ''),
@@ -511,6 +527,7 @@ class DG_Gallery {
 
    /**
     * Gets all valid Documents based on the attributes passed by the user.
+    * NOTE: Keys in returned array are arbitrary and will vary. They should be ignored.
     * @return multitype:unknown Contains all documents matching the query.
     * @throws InvalidArgumentException Thrown when $this->errs is not empty.
     */
@@ -532,12 +549,7 @@ class DG_Gallery {
       // NOTE: Derived from gallery shortcode
       if (!empty($this->atts['include'])) {
          $query['include'] = $this->atts['include'];
-         $_attachments = get_posts($query);
-
-         $attachments = array();
-         foreach ($_attachments as $key => $val) {
-            $attachments[$val->ID] = $_attachments[$key];
-         }
+         $attachments = get_posts($query);
       } else {
          // id == 0    => all attachments w/o a parent
          // id == null => all matched attachments

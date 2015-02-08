@@ -46,7 +46,6 @@ class DG_Document {
     * Returns HTML representing this Document.
     * @filter dg_icon_template Filters the DG icon HTML. Passes a single
     *    bool value indicating whether the gallery is using descriptions or not.
-    * @filter dg_doc_icon Deprecated. To be removed in a future relesase.
     * @return string
     */
    public function __toString() {
@@ -78,10 +77,7 @@ class DG_Document {
          $this->gallery->useDescriptions(),
          $this->ID);
 
-      $core = str_replace($find, $repl, $doc_icon);
-
-      // deprecated: users may filter icon here
-      return apply_filters('dg_doc_icon', $core, $this->ID, $this->gallery->useDescriptions());
+      return str_replace($find, $repl, $doc_icon);
    }
 }
 
