@@ -235,14 +235,7 @@ class DG_Gallery {
     * @return int The sanitized columns value.
     */
    public static function sanitizeColumns($value, &$err) {
-      $ret = absint($value);
-      
-      if ($ret != $value || $ret == 0) {
-         $err = sprintf(self::$unary_err, 'columns', '> 0');
-         $ret = null;
-      }
-      
-      return $ret;
+      return $value != -1 ? absint($value) : null;
    }
 
    /**
@@ -779,11 +772,11 @@ class DG_Gallery {
       } else {
          global $dg_gallery_style;
          
-         $cols = $this->atts['columns'];
          $count = count($this->docs);
-         $itemwidth = $cols > 0 ? (floor(100/$cols) - 1) : 100;
+         $cols = !is_null($this->atts['columns']) ? $this->atts['columns'] : $count;
          
          if (apply_filters('dg_use_default_gallery_style', true )) {
+            $itemwidth = $cols > 0 ? (floor(100/$cols) - 1) : 100;
             $core .= "<style type='text/css'>#$selector .document-icon{width:$itemwidth%}</style>";
          }
          
