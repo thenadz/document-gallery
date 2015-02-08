@@ -59,8 +59,7 @@ customize behavior with various attributes, seen below:
 
 `[dg [fancy=<true/false>] [attachment_pg=<true/false>]
 [category/custom_taxon_name=<**comma-separated list of taxon values**> [relation=<AND/OR>]]
-[descriptions=<true/false>] [ids=<**comma-separated list of ID #s**>]
-[images=<true/false>] [localpost=<true/false>] [order=<ASC/DESC>] [orderby=<**see below**>]]`
+[descriptions=<true/false>] [order=<ASC/DESC>] [orderby=<**see below**>]]`
 
 Though the shortcode above may seem far from "short," none of the attributes are
 required and most users will find that the plugin meets your needs "out of the box"
@@ -77,7 +76,7 @@ under `Settings -> Document Gallery`.
 
 This option determines whether each document icon will link to the actual file
 or to its attachment page.  If you want the user to be able to click on the
-icon and directly rective the option to download then use `attachment_pg=false`
+icon and directly receive the option to download then use `attachment_pg=false`
 (the default). If you have information on the attachment page that you want the
 link to go to, use `attachment_pg=true`.
 
@@ -90,6 +89,12 @@ or any custom taxon can be referenced simply by including `category=category_val
 or `taxon_name=taxon_value`. Multiple values for a single taxon may be separated
 by commas. Note that if a taxon value contains spaces then the entire comma-
 delimited list must be quoted.
+
+**Columns Option** *(New in Version 3.0)*
+
+The columns option does what it sounds like -- sets how many columns to use in
+rendering your gallery. With `columns=-1`, you will get an infinite number of
+columns. In other words, only 1 row with all icons.
 
 **Descriptions Option**
 
@@ -106,16 +111,50 @@ The success in generating thumbs will depend mostly on what your server supports
 To fine-tune how thumbnails are generated, visit `Settings -> Document Gallery`
 in your site's dashboard.
 
-*NOTE: By default, the most universally-supported option for generating thumbnails,
-[Google Drive Viewer](https://docs.google.com/viewer) is disabled by default
-in order to protect your privacy, since using it requires sending your documents
-to Google's servers. If you're not working with confidential documents, you are
-encouraged to enable this for optimum performance.*
+**ID Option** *(New in Version 3.0)*
+
+This option indicates from which parent post/page to retrieve attachments.
+If not explicitly set, the default will be the post/page where the shortcode
+is being used.
+
+If you do not wish to filter by parent, `id=-1` will match all attachments.
+
+**IDs Option** *(New in Version 1.2)*
+
+This is an advanced option intended for experienced WordPress users. If this
+option is used, the plugin will ignore attached documents, instead including
+all attachments defined by the `ids` attribute (e.g.: `ids=10,2,4,42`).
+
+*Note: If this attribute is used, order defaults to the order of IDs given
+rather than menu_order unless order is explicitly stated.*
+
+**Images Option** *(New in Version 1.2)*
+
+This option will tell the plugin to include all images attached to to a page or
+post in addition to all documents.
+
+**Include/Exclude Options** *(New in Version 3.0)*
+
+As the name suggests, these options allow for explicitly adding or removing
+matched attachments in your gallery. Like with the IDs options above, these
+options take a comma-delimited list of attachment IDs.
 
 **Limit Option** *(New in Version 2.3)*
 
 As the name suggests, this value will limit how many results are returned in the gallery.
 If set to *-1*, the limit is infinite.
+
+**MIME Types Option** *(New in Version 3.0)*
+
+This is a comma-delimited list of all
+[MIME types](http://en.wikipedia.org/wiki/Internet_media_type#List_of_common_media_types)
+to be included in the gallery. Most users will not need to modify this value.
+
+One example use-case would be to include images in your gallery (which are
+not included by default). To do this, you would simply set
+`mime_types=application,video,text,audio,image`, where "image" is the only difference
+from the default value. You could also create a gallery which only includes PDFs
+by setting `mime_types=application/pdf`.
 
 **Order Option**
 
@@ -142,31 +181,6 @@ documents are displayed in ascending or descending order.
 * `comment_count` - Order by number of comments (available with WP >= 2.9).
 * `none` - No order (available with Version 2.8).
 * `post__in` - Preserve post ID order given in the post__in array.
-
-**Images Option** *(New in Version 1.2)*
-
-This option will tell the plugin to include all images attached to to a page or
-post in addition to all documents.
-
-**IDs Option** *(New in Version 1.2)*
-
-This is an advanced option intended for experienced WordPress users. If this
-option is used, the plugin will ignore attached documents, instead including
-all attachments defined by the `ids` attribute (e.g.: `ids=10,2,4,42`).
-
-*Note: If this attribute is used, the `order`, `orderby`, `images` and other
-attributes which generally determine which attachments to include or how to
-order them will be ignored. Order is defined by the order the ids are
-provided.*
-
-**Localpost Option** *(New in Version 1.4)*
-
-By default a document gallery only looks at attachments of the page/post where
-the `[dg]` shortcode is used. If you would like to search beyond that local scope,
-you must set `localpost=false`.
-
-This option would probably be useful especially when querying with the *category
-or taxonomy* option, though it can be used with any options you chose.
 
 **Relation Option** *(New in Version 1.4)*
 
@@ -273,7 +287,6 @@ These tags are as follows:
 * **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
 * **%description%**: The attachment description (only present when rendering descriptions).
 
-
 **Filter Thumbnail Generation Methods**
 
 Document Gallery provides the `dg_thumbers` filter, which allows developers to
@@ -349,6 +362,15 @@ function dg_get_audio_video_thumbnail($ID, $pg) {
     return $temp_file;
 }`
 
+**Filter Inclusion of Default Document Gallery CSS**
+
+If you wish to completely replace Document Gallery styling with your own CSS, you can prevent any any
+CSS being loaded by returning false in `dg_use_default_gallery_style` filter, like so:
+`add_filter('dg_use_default_gallery_style', '__return_false');`
+
+*NOTE: By design, this will **NOT** disable inclusion of any custom CSS set at
+`Dashboard -> Settings -> Document Gallery`*
+
 == Frequently Asked Questions ==
 
 
@@ -415,6 +437,23 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.0 =
+* **Enhancement:** Thumbnails can now be manually overridden. To do this, either navigate to
+  `Dashboard -> Settings -> Document Gallery -> Thumbnail Management` and add the image
+  to the target attachment, or set the thumbnail in the attachment edit window.
+* **Enhancement:** Users can now specify the number of columns for a gallery.
+* **Enhancement:** Users can now create galleries with specific filetype(s) by using the `mime_types`
+  option. Thanks for suggesting this functionality,
+  [mepmepmep](https://wordpress.org/support/topic/dynamic-gallery-for-all-documents-of-a-certain-type)!
+* **Enhancement:** Options to `include` or `exclude` specific attachments in a gallery have been added.
+* **Enhancement:** The document gallery CSS has been modified to make all icon images responsive.
+  We've also added the `dg_use_default_gallery_style` so that developers may completely disabled
+  Document Gallery styles and replace it with their own.
+* **Deprecation:** The deprecated `dg_doc_icon` filter has been removed. Developers should use
+  `dg_icon_template`.
+* **Deprecation:** The `localpost` option has been deprecated and will be removed at a future date.
+  If you are currently using `localpost=false` then it should be replaced by `id=-1`.
 
 = 2.3.7 =
 * **Bug Fix:** There was an issue that resulted in an error being thrown in certain situations.
