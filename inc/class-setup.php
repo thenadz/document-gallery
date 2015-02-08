@@ -52,9 +52,7 @@ class DG_Setup {
               // include thumbnail of actual document in gallery display
               'fancy'          => true,
                 
-              // comma-separated list of attachment ids
-              'ids'            => false,
-                
+              // comma-delimited list of all mime types to be included
               'mime_types'     => implode(',', self::getDefaultMimeTypes()),
                 
               // ascending/descending order for included documents
@@ -75,6 +73,7 @@ class DG_Setup {
               // the max number of thumbnails to return
               'limit'          => -1,
                 
+              // # of columns to be used in gallery
               'columns'        => 4
           ),
           'css' => array(
@@ -115,7 +114,7 @@ class DG_Setup {
       global $dg_options;
 
       // do update
-      if (!is_null($dg_options) && (!isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
+      if (!is_null($dg_options) && (isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
          $blogs = array(null);
          
          if (is_multisite()) {
@@ -142,6 +141,7 @@ class DG_Setup {
       self::twoPointTwo($options);
       self::twoPointThree($options);
       self::twoPointFour($options);
+      self::threePointZero($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -231,17 +231,30 @@ class DG_Setup {
     * Creating new meta branch in options to store plugin meta information.
     * 
     * "Localpost" no longer supported. Replaced by "id" attribute.
+    * "Images" no longer supported. Replaced by "mime_types" attribute.
+    * "Ids" still supported, but not stored in DB.
+    * 
+    * Google thumber no longer supported.
+    * 
+    * Added "columns" attribute.
+    * Added "mime_types" attribute.
     * 
     * @param array $options The options to be modified.
     */
-   private static function twoPointFour(&$options) {
+   private static function threePointZero(&$options) {
       if (isset($options['version']) /*&& version_compare($options['version'], '2.4', '<')*/) {
          $options['meta'] = array('version' => $options['version']);
          unset($options['version']);
          
          unset($options['gallery']['localpost']);
+         unset($options['gallery']['ids']);
          unset($options['gallery']['images']);
-         $options['gallery']['columns'] = 4;
+
+         unset($options['thumber']['active']['google']);
+         
+         $defaults = self::getDefaultOptions();
+         $options['gallery']['columns'] = $defaults['gallery']['columns'];
+         $options['gallery']['mime_types'] = $defaults['gallery']['mime_types'];
       }
    }
    
