@@ -23,7 +23,7 @@ class DG_Thumber {
       }
 
       return array('av' => true, 'gs' => $gs_active,
-          'imagick' => $imagick_active, 'google' => false);
+          'imagick' => $imagick_active);
    }
 
    /**
@@ -50,6 +50,8 @@ class DG_Thumber {
          $start = time();
       }
 
+      echo "Getting thumbnail #$ID\n\n";
+      
       $options = self::getOptions();
 
       // if we haven't saved a thumb, generate one
@@ -73,6 +75,7 @@ class DG_Thumber {
                }
 
                if (self::thumbnailGenerationHarness($thumber, $ID, $pg)) {
+                  // harness updates options so we need a new copy
                   $options = self::getOptions();
                   break;
                }
@@ -92,6 +95,7 @@ class DG_Thumber {
       } else {
          // use generated thumbnail
          $url = $options['thumbs'][$ID]['thumb_url'];
+         echo "Got URL: $url\n\n";
       }
 
       return $url;
@@ -344,115 +348,6 @@ class DG_Thumber {
    }
 
    /*==========================================================================
-    * GOOGLE DRIVE VIEWER THUMBNAILS
-    *=========================================================================*/
-
-   /**
-    * Get thumbnail for document with given ID from Google Drive Viewer.
-    *
-    * NOTE: Caller must verify that extension is supported.
-    *
-    * @param str $ID     The attachment ID to retrieve thumbnail for.
-    * @param int $pg     The page number to make thumbnail of -- index starts at 1.
-    * @return bool|str   False on failure, URL to thumb on success.
-    */
-   public static function getGoogleDriveThumbnail($ID, $pg = 1) {
-      // User agent for Lynx 2.8.7rel.2 -- Why? Because I can.
-      static $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
-      static $timeout = 60;
-
-      $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=%d&w=%d';
-      $doc_url = wp_get_attachment_url($ID);
-      if (!$doc_url) {
-         return false;
-      }
-
-      $temp_file = self::getTempFile();
-
-      // args for use in HTTP request
-      $args = array(
-          'timeout' => $timeout, // these requests can take a LONG time
-          'redirection' => 5,
-          'httpversion' => '1.0',
-          'user-agent' => $user_agent,
-          'blocking' => true,
-          'headers' => array(),
-          'cookies' => array(),
-          'body' => null,
-          'compress' => false,
-          'decompress' => true,
-          'sslverify' => true,
-          'stream' => true,
-          'filename' => $temp_file
-      );
-
-      // prevent PHP timeout before HTTP completes
-      @set_time_limit($timeout);
-
-      $options = self::getOptions();
-      $google_viewer = sprintf($google_viewer, urlencode($doc_url), (int)$pg, $options['width']);
-
-      // get thumbnail from Google Drive Viewer & check for error on return
-      $response = wp_remote_get($google_viewer, $args);
-
-      if (is_wp_error($response) || !preg_match('/[23][0-9]{2}/', $response['response']['code'])) {
-         DG_Logger::writeLog(DG_LogLevel::Warning, __('Failed to retrieve thumbnail from Google: ', 'document-gallery') .
-             (is_wp_error($response)
-               ? $response->get_error_message()
-               : $response['response']['message']));
-
-         @unlink($temp_file);
-         return false;
-      }
-
-      return $temp_file;
-   }
-
-   /**
-    * @return array All extensions supported by Google Drive Viewer.
-    */
-   private static function getGoogleDriveExts() {
-      return array(
-         'tiff', 'bmp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-         'pdf', 'pages', 'ai', 'psd', 'dxf', 'svg', 'eps', 'ps', 'ttf'
-      );
-   }
-
-   /**
-    * @return bool Whether Google Drive can access files on this system.
-    */
-   public static function isGoogleDriveAvailable() {
-      static $available = null;
-
-      if (is_null($available)) {
-         // to check if we're visible externally, retrieve image for file we know exists.
-         $user_agent = 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a';
-         $google_viewer = 'https://docs.google.com/viewer?url=%s&a=bi&pagenumber=1&w=1';
-         $google_viewer = sprintf($google_viewer, urlencode(DG_URL . 'LICENSE.txt'));
-
-         // args for use in HTTP request
-         $args = array(
-             'redirection' => 5,
-             'httpversion' => '1.0',
-             'user-agent' => $user_agent,
-             'blocking' => true,
-             'headers' => array(),
-             'cookies' => array(),
-             'body' => null,
-             'compress' => false,
-             'decompress' => true,
-             'sslverify' => true
-         );
-
-         $response = wp_remote_get($google_viewer, $args);
-
-         $available = (!is_wp_error($response) && $response['response']['code'] != 404);
-      }
-
-      return $available;
-   }
-
-   /*==========================================================================
     * DEFAULT THUMBNAILS
     *=========================================================================*/
 
@@ -649,12 +544,6 @@ class DG_Thumber {
                $exts = implode('|', $exts);
                $thumbers[$exts] = array(__CLASS__, 'getImagickThumbnail');
             }
-         }
-
-         // Google Drive Viewer
-         if ($active['google']) {
-            $exts = implode('|', self::getGoogleDriveExts());
-            $thumbers[$exts] = array(__CLASS__, 'getGoogleDriveThumbnail');
          }
 
          // allow users to filter thumbers used
