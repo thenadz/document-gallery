@@ -169,6 +169,19 @@ class DG_Admin {
         ));
 
       add_settings_field(
+         'gallery_defaults_columns', 'columns',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'gallery_defaults',
+         array (
+            'label_for'   => 'label_gallery_defaults_columns',
+            'name'        => 'gallery_defaults][columns',
+            'value'       => esc_attr($defaults['columns']),
+            'type'        => 'number" min="1" step="1',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('The number of columns to display when not rendering descriptions.', 'document-gallery')
+         ));
+
+      add_settings_field(
         'gallery_defaults_descriptions', 'descriptions',
         array(__CLASS__, 'renderCheckboxField'),
         DG_OPTION_NAME, 'gallery_defaults',
@@ -241,8 +254,22 @@ class DG_Admin {
             'value'       => esc_attr($defaults['limit']),
             'type'        => 'number" min="-1" step="1',
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Limit the number of documents included. -1 means no limit.', 'document-gallery')));
+            'description' => __('Limit the number of documents included. -1 means no limit.', 'document-gallery')
+         ));
 
+      add_settings_field(
+         'gallery_defaults_mime_types', 'mime_types',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'gallery_defaults',
+         array (
+            'label_for'   => 'label_gallery_defaults_mime_types',
+            'name'        => 'gallery_defaults][mime_types',
+            'value'       => esc_attr($defaults['mime_types']),
+            'type'        => 'text',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Comma-delimited list of <a href="http://en.wikipedia.org/wiki/Internet_media_type#List_of_common_media_types">MIME types</a>.', 'document-gallery')
+         ));
+      
       add_settings_field(
         'gallery_defaults_post_status', 'post_status',
         array(__CLASS__, 'renderSelectField'),
@@ -309,21 +336,6 @@ class DG_Admin {
                               ? __('Use <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery')
                               : __('Your server is not configured to run <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a>.', 'document-gallery'),
             'disabled'    => !DG_Thumber::isImagickAvailable()
-        ));
-
-      add_settings_field(
-        'thumbnail_generation_google', 'Google Drive Viewer',
-        array(__CLASS__, 'renderCheckboxField'),
-        DG_OPTION_NAME, 'thumbnail_generation',
-        array (
-            'label_for'   => 'label_thumbnail_generation_google',
-            'name'        => 'thumbnail_generation][google',
-            'value'       => esc_attr($active['google']),
-            'option_name' => DG_OPTION_NAME,
-            'description' => DG_Thumber::isGoogleDriveAvailable()
-                              ? __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
-                              : __('Your server does not allow remote HTTP access.', 'document-gallery'),
-            'disabled'    => !DG_Thumber::isGoogleDriveAvailable()
         ));
 
       add_settings_field(
@@ -455,14 +467,14 @@ class DG_Admin {
    private static function validateGeneralSettings($values) {
       global $dg_options;
       $ret = $dg_options;
-
+      
       include_once DG_PATH . 'inc/class-gallery.php';
       
       $thumbs_cleared = false;
 
       // handle gallery shortcode defaults
       $errs = array();
-      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs, true);
+      $ret['gallery'] = DG_Gallery::sanitizeDefaults(null, $values['gallery_defaults'], $errs);
 
       foreach ($errs as $k => $v) {
          add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
@@ -527,8 +539,8 @@ class DG_Admin {
       }
 
       // handle modified CSS
-      if (trim($ret['css']['text']) !== trim($values['css']['text'])) {
-         $ret['css']['text'] = trim($values['css']['text']);
+      if (trim($ret['css']['text']) !== trim($values['css'])) {
+         $ret['css']['text'] = trim($values['css']);
          $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
       }
 
@@ -583,11 +595,7 @@ class DG_Admin {
       }
 
       if (isset($values['ajax'])) {
-         $json_like = '';
-         foreach ($responseArr as $k => $v) {
-            $json_like .= '"'.$k.'":'.(!is_bool($v)? (!is_array($v)? '"'.$v.'"' : '[' . implode(',', $v) . ']' ) : ($v? 'true' : 'false')).',';// php changes boolean to integer in arrays - had to use workaround
-         }
-         echo '{'.trim($json_like,', ').'}';
+         echo DG_Util::jsonEncode($responseArr);
          add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
       }
 
@@ -777,7 +785,7 @@ class DG_Admin {
       <tbody>
          <tr valign="top">
             <td>
-               <textarea readonly="true" rows="10" cols="50" id="options-dump" class="large-text code"><?php var_dump($dg_options); ?></textarea>
+               <textarea readonly="true" rows="10" cols="50" id="options-dump" class="large-text code"><?php print_r($dg_options); ?></textarea>
             </td>
          </tr>
       </tbody>
@@ -895,16 +903,10 @@ class DG_Admin {
             '<span class="displaying-num"><select dir="rtl" class="limit_per_page">'.$select_limit.'</select> '.__('items per page', 'document-gallery').'</span>'.
          '</div>'.
          '<br class="clear" />';
-
-      // Avoiding json_encode to avoid compatibility issues on some systems
-      $json_like = '';
-      foreach ($URL_params as $k => $v) {
-         $json_like .= '"'.$k.'":"'.$v.'",';
-      }
       ?>
 
 <script type="text/javascript">
-   var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
+   var URL_params = <?php echo DG_Util::jsonEncode($URL_params); ?>;
 </script>
 <div class="thumbs-list-wrapper">
    <div>
@@ -1022,11 +1024,7 @@ class DG_Admin {
          }
       }
       if (isset($_POST[DG_OPTION_NAME]['ajax'])) {
-         $json_like = '';
-         foreach ($responseArr as $k => $v) {
-            $json_like .= '"'.$k.'":'.(!is_bool($v)? (!is_array($v)? '"'.$v.'"' : '[' . implode(',', $v) . ']' ) : ($v? 'true' : 'false')).',';// php changes boolean to integer in arrays - had to use workaround
-         }
-         echo '{'.trim($json_like,', ').'}';
+         echo DG_Util::jsonEncode($responseArr);
          wp_die();
       }
    }

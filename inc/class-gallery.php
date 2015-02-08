@@ -92,20 +92,29 @@ class DG_Gallery {
     * @param multitype:string $atts Array of attributes used in shortcode.
     */
    public function __construct($atts) {
+      include_once DG_PATH . 'inc/class-document.php';
+      
       $post = get_post();
 
       // empty string is passed when no arguments are given, but constructor expects an array
       $atts = empty($atts) ? array() : $atts;
 
-      if (!empty( $atts['ids'])) {
+      if (!empty($atts['ids'])) {
          // 'ids' is explicitly ordered, unless you specify otherwise.
-         if (empty( $atts['orderby'])) {
+         if (empty($atts['orderby'])) {
             $atts['orderby'] = 'post__in';
          }
 
          $atts['include'] = $atts['ids'];
+         unset($atts['ids']);
       }
-
+      
+      // allow abbreviated columns attribute
+      if (!empty($atts['cols'])) {
+         $atts['columns'] = $atts['cols'];
+         unset($atts['cols']);
+      }
+      
       // merge options w/ default values not stored in options
       $defaults = array_merge(
          array('id' => $post->ID, 'include' => '', 'exclude' => ''),
@@ -117,15 +126,12 @@ class DG_Gallery {
       // all recognized attributes go here
       $this->atts = shortcode_atts($defaults, $atts);
 
-      // goes through all values in $this->atts, setting $this->errs as needed
-      $this->atts = self::sanitizeDefaults($this->atts, $this->errs);
+      // goes through all values in atts, setting errs as needed
+      $this->atts = self::sanitizeDefaults($defaults, $this->atts, $this->errs);
 
       // query DB for all documents requested
-      include_once DG_PATH . 'inc/class-document.php';
       try {
-         $docs = $this->getDocuments();
-
-         foreach($docs as $doc) {
+         foreach($this->getDocuments() as $doc) {
             $this->docs[] = new DG_Document($doc, $this);
          }
       } catch(InvalidArgumentException $e) {
@@ -135,17 +141,22 @@ class DG_Gallery {
    
    /**
     * Cleans up user input, making sure we don't pass crap on to WP core.
+    * @param multitype:string $old_defaults The previous set of defaults.
     * @param multitype:string $defaults The defaults array to sanitize.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
     * @param bool $isDefaults Whether we're sanitizing the defaults array from DG_Admin.
     */
-   public static function sanitizeDefaults($defaults, &$errs, $isAdmin = false) {
-      $old_defaults = self::getOptions();
-
+   public static function sanitizeDefaults($old_defaults, $defaults, &$errs) {
+      if (is_null($old_defaults)) {
+         $old_defaults = self::getOptions();
+      }
+      
       // remove invalid keys
-      $sanitized = is_array($defaults)? array_intersect_key($defaults, $old_defaults) : array();
+      $sanitized = is_array($defaults)
+         ? array_intersect_key($defaults, $old_defaults)
+         : array();
 
-      // add any missing keys & sanitize each value
+      // add any missing keys & sanitize each new value
       foreach ($old_defaults as $k => $v) {
          if (!isset($sanitized[$k])) {
             if (is_bool($v)) {
@@ -155,24 +166,11 @@ class DG_Gallery {
                // missing value
                $sanitized[$k] = $v;
             }
+         } else if ($sanitized[$k] != $v) {
+            // sanitize value if different from old value
+            $sanitized[$k] = self::sanitizeParameter($k, $sanitized[$k], $errs);
          }
-
-         // sanitize value
-         $sanitized[$k] = self::sanitizeParameter($k, $sanitized[$k], $errs);
       }
-
-      // process values outside of DB options
-      if (!$isAdmin) {
-         $sanitized = self::sanitizeNonOptionDefaults($sanitized, $defaults, $errs);
-         }
-
-      return $sanitized;
-      }
-
-   private static function sanitizeNonOptionDefaults($sanitized, $defaults, &$errs) {
-         $sanitized['id'] = self::sanitizeId($defaults['id'], $err);
-
-         // NOTE: Not wasting time sanitizing ids, include, and exclude.
 
       return $sanitized;
    }
@@ -265,6 +263,16 @@ class DG_Gallery {
 
    /**
     * Takes the provided value and returns a sanitized value.
+    * @param string $value The exclude value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized exclude value.
+    */
+   private static function sanitizeExclude($value, &$err) {
+      return self::sanitizeIdList('Exclude', $value, $err);
+   }
+
+   /**
+    * Takes the provided value and returns a sanitized value.
     * @param string $value The fancy value to be sanitized.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
     * @return bool The sanitized fancy value.
@@ -278,7 +286,7 @@ class DG_Gallery {
 
       return $ret;
    }
-
+   
    /**
     * Takes the provided value and returns a sanitized value.
     * @param string $value The id value to be sanitized.
@@ -290,38 +298,33 @@ class DG_Gallery {
    }
 
    /**
-    * Takes the provided value and returns a sanitized value.
+    * Takes the provided comma-delimited list of IDs and returns null if it is invalid.
+    * @param string $name Name of the value being sanitized. Used in error string when needed.
     * @param string $value The ids value to be sanitized.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
-    * @return bool|multitype:int The sanitized ids value.
+    * @return bool|multitype:int The sanitized comma-delimited list of IDs value.
     */
-   private static function sanitizeIds($value, &$err) {
+   private static function sanitizeIdList($name, $value, &$err) {
       static $regex = '/(?:|\d+(?:,\d+)*)/';
 
       $ret = $value;
 
       if (!preg_match($regex, $value)) {
-         $err = 
-            $ret = null;
-         }
+         $err = sprintf(__('%s may only be a comma-delimited list of integers.', 'document-gallery'), name);
+         $ret = null;
+      }
 
       return $ret;
    }
 
    /**
     * Takes the provided value and returns a sanitized value.
-    * @param string $value The images value to be sanitized.
+    * @param string $value The ids value to be sanitized.
     * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
-    * @return bool The sanitized images value.
+    * @return bool|multitype:int The sanitized ids value.
     */
-   private static function sanitizeImages($value, &$err) {
-      $ret = self::toBool($value);
-
-      if(is_null($ret)) {
-         $err = sprintf(self::$binary_err, 'images', 'true', 'false', $value);
-      }
-
-      return $ret;
+   private static function sanitizeInclude($value, &$err) {
+      return self::sanitizeIdList('Include', $value, $err);
    }
 
    /**
@@ -336,22 +339,6 @@ class DG_Gallery {
       if (is_null($ret) || $ret < -1) {
          $err = sprintf(self::$unary_err, 'limit', '>= -1');
          $ret = null;
-      }
-
-      return $ret;
-   }
-
-   /**
-    * Takes the provided value and returns a sanitized value.
-    * @param string $value The localpost value to be sanitized.
-    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
-    * @return bool The sanitized localpost value.
-    */
-   private static function sanitizeLocalpost($value, &$err) {
-      $ret = self::toBool($value);
-
-      if(is_null($ret)) {
-         $err = sprintf(self::$binary_err, 'localpost', 'true', 'false', $value);
       }
 
       return $ret;
@@ -550,7 +537,7 @@ class DG_Gallery {
       }
 
       // NOTE: Derived from gallery shortcode
-      if (!empty($include)) {
+      if (!empty($this->atts['include'])) {
          $query['include'] = $this->atts['include'];
          $_attachments = get_posts($query);
 
@@ -559,15 +546,16 @@ class DG_Gallery {
             $attachments[$val->ID] = $_attachments[$key];
          }
       } else {
-         // 0 => all attachments w/o a parent | null => all matched attachments
-         $query['post_parent'] = $this->atts['id'] != -1 ? absint($this->atts['id']) : null;
+         // id == 0    => all attachments w/o a parent
+         // id == null => all matched attachments
+         $query['post_parent'] = $this->atts['id'];
          if (!empty($exclude)) {
             $query['exclude'] = $this->atts['exclude'];
          }
 
          $attachments = get_children($query);
       }
-
+      
       return $attachments;
    }
 
@@ -657,7 +645,7 @@ class DG_Gallery {
       // taxons may optionally be prefixed by 'tax_' --
       // this is only useful when avoiding collisions with other attributes
       if (!taxonomy_exists($taxon)) {
-         $tmp = preg_replace('^tax_(.*)', '$1', $taxon, 1, $count);
+         $tmp = preg_replace('/^tax_(.*)/', '$1', $taxon, 1, $count);
          if ($count > 0 && taxonomy_exists($tmp)) {
             $taxon = $tmp;
          } else {
@@ -679,22 +667,6 @@ class DG_Gallery {
       }
 
       return $ret;
-   }
-
-   /**
-    * Given a list of IDs, all attachments represented by these IDs are returned.
-    * @return multitype:Post The posts matched.
-    */
-   private function getAttachmentsByIds() {
-      $args = array(
-         'post_type'     => $this->atts['post_type'],
-         'post_status'   => $this->atts['post_status'],
-         'numberposts'   => $this->atts['limit'],
-         'post__in'      => $this->atts['ids'],
-         'orderby'       => 'post__in'
-      );
-
-      return count($args['post__in']) ? get_posts($args) : array();
    }
 
    /**
@@ -765,22 +737,31 @@ class DG_Gallery {
     * @return string HTML representing this Gallery.
     */
    public function __toString() {
+      static $instance = 0;
+      $instance++;
+      
       static $find = null;
       if (is_null($find)) {
          $find = array('%class%', '%icons%');
       }
 
-      if(!empty($this->errs)) {
+      if (!empty($this->errs)) {
          return '<p>' . implode('</p><p>', $this->errs) . '</p>';
       }
 
-      if(empty($this->docs)) {
+      if (empty($this->docs)) {
          return self::$no_docs;
       }
 
+      $selector = "document-gallery-$instance";
+      $template =
+         "<div id='$selector' class='%class%'>". PHP_EOL .
+            '%icons%' . PHP_EOL .
+         '</div>' . PHP_EOL;
+      
       $icon_wrapper = apply_filters(
          'dg_row_template',
-         '<div class="%class%">'. PHP_EOL . '%icons%' . PHP_EOL . '</div>' . PHP_EOL,
+         $template,
          $this->useDescriptions());
 
       $core = '';
@@ -796,8 +777,15 @@ class DG_Gallery {
             $core .= str_replace($find, $repl, $icon_wrapper);
          }
       } else {
+         global $dg_gallery_style;
+         
          $cols = $this->atts['columns'];
          $count = count($this->docs);
+         $itemwidth = $cols > 0 ? (floor(100/$cols) - 1) : 100;
+         
+         if (apply_filters('dg_use_default_gallery_style', true )) {
+            $core .= "<style type='text/css'>#$selector .document-icon{width:$itemwidth%}</style>";
+         }
          
          for($i = 0; $i < $count; $i += $cols) {
             $repl[1] = '';
