@@ -49,8 +49,6 @@ class DG_Thumber {
       if (is_null($start)) {
          $start = time();
       }
-
-      echo "Getting thumbnail #$ID\n\n";
       
       $options = self::getOptions();
 
@@ -95,7 +93,6 @@ class DG_Thumber {
       } else {
          // use generated thumbnail
          $url = $options['thumbs'][$ID]['thumb_url'];
-         echo "Got URL: $url\n\n";
       }
 
       return $url;
@@ -240,8 +237,8 @@ class DG_Thumber {
          $gs = $options['gs'];
 
          if (false !== $gs) {
-            $gs = escapeshellarg($gs) . ' -sDEVICE=png16m -dFirstPage=%d'
-                . ' -dLastPage=%d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%s %s 2>&1';
+            $gs = escapeshellarg($gs) . ' -sDEVICE=png16m -dFirstPage=%1$d'
+                . ' -dLastPage=%1$d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%2$s %3$s 2>&1';
          }
       }
 
@@ -252,7 +249,7 @@ class DG_Thumber {
       $doc_path = get_attached_file($ID);
       $temp_path = self::getTempFile();
 
-      exec(sprintf($gs, $pg, $pg, $temp_path, $doc_path), $out, $ret);
+      exec(sprintf($gs, $pg, $temp_path, $doc_path), $out, $ret);
 
       if ($ret != 0) {
          DG_Logger::writeLog(DG_LogLevel::Error, __('Ghostscript failed: ', 'document-gallery') . print_r($out));
