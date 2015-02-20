@@ -38,6 +38,17 @@ class DG_Thumber {
    }
 
    /**
+    * Sets the thumbnail for the given attachment ID to a failed state.
+    *
+    * @param int $ID Document ID.
+    */
+   public static function setThumbnailFailed($ID) {
+      $options = self::getOptions();
+      $options['thumbs'][$ID] = array('timestamp' => time());
+      self::setOptions($options);
+   }
+
+   /**
     * Wraps generation of thumbnails for various attachment filetypes.
     *
     * @param int $ID  Document ID
@@ -84,8 +95,7 @@ class DG_Thumber {
       $new = empty($options['thumbs'][$ID]);
       if ($new || empty($options['thumbs'][$ID]['thumber'])) {
          if ($new) {
-            $options['thumbs'][$ID] = array('timestamp' => time());
-            self::setOptions($options);
+            self::setThumbnailFailed($ID);
          }
 
          // fallback to default thumb for attachment type

@@ -374,6 +374,23 @@ CSS being loaded by returning false in `dg_use_default_gallery_style` filter, li
 == Frequently Asked Questions ==
 
 
+= Q: Ghostscript is installed on my server, but it's not working! =
+
+A: Document Gallery does a pretty good job of detecting where Ghostscript is installed,
+but on some installs it may need a little help. To check whether this is the case,
+navigate to `Dashboard -> Settings -> Document Gallery` and see if there is a notice
+next to the Ghostscript checkbox indicating that your server is not properly configured.
+If that notice does exist, the next step is to go to the `Advanced` tab on that same page
+and see if the Ghostscript path is set. If it is not, you'll need to manually fill it
+with the location for your Ghostscript install (eg: `/usr/local/bin/gs`). Once that
+change is saved, the Ghostscript checkbox should be enabled on the first tab.
+
+= Q: Why are all of my document icons in a single column? =
+
+A: Assuming that you do not have the `columns` attribute set to 1, the likely cause
+of this behavior is that descriptions are enabled. To fix this, simply use 
+`[dg descriptions=false]`.
+
 = Q: Why is [insert thumbnail generation method] enabled on one of my WordPress installs, but not on another one? =
 
 A: Document Gallery works very hard behind the scenes to ensure that it enables
@@ -394,30 +411,6 @@ of the PDF into memory. Since we only need a single page to generate the
 thumbnail, this is much more work than is needed. Ghostscript, on the other hand,
 can handle reading only one page into memory, thus doing much less work before
 returning our thumbnail.
-
-= Q: Why isn't Google Drive Viewer enabled by default? =
-
-A: Google Drive Viewer is the most commonly-supported thumbnail generation method,
-alongside the Audio/Video generation, but is disabled by default. The reason
-for this is that in order to use this method, Document Gallery has to send your
-document over to Google's servers, where Google will generate the thumbnail for
-you. For most users, this shouldn't be a big deal, but since some users
-retain sensitive documents on their site, this was made opt-in to avoid
-compromising anyone's security. If you don't have sensitive documents, I
-would recommend enabling it, since it's currently the only way to generate a
-thumbnail for any of the Microsoft Office files, as well as some less common
-file types.
-
-= Q: Ghostscript is installed on my server, but it's not working! =
-
-A: Document Gallery does a pretty good job of detecting where Ghostscript is installed,
-but on some installs it may need a little help. To check whether this is the case,
-navigate to `Dashboard -> Settings -> Document Gallery` and see if there is a notice
-next to the Ghostscript checkbox indicating that your server is not properly configured.
-If that notice does exist, the next step is to go to the `Advanced` tab on that same page
-and see if the Ghostscript path is set. If it is not, you'll need to manually fill it
-with the location for your Ghostscript install (eg: `/usr/local/bin/gs`). Once that
-change is saved, the Ghostscript checkbox should be enabled on the first tab.
 
 == Screenshots ==
 
