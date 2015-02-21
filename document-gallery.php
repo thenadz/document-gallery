@@ -5,14 +5,14 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 2.4
+  Version: 3.0.0-beta
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
   Text Domain: document-gallery
  */
 
-define('DG_VERSION', '2.4');
+define('DG_VERSION', '3.0.0-beta');
 
 // define helper paths & URLs
 define('DG_BASENAME', plugin_basename(__FILE__));
@@ -25,6 +25,9 @@ define('DG_WPADMIN_PATH', ABSPATH . 'wp-admin/');
 global $dg_options;
 define('DG_OPTION_NAME', 'document_gallery');
 $dg_options = get_option(DG_OPTION_NAME, null);
+
+// DG general utility functions
+include_once DG_PATH . 'inc/class-util.php';
 
 // logging functionality
 include_once DG_PATH . 'inc/class-logger.php';
@@ -58,12 +61,19 @@ if (is_admin()) {
    
    // build options page
    add_action('admin_menu', array('DG_Admin', 'addAdminPage'));
+   
+   // add meta box for managing thumbnail generation to attachment Edit Media page
+   add_action('add_meta_boxes', array('DG_Admin', 'addMetaBox'));
+   add_action('wp_ajax_dg_upload_thumb', array('DG_Admin', 'saveMetaBox'));
+   
    if (DG_Admin::doRegisterSettings()) {
       add_action('admin_init', array('DG_Admin', 'registerSettings'));
    }
 } else {
    // styling for gallery
-   add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
+   if (apply_filters('dg_use_default_gallery_style', true )) {
+      add_action('wp_enqueue_scripts', array('DocumentGallery', 'enqueueGalleryStyle'));
+   }
    add_action('wp_print_scripts', array('DocumentGallery', 'printCustomStyle'));
 }
 
@@ -198,7 +208,6 @@ class DocumentGallery {
     */
    private static function isValidOptionsStructure($o, $schema = null) {
       if (is_null($schema)) {
-         include_once DG_PATH . 'inc/class-setup.php';
          $schema = DG_Setup::getDefaultOptions(true);
       }
       
@@ -229,13 +238,15 @@ class DocumentGallery {
     */
    public static function localDateTimeFromTimestamp($timestamp) {
       static $gmt_offet = null;
-      static $wp_format = null;
+      static $wp_date_format = null;
+      static $wp_time_format = null;
       if (is_null($gmt_offet)) {
          $gmt_offet = get_option('gmt_offset');
-         $wp_format = get_option('date_format').' '.get_option('time_format');
+         $wp_date_format = get_option('date_format');
+         $wp_time_format = get_option('time_format');
       }
       
-      return date_i18n($wp_format, $timestamp + $gmt_offet * 3600);
+      return '<span class="nowrap">'.date_i18n($wp_date_format, $timestamp + $gmt_offet * 3600).'</span> <span class="nowrap">'.date_i18n($wp_time_format, $timestamp + $gmt_offet * 3600).'</span>';
    }
    
    /**
@@ -258,8 +269,8 @@ class DocumentGallery {
 (?sx)
   # quotes
   (
-    "(?:[^"\\]++|\\.)*+"
-  | '(?:[^'\\]++|\\.)*+'
+    "(?:[^"\\\\]++|\\.)*+"
+  | '(?:[^'\\\\]++|\\.)*+'
   )
 |
   # comments
@@ -270,8 +281,8 @@ EOS;
 (?six)
   # quotes
   (
-    "(?:[^"\\]++|\\.)*+"
-  | '(?:[^'\\]++|\\.)*+'
+    "(?:[^"\\\\]++|\\.)*+"
+  | '(?:[^'\\\\]++|\\.)*+'
   )
 |
   # ; before } (and the spaces after it while we're here)
@@ -292,8 +303,8 @@ EOS;
   (?!
     (?>
       [^{}"']++
-    | "(?:[^"\\]++|\\.)*+"
-    | '(?:[^'\\]++|\\.)*+' 
+    | "(?:[^"\\\\]++|\\.)*+"
+    | '(?:[^'\\\\]++|\\.)*+' 
     )*+
     {
   )
