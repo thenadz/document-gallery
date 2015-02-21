@@ -29,12 +29,12 @@ class DG_Document {
       
       // init general document data
       $this->gallery = $gallery;
-      $this->description = $attachment->post_content;
+      $this->description = wptexturize($attachment->post_content);
       $this->ID = $attachment->ID;
       $this->link = $gallery->linkToAttachmentPg()
          ? get_attachment_link($attachment->ID)
          : wp_get_attachment_url($attachment->ID);
-      $this->title = get_the_title($attachment->ID);
+      $this->title = wptexturize($attachment->post_title);
       $this->title_attribute = esc_attr(strip_tags($this->title));
    }
 
@@ -46,7 +46,6 @@ class DG_Document {
     * Returns HTML representing this Document.
     * @filter dg_icon_template Filters the DG icon HTML. Passes a single
     *    bool value indicating whether the gallery is using descriptions or not.
-    * @filter dg_doc_icon Deprecated. To be removed in a future relesase.
     * @return string
     */
    public function __toString() {
@@ -65,20 +64,20 @@ class DG_Document {
          $description = '   <p>%description%</p>';
       }
       
-      // allow developers to filter icon output
-      $doc_icon = apply_filters(
-         'dg_icon_template',
+      $doc_icon =
          '   <div class="document-icon">' . PHP_EOL .
          '      <a href="%link%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
          '   </div>' . PHP_EOL .
-         $description,
+         $description;
+      
+      // allow developers to filter icon output
+      $doc_icon = apply_filters(
+         'dg_icon_template',
+         $doc_icon,
          $this->gallery->useDescriptions(),
          $this->ID);
 
-      $core = str_replace($find, $repl, $doc_icon);
-
-      // deprecated: users may filter icon here
-      return apply_filters('dg_doc_icon', $core, $this->ID, $this->gallery->useDescriptions());
+      return str_replace($find, $repl, $doc_icon);
    }
 }
 

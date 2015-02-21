@@ -16,7 +16,7 @@ div.thumbs-list-wrapper>div, div.log-list-wrapper>div{
    -moz-border-radius: 10px;
    background: #B9C9FE;
    color: #039;
-   width: auto;
+   width: 100%;
    margin: 10px auto;
 }
 #ThumbsTable tbody, #LogTable tbody {
@@ -40,7 +40,7 @@ div.thumbs-list-wrapper>div, div.log-list-wrapper>div{
 #LogTable td {
    text-align: left;
 }
-td.title.column-title{
+td.title.column-title, .column-thumbupload {
    text-align: left !important;
 }
 #ThumbsTable img{
@@ -58,11 +58,20 @@ tr.selected{
 tr.selected:hover{
    background: #D8D3E5 !important;
 }
-.column-date, .column-level, .check-column, .column-icon {
+.check-column, .column-icon {
    white-space: nowrap;
+   width: 1%;
 }
 .column-entry, .column-title {
-   width: 100%;
+   /*width: 100%;*/
+}
+.column-thumbupload {
+   white-space: nowrap;
+   width: 35%;
+}
+#document_gallery_gen_box .column-thumbupload {
+   width: auto;
+   padding-left: 7em;
 }
 .nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after{
    display: inline-block;
@@ -148,7 +157,7 @@ tr.selected:hover{
 }
 .logLabel.date {
    background: #999999;
-   white-space: nowrap;
+   /*white-space: nowrap;*/
    font-weight: inherit;
 }
 .logLabel.date:before{
@@ -282,7 +291,60 @@ th input{
 td input{
    margin-right: 0 !important;
 }
-
 textarea[readonly], input[readonly], select[readonly] {
    background-color: #dcdcdc;
+}
+.nowrap {
+   white-space: nowrap;
+}
+.column-level {
+   white-space: nowrap;
+   width: 6em;
+}
+.column-date {
+   width: 16em !important;
+}
+.column-thumbupload {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   cursor: context-menu;
+}
+.column-thumbupload > * {
+   visibility: hidden;
+}
+.column-thumbupload .dashicons {
+   font-size: x-large;
+   padding-top: 2px;
+   padding-left: 16px;
+   padding-right: 10px;
+   vertical-align: text-bottom;
+}
+/*Attempt to add fancy shadows*/
+/*#ThumbsTable tr:hover {
+   z-index: 3;
+   border-color: #ccc;
+   -webkit-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   -moz-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   -ms-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}*/
+#ThumbsTable tr:hover .column-thumbupload > *, #document_gallery_gen_box #ThumbsTable tr .column-thumbupload > * {
+   visibility: visible;
+}
+.dragover {
+   outline: 3px dashed #83b4d8;
+}
+.html5dndmarker span {
+   padding: 0px 10px;
+}
+.buttons-area input:first-child {
+   display: none !important;
+}
+#document_gallery_gen_box h3 span {
+   font-weight: 100;
+}
+#document_gallery_gen_box h3 span i b {
+   font-weight: 500;
 }

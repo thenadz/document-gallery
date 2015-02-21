@@ -6,19 +6,19 @@ class DG_Admin {
     * @var string The hook for the Document Gallery settings page.
     */
    private static $hook;
-   
+
    /**
     * @var string The current tab being rendered.
     */
    private static $current;
-   
+
    /**
     * NOTE: This should only ever be accessed through getTabs().
     * 
     * @var multitype:string Associative array containing all tab names, keyed by tab slug.
     */
    private static $tabs;
-   
+
    /**
     * Returns reference to tabs array, initializing if needed.
     * 
@@ -32,26 +32,26 @@ class DG_Admin {
             'Logging'    => __('Logging',                'document-gallery'),
             'Advanced'   => __('Advanced',               'document-gallery'));
       }
-      
+
       return self::$tabs;
    }
-   
+
    /**
     * Renders Document Gallery options page.
     */
    public static function renderOptions() { ?>
 <div class="wrap">
-	<h2><?php echo __('Document Gallery Settings', 'document-gallery'); ?></h2>
+   <h2><?php echo __('Document Gallery Settings', 'document-gallery'); ?></h2>
 
-	<h2 class="nav-tab-wrapper">
+   <h2 class="nav-tab-wrapper">
 <?php foreach (self::getTabs() as $tab => $name) {
    $class = ($tab == self::$current) ? ' nav-tab-active' : '';
    echo '<a class="nav-tab '.$tab.'-tab'.$class.'" href="?page=' . DG_OPTION_NAME . '&tab='.$tab.'">'.$name.'</a>';
 } ?>
 </h2>
 
-	<form method="post" action="options.php" id="tab-<?php echo self::$current?>">
-		<input type="hidden" name="<?php echo DG_OPTION_NAME; ?>[tab]" value="<?php echo self::$current; ?>" />
+   <form method="post" action="options.php" id="tab-<?php echo self::$current?>">
+      <input type="hidden" name="<?php echo DG_OPTION_NAME; ?>[tab]" value="<?php echo self::$current; ?>" />
 <?php
    settings_fields(DG_OPTION_NAME);
    do_settings_sections(DG_OPTION_NAME);
@@ -81,12 +81,12 @@ class DG_Admin {
    public static function addDonateLink($links, $file) {
       if ($file === DG_BASENAME) {
          global $dg_options;
-   
+
          $donate = '<strong><a href="' . $dg_options['meta']['donate_link'] . '">' .
                __('Donate', 'document-gallery') . '</a></strong>';
          $links[] = $donate;
       }
-      
+
       return $links;
    }
 
@@ -100,15 +100,19 @@ class DG_Admin {
           'manage_options', DG_OPTION_NAME, array(__CLASS__, 'renderOptions'));
       add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueueScriptsAndStyles'));
    }
-   
+
    /**
     * Enqueues styles and scripts for the admin settings page.
     */
    public static function enqueueScriptsAndStyles($hook) {
       if ($hook !== DG_Admin::$hook) return;
-      
+
       wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
       wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
+      wp_localize_script('document-gallery-admin', 'dg_admin_vars', array('upload_limit' => wp_max_upload_size()));
+      if ($hook == 'post.php') {
+         wp_localize_script('document-gallery-admin', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+      }
    }
 
    /**
@@ -127,7 +131,7 @@ class DG_Admin {
       $funct = 'register' . self::$current . 'Settings';
       DG_Admin::$funct();
    }
-   
+
    /**
     * Registers settings for the general tab.
     */
@@ -165,6 +169,19 @@ class DG_Admin {
         ));
 
       add_settings_field(
+         'gallery_defaults_columns', 'columns',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'gallery_defaults',
+         array (
+            'label_for'   => 'label_gallery_defaults_columns',
+            'name'        => 'gallery_defaults][columns',
+            'value'       => esc_attr($defaults['columns']),
+            'type'        => 'number" min="1" step="1',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('The number of columns to display when not rendering descriptions.', 'document-gallery')
+         ));
+
+      add_settings_field(
         'gallery_defaults_descriptions', 'descriptions',
         array(__CLASS__, 'renderCheckboxField'),
         DG_OPTION_NAME, 'gallery_defaults',
@@ -186,30 +203,6 @@ class DG_Admin {
             'value'       => esc_attr($defaults['fancy']),
             'option_name' => DG_OPTION_NAME,
             'description' => __('Use auto-generated document thumbnails', 'document-gallery')
-        ));
-
-      add_settings_field(
-        'gallery_defaults_images', 'images',
-        array(__CLASS__, 'renderCheckboxField'),
-        DG_OPTION_NAME, 'gallery_defaults',
-        array (
-            'label_for'   => 'label_gallery_defaults_images',
-            'name'        => 'gallery_defaults][images',
-            'value'       => esc_attr($defaults['images']),
-            'option_name' => DG_OPTION_NAME,
-            'description' => __('Include image attachments in gallery', 'document-gallery')
-        ));
-
-      add_settings_field(
-        'gallery_defaults_localpost', 'localpost',
-        array(__CLASS__, 'renderCheckboxField'),
-        DG_OPTION_NAME, 'gallery_defaults',
-        array (
-            'label_for'   => 'label_gallery_defaults_localpost',
-            'name'        => 'gallery_defaults][localpost',
-            'value'       => esc_attr($defaults['localpost']),
-            'option_name' => DG_OPTION_NAME,
-            'description' => __('Only look for attachments in post where [dg] is used', 'document-gallery')
         ));
 
       add_settings_field(
@@ -261,8 +254,22 @@ class DG_Admin {
             'value'       => esc_attr($defaults['limit']),
             'type'        => 'number" min="-1" step="1',
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Limit the number of documents included. -1 means no limit.', 'document-gallery')));
+            'description' => __('Limit the number of documents included. -1 means no limit.', 'document-gallery')
+         ));
 
+      add_settings_field(
+         'gallery_defaults_mime_types', 'mime_types',
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'gallery_defaults',
+         array (
+            'label_for'   => 'label_gallery_defaults_mime_types',
+            'name'        => 'gallery_defaults][mime_types',
+            'value'       => esc_attr($defaults['mime_types']),
+            'type'        => 'text',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Comma-delimited list of <a href="http://en.wikipedia.org/wiki/Internet_media_type#List_of_common_media_types">MIME types</a>.', 'document-gallery')
+         ));
+      
       add_settings_field(
         'gallery_defaults_post_status', 'post_status',
         array(__CLASS__, 'renderSelectField'),
@@ -288,7 +295,7 @@ class DG_Admin {
             'option_name' => DG_OPTION_NAME,
             'description' => __('Which post type to look for when querying documents.', 'document-gallery')
         ));
-      
+
       add_settings_field(
         'thumbnail_generation_av', 'Audio/Video',
         array(__CLASS__, 'renderCheckboxField'),
@@ -332,21 +339,6 @@ class DG_Admin {
         ));
 
       add_settings_field(
-        'thumbnail_generation_google', 'Google Drive Viewer',
-        array(__CLASS__, 'renderCheckboxField'),
-        DG_OPTION_NAME, 'thumbnail_generation',
-        array (
-            'label_for'   => 'label_thumbnail_generation_google',
-            'name'        => 'thumbnail_generation][google',
-            'value'       => esc_attr($active['google']),
-            'option_name' => DG_OPTION_NAME,
-            'description' => DG_Thumber::isGoogleDriveAvailable()
-                              ? __('Use <a href="https://drive.google.com/viewer" target="_blank">Google Drive Viewer</a> to generate thumbnails for MS Office files and many other file types remotely.', 'document-gallery')
-                              : __('Your server does not allow remote HTTP access.', 'document-gallery'),
-            'disabled'    => !DG_Thumber::isGoogleDriveAvailable()
-        ));
-
-      add_settings_field(
          'thumbnail_generation_width', 'Max Thumbnail Dimensions',
          array(__CLASS__, 'renderMultiTextField'),
          DG_OPTION_NAME, 'thumbnail_generation',
@@ -367,7 +359,7 @@ class DG_Admin {
                'description' => __('The max width and height (in pixels) that thumbnails will be generated.', 'document-gallery'))
          ));
    }
-   
+
    /**
     * Registers settings for the thumbnail management tab.
     */
@@ -376,7 +368,7 @@ class DG_Admin {
           'thumbnail_table', '',
          array(__CLASS__, 'renderThumbnailSection'), DG_OPTION_NAME);
    }
-   
+
    /**
     * Registers settings for the logging tab.
     */
@@ -385,17 +377,17 @@ class DG_Admin {
           'logging_table', '',
          array(__CLASS__, 'renderLoggingSection'), DG_OPTION_NAME);
    }
-   
+
    /**
     * Registers settings for the advanced tab.
     */
    private static function registerAdvancedSettings() {
       global $dg_options;
-      
+
       add_settings_section(
          'advanced', __('Advanced Thumbnail Generation', 'document-gallery'),
          array(__CLASS__, 'renderAdvancedSection'), DG_OPTION_NAME);
-      
+
       add_settings_field(
          'advanced_logging', 'Logging',
          array(__CLASS__, 'renderCheckboxField'),
@@ -407,7 +399,7 @@ class DG_Admin {
             'option_name' => DG_OPTION_NAME,
             'description' => __('Whether to log debug and error information related to Document Gallery.', 'document-gallery')
          ));
-      
+
       add_settings_field(
          'advanced_validation', 'Option Validation',
          array(__CLASS__, 'renderCheckboxField'),
@@ -451,7 +443,7 @@ class DG_Admin {
          'advanced_options_dump', __('Options Array Dump', 'document-gallery'),
          array(__CLASS__, 'renderOptionsDumpSection'), DG_OPTION_NAME);
    }
-   
+
    /**
     * Validates submitted options, sanitizing any invalid options.
     * @param array $values User-submitted new options.
@@ -482,12 +474,12 @@ class DG_Admin {
 
       // handle gallery shortcode defaults
       $errs = array();
-      $ret['gallery'] = DG_Gallery::sanitizeDefaults($values['gallery_defaults'], $errs, true);
+      $ret['gallery'] = DG_Gallery::sanitizeDefaults(null, $values['gallery_defaults'], $errs);
 
       foreach ($errs as $k => $v) {
          add_settings_error(DG_OPTION_NAME, str_replace('_', '-', $k), $v);
       }
-      
+
       // handle setting width
       if (isset($values['thumbnail_generation']['width'])) {
          $width = (int)$values['thumbnail_generation']['width'];
@@ -500,7 +492,7 @@ class DG_Admin {
          
          unset($values['thumbnail_generation']['width']);
       }
-      
+
       // handle setting height
       if (isset($values['thumbnail_generation']['height'])) {
          $height = (int)$values['thumbnail_generation']['height'];
@@ -513,7 +505,7 @@ class DG_Admin {
          
          unset($values['thumbnail_generation']['width']);
       }
-      
+
       // delete thumb cache to force regeneration if max dimensions changed
       if ($ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
          $ret['thumber']['height'] !== $dg_options['thumber']['height']) {
@@ -522,7 +514,7 @@ class DG_Admin {
                @unlink($v['thumb_path']);
             }
          }
-          
+
          $ret['thumber']['thumbs'] = array();
          $thumbs_cleared = true;
       }
@@ -554,7 +546,7 @@ class DG_Admin {
 
       return $ret;
    }
-   
+
    /**
     * Validates thumbnail management settings, sanitizing any invalid options.
     * @param array $values User-submitted new options.
@@ -563,27 +555,111 @@ class DG_Admin {
    private static function validateThumbnailSettings($values) {
       global $dg_options;
       $ret = $dg_options;
-      
-      if (isset($values['ids'])) {
+      $responseArr = array('result' => false);
+
+      if (isset($values['entry'])) {
+         $ID = intval($values['entry']);
+      } else {
+         $ID = -1;
+      }
+
+      // Thumbnail(s) cleanup;
+      // cleanup value is a marker
+      if ( isset($values['cleanup']) && isset($values['ids']) ) {
          $deleted = array_values(array_intersect(array_keys($dg_options['thumber']['thumbs']), $values['ids']));
-         
+
          foreach ($deleted as $k) {
             if (isset($ret['thumber']['thumbs'][$k]['thumber'])) {
                @unlink($ret['thumber']['thumbs'][$k]['thumb_path']);
             }
-            
+
             unset($ret['thumber']['thumbs'][$k]);
          }
-         
-         if (isset($values['ajax'])) {
-            echo '[' . implode(',', $deleted) . ']';
-            add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
+
+         $responseArr['result'] = true;
+         $responseArr['deleted'] = $deleted;
+      }
+      // Thumbnail file manual refresh (one at a time)
+      // upload value is a marker
+      elseif ( isset($values['upload']) && isset($_FILES['file']) && isset($ret['thumber']['thumbs'][$ID]) ) {
+         $old_path = $ret['thumber']['thumbs'][$ID]['thumb_path'];
+         $uploaded_filename = self::validateUploadedFile();
+         if ($uploaded_filename && DG_Thumber::setThumbnail($ID, $uploaded_filename)) {
+            if ($dg_options['thumber']['thumbs'][$ID]['thumb_path'] !== $old_path) {
+               @unlink($old_path);
+            }
+            $responseArr['result'] = true;
+            $responseArr['url'] = $dg_options['thumber']['thumbs'][$ID]['thumb_url'];
+            $ret['thumber']['thumbs'][$ID] = $dg_options['thumber']['thumbs'][$ID];
          }
       }
-      
+
+      if (isset($values['ajax'])) {
+         echo DG_Util::jsonEncode($responseArr);
+         add_filter('wp_redirect', array(__CLASS__, '_exit'), 1, 0);
+      }
+
       return $ret;
    }
-   
+
+   /**
+    * Validates uploaded file as a semi for potential thumbnail.
+    * @param  str $var   File field name.
+    * @return bool|str   False on failure, path to temp file on success.
+    */
+   public static function validateUploadedFile($var = 'file') {
+      // checking if any file was delivered
+      if (!isset($_FILES[$var]))
+         return false;
+      // we gonna process only first one
+      if ( !is_array($_FILES[$var]['error']) ) {
+         $upload_err  = $_FILES[$var]['error'];
+         $upload_path = $_FILES[$var]['tmp_name'];
+         $upload_size = $_FILES[$var]['size'];
+         $upload_type = $_FILES[$var]['type'];
+         $upload_name = $_FILES[$var]['name'];
+      } else {
+         $upload_err  = $_FILES[$var]['error'][0];
+         $upload_path = $_FILES[$var]['tmp_name'][0];
+         $upload_size = $_FILES[$var]['size'][0];
+         $upload_type = $_FILES[$var]['type'][0];
+         $upload_name = $_FILES[$var]['name'][0];
+      }
+      $info = getimagesize($upload_path);
+      if ($info) {
+         if ($info['mime']!=$upload_type) {// in DG_Thumber::getExt() we'll define and set appropriate extension
+            DG_Logger::writeLog(
+               DG_LogLevel::Warning,
+               __('File extension doesn\'t match the MIME type of the image: ', 'document-gallery') .
+               $upload_name.' - '.$info['mime']);
+         }
+         if ($upload_size>wp_max_upload_size()) {
+            DG_Logger::writeLog(
+               DG_LogLevel::Warning,
+               __('Uploaded file size exceeds the allowable limit: ', 'document-gallery') .
+               $upload_name.' - '.$upload_size.'b');
+            return false;
+         }
+      } else {
+         DG_Logger::writeLog(
+            DG_LogLevel::Warning,
+            __('Uploaded file is not an image: ', 'document-gallery') .
+            $upload_name);
+         return false;
+      }
+      if ($upload_err == UPLOAD_ERR_OK && $upload_size > 0) {
+         $temp_file = $upload_path;
+      } else {
+         DG_Logger::writeLog(
+            DG_LogLevel::Error,
+            __('Failed to get uploaded file: ', 'document-gallery') .
+            $upload_err);
+         return false;
+      }
+
+      return $temp_file;
+   }
+
    /**
     * Validates logging settings, sanitizing any invalid options.
     * @param array $values User-submitted new options.
@@ -596,7 +672,7 @@ class DG_Admin {
       }
       return $dg_options;
    }
-   
+
    /**
     * Validates advanced settings, sanitizing any invalid options.
     * @param array $values User-submitted new options.
@@ -605,7 +681,7 @@ class DG_Admin {
    private static function validateAdvancedSettings($values) {
       global $dg_options;
       $ret = $dg_options;
-      
+
       // handle setting the Ghostscript path
       if (isset($values['gs']) &&
          0 != strcmp($values['gs'], $ret['thumber']['gs'])) {
@@ -616,7 +692,7 @@ class DG_Admin {
                __('Invalid Ghostscript path given: ', 'document-gallery') . $values['gs']);
          }
       }
-      
+
       // handle setting timeout
       if (isset($values['timeout'])) {
          $timeout = (int)$values['timeout'];
@@ -627,7 +703,7 @@ class DG_Admin {
                __('Invalid timeout given: ', 'document-gallery') . $values['timeout']);
          }
       }
-      
+
       // validation checkbox
       $ret['validation'] = isset($values['validation']);
       
@@ -636,7 +712,7 @@ class DG_Admin {
       
       return $ret;
    }
-   
+
    /**
     * @return bool Whether to register settings.
     */
@@ -674,13 +750,13 @@ class DG_Admin {
           __('Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.'),
           DG_URL . 'assets/css/style.css'); ?></p>
 <table class="form-table">
-	<tbody>
-		<tr valign="top">
-			<td>
-			   <textarea name="<?php echo DG_OPTION_NAME; ?>[css]" rows="10" cols="50" class="large-text code"><?php echo $dg_options['css']['text']; ?></textarea>
-			</td>
-		</tr>
-	</tbody>
+   <tbody>
+      <tr valign="top">
+         <td>
+            <textarea name="<?php echo DG_OPTION_NAME; ?>[css]" rows="10" cols="50" class="large-text code"><?php echo $dg_options['css']['text']; ?></textarea>
+         </td>
+      </tr>
+   </tbody>
 </table>
 <?php }
 
@@ -692,11 +768,11 @@ class DG_Admin {
 <p><?php _e('Unless you <em>really</em> know what you\'re doing, you should not touch these values.', 'document-gallery'); ?></p>
 <?php if (!DG_Thumber::isExecAvailable()) : ?>
 <p>
-	<em><?php _e('NOTE: <code>exec()</code> is not accessible. Ghostscript will not function.', 'document-gallery'); ?></em>
+   <em><?php _e('NOTE: <code>exec()</code> is not accessible. Ghostscript will not function.', 'document-gallery'); ?></em>
 </p>
 <?php endif; ?>
    <?php }
-   
+
    /**
     * Renders a readonly textfield containing a dump of current DG options.
     */
@@ -706,13 +782,13 @@ class DG_Admin {
       _e('The following <em>readonly text</em> should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'documet-gallery');
    ?></p>
    <table class="form-table">
-   	<tbody>
-   		<tr valign="top">
-   			<td>
-   			   <textarea readonly="true" rows="10" cols="50" id="options-dump" class="large-text code"><?php var_dump($dg_options); ?></textarea>
-   			</td>
-   		</tr>
-   	</tbody>
+      <tbody>
+         <tr valign="top">
+            <td>
+               <textarea readonly="true" rows="10" cols="50" id="options-dump" class="large-text code"><?php print_r($dg_options); ?></textarea>
+            </td>
+         </tr>
+      </tbody>
    </table>
    <?php }
 
@@ -725,20 +801,19 @@ class DG_Admin {
 
       $URL_params = array('page' => DG_OPTION_NAME, 'tab' => 'Thumbnail');
       $att_ids = array();
-      
+
       if (isset($_REQUEST['orderby']) && in_array(strtolower($_REQUEST['orderby']), array('title', 'date'))) {
          $orderby = strtolower($_REQUEST['orderby']);
          $URL_params['orderby'] = $orderby;
-         
-         switch ($orderby)
-         {
+
+         switch ($orderby) {
             case 'date':
                foreach ($options['thumbs'] as $key => $node) {
                   $keyArray[$key] = $node['timestamp'];
                   $options['thumbs'][$key]['thumb_id'] = $att_ids[] = $key;
                }
                break;
-               
+
             case 'title':
                foreach ($options['thumbs'] as $key => $node) {
                   $keyArray[$key] = basename($node['thumb_path']);
@@ -746,7 +821,7 @@ class DG_Admin {
                }
                break;
          }
-         
+
          $order = strtolower($_REQUEST['order']);
          if (!isset($_REQUEST['order']) || !in_array($order, array('asc', 'desc'))) {
             $order = 'asc';
@@ -771,7 +846,7 @@ class DG_Admin {
       } else {
          $limit = intval($_REQUEST['limit']);
       }
-      
+
       $URL_params['limit'] = $limit;
       $select_limit = '';
       foreach ($limit_options as $l_o) {
@@ -783,7 +858,7 @@ class DG_Admin {
       if ($sheet <= 0 || $sheet > $lastsheet) {
          $sheet = 1;
       }
-      
+
       $offset = ($sheet - 1) * $limit;
 
       $att_ids = array_slice($att_ids, $offset, $limit);
@@ -801,7 +876,7 @@ class DG_Admin {
          $titles[$att->ID] = $att->post_title.'.'.$path_parts['extension'];
       }
       unset($atts);
-      
+
       $thead = '<tr>'.
             '<th scope="col" class="manage-column column-cb check-column">'.
                '<label class="screen-reader-text" for="cb-select-all-%1$d">'.__('Select All', 'document-gallery').'</label>'.
@@ -809,6 +884,7 @@ class DG_Admin {
             '</th>'.
             '<th scope="col" class="manage-column column-icon">'.__('Thumbnail', 'document-gallery').'</th>'.
             '<th scope="col" class="manage-column column-title '.(($orderby != 'title')?'sortable desc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'title','order'=>(($orderby != 'title')?'asc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('File name', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
+            '<th scope="col" class="manage-column column-thumbupload"></th>'.
             '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
          '</tr>';
 
@@ -827,51 +903,132 @@ class DG_Admin {
             '<span class="displaying-num"><select dir="rtl" class="limit_per_page">'.$select_limit.'</select> '.__('items per page', 'document-gallery').'</span>'.
          '</div>'.
          '<br class="clear" />';
-
-      // Avoiding json_encode to avoid compatibility issues on some systems
-      $json_like = '';
-      foreach ($URL_params as $k => $v) {
-         $json_like .= '"'.$k.'":"'.$v.'",';
-      }
       ?>
 
 <script type="text/javascript">
-var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
-      </script>
+   var URL_params = <?php echo DG_Util::jsonEncode($URL_params); ?>;
+</script>
 <div class="thumbs-list-wrapper">
-	<div>
-		<div class="tablenav top"><?php echo $pagination; ?></div>
-		<table id="ThumbsTable" class="wp-list-table widefat fixed media"
-			cellpadding="0" cellspacing="0">
-			<thead>
+   <div>
+      <div class="tablenav top"><?php echo $pagination; ?></div>
+      <table id="ThumbsTable" class="wp-list-table widefat fixed media"
+         cellpadding="0" cellspacing="0">
+         <thead>
                <?php printf($thead, 1); ?>
             </thead>
-			<tfoot>
+         <tfoot>
                <?php printf($thead, 2); ?>
             </tfoot>
-			<tbody><?php
+         <tbody><?php
                $i = 0;
                foreach ($options['thumbs'] as $v) {
                   if ($i < $offset) { $i++; continue; }
                   if (++$i > $offset + $limit) { break; }
-                  
-                  $icon = isset($v['thumb_url']) ? $v['thumb_url'] : DG_URL . 'assets/icons/missing.png';
+
+                  $icon = isset($v['thumb_url']) ? $v['thumb_url'] : DG_Thumber::getDefaultThumbnail($v['thumb_id']);
                   $title = isset($titles[$v['thumb_id']]) ? $titles[$v['thumb_id']] : '';
                   $date = DocumentGallery::localDateTimeFromTimestamp($v['timestamp']);
                   
-                  echo '<tr><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
+                  echo '<tr data-entry="'.$v['thumb_id'].'"><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
                           $icon.'" />'.'</td><td class="title column-title">' .
                           ($title ? '<strong><a href="' . home_url('/?attachment_id='.$v['thumb_id']).'" target="_blank" title="'.__('View', 'document-gallery').' \'' .
                           $title.'\' '.__('attachment page', 'document-gallery').'">'.$title.'</a></strong>' : __('Attachment not found', 'document-gallery')) .
+                           '</td><td class="column-thumbupload">' .
+                              '<span class="manual-download">' .
+                                 '<span class="dashicons dashicons-upload"></span>' .
+                                 '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
+                                 '<span class="buttons-area">' .
+                                    '<input id="upload-button'.$v['thumb_id'].'" type="file" />' .
+                                    '<input id="trigger-button'.$v['thumb_id'].'" type="button" value="Select File" class="button" />' .
+                                 '</span>' .
+                              '</span>' .
                           '</td><td class="date column-date">'.$date.'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
-		</table>
-		<div class="tablenav bottom"><?php echo $pagination; ?></div>
-	</div>
+      </table>
+      <div class="tablenav bottom"><?php echo $pagination; ?></div>
+   </div>
 </div>
 <?php }
+
+   /**
+    * Adds meta box to the attchements' edit pages.
+    */
+   public static function addMetaBox() {
+      $screens = array( 'attachment' );
+      foreach ( $screens as $screen ) {
+         add_meta_box(
+               DG_OPTION_NAME.'_gen_box',
+               __( '<b>Thumbnail</b> for <i><b>Document Gallery</b></i>', 'document-gallery' ),
+               array(__CLASS__, 'renderMetaBox'),
+               $screen,
+               'normal'
+            );
+      }
+      DG_Admin::$hook = 'post.php';
+      add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueueScriptsAndStyles'));
+   }
+
+   /**
+    * Render a Meta Box.
+    */
+   public static function renderMetaBox($post) {
+      global $dg_options;
+      wp_nonce_field( DG_OPTION_NAME.'_meta_box', DG_OPTION_NAME.'_meta_box_nonce' );
+      $ID = $post->ID;
+                  $icon = isset($dg_options['thumber']['thumbs'][$ID]['thumb_url']) ? $dg_options['thumber']['thumbs'][$ID]['thumb_url'] : DG_Thumber::getDefaultThumbnail($ID);
+
+                  echo '<table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">'.
+                     '<tbody><tr data-entry="'.$ID.'"><td class="column-icon media-icon"><img src="' .
+                     $icon.'" />'.'</td><td class="column-thumbupload">' .
+                        '<span class="manual-download">' .
+                           '<span class="dashicons dashicons-upload"></span>' .
+                           '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
+                           '<span class="buttons-area">' .
+                              '<input id="upload-button'.$ID.'" type="file" />' .
+                              '<input id="trigger-button'.$ID.'" type="button" value="Select File" class="button" />' .
+                           '</span>' .
+                        '</span>' .
+                     '</td></tr></tbody></table>'.
+                     (empty($dg_options['thumber']['thumbs'][$ID]) ? '<span class="dashicons dashicons-info"></span><span class="">Please note this attachment hasn&#39;t been used in any Document Gallery instance and so there is no autogenerated thumbnail, in the meantime default one is used instead.</span>' : '').PHP_EOL;
+   }
+
+   /**
+    * Save a Meta Box.
+    */
+   public static function saveMetaBox($post_id) {
+      // Check if our nonce is set.
+      // Verify that the nonce is valid.
+      // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+      if ( !isset($_POST[DG_OPTION_NAME.'_meta_box_nonce']) || !wp_verify_nonce($_POST[DG_OPTION_NAME.'_meta_box_nonce'], DG_OPTION_NAME.'_meta_box') || (defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE) ) {
+         return;
+      }
+      
+      global $dg_options;
+      $responseArr = array('result' => false);
+      if (isset($_POST[DG_OPTION_NAME]['entry'])) {
+         $ID = intval($_POST[DG_OPTION_NAME]['entry']);
+      } else {
+         $ID = -1;
+      }
+      if ( isset($_POST[DG_OPTION_NAME]['upload']) && isset($_FILES['file']) && isset($dg_options['thumber']['thumbs'][$ID]) ) {
+         $old_path = $dg_options['thumber']['thumbs'][$ID]['thumb_path'];
+         $uploaded_filename = self::validateUploadedFile();
+         if ($uploaded_filename && DG_Thumber::setThumbnail($ID, $uploaded_filename)) {
+            if ($dg_options['thumber']['thumbs'][$ID]['thumb_path'] !== $old_path) {
+               @unlink($old_path);
+            }
+            $responseArr['result'] = true;
+            $responseArr['url'] = $dg_options['thumber']['thumbs'][$ID]['thumb_url'];
+         }
+      }
+      if (isset($_POST[DG_OPTION_NAME]['ajax'])) {
+         echo DG_Util::jsonEncode($responseArr);
+         wp_die();
+      }
+   }
+
    /**
     * Render the Logging table.
     */
@@ -948,16 +1105,16 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
          echo '<div class="noLog">'.__('There are no log entries at this time.', 'document-gallery').'<br />'.__('For Your information:', 'document-gallery').' <strong><i>'.__('Logging', 'document-gallery').'</i></strong> '.(DG_Logger::logEnabled()?'<span class="loggingON">'.__('is turned ON', 'document-gallery').'!</span>':'<span class="loggingOFF">'.__('is turned OFF', 'document-gallery').'!</span>').'</div>';
       }
    }
-   
+
    /**
     * Takes label name and returns SPAN tag.
     * @param string $e label name.
     * @return string SPAN tag
     */
    private static function getLogLabelSpan($e) {
-   	return '<span class="logLabel ' . strtolower($e) . '">' . strtoupper($e) . '</span>';
+      return '<span class="logLabel ' . strtolower($e) . '">' . strtoupper($e) . '</span>';
    }
-
+   
    /**
     * Render a checkbox field.
     * @param array $args
@@ -969,7 +1126,7 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
           $args['name'],
           $args['label_for'],
           checked($args['value'], 1, false),
-          $args['disabled'] ? 'disabled="disabled"' : '',
+          disabled($args['disabled'], true, false),
           $args['description']);
    }
 
@@ -986,7 +1143,7 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
          $args['label_for'],
          $args['description']);
    }
-   
+
    /**
     * Accepts a two-dimensional array where each inner array consists of valid arguments for renderTextField.
     * @param array $args
@@ -1017,7 +1174,7 @@ var URL_params = <?php echo '{'.trim($json_like,', ').'}'; ?>;
 
       print '</select> ' . $args['description'];
    }
-   
+
    /**
     * Wraps the PHP exit language construct.
     */

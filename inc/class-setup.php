@@ -52,14 +52,8 @@ class DG_Setup {
               // include thumbnail of actual document in gallery display
               'fancy'          => true,
                 
-              // comma-separated list of attachment ids
-              'ids'            => false,
-                
-              // if true, all images attached to current page will be included also
-              'images'         => false,
-                
-              // include just attached to the post using shortcode
-              'localpost'      => true,
+              // comma-delimited list of all mime types to be included
+              'mime_types'     => implode(',', self::getDefaultMimeTypes()),
                 
               // ascending/descending order for included documents
               'order'          => 'ASC',
@@ -78,6 +72,9 @@ class DG_Setup {
                 
               // the max number of thumbnails to return
               'limit'          => -1,
+                
+              // # of columns to be used in gallery
+              'columns'        => 4
           ),
           'css' => array(
               // plain text of CSS to be edited by user
@@ -104,13 +101,20 @@ class DG_Setup {
    }
 
    /**
+    * @return multitype:string The default MIME types to include in gallery.
+    */
+   public static function getDefaultMimeTypes() {
+      return array('application', 'video', 'text', 'audio');
+   }
+   
+   /**
     * Runs every page load, updates as needed.
     */
    public static function maybeUpdate() {
       global $dg_options;
 
       // do update
-      if (!is_null($dg_options) && (!isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
+      if (!is_null($dg_options) && (isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
          $blogs = array(null);
          
          if (is_multisite()) {
@@ -136,7 +140,7 @@ class DG_Setup {
       // version-specific updates
       self::twoPointTwo($options);
       self::twoPointThree($options);
-      self::twoPointFour($options);
+      self::threePointZeroBeta($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -225,12 +229,36 @@ class DG_Setup {
    /**
     * Creating new meta branch in options to store plugin meta information.
     * 
+    * "Localpost" no longer supported. Replaced by "id" attribute.
+    * "Images" no longer supported. Replaced by "mime_types" attribute.
+    * "Ids" still supported, but not stored in DB.
+    * 
+    * Google thumber no longer supported.
+    * 
+    * Added "columns" attribute.
+    * Added "mime_types" attribute.
+    * 
     * @param array $options The options to be modified.
     */
-   private static function twoPointFour(&$options) {
-      if (isset($options['version']) /*&& version_compare($options['version'], '2.4', '<')*/) {
+   private static function threePointZeroBeta(&$options) {
+      if (isset($options['version']) /*&& version_compare($options['version'], '3.0.0-beta', '<')*/) {
          $options['meta'] = array('version' => $options['version']);
          unset($options['version']);
+         
+         $images = $options['gallery']['images'];
+         
+         unset($options['gallery']['localpost']);
+         unset($options['gallery']['ids']);
+         unset($options['gallery']['images']);
+
+         unset($options['thumber']['active']['google']);
+         
+         $defaults = self::getDefaultOptions();
+         $options['gallery']['columns'] = $defaults['gallery']['columns'];
+         $options['gallery']['mime_types'] = $defaults['gallery']['mime_types'];
+         if ($images) {
+            $options['gallery']['mime_types'] .= ',image';
+         }
       }
    }
    
