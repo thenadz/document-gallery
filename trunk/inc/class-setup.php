@@ -140,8 +140,7 @@ class DG_Setup {
       // version-specific updates
       self::twoPointTwo($options);
       self::twoPointThree($options);
-      self::twoPointFour($options);
-      self::threePointZero($options);
+      self::threePointZeroBeta($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -241,8 +240,8 @@ class DG_Setup {
     * 
     * @param array $options The options to be modified.
     */
-   private static function threePointZero(&$options) {
-      if (isset($options['version']) /*&& version_compare($options['version'], '3.0', '<')*/) {
+   private static function threePointZeroBeta(&$options) {
+      if (isset($options['version']) /*&& version_compare($options['version'], '3.0.0-beta', '<')*/) {
          $options['meta'] = array('version' => $options['version']);
          unset($options['version']);
          
