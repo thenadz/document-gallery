@@ -1081,8 +1081,14 @@ class DG_Admin {
             $i = 0;
             foreach ($log_list as $v) {
                $date = DocumentGallery::localDateTimeFromTimestamp($v[0]);
-               $v[2] = preg_replace('/ (attachment #)(\d+) /', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
+               
+               // convert attachment names to links
+               $v[2] = preg_replace('/[ ^](attachment #)(\d+)[., ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
+               
+               // bold the place where log entry was submitted
                $v[2] = preg_replace('/^(\(\w+::\w+\)) /', '<strong>\1</strong> ', $v[2]);
+               
+               // italicize any function references within log entry
                $v[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $v[2]);
 
                echo '<tr><td class="date column-date" data-sort-value="'.$v[0].'"><span class="logLabel date">'.$date.'</span></td>' .
