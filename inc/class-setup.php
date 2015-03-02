@@ -114,7 +114,7 @@ class DG_Setup {
       global $dg_options;
 
       // do update
-      if (!is_null($dg_options) && (isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
+      if (!is_null($dg_options) && (isset($dg_options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
          $blogs = array(null);
          
          if (is_multisite()) {
