@@ -258,4 +258,98 @@ jQuery(document).ready(function(){
    if (!('draggable' in document.createElement('span'))) {
       jQuery('.html5dndmarker').hide();
    }
+   
+   jQuery( 'td .dashicons-edit' ).click(function() {
+      var cell = jQuery( this ).closest('td');
+      if (cell.hasClass('column-title')) {
+         if (cell.find('a').css('display') == 'none') {
+            return;
+         }
+         cell.find('a').hide().after('<input type="text" value="'+cell.find('.editable-title').text()+'">');
+         cell.find('input').focus();
+      } else if (cell.hasClass('column-description')) {
+         if (cell.find('.editable-description').css('display') == 'none') {
+            return;
+         }
+         cell.find('.editable-description').hide().after('<textarea>'+cell.find('.editable-description').text()+'</textarea>');
+         cell.find('textarea').focus();
+      } else {
+         return;
+      }
+      jQuery( this ).css('visibility', 'hidden');
+      cell.find('.edit-controls').show();
+   });
+   jQuery( '.edit-controls .dashicons-no' ).click(function() {
+      var cell = jQuery( this ).closest('td');
+      if (cell.hasClass('column-title')) {
+         if (cell.find('a').css('display') != 'none') {
+            return;
+         }
+         cell.find('input').fadeOut('fast', function(){jQuery(this).remove();cell.find('a').fadeIn('fast');});
+      } else if (cell.hasClass('column-description')) {
+         if (cell.find('.editable-description').css('display') != 'none') {
+            return;
+         }
+         cell.find('textarea').fadeOut('fast', function(){jQuery(this).remove();cell.find('.editable-description').fadeIn('fast');});
+      } else {
+         return;
+      }
+      jQuery( this ).closest('.edit-controls').hide();
+      cell.find('.dashicons-edit').css('visibility', 'visible');
+   });
+   jQuery( '.edit-controls .dashicons-yes' ).click(function() {
+      var cell = jQuery( this ).closest('td');
+      var entry = jQuery(this).closest('tr').data('entry')
+      var target = jQuery('#tab-Thumbnail').attr('action');
+      var formData= new FormData(jQuery('[data-entry='+entry+']').closest('form')[0]);
+      formData.append('document_gallery[entry]', entry);
+      formData.append('document_gallery[ajax]', 'true');
+      var newContent, updateGoal;
+      if (cell.hasClass('column-title')) {
+         newContent = cell.find('input');
+         updateGoal = cell.find('.editable-title');
+         formData.append('document_gallery[title]', encodeURIComponent(newContent.val()));
+      } else if (cell.hasClass('column-description')) {
+         newContent = cell.find('textarea');
+         updateGoal = cell.find('.editable-description');
+         formData.append('document_gallery[description]', encodeURIComponent(newContent.val()));
+      } else {
+         return;
+      }
+      if (newContent.val()==updateGoal.text()) {
+         jQuery( this ).next('.dashicons-no').click();
+         return;
+      }
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', target);
+      //var theImg = jQuery('[data-entry='+entry+']').find('.column-icon img');
+      xhr.onreadystatechange = function() {
+         if (xhr.readyState == 4) {
+            cell.addClass('trans');
+           if (xhr.responseText.indexOf("\n") == -1) {
+               eval('var response = ' + xhr.responseText + ';');
+               if (response.result) {
+                  updateGoal.text(newContent.val());
+                  cell.find('.dashicons-no').click();
+                  cell.addClass('responseSuccess').delay(2000).queue(function(){ jQuery(this).removeClass('responseSuccess').dequeue();}).delay(1100).queue(function(){ jQuery(this).removeClass('trans').dequeue();});
+               } else {
+                  shake(newContent);
+                  cell.addClass('responseFail').delay(1100).queue(function(){ jQuery(this).removeClass('responseFail').dequeue();}).delay(1100).queue(function(){ jQuery(this).removeClass('trans').dequeue();});
+               }
+            } else {
+               shake(newContent);
+               cell.addClass('responseFail').delay(1100).queue(function(){ jQuery(this).removeClass('responseFail').dequeue();}).delay(1100).queue(function(){ jQuery(this).removeClass('trans').dequeue();});
+               console.log('Invalid response from server:');
+               console.log(xhr.responseText);
+            }
+         }
+      }
+      xhr.send(formData);
+   });
+   function shake(target) {
+      var offset = 4;
+      for( var i = 0; i < 6; i++ ) {
+         target.animate( { 'margin-left': "+=" + ( offset = -offset ) + 'px' }, 50);
+      }
+   }
 });
