@@ -887,14 +887,20 @@ class DG_Admin {
       $offset = ($sheet - 1) * $limit;
 
       $att_ids = array_slice($att_ids, $offset, $limit);
-      $atts = get_posts(
-         array(
-            'post_type'   => 'any',
-            'post_status' => 'any',
-            'numberposts' => -1,
-            'post__in'    => $att_ids,
-            'orderby'     => 'post__in'
-      ));
+      
+      // https://core.trac.wordpress.org/ticket/12212
+	  $atts = array();
+	  if (!empty($att_ids)) {
+		  $atts = get_posts(
+			 array(
+				'post_type'   => 'any',
+				'post_status' => 'any',
+				'numberposts' => -1,
+				'post__in'    => $att_ids,
+				'orderby'     => 'post__in'
+		  ));
+	  }
+	  
       $titles = array();
       $contents = array();
       foreach ($atts as $att) {
