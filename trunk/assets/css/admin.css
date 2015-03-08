@@ -1,3 +1,35 @@
+@media screen and (max-width: 782px) {
+   .column-title {
+      width: 150px;
+   }
+   .column-date {
+      display: table-cell !important;
+      width: auto !important;
+   }
+   .nav-tab-wrapper {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+   }
+   .top .tablenav-pages {
+      display: none;
+   }
+   .bottom .tablenav-pages {
+      width: auto !important;
+      margin-top: 0px !important;
+   }
+   .bottom .displaying-num {
+      position: inherit !important;
+   }
+}
+@media screen and (max-width: 979px) {
+   .column-thumbupload {
+      display: none;
+   }
+   .thumbs-list-wrapper {
+      margin-top: 0px !important;
+   }
+}
+
 div.thumbs-list-wrapper, div.log-list-wrapper{
    text-align:center;
    margin-top: 1.5em;
