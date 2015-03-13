@@ -129,7 +129,7 @@ class DG_Setup {
    }
    
    /**
-    * Runs when update is needed, updating the given blog. If blog is null,
+    * Runs when update is needed, updating the given blog. If $blog is null,
     * active blog is updated.
     * @param int $blog Blog to update or null if updating current blog.
     */
