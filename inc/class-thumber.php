@@ -691,11 +691,12 @@ class DG_Thumber {
     * with the ID(s), if such a thumbnails exists.
     *
     * @param int|array $ids
+    * @return array All IDs that were deleted -- some subset of IDs requested to be deleted.
     */
    public static function deleteThumbMeta($ids) {
       $options = self::getOptions();
-      $modified = false;
 
+      $deleted = array();
       foreach ((array)$ids as $id) {
          if (isset($options['thumbs'][$id])) {
             if (isset($options['thumbs'][$id]['thumber'])) {
@@ -703,11 +704,13 @@ class DG_Thumber {
             }
 
             unset($options['thumbs'][$id]);
-            $modified = true;
+            $deleted[] = $id;
          }
       }
 
-      if ($modified) { self::setOptions($options); }
+      if (count($deleted) > 0) { self::setOptions($options); }
+      
+      return $deleted;
    }
 
    /**
