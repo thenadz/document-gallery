@@ -114,7 +114,7 @@ class DG_Setup {
       global $dg_options;
 
       // do update
-      if (!is_null($dg_options) && (isset($options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
+      if (!is_null($dg_options) && (isset($dg_options['version']) || DG_VERSION !== $dg_options['meta']['version'])) {
          $blogs = array(null);
          
          if (is_multisite()) {
@@ -129,7 +129,7 @@ class DG_Setup {
    }
    
    /**
-    * Runs when update is needed, updating the given blog. If blog is null,
+    * Runs when update is needed, updating the given blog. If $blog is null,
     * active blog is updated.
     * @param int $blog Blog to update or null if updating current blog.
     */
@@ -140,8 +140,7 @@ class DG_Setup {
       // version-specific updates
       self::twoPointTwo($options);
       self::twoPointThree($options);
-      self::twoPointFour($options);
-      self::threePointZero($options);
+      self::threePointZeroBeta($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -241,8 +240,8 @@ class DG_Setup {
     * 
     * @param array $options The options to be modified.
     */
-   private static function threePointZero(&$options) {
-      if (isset($options['version']) /*&& version_compare($options['version'], '3.0', '<')*/) {
+   private static function threePointZeroBeta(&$options) {
+      if (isset($options['version']) /*&& version_compare($options['version'], '3.0.0-beta', '<')*/) {
          $options['meta'] = array('version' => $options['version']);
          unset($options['version']);
          

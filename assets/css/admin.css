@@ -1,3 +1,35 @@
+@media screen and (max-width: 782px) {
+   .column-title {
+      width: 150px;
+   }
+   .column-date {
+      display: table-cell !important;
+      width: auto !important;
+   }
+   .nav-tab-wrapper {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+   }
+   .top .tablenav-pages {
+      display: none;
+   }
+   .bottom .tablenav-pages {
+      width: auto !important;
+      margin-top: 0px !important;
+   }
+   .bottom .displaying-num {
+      position: inherit !important;
+   }
+}
+@media screen and (max-width: 979px) {
+   .column-thumbupload {
+      display: none;
+   }
+   .thumbs-list-wrapper {
+      margin-top: 0px !important;
+   }
+}
+
 div.thumbs-list-wrapper, div.log-list-wrapper{
    text-align:center;
    margin-top: 1.5em;
@@ -195,7 +227,7 @@ tr.selected:hover{
    float: right;
    padding-right: 15px;
 }
-.levelSelector > * {
+.levelSelector > *, .dashicons {
    -webkit-touch-callout: none;
    -webkit-user-select: none;
    -khtml-user-select: none;
@@ -347,4 +379,92 @@ textarea[readonly], input[readonly], select[readonly] {
 }
 #document_gallery_gen_box h3 span i b {
    font-weight: 500;
+}
+th.column-description {
+   text-align: left !important;
+}
+.editable-description {
+   max-height: 70px;
+   overflow-y: auto;
+   text-align: justify;
+}
+.column-description textarea {
+   height: 65px;
+   width: 100%;
+}
+td.column-title, td.column-description {
+   position: relative;
+}
+td.column-title.trans, td.column-description.trans {
+   background-color: inherit;
+   transition: background-color 1s linear;
+   -moz-transition: background-color 1s linear;
+   -o-transition: background-color 1s linear;
+   -webkit-transition: background-color 1s linear;
+}
+td .dashicons-edit, td .edit-controls {
+   display: none;
+   position: absolute;
+   top: 5px;
+   right: 12px;
+}
+td .dashicons-edit, .edit-controls .dashicons-yes, .edit-controls .dashicons-no {
+   z-index: 100;
+   font-size: x-large;
+   cursor: pointer;
+}
+td .dashicons-edit {
+   color: #0074A2;
+}
+.edit-controls:hover {
+   opacity: 1;
+}
+.edit-controls {
+   opacity: 0.1;
+}
+.edit-controls .dashicons-yes {
+   color: green;
+}
+.edit-controls .dashicons-no {
+   color: red;
+}
+.responseSuccess {
+   background-color: greenyellow !important;
+}
+.responseFail {
+   background-color: crimson !important;
+}
+td.column-title .dashicons-edit, td.column-description .dashicons-edit {
+   display: block;
+   overflow: hidden;
+   height: 0;
+   opacity: 0;
+   transition: opacity 1s ease-out;
+   -moz-transition: opacity 1s ease-out;
+   -o-transition: opacity 1s ease-out;
+   -webkit-transition: opacity 1s ease-out;
+}
+td.column-title:hover .dashicons-edit, td.column-description:hover .dashicons-edit {
+   opacity: 1;
+   height: auto;
+}
+td.column-title input {
+   width: 75%;
+}
+.manual-download {
+   display: block;
+   text-align: center;
+}
+.editable-description::-webkit-scrollbar, .column-description textarea::-webkit-scrollbar {
+   width: 5px;
+   height: 5px;
+}
+.editable-description::-webkit-scrollbar-track-piece, .column-description textarea::-webkit-scrollbar-track-piece {
+   background-color: #ffffff;
+   -webkit-border-radius: 5px;
+}
+.editable-description::-webkit-scrollbar-thumb:vertical, .column-description textarea::-webkit-scrollbar-thumb:vertical {
+   height: 5px;
+   background-color: #9b9b9b;;
+   -webkit-border-radius: 5px;
 }

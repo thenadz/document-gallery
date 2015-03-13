@@ -579,6 +579,31 @@ class DG_Admin {
          $responseArr['result'] = true;
          $responseArr['deleted'] = $deleted;
       }
+      
+      // Attachment title update
+      // title value is a marker
+      elseif ( isset($values['title']) && $ID != -1 ) {
+         $attachment = array(
+            'ID'         => $ID,
+            'post_title' => rawurldecode(addslashes($values['title']))
+         );
+         if ( wp_update_post( $attachment ) ) {
+            $responseArr['result'] = true;
+         }
+      }
+      
+      // Attachment description update
+      // description value is a marker
+      elseif ( isset($values['description']) && $ID != -1 ) {
+         $attachment = array(
+            'ID'           => $ID,
+            'post_content' => rawurldecode(addslashes($values['description']))
+         );
+         if ( wp_update_post( $attachment ) ) {
+            $responseArr['result'] = true;
+         }
+      }
+      
       // Thumbnail file manual refresh (one at a time)
       // upload value is a marker
       elseif ( isset($values['upload']) && isset($_FILES['file']) && isset($ret['thumber']['thumbs'][$ID]) ) {
@@ -862,18 +887,27 @@ class DG_Admin {
       $offset = ($sheet - 1) * $limit;
 
       $att_ids = array_slice($att_ids, $offset, $limit);
-      $atts = get_posts(
-         array(
-            'post_type'   => 'any',
-            'post_status' => 'any',
-            'numberposts' => -1,
-            'post__in'    => $att_ids,
-            'orderby'     => 'post__in'
-      ));
+      
+      // https://core.trac.wordpress.org/ticket/12212
+	  $atts = array();
+	  if (!empty($att_ids)) {
+		  $atts = get_posts(
+			 array(
+				'post_type'   => 'any',
+				'post_status' => 'any',
+				'numberposts' => -1,
+				'post__in'    => $att_ids,
+				'orderby'     => 'post__in'
+		  ));
+	  }
+	  
       $titles = array();
+      $contents = array();
       foreach ($atts as $att) {
          $path_parts = pathinfo($att->guid);
-         $titles[$att->ID] = $att->post_title.'.'.$path_parts['extension'];
+         $titles[$att->ID] = $att->post_title;
+         $types[$att->ID] = $path_parts['extension'];
+         $contents[$att->ID] = $att->post_content;
       }
       unset($atts);
 
@@ -884,6 +918,7 @@ class DG_Admin {
             '</th>'.
             '<th scope="col" class="manage-column column-icon">'.__('Thumbnail', 'document-gallery').'</th>'.
             '<th scope="col" class="manage-column column-title '.(($orderby != 'title')?'sortable desc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'title','order'=>(($orderby != 'title')?'asc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('File name', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
+            '<th scope="col" class="manage-column column-description">'.__('Description', 'document-gallery').'</th>'.
             '<th scope="col" class="manage-column column-thumbupload"></th>'.
             '<th scope="col" class="manage-column column-date '.(($orderby != 'date')?'sortable asc':'sorted '.$order).'"><a href="?'.http_build_query(array_merge($URL_params, array('orderby'=>'date','order'=>(($orderby != 'date')?'desc':(($order == 'asc')?'desc':'asc'))))).'"><span>'.__('Date', 'document-gallery').'</span><span class="sorting-indicator"></span></th>'.
          '</tr>';
@@ -927,14 +962,16 @@ class DG_Admin {
 
                   $icon = isset($v['thumb_url']) ? $v['thumb_url'] : DG_Thumber::getDefaultThumbnail($v['thumb_id']);
                   $title = isset($titles[$v['thumb_id']]) ? $titles[$v['thumb_id']] : '';
+                  $type = $types[$v['thumb_id']];
+                  $description = $contents[$v['thumb_id']];
                   $date = DocumentGallery::localDateTimeFromTimestamp($v['timestamp']);
                   
                   echo '<tr data-entry="'.$v['thumb_id'].'"><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
                           $v['thumb_id'].'"></td><td class="column-icon media-icon"><img src="' .
                           $icon.'" />'.'</td><td class="title column-title">' .
                           ($title ? '<strong><a href="' . home_url('/?attachment_id='.$v['thumb_id']).'" target="_blank" title="'.__('View', 'document-gallery').' \'' .
-                          $title.'\' '.__('attachment page', 'document-gallery').'">'.$title.'</a></strong>' : __('Attachment not found', 'document-gallery')) .
-                           '</td><td class="column-thumbupload">' .
+                           $title.'\' '.__('attachment page', 'document-gallery').'"><span class="editable-title">'.$title.'</span> <sup>'.$type.'</sup></a></strong>' : __('Attachment not found', 'document-gallery')) .
+                           '<span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span></td><td class="column-description"><div class="editable-description">'.$description.'</div><span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span>'.                           '</td><td class="column-thumbupload">' .
                               '<span class="manual-download">' .
                                  '<span class="dashicons dashicons-upload"></span>' .
                                  '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
@@ -1081,8 +1118,14 @@ class DG_Admin {
             $i = 0;
             foreach ($log_list as $v) {
                $date = DocumentGallery::localDateTimeFromTimestamp($v[0]);
-               $v[2] = preg_replace('/ (attachment #)(\d+) /', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
+               
+               // convert attachment names to links
+               $v[2] = preg_replace('/[ ^](attachment #)(\d+)[., ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
+               
+               // bold the place where log entry was submitted
                $v[2] = preg_replace('/^(\(\w+::\w+\)) /', '<strong>\1</strong> ', $v[2]);
+               
+               // italicize any function references within log entry
                $v[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $v[2]);
 
                echo '<tr><td class="date column-date" data-sort-value="'.$v[0].'"><span class="logLabel date">'.$date.'</span></td>' .
