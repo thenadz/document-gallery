@@ -3,8 +3,8 @@ Contributors: dan.rossiter, demur
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
-Tested up to: 4.1
-Stable tag: 2.3.7
+Tested up to: 4.1.1
+Stable tag: 3.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -432,6 +432,10 @@ ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
 = 3.0 =
+* **Notice:** Google Drive support has been removed as recent changes to how the service functions
+  have made it no longer useful in thumbnail generation. A replacement for supporting MS Office
+  filetypes (and other filetypes not supported in existing options) is in the works and we hope
+  to release it soon. 
 * **Enhancement:** Thumbnails can now be manually overridden. To do this, either navigate to
   `Dashboard -> Settings -> Document Gallery -> Thumbnail Management` and add the image
   to the target attachment, or set the thumbnail in the attachment edit window.
@@ -442,7 +446,7 @@ ideas for future Document Gallery development, take a look at our
 * **Enhancement:** Options to `include` or `exclude` specific attachments in a gallery have been added.
 * **Enhancement:** The document gallery CSS has been modified to make all icon images responsive.
   We've also added the `dg_use_default_gallery_style` so that developers may completely disabled
-  Document Gallery styles and replace it with their own.
+  Document Gallery CSS and replace it with his/her own.
 * **Deprecation:** The deprecated `dg_doc_icon` filter has been removed. Developers should use
   `dg_icon_template`.
 * **Deprecation:** The `localpost` option has been deprecated and will be removed at a future date.
