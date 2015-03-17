@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
 Tested up to: 4.1.1
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -430,6 +430,9 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.0.2 =
+* **Bug Fix:** The update process was broken in 3.0 -- this resolves that issue.
 
 = 3.0 =
 * **Notice:** Google Drive support has been removed as recent changes to how the service functions
