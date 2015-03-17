@@ -217,7 +217,7 @@ class DG_Setup {
          // if user inadvertantly enabled google drive viewer on system where it's not supported
          // then avoid locking it in the on state
          if ($options['thumber']['active']['google']) {
-            $options['thumber']['active']['google'] = DG_Thumber::isGoogleDriveAvailable();
+            $options['thumber']['active']['google'] = false /* DG_Thumber::isGoogleDriveAvailable() */;
          }
 
          $options['gallery']['post_status'] = 'any';
