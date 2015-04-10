@@ -105,14 +105,37 @@ class DG_Admin {
     * Enqueues styles and scripts for the admin settings page.
     */
    public static function enqueueScriptsAndStyles($hook) {
-      if ($hook !== DG_Admin::$hook) return;
-
-      wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
-      wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
-      wp_localize_script('document-gallery-admin', 'dg_admin_vars', array('upload_limit' => wp_max_upload_size()));
-      if ($hook == 'post.php') {
-         wp_localize_script('document-gallery-admin', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+      if ($hook === DG_Admin::$hook) {
+         // Settings Page
+         wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
+         wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
+         wp_localize_script('document-gallery-admin', 'dg_admin_vars', array('upload_limit' => wp_max_upload_size()));
+         if ($hook == 'post.php') {
+            wp_localize_script('document-gallery-admin', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+         }
+      } else {
+         global $dg_options;
+         // Media Manager
+         wp_enqueue_script('document-gallery-media-manager', DG_URL . 'assets/js/media_manager.js', array('media-views'), DG_VERSION, true);
+         wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
+            'documentGalleryMenuTitle'    => __('Create Document Gallery', 'document-gallery'),
+            'documentGalleryButton'       => __('Create a new Document Gallery', 'document-gallery'),
+            'cancelDocumentGalleryTitle'  => __('&#8592; Cancel Document Gallery', 'document-gallery'),
+            'updateDocumentGallery'       => __('Update Document Gallery', 'document-gallery'),
+            'insertDocumentGallery'       => __('Insert Document Gallery', 'document-gallery'),
+            'addToDocumentGallery'        => __('Add to Document Gallery', 'document-gallery'),
+            'addToDocumentGalleryTitle'   => __('Add to Document Gallery', 'document-gallery'),
+            'editDocumentGalleryTitle'    => __('Edit Document Gallery', 'document-gallery')
+             ) );
+         wp_localize_script('document-gallery-media-manager', 'documentGalleryDefaults', $dg_options['gallery']);
       }
+   }
+   
+   /**
+    * Load Document Gallery Custom templates.
+    */
+   public static function loadCustomTemplates() {
+      include_once DG_PATH . 'admin/media-manager-template.php';
    }
 
    /**
