@@ -468,3 +468,22 @@ td.column-title input {
    background-color: #9b9b9b;;
    -webkit-border-radius: 5px;
 }
+.document-gallery-settings label.setting {
+   margin: 2px 0;
+}
+.document-gallery-settings label.setting table {
+   width: 100%;
+   padding-right: 8px;
+}
+.document-gallery-settings label.setting table tr td:last-of-type, .document-gallery-settings label.setting table tr td:last-of-type * {
+   text-align: right !important;
+   float: none !important;
+   margin: auto 0 !important;
+}
+.document-gallery-settings label.setting table tr td:last-of-type select {
+   max-width: none !important;
+}
+.document-gallery-settings label.setting table tr td span {
+   text-align: left !important;
+   float: none !important;
+}
