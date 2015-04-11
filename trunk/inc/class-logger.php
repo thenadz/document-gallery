@@ -65,6 +65,8 @@ class DG_Logger {
                $ret[] = $fields;
             }
          }
+         
+         @fclose($fp);
       }
       
       return $ret;
@@ -110,21 +112,32 @@ class DG_Logger {
          // do perge for this blog
          $file = self::getLogFileName($blog);
          if (file_exists($file)) {
-            $fp = @fopen($file, 'rw');
+            $fp = @fopen($file, 'r');
             
             if ($fp !== false) {
+               $truncate = false;
                $offset = 0;
+               
+               // find the first non-expired entry
                while (($fields = fgetcsv($fp)) !== false) {
                   if (!is_null($fields) && $time > ($fields[0] + $purge_interval)) {
                      $truncate = true;
                      break;
                   }
                   
+                  // we can't continue if getting fp offset is failing
                   $offset = @ftell($fp);
+                  if (false === $offset) {
+                     break;
+                  }
                }
                
+               @fclose($fp);
+               
+               // if any expired entries exist -- remove them from the file
                if ($truncate) {
-                  @ftruncate($fp, $offset);
+                  $data = file_get_contents($file, false, null, $offset);
+                  file_put_contents($file, $data, LOCK_EX);
                }
             }
          }
