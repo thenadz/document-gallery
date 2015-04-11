@@ -19,7 +19,7 @@ class DocumentGallery {
     * @return string HTML for the Document Gallery.
     */
    public static function doShortcode($atts) {
-      include_once 'inc/class-gallery.php';
+      include_once DG_PATH . 'inc/class-gallery.php';
 
       $start = microtime(true);
       $gallery = (string)new DG_Gallery($atts);
@@ -68,8 +68,8 @@ class DocumentGallery {
    public static function getOptions($blog = null) {
       global $dg_options;
       return is_null($blog)
-      ? $dg_options
-      : get_blog_option($blog, DG_OPTION_NAME, null);
+         ? $dg_options
+         : get_blog_option($blog, DG_OPTION_NAME, null);
    }
     
    /**

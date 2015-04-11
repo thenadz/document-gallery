@@ -114,8 +114,8 @@ class DG_Admin {
             wp_localize_script('document-gallery-admin', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
          }
       } else {
-         global $dg_options;
          // Media Manager
+         global $dg_options;
          wp_enqueue_script('document-gallery-media-manager', DG_URL . 'assets/js/media_manager.js', array('media-views'), DG_VERSION, true);
          wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
             'documentGalleryMenuTitle'    => __('Create Document Gallery', 'document-gallery'),
@@ -320,7 +320,7 @@ class DG_Admin {
         ));
 
       add_settings_field(
-        'thumbnail_generation_av', 'Audio/Video',
+        'thumbnail_generation_av', __('Audio/Video', 'document-gallery'),
         array(__CLASS__, 'renderCheckboxField'),
         DG_OPTION_NAME, 'thumbnail_generation',
         array (
@@ -362,7 +362,7 @@ class DG_Admin {
         ));
 
       add_settings_field(
-         'thumbnail_generation_width', 'Max Thumbnail Dimensions',
+         'thumbnail_generation_width', __('Max Thumbnail Dimensions', 'document-gallery'),
          array(__CLASS__, 'renderMultiTextField'),
          DG_OPTION_NAME, 'thumbnail_generation',
          array (
@@ -412,19 +412,32 @@ class DG_Admin {
          array(__CLASS__, 'renderAdvancedSection'), DG_OPTION_NAME);
 
       add_settings_field(
-         'advanced_logging', 'Logging',
+         'advanced_logging_enabled', __('Logging Enabled', 'document-gallery'),
          array(__CLASS__, 'renderCheckboxField'),
          DG_OPTION_NAME, 'advanced',
          array (
-            'label_for'   => 'label_advanced_logging',
-            'name'        => 'logging',
-            'value'       => esc_attr($dg_options['logging']),
+            'label_for'   => 'label_advanced_logging_enabled',
+            'name'        => 'logging_enabled',
+            'value'       => esc_attr($dg_options['logging']['enabled']),
             'option_name' => DG_OPTION_NAME,
             'description' => __('Whether to log debug and error information related to Document Gallery.', 'document-gallery')
          ));
 
       add_settings_field(
-         'advanced_validation', 'Option Validation',
+         'advanced_logging_purge_interval', __('Logging Purge Interval', 'document-gallery'),
+         array(__CLASS__, 'renderTextField'),
+         DG_OPTION_NAME, 'advanced',
+         array (
+            'label_for'   => 'label_advanced_logging_purge_interval',
+            'name'        => 'logging_purge_interval',
+            'value'       => esc_attr($dg_options['logging']['purge_interval']),
+            'type'        => 'number" min="0" step="1',
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Number of days to keep old log entries (0 disables purging).', 'document-gallery')
+         ));
+
+      add_settings_field(
+         'advanced_validation', __('Option Validation', 'document-gallery'),
          array(__CLASS__, 'renderCheckboxField'),
          DG_OPTION_NAME, 'advanced',
          array (
@@ -436,7 +449,7 @@ class DG_Admin {
          ));
 
       add_settings_field(
-         'advanced_thumb_timeout', 'Thumbnail Generation Timeout',
+         'advanced_thumb_timeout', __('Thumbnail Generation Timeout', 'document-gallery'),
          array(__CLASS__, 'renderTextField'),
          DG_OPTION_NAME, 'advanced',
          array (
@@ -449,7 +462,7 @@ class DG_Admin {
                              ' <em>' . __('Note that generation will continue where timeout happened next time the gallery is loaded.', 'document-gallery') . '</em>'));
 
       add_settings_field(
-        'advanced_gs', 'Ghostscript Absolute Path',
+        'advanced_gs', __('Ghostscript Absolute Path', 'document-gallery'),
         array(__CLASS__, 'renderTextField'),
         DG_OPTION_NAME, 'advanced',
         array (
@@ -755,8 +768,17 @@ class DG_Admin {
       // validation checkbox
       $ret['validation'] = isset($values['validation']);
       
-      // logging checkbox
-      $ret['logging'] = isset($values['logging']);
+      // logging settings
+      $ret['logging']['enabled'] = isset($values['logging_enabled']);
+      if (isset($values['logging_purge_interval'])) {
+         $purge_interval = (int)$values['logging_purge_interval'];
+         if ($purge_interval >= 0) {
+            $ret['logging']['purge_interval'] = $purge_interval;
+         } else {
+            add_settings_error(DG_OPTION_NAME, 'thumber-logging-purge-interval',
+               __('Invalid logging purge interval given: ', 'document-gallery') . $values['logging_purge_interval']);
+         }
+      }
       
       return $ret;
    }
