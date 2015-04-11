@@ -5,14 +5,14 @@ defined('WPINC') OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 3.0.2
+  Version: 3.1
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv2
   Text Domain: document-gallery
  */
 
-define('DG_VERSION', '3.0.2');
+define('DG_VERSION', '3.1');
 
 // define helper paths & URLs
 define('DG_BASENAME', plugin_basename(__FILE__));
@@ -27,13 +27,14 @@ define('DG_OPTION_NAME', 'document_gallery');
 $dg_options = get_option(DG_OPTION_NAME, null);
 
 // core functionality
-include_once DG_PATH . 'document-gallery-class.php';
+include_once DG_PATH . 'inc/class-document-gallery.php';
 
 // DG general utility functions
 include_once DG_PATH . 'inc/class-util.php';
 
 // logging functionality
 include_once DG_PATH . 'inc/class-logger.php';
+add_action(DG_Logger::PurgeLogsAction, array('DG_Logger', 'purgeExpiredEntries'));
 
 // handle activation, updates, and uninstallation
 include_once DG_PATH . 'inc/class-setup.php';
