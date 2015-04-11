@@ -51,11 +51,12 @@ class DG_Thumber {
    /**
     * Wraps generation of thumbnails for various attachment filetypes.
     *
-    * @param int $ID  Document ID
-    * @param int $pg  Page number to get thumb from.
-    * @return str     URL to the thumbnail.
+    * @param int $ID                   Document ID
+    * @param int $pg                   Page number to get thumb from.
+    * @param bool $generate_if_missing Whether to attempt generating the thumbnail if missing.
+    * @return str                      URL to the thumbnail.
     */
-   public static function getThumbnail($ID, $pg = 1) {
+   public static function getThumbnail($ID, $pg = 1, $generate_if_missing = true) {
       static $start = null;
       if (is_null($start)) {
          $start = time();
@@ -65,6 +66,11 @@ class DG_Thumber {
 
       // if we haven't saved a thumb, generate one
       if (empty($options['thumbs'][$ID])) {
+         // short-circuit generation if not required
+         if (!$generate_if_missing) {
+            return null;
+         }
+         
          // prevent page timing out or user waiting too long for page
          if ((time() - $start) > $options['timeout']) {
             return self::getDefaultThumbnail($ID, $pg);

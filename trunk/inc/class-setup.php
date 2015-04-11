@@ -92,11 +92,17 @@ class DG_Setup {
               'donate_link'    => $donate_link
           ),
             
-          // whether to validate DG option structure on save
-          'validation' => false,
+          // logging options
+          'logging' => array(
+             // TODO: more granular -- log_level instead of blanket enable/disable
+             'enabled'         => true,
+                
+             // max age of log entry
+             'purge_interval'  => 7
+          ),
             
-          // whether to logging DG activity
-          'logging' => false
+          // whether to validate DG option structure on save
+          'validation' => false
       );
    }
 
@@ -141,6 +147,7 @@ class DG_Setup {
       self::twoPointTwo($options);
       self::twoPointThree($options);
       self::threePointZeroBeta($options);
+      self::threePointOne($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -262,6 +269,18 @@ class DG_Setup {
       }
    }
    
+   private static function threePointOne(&$options) {
+      if (version_compare($options['meta']['version'], '3.1', '<')) {
+         $logging_enabled = $options['logging'];
+         $options['logging'] = array(
+            'enabled'         => $logging_enabled,
+            'purge_interval'  => 7);
+      
+         // purge log entries regularly
+         wp_schedule_event(time(), 'daily', DG_Logger::PurgeLogsAction);
+      }
+   }
+   
    /**
     * Sets up Document Gallery on all blog(s) activated.
     * @param bool $networkwide Whether this is a network-wide update (multisite only).
@@ -280,6 +299,9 @@ class DG_Setup {
       foreach ($blogs as $blog) {
          self::_activate($blog);
       }
+
+      // handle purging log entries regularly
+      wp_schedule_event(time(), 'daily', DG_Logger::PurgeLogsAction);
    }
    
    /**
@@ -324,7 +346,10 @@ class DG_Setup {
       foreach ($blogs as $blog) {
          self::_uninstall($blog);
       }
+      
+      wp_clear_scheduled_hook(DG_Logger::PurgeLogsAction);
    }
+   
    /**
     * Runs when DG is uninstalled for an individual blog.
     */
