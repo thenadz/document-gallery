@@ -5,14 +5,20 @@ defined('WPINC') OR exit;
  * Encapsulates the logic required to maintain and read log files.
  */
 class DG_Logger {
+   
    /**
-    * Appends DG log file if logging is enabled. The following format is used for each line:
-    * datetime | level | entry | stacktrace (optional)
+    * @var string Name of the log purge action.
+    */
+   const PurgeLogsAction = 'document-gallery_purge-logs'; 
+   
+   /**
+    * Appends DG log file if logging is enabled.
     *
-    * @param int The level of serverity (should be passed using DG_LogLevel consts).
-    * @param string $entry Value to be logged.
+    * @param int              The level of serverity (should be passed using DG_LogLevel consts).
+    * @param string $entry    Value to be logged.
     * @param bool $stacktrace Whether to include full stack trace.
-    * @param bool $force Whether to ignore logging flag and log no matter what.
+    * @param bool $force      Whether to ignore logging flag and log no matter what.
+    *                         Only should be used when the user *must* know about something.
     */
    public static function writeLog($level, $entry, $stacktrace = false, $force = false) {
       if ($force || self::logEnabled()) {
@@ -23,43 +29,7 @@ class DG_Logger {
             $trace = debug_backtrace(false);
             if ($stacktrace) {
                unset($trace[0]);
-               
-               $trace_str = '';
-               $i = 1;
-               
-               foreach($trace as $node) {
-                  $trace_str .= "#$i ";
-                  
-                  $file = '';
-                  if (isset($node['file'])) {
-                     // convert to relative path from WP root
-                     $file = str_replace(ABSPATH, '', $node['file']);
-                  }
-                  
-                  if (isset($node['line'])) {
-                     $file .= "({$node['line']})";
-                  }
-                  
-                  if ($file) {
-                     $trace_str .= "$file: ";
-                  }
-                  
-                  if(isset($node['class'])) {
-                     $trace_str .= "{$node['class']}{$node['type']}";
-                  }
-                  
-                  if (isset($node['function'])) {
-                     $args = '';
-                     if (isset($node['args'])) {
-                        $args = implode(', ', array_map(array(__CLASS__, 'print_r'), $node['args']));
-                     }
-                     
-                     $trace_str .= "{$node['function']}($args)" . PHP_EOL;
-                  }
-                  $i++;
-               }
-               
-               $fields[] = $trace_str;
+               $fields[] = self::getStackTraceString($trace);
             } else {
                // Remove first item from backtrace as it's this function which is redundant.
                $caller = $trace[1];
@@ -109,18 +79,131 @@ class DG_Logger {
    }
    
    /**
-    * @return bool Whether debug logging is currently enabled.
+    * Clears the log file for all blogs.
     */
-   public static function logEnabled() {
-      global $dg_options;
-      return $dg_options['logging'];
+   public static function clearLogs() {
+      // we don't care if the files actually exist -- they won't when we're done
+      foreach (self::getLogFileNames() as $file) {
+         @unlink($file);
+      }
    }
    
    /**
+    * Truncates all blog logs to the current purge interval.
+    */
+   public static function purgeExpiredEntries() {
+      $blogs = array(null);
+      if (is_multisite()) {
+         global $wpdb;
+         $blogs = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+      }
+      
+      // truncate each blog's log file
+      $time = time();
+      foreach ($blogs as $blog) {
+         $options = self::getOptions($blog);
+         $purge_interval = $options['purge_interval'] * DAY_IN_SECONDS;
+         
+         // purging is disabled for this blog
+         if ($purge_interval <= 0) continue;
+         
+         // do perge for this blog
+         $file = self::getLogFileName($blog);
+         if (file_exists($file)) {
+            $fp = @fopen($file, 'rw');
+            
+            if ($fp !== false) {
+               $offset = 0;
+               while (($fields = fgetcsv($fp)) !== false) {
+                  if (!is_null($fields) && $time > ($fields[0] + $purge_interval)) {
+                     $truncate = true;
+                     break;
+                  }
+                  
+                  $offset = @ftell($fp);
+               }
+               
+               if ($truncate) {
+                  @ftruncate($fp, $offset);
+               }
+            }
+         }
+      }
+   }
+   
+   /**
+    * Generally not necessary to call external to this class -- only use if generating
+    * log entry will take significant resources and you want to avoid this operation
+    * if it will not actually be logged.
+    * 
+    * @return bool Whether debug logging is currently enabled.
+    */
+   public static function logEnabled() {
+      $options = self::getOptions();
+      return $options['enabled'];
+   }
+   
+   /**
+    * Gets logging options.
+    * 
+    * @param int $blog ID of the blog to be retrieved in multisite env.
+    * @return multitype:unknown Logger options for the blog.
+    */
+   public static function getOptions($blog = null) {
+      $options = DocumentGallery::getOptions($blog);
+      return $options['logging'];
+   }
+   
+   /**
+    * @param $id int The ID of the blog to retrieve log file name for. Defaults to current blog.
     * @return string Full path to log file for current blog.
     */
-   private static function getLogFileName() {
-      return DG_PATH . 'log/' . get_current_blog_id() . '.log';
+   private static function getLogFileName($id = null) {
+      if (is_null($id)) { $id = get_current_blog_id(); }
+      return DG_PATH . 'log/' . $id . '.log';
+   }
+   
+   /**
+    * @param multitype $trace Array containing stack trace to be converted to string.
+    * @return string The stack trace in human-readable form.
+    */
+   private static function getStackTraceString($trace) {
+      $trace_str = '';
+      $i = 1;
+       
+      foreach($trace as $node) {
+         $trace_str .= "#$i ";
+      
+         $file = '';
+         if (isset($node['file'])) {
+            // convert to relative path from WP root
+            $file = str_replace(ABSPATH, '', $node['file']);
+         }
+      
+         if (isset($node['line'])) {
+            $file .= "({$node['line']})";
+         }
+      
+         if ($file) {
+            $trace_str .= "$file: ";
+         }
+      
+         if(isset($node['class'])) {
+            $trace_str .= "{$node['class']}{$node['type']}";
+         }
+      
+         if (isset($node['function'])) {
+            $args = '';
+            if (isset($node['args'])) {
+               $args = implode(', ', array_map(array(__CLASS__, 'print_r'), $node['args']));
+            }
+             
+            $trace_str .= "{$node['function']}($args)" . PHP_EOL;
+         }
+         $i++;
+      }
+      
+      return $trace_str;
    }
    
    /**
@@ -130,6 +213,13 @@ class DG_Logger {
     */
    private static function print_r($v) {
       return print_r($v, true);
+   }
+   
+   /**
+    * Blocks instantiation. All functions are static.
+    */
+   private function __construct() {
+
    }
 }
 
