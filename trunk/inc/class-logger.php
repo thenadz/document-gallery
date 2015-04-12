@@ -92,6 +92,8 @@ class DG_Logger {
    
    /**
     * Truncates all blog logs to the current purge interval.
+    * 
+    * TODO: This is a memory hog. Consider switching to stream filter.
     */
    public static function purgeExpiredEntries() {
       $blogs = array(null);
