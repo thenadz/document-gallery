@@ -97,7 +97,7 @@ class DG_Setup {
              // TODO: more granular -- log_level instead of blanket enable/disable
              'enabled'         => false,
                 
-             // max age of log entry
+             // max age of log entry (days)
              'purge_interval'  => 7
           ),
             
@@ -110,7 +110,7 @@ class DG_Setup {
     * @return multitype:string The default MIME types to include in gallery.
     */
    public static function getDefaultMimeTypes() {
-      return array('application', 'video', 'text', 'audio');
+      return array('application', 'video', 'text', 'audio', 'image');
    }
    
    /**
