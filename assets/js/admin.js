@@ -94,6 +94,24 @@ jQuery(document).ready(function(){
          }
       }
    });
+   
+   jQuery('#LogTable .manage-column').click(function(){
+        var newrows = [];
+        var table = jQuery('#LogTable > tbody');
+        
+        table.find('tr').each(function(i){
+        	newrows[i] = jQuery('<tr></tr>');
+            jQuery(this).find('td').each(function(){
+                newrows[i].append(jQuery(this));
+            });
+        });
+        table.find('tr').remove();
+        jQuery.each(newrows, function(){
+            table.prepend(this);
+        });
+
+	    return false;
+	});
 
    function DragDropFilesStop(e) {
       e = e || event;
