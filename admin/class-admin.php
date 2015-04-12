@@ -1161,21 +1161,22 @@ class DG_Admin {
          </tfoot>
          <tbody><?php
             $i = 0;
-            foreach ($log_list as $v) {
-               $date = DocumentGallery::localDateTimeFromTimestamp($v[0]);
+            for ($i = count($log_list); $i > 0; $i--) {
+               $log_entry = $log_list[$i - 1];
+               $date = DocumentGallery::localDateTimeFromTimestamp($log_entry[0]);
                
                // convert attachment names to links
-               $v[2] = preg_replace('/[ ^](attachment #)(\d+)[., ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $v[2]);
+               $log_entry[2] = preg_replace('/[ ^](attachment #)(\d+)[., ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $log_entry[2]);
                
                // bold the place where log entry was submitted
-               $v[2] = preg_replace('/^(\(\w+::\w+\)) /', '<strong>\1</strong> ', $v[2]);
+               $log_entry[2] = preg_replace('/^(\(\w+::\w+\)) /', '<strong>\1</strong> ', $log_entry[2]);
                
                // italicize any function references within log entry
-               $v[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $v[2]);
+               $log_entry[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $log_entry[2]);
 
-               echo '<tr><td class="date column-date" data-sort-value="'.$v[0].'"><span class="logLabel date">'.$date.'</span></td>' .
+               echo '<tr><td class="date column-date" data-sort-value="'.$log_entry[0].'"><span class="logLabel date">'.$date.'</span></td>' .
                   '<td class="column-level">'.$levels[$v[1]].'</td>' .
-                  '<td class="column-entry">'.(empty($v[3]) ? '<pre>'.$v[2].'</pre>' : '<div class="expander" title="Click to Expand"><pre>'.$v[2].'</pre><div><span class="dashicons dashicons-arrow-down-alt2"></span></div></div><div class="spoiler-body"><pre>'.$v[3].'</pre></div>').'</td>' .
+                  '<td class="column-entry">'.(empty($log_entry[3]) ? '<pre>'.$log_entry[2].'</pre>' : '<div class="expander" title="Click to Expand"><pre>'.$log_entry[2].'</pre><div><span class="dashicons dashicons-arrow-down-alt2"></span></div></div><div class="spoiler-body"><pre>'.$log_entry[3].'</pre></div>').'</td>' .
                   '</tr>'.PHP_EOL;
             } ?>
          </tbody>
