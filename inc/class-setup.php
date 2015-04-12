@@ -95,7 +95,7 @@ class DG_Setup {
           // logging options
           'logging' => array(
              // TODO: more granular -- log_level instead of blanket enable/disable
-             'enabled'         => true,
+             'enabled'         => false,
                 
              // max age of log entry
              'purge_interval'  => 7
