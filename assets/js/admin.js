@@ -100,7 +100,7 @@ jQuery(document).ready(function(){
         var table = jQuery('#LogTable > tbody');
         
         table.find('tr').each(function(i){
-        	newrows[i] = jQuery('<tr></tr>');
+        	newrows[i] = jQuery(this);
             jQuery(this).find('td').each(function(){
                 newrows[i].append(jQuery(this));
             });
