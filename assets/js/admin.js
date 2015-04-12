@@ -96,17 +96,12 @@ jQuery(document).ready(function(){
    });
    
    jQuery('#LogTable .manage-column').click(function(){
-        var newrows = [];
         var table = jQuery('#LogTable > tbody');
-        
-        table.find('tr').each(function(i){
-        	newrows[i] = jQuery(this);
-            jQuery(this).find('td').each(function(){
-                newrows[i].append(jQuery(this));
-            });
-        });
-        table.find('tr').remove();
-        jQuery.each(newrows, function(){
+        var rows = table.find('tr');
+		
+        rows.remove();
+		
+        rows.each(function(){
             table.prepend(this);
         });
 
