@@ -95,15 +95,11 @@ jQuery(document).ready(function(){
       }
    });
    
-   jQuery('#LogTable .manage-column').click(function(){
+   jQuery('#LogTable .manage-column.column-date').click(function(){
+	   jQuery(this).toggleClass('asc desc');
         var table = jQuery('#LogTable > tbody');
-        var rows = table.find('tr');
-		
-        rows.remove();
-		
-        rows.each(function(){
-            table.prepend(this);
-        });
+        var rows = table.children('tr');
+		table.append(rows.get().reverse());
 	});
 
    function DragDropFilesStop(e) {
