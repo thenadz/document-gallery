@@ -104,8 +104,6 @@ jQuery(document).ready(function(){
         rows.each(function(){
             table.prepend(this);
         });
-
-	    return false;
 	});
 
    function DragDropFilesStop(e) {
