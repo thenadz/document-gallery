@@ -108,6 +108,12 @@ class DG_Admin {
       if ($hook === DG_Admin::$hook) {
          // Settings Page
          wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
+         
+         // gracefully degrade for older WP versions
+         if (version_compare(get_bloginfo('version'), '3.8', '<')) {
+            echo '<style type="text/css">.dashicons, .nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after, #ThumbsTable .title a:after, #LogTable>tbody a:after {display: none !important;}</style>' . PHP_EOL;
+         }
+         
          wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
          wp_localize_script('document-gallery-admin', 'dg_admin_vars', array('upload_limit' => wp_max_upload_size()));
          if ($hook == 'post.php') {
