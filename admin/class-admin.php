@@ -492,13 +492,22 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      if (empty($values['tab']) || !array_key_exists($values['tab'], self::getTabs())) {
-         reset(self::getTabs());
-         $values['tab'] = key(self::getTabs());
+      // NOTE: WP double-calls this function -- below logic prevents potential
+      //       side effects by processing a maximum of one call to validate
+      //       per page load, re-returning the previous result on any
+      //       subsequent calls.
+      static $ret = null;
+      if (is_null($ret)) {
+         if (empty($values['tab']) || !array_key_exists($values['tab'], self::getTabs())) {
+            reset(self::getTabs());
+            $values['tab'] = key(self::getTabs());
+         }
+         $funct = 'validate'.$values['tab'].'Settings';
+         unset($values['tab']);
+         $ret = DG_Admin::$funct($values);
       }
-      $funct = 'validate'.$values['tab'].'Settings';
-      unset($values['tab']);
-      return DG_Admin::$funct($values);
+      
+      return $ret;
    }
 
    /**
@@ -1174,7 +1183,6 @@ class DG_Admin {
             <?php echo $thead; ?>
          </tfoot>
          <tbody><?php
-            $i = 0;
             for ($i = count($log_list); $i > 0; $i--) {
                $log_entry = $log_list[$i - 1];
                $date = DocumentGallery::localDateTimeFromTimestamp($log_entry[0]);
