@@ -194,9 +194,8 @@ taxa match (OR).
 *NOTE: This has no bearing on the relationship between different terms for a single
 taxon (eg: `[dg category=x,y,z relation=AND]` will return any attachments where the
 category is x, y, OR z). If you wish to return only attachments with all 3 categories,
-you will instead need to use the following syntax: 
-`[dg category=x,y,z category_relation=AND]`. This syntax of *taxon*_relation will
-work for any taxon, not just "category."*
+you will instead need to use the following syntax: `[dg category=x,y,z category_relation=AND]`.
+This syntax of *taxon*_relation will work for any taxon, not just "category."*
 
 = Customize Appearance =
 
@@ -249,8 +248,8 @@ Each of the following filters provides an bool argument which indicates
 whither the gallery being generated will display descriptions, which
 allows you to handle galleries with and without descriptions differently.
 
-If you wish to wrap your galleries in some additional content, the 
-`dg_gallery_template` is the tool for the job. With it you can include
+If you wish to wrap your galleries in some additional content,
+the `dg_gallery_template` is the tool for the job. With it you can include
 content prior to or following your document galleries. The filter
 exposes 1 special tag which is replaced during gallery generation
 with data specific to that gallery. The tag is described below:
@@ -270,8 +269,8 @@ These tags are as follows:
 * **%icons%**: The icon data for this row.
 
 
-If you wish to modify the HTML that wraps individual icons, the 
-`dg_icon_template` filter is what you will use. The filter is passed
+If you wish to modify the HTML that wraps individual icons,
+the `dg_icon_template` filter is what you will use. The filter is passed
 two arguments which may be used to gain additional information about
 the document that will be used in generating this icon. The first
 argument is a bool value which indicates whether descriptions will
