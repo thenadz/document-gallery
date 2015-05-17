@@ -108,26 +108,32 @@ class DG_Admin {
       if ($hook === DG_Admin::$hook) {
          // Settings Page
          wp_enqueue_style('document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION);
+         
+         // gracefully degrade for older WP versions
+         if (version_compare(get_bloginfo('version'), '3.8', '<')) {
+            echo '<style type="text/css">.dashicons, .nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after, #ThumbsTable .title a:after, #LogTable>tbody a:after {display: none !important;}</style>' . PHP_EOL;
+         }
+         
          wp_enqueue_script('document-gallery-admin', DG_URL . 'assets/js/admin.js', array('jquery'), DG_VERSION, true);
          wp_localize_script('document-gallery-admin', 'dg_admin_vars', array('upload_limit' => wp_max_upload_size()));
          if ($hook == 'post.php') {
             wp_localize_script('document-gallery-admin', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+            
+            // Media Manager
+            global $dg_options;
+            wp_enqueue_script('document-gallery-media-manager', DG_URL . 'assets/js/media_manager.js', array('media-views'), DG_VERSION, true);
+            wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
+               'documentGalleryMenuTitle'    => __('Create Document Gallery', 'document-gallery'),
+               'documentGalleryButton'       => __('Create a new Document Gallery', 'document-gallery'),
+               'cancelDocumentGalleryTitle'  => __('&#8592; Cancel Document Gallery', 'document-gallery'),
+               'updateDocumentGallery'       => __('Update Document Gallery', 'document-gallery'),
+               'insertDocumentGallery'       => __('Insert Document Gallery', 'document-gallery'),
+               'addToDocumentGallery'        => __('Add to Document Gallery', 'document-gallery'),
+               'addToDocumentGalleryTitle'   => __('Add to Document Gallery', 'document-gallery'),
+               'editDocumentGalleryTitle'    => __('Edit Document Gallery', 'document-gallery')
+                ) );
+            wp_localize_script('document-gallery-media-manager', 'documentGalleryDefaults', $dg_options['gallery']);
          }
-      } else {
-         // Media Manager
-         global $dg_options;
-         wp_enqueue_script('document-gallery-media-manager', DG_URL . 'assets/js/media_manager.js', array('media-views'), DG_VERSION, true);
-         wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
-            'documentGalleryMenuTitle'    => __('Create Document Gallery', 'document-gallery'),
-            'documentGalleryButton'       => __('Create a new Document Gallery', 'document-gallery'),
-            'cancelDocumentGalleryTitle'  => __('&#8592; Cancel Document Gallery', 'document-gallery'),
-            'updateDocumentGallery'       => __('Update Document Gallery', 'document-gallery'),
-            'insertDocumentGallery'       => __('Insert Document Gallery', 'document-gallery'),
-            'addToDocumentGallery'        => __('Add to Document Gallery', 'document-gallery'),
-            'addToDocumentGalleryTitle'   => __('Add to Document Gallery', 'document-gallery'),
-            'editDocumentGalleryTitle'    => __('Edit Document Gallery', 'document-gallery')
-             ) );
-         wp_localize_script('document-gallery-media-manager', 'documentGalleryDefaults', $dg_options['gallery']);
       }
    }
    
@@ -486,13 +492,22 @@ class DG_Admin {
     * @return array Sanitized new options.
     */
    public static function validateSettings($values) {
-      if (empty($values['tab']) || !array_key_exists($values['tab'], self::getTabs())) {
-         reset(self::getTabs());
-         $values['tab'] = key(self::getTabs());
+      // NOTE: WP double-calls this function -- below logic prevents potential
+      //       side effects by processing a maximum of one call to validate
+      //       per page load, re-returning the previous result on any
+      //       subsequent calls.
+      static $ret = null;
+      if (is_null($ret)) {
+         if (empty($values['tab']) || !array_key_exists($values['tab'], self::getTabs())) {
+            reset(self::getTabs());
+            $values['tab'] = key(self::getTabs());
+         }
+         $funct = 'validate'.$values['tab'].'Settings';
+         unset($values['tab']);
+         $ret = DG_Admin::$funct($values);
       }
-      $funct = 'validate'.$values['tab'].'Settings';
-      unset($values['tab']);
-      return DG_Admin::$funct($values);
+      
+      return $ret;
    }
 
    /**
@@ -1119,11 +1134,19 @@ class DG_Admin {
       if ($log_list) {
          $levels = array_map(array(__CLASS__, 'getLogLabelSpan'), array_keys(DG_LogLevel::getLogLevels()));
 
-         $thead = '<tr>'.
-               '<th scope="col" class="manage-column column-date"><span>'.__('Date', 'document-gallery').'</span></th>'.
-               '<th scope="col" class="manage-column column-level"><span>'.__('Level', 'document-gallery').'</span></th>'.
-               '<th scope="col" class="manage-column column-message"><span>'.__('Message', 'document-gallery').'</span></th>'.
+         $fmt =
+            '<tr>' .
+               '<th scope="col" class="manage-column column-date sorted desc"><a href="javascript:void(0);">' .
+                  '<span>%s</span><span class="sorting-indicator"></span></a>' .
+               '</th>' .
+               '<th scope="col" class="manage-column column-level"><span>%s</span></th>' .
+               '<th scope="col" class="manage-column column-message"><span>%s</span></th>' .
             '</tr>';
+         
+         $thead = sprintf($fmt,
+            __('Date', 'document-gallery'),
+            __('Level', 'document-gallery'),
+            __('Message', 'document-gallery'));
 
          ?>
 <div class="log-list-wrapper">
@@ -1160,7 +1183,6 @@ class DG_Admin {
             <?php echo $thead; ?>
          </tfoot>
          <tbody><?php
-            $i = 0;
             for ($i = count($log_list); $i > 0; $i--) {
                $log_entry = $log_list[$i - 1];
                $date = DocumentGallery::localDateTimeFromTimestamp($log_entry[0]);
@@ -1175,7 +1197,7 @@ class DG_Admin {
                $log_entry[2] = preg_replace('/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $log_entry[2]);
 
                echo '<tr><td class="date column-date" data-sort-value="'.$log_entry[0].'"><span class="logLabel date">'.$date.'</span></td>' .
-                  '<td class="column-level">'.$levels[$v[1]].'</td>' .
+                  '<td class="column-level">'.$levels[$log_entry[1]].'</td>' .
                   '<td class="column-entry">'.(empty($log_entry[3]) ? '<pre>'.$log_entry[2].'</pre>' : '<div class="expander" title="Click to Expand"><pre>'.$log_entry[2].'</pre><div><span class="dashicons dashicons-arrow-down-alt2"></span></div></div><div class="spoiler-body"><pre>'.$log_entry[3].'</pre></div>').'</td>' .
                   '</tr>'.PHP_EOL;
             } ?>
