@@ -95,9 +95,9 @@ class DG_Setup {
           // logging options
           'logging' => array(
              // TODO: more granular -- log_level instead of blanket enable/disable
-             'enabled'         => true,
+             'enabled'         => false,
                 
-             // max age of log entry
+             // max age of log entry (days)
              'purge_interval'  => 7
           ),
             
@@ -110,7 +110,7 @@ class DG_Setup {
     * @return multitype:string The default MIME types to include in gallery.
     */
    public static function getDefaultMimeTypes() {
-      return array('application', 'video', 'text', 'audio');
+      return array('application', 'video', 'text', 'audio', 'image');
    }
    
    /**
@@ -269,6 +269,13 @@ class DG_Setup {
       }
    }
    
+   /**
+    * Flat logging option split out into multiple options in a nested array.
+    * 
+    * Added scheduled log purge event to handle rollovers.
+    * 
+    * @param unknown $options
+    */
    private static function threePointOne(&$options) {
       if (version_compare($options['meta']['version'], '3.1', '<')) {
          $logging_enabled = $options['logging'];
