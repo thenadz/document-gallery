@@ -430,6 +430,10 @@ To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
+= 3.2 =
+* **Enhancement:** The long awaited option to open thumbnail links in a new window
+  has been added. Simply use `[dg new_window=true]`.
+
 = 3.1 =
 * **Enhancement:** The Media Manager can now be used to generate a gallery without
   needing to manually write the shortcode.

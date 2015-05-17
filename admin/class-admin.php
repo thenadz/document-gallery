@@ -298,6 +298,18 @@ class DG_Admin {
             'option_name' => DG_OPTION_NAME,
             'description' => __('Comma-delimited list of <a href="http://en.wikipedia.org/wiki/Internet_media_type#List_of_common_media_types">MIME types</a>.', 'document-gallery')
          ));
+
+      add_settings_field(
+        'gallery_defaults_new_window', 'new_window',
+        array(__CLASS__, 'renderCheckboxField'),
+        DG_OPTION_NAME, 'gallery_defaults',
+        array (
+            'label_for'   => 'label_gallery_defaults_new_window',
+            'name'        => 'gallery_defaults][new_window',
+            'value'       => esc_attr($defaults['new_window']),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __('Open thumbnail links in new window.', 'document-gallery')
+        ));
       
       add_settings_field(
         'gallery_defaults_post_status', 'post_status',
