@@ -269,6 +269,13 @@ class DG_Setup {
       }
    }
    
+   /**
+    * Flat logging option split out into multiple options in a nested array.
+    * 
+    * Added scheduled log purge event to handle rollovers.
+    * 
+    * @param unknown $options
+    */
    private static function threePointOne(&$options) {
       if (version_compare($options['meta']['version'], '3.1', '<')) {
          $logging_enabled = $options['logging'];
