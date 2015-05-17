@@ -74,7 +74,10 @@ class DG_Setup {
               'limit'          => -1,
                 
               // # of columns to be used in gallery
-              'columns'        => 4
+              'columns'        => 4,
+                
+              // whether to open documents in new window
+              'new_window'     => false
           ),
           'css' => array(
               // plain text of CSS to be edited by user
@@ -148,6 +151,7 @@ class DG_Setup {
       self::twoPointThree($options);
       self::threePointZeroBeta($options);
       self::threePointOne($options);
+      self::threePointTwo($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -285,6 +289,17 @@ class DG_Setup {
       
          // purge log entries regularly
          wp_schedule_event(time(), 'daily', DG_Logger::PurgeLogsAction);
+      }
+   }
+   
+   /**
+    * Adds 'new_window' under gallery options.
+    *
+    * @param unknown $options
+    */
+   private static function threePointTwo(&$options) {
+      if (version_compare($options['meta']['version'], '3.2', '<')) {
+         $options['gallery']['new_window'] = false;
       }
    }
    
