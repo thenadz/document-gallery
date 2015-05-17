@@ -431,6 +431,12 @@ To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
+= 3.1 =
+* **Enhancement:** The Media Manager can now be used to generate a gallery without
+  needing to manually write the shortcode.
+* **Enhancement:** Document Gallery logs can now be rolled over at regular intervals
+  to avoid generating massive log files over extended periods of time.
+
 = 3.0.2 =
 * **Bug Fix:** The update process was broken in 3.0 -- this resolves that issue.
 

@@ -55,7 +55,7 @@ class DG_Logger {
       
       if ($fp !== false) {
          $ret = array();
-         while (count($ret) < $limit && ($fields = fgetcsv($fp)) !== false) {
+         while (count($ret) < $limit && false !== ($fields = fgetcsv($fp))) {
             if ($skip > 0) {
                $skip--;
                continue;
@@ -96,6 +96,8 @@ class DG_Logger {
     * TODO: This is a memory hog. Consider switching to stream filter.
     */
    public static function purgeExpiredEntries() {
+      self::writeLog(DG_LogLevel::Detail, 'Beginning scheduled log file purge.');
+      
       $blogs = array(null);
       if (is_multisite()) {
          global $wpdb;
@@ -105,6 +107,7 @@ class DG_Logger {
       // truncate each blog's log file
       $time = time();
       foreach ($blogs as $blog) {
+         $blog_num = !is_null($blog) ? $blog : get_current_blog_id();
          $options = self::getOptions($blog);
          $purge_interval = $options['purge_interval'] * DAY_IN_SECONDS;
          
@@ -112,7 +115,7 @@ class DG_Logger {
          if ($purge_interval <= 0) continue;
          
          // do perge for this blog
-         $file = self::getLogFileName($blog);
+         $file = self::getLogFileName($blog_num);
          if (file_exists($file)) {
             $fp = @fopen($file, 'r');
             
@@ -123,11 +126,11 @@ class DG_Logger {
                // find the first non-expired entry
                while (($fields = fgetcsv($fp)) !== false) {
                   if (!is_null($fields) && $time > ($fields[0] + $purge_interval)) {
-                     $truncate = true;
+                     // we've reached the recent entries -- nothing beyond here will be removed
                      break;
                   }
-                  
-                  // we can't continue if getting fp offset is failing
+
+                  $truncate = true;
                   $offset = @ftell($fp);
                   if (false === $offset) {
                      break;
@@ -138,6 +141,7 @@ class DG_Logger {
                
                // if any expired entries exist -- remove them from the file
                if ($truncate) {
+                  self::writeLog(DG_LogLevel::Detail, "Purging log entries for blog #$blog_num.");
                   $data = file_get_contents($file, false, null, $offset);
                   file_put_contents($file, $data, LOCK_EX);
                }
@@ -174,7 +178,7 @@ class DG_Logger {
     * @return string Full path to log file for current blog.
     */
    private static function getLogFileName($id = null) {
-      if (is_null($id)) { $id = get_current_blog_id(); }
+      $id = !is_null($id) ? $id : get_current_blog_id();
       return DG_PATH . 'log/' . $id . '.log';
    }
    
