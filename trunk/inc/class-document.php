@@ -64,9 +64,10 @@ class DG_Document {
          $description = '   <p>%description%</p>';
       }
       
+      $target = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
       $doc_icon =
          '   <div class="document-icon">' . PHP_EOL .
-         '      <a href="%link%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
+         "      <a href=\"%link%\" target=\"$target\"><img src=\"%img%\" title=\"%title_attribute%\" alt=\"%title_attribute%\" /><br>%title%</a>" . PHP_EOL .
          '   </div>' . PHP_EOL .
          $description;
       

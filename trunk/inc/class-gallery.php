@@ -31,6 +31,13 @@ class DG_Gallery {
    public function linkToAttachmentPg() {
       return $this->atts['attachment_pg'];
    }
+   
+   /**
+    * @return bool Whether to open thumb links in new window.
+    */
+   public function openLinkInNewWindow() {
+      return $this->atts['new_window'];
+   }
 
    /**
     * @return bool Whether to use "fancy" thumbnails.
@@ -362,6 +369,22 @@ class DG_Gallery {
    private static function sanitizeMimeTypes($value, &$err) {
       // TODO: do some actual sanitization...
       return $value;
+   }
+
+   /**
+    * Takes the provided value and returns a sanitized value.
+    * @param string $value The new_window value to be sanitized.
+    * @param multitype:string &$errs The array of errors, which will be appended with any errors found.
+    * @return bool The sanitized new_window value.
+    */
+   private static function sanitizeNewWindow($value, &$err) {
+      $ret = self::toBool($value);
+
+      if(is_null($ret)) {
+         $err = sprintf(self::$binary_err, 'new_window', 'true', 'false', $value);
+      }
+
+      return $ret;
    }
 
    /**
