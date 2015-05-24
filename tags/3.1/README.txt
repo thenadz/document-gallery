@@ -387,8 +387,8 @@ change is saved, the Ghostscript checkbox should be enabled on the first tab.
 = Q: Why are all of my document icons in a single column? =
 
 A: Assuming that you do not have the `columns` attribute set to 1, the likely cause
-of this behavior is that descriptions are enabled. To fix this, simply use 
-`[dg descriptions=false]`.
+of this behavior is that descriptions are enabled. To fix this, simply add `descriptions=false`
+(eg: `[dg descriptions=false]`).
 
 = Q: Why is [insert thumbnail generation method] enabled on one of my WordPress installs, but not on another one? =
 
@@ -413,13 +413,17 @@ returning our thumbnail.
 
 == Screenshots ==
 
-1. This is an example of "fancy" thumbnails. The images are a copy of the front
+1. Document Gallery integrates directly with the WordPress Media Manager.
+2. The common configuration options are directly accessible through the Media Manager
+interface, but additional configuration can be manually added to the generated
+shortcode.
+3. This is an example of "fancy" thumbnails. The images are a copy of the front
 page for each document.
-2. This is an example of multiple Document Galleries on a single page (using
+4. This is an example of multiple Document Galleries on a single page (using
 the `ids` attribute). It also shows how images will appear in a Document
 Gallery. Note that the description field supports HTML markup, so the
 possibilities are endless!
-3. This is how the Document Gallery looks with `descriptions=false` (default).
+5. This is how the Document Gallery looks with `descriptions=false` (default).
 Note that the display inherits styling from your active theme.
 
 == Changelog ==
@@ -429,6 +433,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.2 =
+* **Enhancement:** The long awaited option to open thumbnail links in a new window
+  has been added. Simply use `[dg new_window=true]`.
 
 = 3.1 =
 * **Enhancement:** The Media Manager can now be used to generate a gallery without
