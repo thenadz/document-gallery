@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.6
 Tested up to: 4.2.2
-Stable tag: 3.1
+Stable tag: 3.2s
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,11 +55,9 @@ In order to include all compatible documents from a given page or post, you
 must include the following shortcode in the post: `[dg]`.
 
 In addition to the default behavior, the plugin provides many options to
-customize behavior with various attributes, seen below:
+customize behavior with various attributes, some of which are shown below:
 
-`[dg [fancy=<true/false>] [attachment_pg=<true/false>]
-[category/custom_taxon_name=<**comma-separated list of taxon values**> [relation=<AND/OR>]]
-[descriptions=<true/false>] [order=<ASC/DESC>] [orderby=<**see below**>]]`
+`[dg [fancy=<true/false>] [attachment_pg=<true/false>] [descriptions=<true/false>] [order=<ASC/DESC>] [orderby=<**see below**>]]`
 
 Though the shortcode above may seem far from "short," none of the attributes are
 required and most users will find that the plugin meets your needs "out of the box"
@@ -67,10 +65,7 @@ without any added attributes.
 
 **Default Values**
 
-By default, document gallery will use `no descriptions`, `orderby menu_order`
-, `ASC order`, `no attachment_pg links`, and `no images` from the `local post`
-if you do not specify otherwise. These defaults can be configured in your dashboard
-under `Settings -> Document Gallery`.
+Default document gallery behavior can be configured in your dashboard under `Settings -> Document Gallery`.
 
 **Attachment Page Option** *(New in Version 1.1)*
 
@@ -155,6 +150,10 @@ not included by default). To do this, you would simply set
 `mime_types=application,video,text,audio,image`, where "image" is the only difference
 from the default value. You could also create a gallery which only includes PDFs
 by setting `mime_types=application/pdf`.
+
+**New Window Option** *(New in Version 3.2)*
+
+If true, clicking one of the documents in your gallery will open the target link in a new window/tab.
 
 **Order Option**
 
