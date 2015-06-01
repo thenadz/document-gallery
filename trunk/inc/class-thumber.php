@@ -377,15 +377,12 @@ class DG_Thumber {
       $height = $options['height'];
       $icon_url = DG_URL . 'assets/icons/';
 
-      $url = wp_get_attachment_url($ID);
-      $ext = self::getExt($url);
-
       // handle images
       if ($icon = image_downsize($ID, array($width, $height))) {
          $icon = $icon[0];
       }
       // default extension icon
-      elseif ($name = self::getDefaultIcon($ext)) {
+      elseif ($name = self::getDefaultIcon(self::getExt(wp_get_attachment_url($ID)))) {
          $icon = $icon_url . $name;
       }
       // fallback to standard WP icons
@@ -629,8 +626,7 @@ class DG_Thumber {
       if (is_wp_error($img)) {
          DG_Logger::writeLog(
             DG_LogLevel::Error,
-            __('Failed to get image editor: ', 'document-gallery') .
-            $img->get_error_message());
+            __('Failed to get image editor: ', 'document-gallery') . $img->get_error_message());
          return false;
       }
 
@@ -665,7 +661,8 @@ class DG_Thumber {
    /**
     * Caller should handle removal of the temp file when finished.
     *
-    * @param str $ext
+    * @param string $ext The extension to be given to the temp file.
+    * @return string A temp file with the given extension.
     */
    private static function getTempFile($ext = 'png') {
       static $base = null;
@@ -750,23 +747,30 @@ class DG_Thumber {
     * Formerly achieved with wp_check_filetype(), but it was only returning
     * valid results if the active user had permission to upload the given filetype.
     *
-    * @param str $filename  Name of the file to get extension from.
-    * @return str|bool      Returns the file extension on success, false on failure.
+    * @param str $filename Name of the file to get extension from.
+    * @return bool|str Returns the file extension on success, false on failure.
     */
-   private static function getExt($filename, $img = false) {
-      $options = $img ? array('jpg', 'jpeg', 'gif', 'png', 'bmp') : array_keys(wp_get_mime_types());
+   private static function getExt($filename) {
       if ($ext = pathinfo($filename, PATHINFO_EXTENSION)) {
-         $res = preg_grep('/^(?:.*\|)?' . $ext . '(?:\|.*)?$/i', $options);
+         $res = preg_grep('/^(?:.*\|)?' . $ext . '(?:\|.*)?$/i', self::getAllExts());
          $res = reset($res);
          if ($res!== false) {
             return $ext;
          }
-      }
-      elseif ( ($info = getimagesize($filename)) && ($ext = image_type_to_extension($info[2], false)) ) {
+      } elseif ( ($info = getimagesize($filename)) && ($ext = image_type_to_extension($info[2], false)) ) {
          return $ext;
       }
 
       return false;
+   }
+
+   /**
+    * Addresses issues with getting a complete list of supported MIME types as
+    * described in this issue: https://core.trac.wordpress.org/ticket/32544
+    * @return array Contains all MIME types supported by WordPress, including custom types added by plugins.
+    */
+   private static function getAllExts() {
+      return array_keys(array_merge(wp_get_mime_types(), get_allowed_mime_types()));
    }
 
    /**
