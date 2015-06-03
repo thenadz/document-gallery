@@ -48,7 +48,7 @@ jQuery(document).ready(function(){
          } ).fail(function() {
             console.log( 'Problem in reaching the server' );
          });
-	  }
+      }
       return false;
    });
    
@@ -96,11 +96,11 @@ jQuery(document).ready(function(){
    });
    
    jQuery('#LogTable .manage-column.column-date').click(function(){
-	   jQuery(this).toggleClass('asc desc');
+      jQuery(this).toggleClass('asc desc');
         var table = jQuery('#LogTable > tbody');
         var rows = table.children('tr');
-		table.append(rows.get().reverse());
-	});
+        table.append(rows.get().reverse());
+   });
 
    function DragDropFilesStop(e) {
       e = e || event;
@@ -145,6 +145,7 @@ jQuery(document).ready(function(){
    }
 
    //Firing HTML5 DragLeave only when all the DragEnter'ed child elements were DragLeave'd - http://stackoverflow.com/a/21002544
+   //Had to change in favour of http://stackoverflow.com/questions/10253663/ because of issues with FireFox
    var counter = {};
    function handleDragEnter(e) {
       // this / e.target is the current hover target.
@@ -153,7 +154,7 @@ jQuery(document).ready(function(){
          for (var i = 0; i < e.originalEvent.dataTransfer.types.length; i++) {
             if (e.originalEvent.dataTransfer.types[i] == 'Files') {
                this.classList.add('dragover');
-               counter[jQuery(this).data('entry')]++;//or without jQuery: this.getAttribute('data-entry')
+               counter[jQuery(this).data('entry')] = counter[jQuery(this).data('entry')].add(jQuery(e.target));
                break;
             }
          }
@@ -165,8 +166,8 @@ jQuery(document).ready(function(){
       if (e.originalEvent.dataTransfer.types) {
          for (var i = 0; i < e.originalEvent.dataTransfer.types.length; i++) {
             if (e.originalEvent.dataTransfer.types[i] == 'Files') {
-               counter[jQuery(this).data('entry')]--;
-               if (counter[jQuery(this).data('entry')] === 0) {
+               counter[jQuery(this).data('entry')] = counter[jQuery(this).data('entry')].not(e.target);
+               if (counter[jQuery(this).data('entry')].length === 0) {
                   this.classList.remove('dragover');// this / e.target is previous target element.
                }
                break;
@@ -185,7 +186,7 @@ jQuery(document).ready(function(){
                e.preventDefault();
 
                processFiles(e.originalEvent.dataTransfer.files,jQuery(this).data('entry'));
-               counter[jQuery(this).data('entry')] = 0;
+               counter[jQuery(this).data('entry')] = jQuery();
                this.classList.remove('dragover');
                break;
             }
@@ -204,8 +205,8 @@ jQuery(document).ready(function(){
       for (var i = 0, f; f = files[i]; i++) {
          //Processing only first qualifying file
          if (f.type.indexOf('image/') == 0 && typeof dg_admin_vars.upload_limit != 'undefined' && f.size <= parseInt(dg_admin_vars.upload_limit)) {
-            var target;
-            var formData= new FormData(jQuery('[data-entry='+entry+']').closest('form')[0]);
+            var target, theRow = jQuery('[data-entry='+entry+']');
+            var formData= new FormData( theRow.closest('form')[0] );
             if (typeof ajax_object != 'undefined' && typeof ajax_object.ajax_url != 'undefined') {
                target = ajax_object.ajax_url;
                formData.append('action', 'dg_upload_thumb');
@@ -218,10 +219,12 @@ jQuery(document).ready(function(){
             formData.append('file', f);
             var xhr = new XMLHttpRequest();
             xhr.open('POST', target);
-            var theImg = jQuery('[data-entry='+entry+']').find('.column-icon img');
+            var theImg = theRow.find('.column-icon img');
+            var progressBarValue = theRow.find('.progress > *:first');
             xhr.onreadystatechange = function() {
                if (xhr.readyState == 4) {
-                  if (xhr.responseText.indexOf("\n") == -1) {
+                  if (xhr.status == 200 && xhr.responseText.indexOf("\n") == -1) {
+                     jQuery(progressBarValue).parent().addClass('success');
                      eval('var response = ' + xhr.responseText + ';');
                      if (response.result) {
                         // check if generated thumbnail has the same url
@@ -232,13 +235,37 @@ jQuery(document).ready(function(){
                         }
                      }
                   } else {
+                     jQuery(progressBarValue).parent().addClass('fail');
                      console.log('Invalid response from server:');
                      console.log(xhr.responseText);
                   }
+                  setTimeout( function() {
+                     theRow.find('.column-thumbupload > *').toggleClass('invis');
+                     jQuery(progressBarValue).parent().removeClass('success fail');
+                  }, 5000 );
                }
-            }
+            };
+            xhr.onload = function() {
+               progressBarValue.width('100%');
+            };
+            xhr.upload.onprogress = function (event) {
+               if (event.lengthComputable) {
+                  var complete = (event.loaded / event.total * 100 | 0);
+                  progressBarValue.width( complete + '%');
+               }
+            };
+            progressBarValue.width( 0 );
+            theRow.find('.column-thumbupload > *').toggleClass('invis');
             xhr.send(formData);
             break;
+         } else {
+            console.log('Attempt to upload improper file %c'+f.name+':','font-weight:bold;');
+            if (f.type.indexOf('image/') != 0) {
+               console.log('\tIs not an image - '+f.type);
+            }
+            if (typeof dg_admin_vars.upload_limit != 'undefined' && f.size > parseInt(dg_admin_vars.upload_limit)) {
+               console.log('\tIs too big - '+f.size+'b; (Limit is '+dg_admin_vars.upload_limit+'b)');
+            }
          }
       }
    }
@@ -250,7 +277,7 @@ jQuery(document).ready(function(){
          .on('dragover',  handleDragOver)
          .on('dragleave', handleDragLeave)
          .on('drop',      handleDrop);
-      counter[jQuery(this).data('entry')] = 0;
+      counter[jQuery(this).data('entry')] = jQuery();
       jQuery(this).find('input:button').on('click', function() {
             jQuery(this).prevAll('input:file').click();
       });
@@ -306,7 +333,7 @@ jQuery(document).ready(function(){
    });
    jQuery( '.edit-controls .dashicons-yes' ).click(function() {
       var cell = jQuery( this ).closest('td');
-      var entry = jQuery(this).closest('tr').data('entry')
+      var entry = jQuery(this).closest('tr').data('entry');
       var target = jQuery('#tab-Thumbnail').attr('action');
       var formData= new FormData(jQuery('[data-entry='+entry+']').closest('form')[0]);
       formData.append('document_gallery[entry]', entry);
@@ -329,10 +356,10 @@ jQuery(document).ready(function(){
       }
       var xhr = new XMLHttpRequest();
       xhr.open('POST', target);
-      //var theImg = jQuery('[data-entry='+entry+']').find('.column-icon img');
       xhr.onreadystatechange = function() {
          if (xhr.readyState == 4) {
             cell.addClass('trans');
+            cell.find('.edit-controls').removeClass('waiting');
            if (xhr.responseText.indexOf("\n") == -1) {
                eval('var response = ' + xhr.responseText + ';');
                if (response.result) {
@@ -350,7 +377,8 @@ jQuery(document).ready(function(){
                console.log(xhr.responseText);
             }
          }
-      }
+      };
+      jQuery( this ).closest('.edit-controls').addClass('waiting');
       xhr.send(formData);
    });
    function shake(target) {
