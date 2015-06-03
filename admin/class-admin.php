@@ -1043,7 +1043,8 @@ class DG_Admin {
                           $icon.'" />'.'</td><td class="title column-title">' .
                           ($title ? '<strong><a href="' . home_url('/?attachment_id='.$v['thumb_id']).'" target="_blank" title="'.__('View', 'document-gallery').' \'' .
                            $title.'\' '.__('attachment page', 'document-gallery').'"><span class="editable-title">'.$title.'</span> <sup>'.$type.'</sup></a></strong>' : __('Attachment not found', 'document-gallery')) .
-                           '<span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span></td><td class="column-description"><div class="editable-description">'.$description.'</div><span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span>'.                           '</td><td class="column-thumbupload">' .
+                           '<span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span></td><td class="column-description"><div class="editable-description">'.$description.'</div><span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span><span class="dashicons dashicons-update"></span></span>'.
+                           '</td><td class="column-thumbupload">' .
                               '<span class="manual-download">' .
                                  '<span class="dashicons dashicons-upload"></span>' .
                                  '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
@@ -1052,6 +1053,7 @@ class DG_Admin {
                                     '<input id="trigger-button'.$v['thumb_id'].'" type="button" value="Select File" class="button" />' .
                                  '</span>' .
                               '</span>' .
+                          '<div class="progress animate invis"><span><span></span></span></div>' .
                           '</td><td class="date column-date">'.$date.'</td></tr>'.PHP_EOL;
                } ?>
             </tbody>
