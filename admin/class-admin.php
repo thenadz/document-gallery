@@ -308,7 +308,7 @@ class DG_Admin {
             'name'        => 'gallery_defaults][new_window',
             'value'       => esc_attr($defaults['new_window']),
             'option_name' => DG_OPTION_NAME,
-            'description' => __('Open thumbnail links in new window.', 'document-gallery')
+            'description' => __('Open thumbnail links in new window', 'document-gallery').'.'
         ));
       
       add_settings_field(

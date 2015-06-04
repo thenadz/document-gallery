@@ -40,6 +40,13 @@
 
    <label class="setting">
       <table><tr>
+         <td><span><?php _e('Open thumbnail links in new window', 'document-gallery'); ?></span></td>
+         <td><input type="checkbox" data-setting="new_window" <# if ( documentGalleryDefaults.new_window ) { #>checked="checked"<# } #>/></td>
+      </tr></table>
+   </label>
+
+   <label class="setting">
+      <table><tr>
          <td><span><?php _e('Include document descriptions', 'document-gallery'); ?></span></td>
          <td><input type="checkbox" data-setting="descriptions" <# if ( documentGalleryDefaults.descriptions ) { #>checked="checked"<# } #>/></td>
       </tr></table>
