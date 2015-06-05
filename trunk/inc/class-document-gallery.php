@@ -41,8 +41,8 @@ class DocumentGallery {
    public static function printCustomStyle() {
       global $dg_options;
 
-      if (!empty($dg_options['css']['minified'])) {
-         echo "<style type='text/css'>{$dg_options['css']['minified']}</style>" . PHP_EOL;
+      if (!empty($dg_options['css']['text'])) {
+         echo "<style type='text/css'>{$dg_options['css']['text']}</style>" . PHP_EOL;
       }
    }
 
@@ -167,77 +167,6 @@ class DocumentGallery {
       }
 
       return '<span class="nowrap">'.date_i18n($wp_date_format, $timestamp + $gmt_offet * 3600).'</span> <span class="nowrap">'.date_i18n($wp_time_format, $timestamp + $gmt_offet * 3600).'</span>';
-   }
-    
-   /**
-    * Compiles any custom CSS, including minification and escaping HTML.
-    * @param string $custom The custom CSS to compile.
-    * @return string Compiled CSS.
-    */
-   public static function compileCustomCss($custom) {
-      $css = str_replace('&gt;', '>', esc_html($custom));
-      return self::minifyCss($css);
-   }
-    
-   /**
-    * Minifies CSS string.
-    * Source: http://stackoverflow.com/a/15195752/866618
-    */
-   private static function minifyCss($css) {
-      # remove comments first (simplifies the other regex)
-      $re1 = <<<EOS
-(?sx)
-  # quotes
-  (
-    "(?:[^"\\\\]++|\\.)*+"
-  | '(?:[^'\\\\]++|\\.)*+'
-  )
-|
-  # comments
-  /\* (?> .*? \*/ )
-EOS;
-
-      $re2 = <<<EOS
-(?six)
-  # quotes
-  (
-    "(?:[^"\\\\]++|\\.)*+"
-  | '(?:[^'\\\\]++|\\.)*+'
-  )
-|
-  # ; before } (and the spaces after it while we're here)
-  \s*+ ; \s*+ ( } ) \s*+
-|
-  # all spaces around meta chars/operators
-  \s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\b ) \s*+
-|
-  # spaces right of ( [ :
-  ( [[(:] ) \s++
-|
-  # spaces left of ) ]
-  \s++ ( [])] )
-|
-  # spaces left (and right) of :
-  \s++ ( : ) \s*+
-  # but not in selectors: not followed by a {
-  (?!
-    (?>
-      [^{}"']++
-    | "(?:[^"\\\\]++|\\.)*+"
-    | '(?:[^'\\\\]++|\\.)*+'
-    )*+
-    {
-  )
-|
-  # spaces at beginning/end of string
-  ^ \s++ | \s++ \z
-|
-  # double spaces to single
-  (\s)\s+
-EOS;
-
-      $css = preg_replace("%$re1%", '$1', $css);
-      return preg_replace("%$re2%", '$1$2$3$4$5$6$7', $css);
    }
 
    /**
