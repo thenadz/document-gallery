@@ -604,7 +604,6 @@ class DG_Admin {
       // handle modified CSS
       if (trim($ret['css']['text']) !== trim($values['css'])) {
          $ret['css']['text'] = trim($values['css']);
-         $ret['css']['minified'] = DocumentGallery::compileCustomCss($ret['css']['text']);
       }
 
       return $ret;

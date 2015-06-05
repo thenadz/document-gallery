@@ -81,10 +81,7 @@ class DG_Setup {
           ),
           'css' => array(
               // plain text of CSS to be edited by user
-              'text'           => '',
-                
-              // "minified" text to be rendered on pages
-              'minified'       => ''
+              'text'           => ''
           ),
           
           'meta' => array(
@@ -152,6 +149,7 @@ class DG_Setup {
       self::threePointZeroBeta($options);
       self::threePointOne($options);
       self::threePointTwo($options);
+      self::threePointThree($options);
       
       // update plugin meta data
       $options['meta']['version'] = DG_VERSION;
@@ -223,7 +221,7 @@ class DG_Setup {
          unset($options['css']['version']);
 
          // need to recalculate minified, excluding static CSS which was previously included
-         $options['css']['minified'] = DocumentGallery::compileCustomCss($options['css']['text']);
+         //$options['css']['minified'] = DocumentGallery::compileCustomCss($options['css']['text']);
          
          // if user inadvertantly enabled google drive viewer on system where it's not supported
          // then avoid locking it in the on state
@@ -300,6 +298,17 @@ class DG_Setup {
    private static function threePointTwo(&$options) {
       if (version_compare($options['meta']['version'], '3.2', '<')) {
          $options['gallery']['new_window'] = false;
+      }
+   }
+
+   /**
+    * Removes minified CSS.
+    *
+    * @param unknown $options
+    */
+   private static function threePointThree(&$options) {
+      if (version_compare($options['meta']['version'], '3.3', '<')) {
+         unset($options['css']['minified']);
       }
    }
    
