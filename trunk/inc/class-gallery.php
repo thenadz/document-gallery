@@ -194,7 +194,7 @@ class DG_Gallery {
 					// missing value
 					$sanitized[ $k ] = $v;
 				}
-			} else if ( $sanitized[ $k ] != $v ) {
+			} else if ( $sanitized[ $k ] !== $v ) { //Sometimes we get boolean in the string form for checkboxes
 				// sanitize value if different from old value
 				$sanitized[ $k ] = self::sanitizeParameter( $k, $sanitized[ $k ], $errs );
 			}
