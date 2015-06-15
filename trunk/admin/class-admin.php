@@ -106,7 +106,7 @@ class DG_Admin {
 	 * Enqueues styles and scripts for the admin settings page.
 	 */
 	public static function enqueueScriptsAndStyles( $hook ) {
-		if ( $hook === DG_Admin::$hook ) {
+		if ( in_array( $hook, array( DG_Admin::$hook, 'post.php', 'post-new.php' ), true ) ) {
 			// Settings Page
 			wp_enqueue_style( 'document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION );
 
@@ -117,7 +117,7 @@ class DG_Admin {
 
 			wp_enqueue_script( 'document-gallery-admin', DG_URL . 'assets/js/admin.js', array( 'jquery' ), DG_VERSION, true );
 			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
-			if ( $hook == 'post.php' ) {
+			if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
 				wp_localize_script( 'document-gallery-admin', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
 				// Media Manager
@@ -1116,7 +1116,6 @@ class DG_Admin {
 				'normal'
 			);
 		}
-		DG_Admin::$hook = 'post.php';
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueueScriptsAndStyles' ) );
 	}
 
