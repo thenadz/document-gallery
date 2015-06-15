@@ -296,17 +296,17 @@ class DG_Setup {
 	private static function threePointThree( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.3', '<' ) ) {
 			unset( $options['css']['minified'] );
-			include_once DG_PATH . 'inc/class-gallery.php';
+
 			$defaults = self::getDefaultOptions();
 			foreach ( $defaults as $class => $block ) {
 				if ( is_array($block) ) {
 					foreach ( $block as $prop => $value ) {
-						if ( is_bool($value) && isset($options[$class][$prop]) && ! is_bool($options[$class][$prop]) ) {
-							$options[$class][$prop] = DG_Gallery::toBool($options[$class][$prop]);
+						if ( is_bool( $value ) && isset( $options[$class][$prop] ) && ! is_bool( $options[$class][$prop] ) ) {
+							$options[$class][$prop] = DG_Util::toBool( $options[$class][$prop] );
 						}
 					}
-				} elseif ( is_bool($block) && isset($options[$class]) && ! is_bool($options[$class]) ) {
-					$options[$class] = DG_Gallery::toBool($options[$class]);
+				} elseif ( is_bool( $block ) && isset( $options[$class] ) && ! is_bool( $options[$class] ) ) {
+					$options[$class] = DG_Util::toBool( $options[$class] );
 				}
 			}
 		}
