@@ -13,7 +13,7 @@ class DG_Document {
 		*=========================================================================*/
 
 	// general document data
-	private $description, $gallery, $ID, $link, $title, $title_attribute;
+	private $description, $gallery, $ID, $link, $title, $title_attribute, $path, $extension, $size;
 
 	/*==========================================================================
 		* INIT GALLERY
@@ -26,8 +26,6 @@ class DG_Document {
 	 * @param DG_Gallery $gallery Instance of Gallery class.
 	 */
 	public function __construct( $attachment, $gallery ) {
-		include_once DG_PATH . 'inc/class-thumber.php';
-
 		// init general document data
 		$this->gallery         = $gallery;
 		$this->description     = wptexturize( $attachment->post_content );
@@ -37,6 +35,11 @@ class DG_Document {
 			: wp_get_attachment_url( $attachment->ID );
 		$this->title           = wptexturize( $attachment->post_title );
 		$this->title_attribute = esc_attr( strip_tags( $this->title ) );
+
+		$this->path            = get_attached_file( $attachment->ID );
+		$wp_filetype           = wp_check_filetype_and_ext( $this->path, basename( $this->path ) );
+		$this->extension       = $wp_filetype['ext'];
+		$this->size            = size_format( filesize( $this->path ) );
 	}
 
 	/*==========================================================================
@@ -50,12 +53,15 @@ class DG_Document {
 	 * @return string
 	 */
 	public function __toString() {
+		include_once DG_PATH . 'inc/class-thumber.php';
+
 		$thumb = $this->gallery->useFancyThumbs()
 			? DG_Thumber::getThumbnail( $this->ID )
 			: DG_Thumber::getDefaultThumbnail( $this->ID );
+		$target   = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
 
-		$repl        = array( $this->link, $thumb, $this->title_attribute, $this->title );
-		$find        = array( '%link%', '%img%', '%title_attribute%', '%title%' );
+		$repl        = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path );
+		$find        = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%' );
 		$description = '';
 
 		// if descriptions then add filterable tag and value to replaced tag
@@ -65,10 +71,9 @@ class DG_Document {
 			$description = '   <p>%description%</p>';
 		}
 
-		$target   = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
 		$doc_icon =
 			'   <div class="document-icon">' . PHP_EOL .
-			"      <a href=\"%link%\" target=\"$target\"><img src=\"%img%\" title=\"%title_attribute%\" alt=\"%title_attribute%\" /><br>%title%</a>" . PHP_EOL .
+			'      <a href="%link%" target="%target%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
 			'   </div>' . PHP_EOL .
 			$description;
 
