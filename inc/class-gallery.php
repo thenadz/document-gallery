@@ -250,7 +250,7 @@ class DG_Gallery {
 	 * @return bool The sanitized attachment_pg value.
 	 */
 	private static function sanitizeAttachmentPg( $value, &$err ) {
-		$ret = self::toBool( $value );
+		$ret = DG_Util::toBool( $value );
 
 		if ( is_null( $ret ) ) {
 			$err = sprintf( self::$binary_err, 'attachment_pg', 'true', 'false', $value );
@@ -280,7 +280,7 @@ class DG_Gallery {
 	 * @return bool The sanitized descriptions value.
 	 */
 	private static function sanitizeDescriptions( $value, &$err ) {
-		$ret = self::toBool( $value );
+		$ret = DG_Util::toBool( $value );
 
 		if ( is_null( $ret ) ) {
 			$err = sprintf( self::$binary_err, 'descriptions', 'true', 'false', $value );
@@ -310,7 +310,7 @@ class DG_Gallery {
 	 * @return bool The sanitized fancy value.
 	 */
 	private static function sanitizeFancy( $value, &$err ) {
-		$ret = self::toBool( $value );
+		$ret = DG_Util::toBool( $value );
 
 		if ( is_null( $ret ) ) {
 			$err = sprintf( self::$binary_err, 'fancy', 'true', 'false', $value );
@@ -406,7 +406,7 @@ class DG_Gallery {
 	 * @return bool The sanitized new_window value.
 	 */
 	private static function sanitizeNewWindow( $value, &$err ) {
-		$ret = self::toBool( $value );
+		$ret = DG_Util::toBool( $value );
 
 		if ( is_null( $ret ) ) {
 			$err = sprintf( self::$binary_err, 'new_window', 'true', 'false', $value );
@@ -776,46 +776,6 @@ class DG_Gallery {
 		return ! is_numeric( $var )      // isn't numeric
 		       || (int) $var != $var   // isn't int
 		       || (int) $var < 0;      // isn't positive
-	}
-
-	/**
-	 * Converts provided value to bool.
-	 *
-	 * @param unknown $val To be converted.
-	 *
-	 * @return bool|NULL Bool value if can be parsed, else NULL.
-	 */
-	private static function toBool( $val ) {
-		if ( is_null( $val ) ) {
-			return false;
-		}
-
-		if ( is_bool( $val ) ) {
-			return $val;
-		}
-
-		if ( is_int( $val ) ) {
-			if ( 1 === $val ) {
-				return true;
-			}
-
-			if ( 0 === $val ) {
-				return false;
-			}
-		}
-
-		if ( is_string( $val ) ) {
-			$val = strtolower( $val );
-			if ( 'true' === $val || '1' === $val ) {
-				return true;
-			}
-
-			if ( 'false' === $val || '0' === $val ) {
-				return false;
-			}
-		}
-
-		return null;
 	}
 
 	/*==========================================================================
