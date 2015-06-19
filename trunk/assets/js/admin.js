@@ -32,6 +32,7 @@ jQuery(document).ready(function () {
             var b = jQuery(this).serialize() +
                 '&document_gallery%5Bajax%5D=true' +
                 '&document_gallery%5Bcleanup%5D=true';
+            jQuery('.deleteSelected').addClass('waiting').attr('disabled', 'disabled');
             jQuery.post(a, b, function (response) {
                 if (response.indexOf("\n") == -1) {
                     eval('var reply = ' + response + ';');
@@ -49,8 +50,10 @@ jQuery(document).ready(function () {
                     console.log('Invalid response from server:');
                     console.log(response);
                 }
+                jQuery('.deleteSelected').removeClass('waiting').removeAttr('disabled');
             }).fail(function () {
                 console.log('Problem in reaching the server');
+                jQuery('.deleteSelected').removeClass('waiting').removeAttr('disabled');
             });
         }
         return false;

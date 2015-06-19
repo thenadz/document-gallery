@@ -530,11 +530,19 @@ td .dashicons-edit, .edit-controls .dashicons-update {
     cursor: default;
 }
 
-.edit-controls.waiting .dashicons-update {
+.edit-controls.waiting .dashicons-update, .deleteSelected.waiting:before {
     display: block;
     -webkit-animation: spin 1s linear infinite;
     -moz-animation: spin 1s linear infinite;
     animation: spin 1s linear infinite;
+}
+
+.deleteSelected.waiting:before {
+    content: '\f463';
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 0;
 }
 
 @-moz-keyframes spin {
