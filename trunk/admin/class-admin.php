@@ -117,7 +117,7 @@ class DG_Admin {
 
 			wp_enqueue_script( 'document-gallery-admin', DG_URL . 'assets/js/admin.js', array( 'jquery' ), DG_VERSION, true );
 			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
-			if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			if ( $hook !== self::$hook ) { //if $hook is 'post.php' or 'post-new.php'
 				wp_localize_script( 'document-gallery-admin', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
 				// Media Manager
@@ -126,7 +126,7 @@ class DG_Admin {
 				wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
 					'documentGalleryMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
 					'documentGalleryButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
-					'cancelDocumentGalleryTitle' => __( '&#8592; Cancel Document Gallery', 'document-gallery' ),
+					'cancelDocumentGalleryTitle' => '&#8592; ' . __( 'Cancel Document Gallery', 'document-gallery' ),
 					'updateDocumentGallery'      => __( 'Update Document Gallery', 'document-gallery' ),
 					'insertDocumentGallery'      => __( 'Insert Document Gallery', 'document-gallery' ),
 					'addToDocumentGallery'       => __( 'Add to Document Gallery', 'document-gallery' ),
