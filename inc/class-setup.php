@@ -289,7 +289,7 @@ class DG_Setup {
 	}
 
 	/**
-	 * Removes minified CSS.
+	 * Removes minified CSS. Fixing corrupt data for boolean fields that may have gotten strings.
 	 *
 	 * @param array $options The options to be modified.
 	 */
@@ -302,11 +302,11 @@ class DG_Setup {
 				if ( is_array($block) ) {
 					foreach ( $block as $prop => $value ) {
 						if ( is_bool( $value ) && isset( $options[$class][$prop] ) && ! is_bool( $options[$class][$prop] ) ) {
-							$options[$class][$prop] = DG_Util::toBool( $options[$class][$prop] );
+							$options[$class][$prop] = DG_Util::toBool( $options[$class][$prop], $value );
 						}
 					}
 				} elseif ( is_bool( $block ) && isset( $options[$class] ) && ! is_bool( $options[$class] ) ) {
-					$options[$class] = DG_Util::toBool( $options[$class] );
+					$options[$class] = DG_Util::toBool( $options[$class], $block );
 				}
 			}
 		}
