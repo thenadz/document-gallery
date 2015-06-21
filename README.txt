@@ -280,10 +280,15 @@ which are replaced during gallery generation with document-specific data.
 These tags are as follows:
 
 * **%link%**: The URL that will be loaded when the user clicks the icon.
+* **%target%**: The target attribute for the anchor tag (e.g.: _blank, _self).
 * **%img%**: The URL pointing the the image that will be displayed.
 * **%title%**: The human-readable title of the attachment.
 * **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
 * **%description%**: The attachment description (only present when rendering descriptions).
+* **%extension%**: The document file extension.
+* **%size%**: The human-readable file size formatted by
+  [size_format](https://codex.wordpress.org/Function_Reference/size_format).
+* **%path%**: The system path pointing to the document.
 
 **Filter Thumbnail Generation Methods**
 
@@ -432,6 +437,16 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.3 =
+* **Enhancement:** Developers using the Document Gallery API now have access to new
+  values when using the `dg_icon_template` filter.
+  (Thanks to [pierowbmstr](https://wordpress.org/support/profile/pierowbmstr)!)
+* **Bug Fix:** Resolved some advanced CSS commands (e.g.: `calc()`) breaking in custom CSS.
+* **Bug Fix:** Some DG options were not being saved correctly resulting in odd behavior
+  in some edge cases.
+* **Bug Fix:** Resolved Media Manager integration not being available when first creating
+  a post.
 
 = 3.2 =
 * **Enhancement:** The long awaited option to open thumbnail links in a new window
