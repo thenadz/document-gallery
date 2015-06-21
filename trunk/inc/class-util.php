@@ -96,10 +96,11 @@ class DG_Util {
 	 * Converts provided value to bool.
 	 *
 	 * @param unknown $val To be converted.
+	 * @param bool $default The value to return if unable to parse $val.
 	 *
 	 * @return bool|NULL Bool value if can be parsed, else NULL.
 	 */
-	public static function toBool( $val ) {
+	public static function toBool( $val, $default = null ) {
 		if ( is_null( $val ) ) {
 			return false;
 		}
@@ -129,6 +130,6 @@ class DG_Util {
 			}
 		}
 
-		return null;
+		return $default;
 	}
 }
