@@ -703,9 +703,9 @@ class DG_Admin {
 	/**
 	 * Validates uploaded file as a semi for potential thumbnail.
 	 *
-	 * @param  str $var File field name.
+	 * @param  string $var File field name.
 	 *
-	 * @return bool|str   False on failure, path to temp file on success.
+	 * @return bool|string   False on failure, path to temp file on success.
 	 */
 	public static function validateUploadedFile( $var = 'file' ) {
 		// checking if any file was delivered
