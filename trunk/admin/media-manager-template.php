@@ -2,7 +2,7 @@
 	include_once DG_PATH . 'inc/class-gallery.php';
 ?>
 <script type="text/html" id="tmpl-document-gallery-settings">
-	<h3><?php _e('Document Gallery Settings'); ?></h3>
+	<h3><?php _e('Document Gallery Settings', 'document-gallery'); ?></h3>
 
 	<label class="setting">
 		<table><tr>
