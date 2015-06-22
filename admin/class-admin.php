@@ -1080,8 +1080,7 @@ class DG_Admin {
 						echo '<tr data-entry="' . $v['thumb_id'] . '"><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
 						     $v['thumb_id'] . '"></td><td class="column-icon media-icon"><img src="' .
 						     $icon . '" />' . '</td><td class="title column-title">' .
-						     ( $title ? '<strong><a href="' . home_url( '/?attachment_id=' . $v['thumb_id'] ) . '" target="_blank" title="' . __( 'View', 'document-gallery' ) . ' \'' .
-						                $title . '\' ' . __( 'attachment page', 'document-gallery' ) . '"><span class="editable-title">' . $title . '</span> <sup>' . $type . '</sup></a></strong>' : __( 'Attachment not found', 'document-gallery' ) ) .
+						     ( $title ? '<strong><a href="' . home_url( '/?attachment_id=' . $v['thumb_id'] ) . '" target="_blank" title="' . sprintf( __( "View '%s' attachment page", 'document-gallery' ), $title ) . '"><span class="editable-title">' . $title . '</span> <sup>' . $type . '</sup></a></strong>' : __( 'Attachment not found', 'document-gallery' ) ) .
 						     '<span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span></td><td class="column-description"><div class="editable-description">' . $description . '</div><span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span><span class="dashicons dashicons-update"></span></span>' .
 						     '</td><td class="column-thumbupload">' .
 						     '<span class="manual-download">' .
