@@ -346,7 +346,7 @@ class DG_Gallery {
 		$ret = $value;
 
 		if ( ! preg_match( $regex, $value ) ) {
-			$err = sprintf( __( '%s may only be a comma-delimited list of integers.', 'document-gallery' ), name );
+			$err = sprintf( __( '%s may only be a comma-delimited list of integers.', 'document-gallery' ), $name );
 			$ret = null;
 		}
 
