@@ -43,7 +43,7 @@ class DocumentGallery {
 		global $dg_options;
 
 		if ( ! empty( $dg_options['css']['text'] ) ) {
-			echo "<style type='text/css'>{$dg_options['css']['text']}</style>" . PHP_EOL;
+			echo '<style type="text/css">' . $dg_options['css']['text'] . '</style>' . PHP_EOL;
 		}
 	}
 

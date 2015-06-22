@@ -583,7 +583,7 @@ class DG_Gallery {
 		$ret = strtoupper( $operator );
 
 		if ( ! in_array( $ret, self::getOperatorOptions() ) ) {
-			$this->errs[] = sprintf( self::$binary_err, $key, 'IN", "NOT IN", "OR', 'AND', $operator );
+			$this->errs[] = sprintf( self::$binary_err, 'IN", "NOT IN", "OR', 'AND', $operator );
 			$ret          = null;
 		} else if ( $ret === 'OR' ) {
 			$ret = 'IN';
