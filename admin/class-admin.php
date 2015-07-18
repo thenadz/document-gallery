@@ -693,8 +693,7 @@ class DG_Admin {
 		}
 
 		if ( isset( $values['ajax'] ) ) {
-			echo DG_Util::jsonEncode( $responseArr );
-			add_filter( 'wp_redirect', array( __CLASS__, '_exit' ), 1, 0 );
+			wp_send_json( $responseArr );
 		}
 
 		return $ret;
@@ -1047,7 +1046,7 @@ class DG_Admin {
 		?>
 
 		<script type="text/javascript">
-			var URL_params = <?php echo DG_Util::jsonEncode($URL_params); ?>;
+			var URL_params = <?php echo wp_json_encode( $URL_params ); ?>;
 		</script>
 		<div class="thumbs-list-wrapper">
 			<div>
@@ -1172,8 +1171,7 @@ class DG_Admin {
 			}
 		}
 		if ( isset( $_POST[ DG_OPTION_NAME ]['ajax'] ) ) {
-			echo DG_Util::jsonEncode( $responseArr );
-			wp_die();
+			wp_send_json($responseArr);
 		}
 	}
 
@@ -1344,13 +1342,6 @@ class DG_Admin {
 		}
 
 		print '</select> ' . $args['description'];
-	}
-
-	/**
-	 * Wraps the PHP exit language construct.
-	 */
-	public static function _exit() {
-		exit;
 	}
 
 	/**
