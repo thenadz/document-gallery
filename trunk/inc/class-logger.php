@@ -31,9 +31,13 @@ class DG_Logger {
 					unset( $trace[0] );
 					$fields[] = self::getStackTraceString( $trace );
 				} else {
-					// Remove first item from backtrace as it's this function which is redundant.
+					// Ignore first item from backtrace as it's this function which is redundant.
 					$caller    = $trace[1];
-					$caller    = ( isset( $caller['class'] ) ? $caller['class'] : '' ) . $caller['type'] . $caller['function'];
+
+					$class = isset( $caller['class'] ) ? $caller['class'] : '';
+					$type = isset( $caller['type'] ) ? $caller['type'] : '';
+					$caller    = $class . $type . $caller['function'];
+
 					$fields[2] = '(' . $caller . ') ' . $fields[2];
 				}
 

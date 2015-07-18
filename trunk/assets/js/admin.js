@@ -33,22 +33,16 @@ jQuery(document).ready(function () {
                 '&document_gallery%5Bajax%5D=true' +
                 '&document_gallery%5Bcleanup%5D=true';
             jQuery('.deleteSelected').addClass('waiting').attr('disabled', 'disabled');
-            jQuery.post(a, b, function (response) {
-                if (response.indexOf("\n") == -1) {
-                    eval('var reply = ' + response + ';');
-                    if (reply.result) {
-                        var result = reply.deleted;
-                        for (var index in result) {
-                            jQuery('input[type=checkbox][value=' + result[index] + ']').closest('tr').fadeOut('slow', 0.00, function () {
-                                jQuery(this).slideUp('slow', function () {
-                                    jQuery(this).remove();
-                                });
+            jQuery.post(a, b, function (reply) {
+                if (reply.result) {
+                    var result = reply.deleted;
+                    for (var index in result) {
+                        jQuery('input[type=checkbox][value=' + result[index] + ']').closest('tr').fadeOut('slow', 0.00, function () {
+                            jQuery(this).slideUp('slow', function () {
+                                jQuery(this).remove();
                             });
-                        }
+                        });
                     }
-                } else {
-                    console.log('Invalid response from server:');
-                    console.log(response);
                 }
                 jQuery('.deleteSelected').removeClass('waiting').removeAttr('disabled');
             }).fail(function () {
