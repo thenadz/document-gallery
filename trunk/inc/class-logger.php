@@ -121,7 +121,7 @@ class DG_Logger {
 				continue;
 			}
 
-			// do perge for this blog
+			// do purge for this blog
 			$file = self::getLogFileName( $blog_num );
 			if ( file_exists( $file ) ) {
 				$fp = @fopen( $file, 'r' );
@@ -137,11 +137,12 @@ class DG_Logger {
 							break;
 						}
 
-						$truncate = true;
 						$offset   = @ftell( $fp );
 						if ( false === $offset ) {
 							break;
 						}
+
+						$truncate = true;
 					}
 
 					@fclose( $fp );
