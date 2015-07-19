@@ -9,6 +9,25 @@ defined( 'WPINC' ) OR exit;
 class DG_Util {
 
 	/**
+	 * @param callable $callable The callable.
+	 * @return string The string representation of the callable.
+	 */
+	public static function callableToString($callable) {
+		$ret = $callable;
+		if ( is_array( $callable ) ) {
+			$sep = '::';
+			if ( !is_string( $callable[0] ) ) {
+				$callable[0] = get_class( $callable[0] );
+				$sep = '->';
+			}
+
+			$ret = "{$callable[0]}$sep{$callable[1]}";
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * @return array All blog IDs.
 	 */
 	public static function getBlogIds() {

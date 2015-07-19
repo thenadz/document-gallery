@@ -576,7 +576,7 @@ class DG_Thumber {
 				if ( count( $thumbers ) > 0 ) {
 					$entry = __( 'Thumbnail Generators: ', 'document-gallery' );
 					foreach ( $thumbers as $k => $v ) {
-						$thumber = is_array( $v ) ? implode( '::', $v ) : print_r( $v, true );
+						$thumber = DG_Util::callableToString($v);
 
 						// TODO: The following works for all internal regexes, but may have unpredictable
 						// results if developer adds additional thumbnail generators using different regexes
