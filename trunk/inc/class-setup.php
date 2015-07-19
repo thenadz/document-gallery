@@ -78,7 +78,7 @@ class DG_Setup {
 			// logging options
 			'logging'    => array(
 				// TODO: more granular -- log_level instead of blanket enable/disable
-				'enabled'        => defined('WP_DEBUG') && WP_DEBUG,
+				'enabled'        => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				// max age of log entry (days)
 				'purge_interval' => 7
 			),
