@@ -829,11 +829,11 @@ class DG_Gallery {
 				$core .= str_replace( $find, $repl, $icon_wrapper );
 			}
 		} else {
-			global $dg_gallery_style;
-
 			$count = count( $this->docs );
 			$cols  = ! is_null( $this->atts['columns'] ) ? $this->atts['columns'] : $count;
 
+			// TODO: Invalid HTML. WP Core does it this way for [gallery], but consider setting width for each
+			// .document-icon as style attribute in element.
 			if ( apply_filters( 'dg_use_default_gallery_style', true ) ) {
 				$itemwidth = $cols > 0 ? ( floor( 100 / $cols ) - 1 ) : 100;
 				$core .= "<style type='text/css'>#$selector .document-icon{width:$itemwidth%}</style>";
