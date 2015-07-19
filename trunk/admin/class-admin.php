@@ -111,9 +111,15 @@ class DG_Admin {
 			wp_enqueue_style( 'document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION );
 
 			// gracefully degrade for older WP versions
-			if ( version_compare( get_bloginfo( 'version' ), '3.8', '<' ) ) {
-				echo '<style type="text/css">.dashicons, .nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after, #ThumbsTable .title a:after, #LogTable>tbody a:after {display: none !important;}</style>' . PHP_EOL;
-			}
+			if ( version_compare( get_bloginfo( 'version' ), '3.8', '<' ) ) { ?>
+				<style type="text/css">
+					.dashicons, .nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before,
+					.collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after,
+					#ThumbsTable .title a:after, #LogTable>tbody a:after {
+						display: none !important;
+					}
+				</style>
+			<?php }
 
 			wp_enqueue_script( 'document-gallery-admin', DG_URL . 'assets/js/admin.js', array( 'jquery' ), DG_VERSION, true );
 			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
@@ -922,11 +928,7 @@ class DG_Admin {
 		$URL_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'Thumbnail' );
 		$att_ids    = array();
 
-		if ( isset( $_REQUEST['orderby'] ) && in_array( strtolower( $_REQUEST['orderby'] ), array(
-				'title',
-				'date'
-			) )
-		) {
+		if ( isset( $_REQUEST['orderby'] ) && in_array( strtolower( $_REQUEST['orderby'] ), array( 'title', 'date' ) ) ) {
 			$orderby               = strtolower( $_REQUEST['orderby'] );
 			$URL_params['orderby'] = $orderby;
 
@@ -1004,7 +1006,7 @@ class DG_Admin {
 		$contents = array();
 		foreach ( $atts as $att ) {
 			$path_parts           = pathinfo( $att->guid );
-			$titles[ $att->ID ]   = $att->post_title;
+			$titles[ $att->ID ]   = !empty($att->post_title) ? $att->post_title : $path_parts['filename'];
 			$types[ $att->ID ]    = $path_parts['extension'];
 			$contents[ $att->ID ] = $att->post_content;
 		}
@@ -1075,23 +1077,57 @@ class DG_Admin {
 						$type        = $types[ $v['thumb_id'] ];
 						$description = $contents[ $v['thumb_id'] ];
 						$date        = DocumentGallery::localDateTimeFromTimestamp( $v['timestamp'] );
-
-						echo '<tr data-entry="' . $v['thumb_id'] . '"><td scope="row" class="check-column"><input type="checkbox" class="cb-ids" name="' . DG_OPTION_NAME . '[ids][]" value="' .
-						     $v['thumb_id'] . '"></td><td class="column-icon media-icon"><img src="' .
-						     $icon . '" />' . '</td><td class="title column-title">' .
-						     ( $title ? '<strong><a href="' . home_url( '/?attachment_id=' . $v['thumb_id'] ) . '" target="_blank" title="' . sprintf( __( "View '%s' attachment page", 'document-gallery' ), $title ) . '"><span class="editable-title">' . $title . '</span> <sup>' . $type . '</sup></a></strong>' : __( 'Attachment not found', 'document-gallery' ) ) .
-						     '<span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span></span></td><td class="column-description"><div class="editable-description">' . $description . '</div><span class="dashicons dashicons-edit"></span><span class="edit-controls"><span class="dashicons dashicons-yes"></span> <span class="dashicons dashicons-no"></span><span class="dashicons dashicons-update"></span></span>' .
-						     '</td><td class="column-thumbupload">' .
-						     '<span class="manual-download">' .
-						     '<span class="dashicons dashicons-upload"></span>' .
-						     '<span class="html5dndmarker">Drop file here<span> or </span></span>' .
-						     '<span class="buttons-area">' .
-						     '<input id="upload-button' . $v['thumb_id'] . '" type="file" />' .
-						     '<input id="trigger-button' . $v['thumb_id'] . '" type="button" value="Select File" class="button" />' .
-						     '</span>' .
-						     '</span>' .
-						     '<div class="progress animate invis"><span><span></span></span></div>' .
-						     '</td><td class="date column-date">' . $date . '</td></tr>' . PHP_EOL;
+						?>
+						<tr data-entry="<?php echo $v['thumb_id']; ?>">
+							<td scope="row" class="check-column">
+								<input
+									type="checkbox"
+									class="cb-ids"
+									name="<?php echo DG_OPTION_NAME; ?>[ids][]"
+									value="<?php echo $v['thumb_id']; ?>">
+							</td>
+							<td class="column-icon media-icon"><img src="<?php echo $icon; ?>" /></td>
+							<td class="title column-title">
+								<strong>
+									<a
+										href="<?php echo home_url( '/?attachment_id=' . $v['thumb_id'] ); ?>"
+										target="_blank"
+										title="<?php sprintf( __( "View '%s' attachment page", 'document-gallery' ), $title ); ?>">
+										<span class="editable-title"><?php echo $title; ?></span>
+										<sup><?php echo $type; ?></sup>
+									</a>
+								</strong>
+								<span class="dashicons dashicons-edit"></span>
+								<span class="edit-controls">
+									<span class="dashicons dashicons-yes"></span>
+									<span class="dashicons dashicons-no"></span>
+								</span>
+							</td>
+							<td class="column-description">
+								<div class="editable-description"><?php echo $description; ?></div>
+								<span class="dashicons dashicons-edit"></span>
+								<span class="edit-controls">
+									<span class="dashicons dashicons-yes"></span>
+									<span class="dashicons dashicons-no"></span>
+									<span class="dashicons dashicons-update"></span>
+								</span>
+							</td>
+							<td class="column-thumbupload">
+								<span class="manual-download">
+									<span class="dashicons dashicons-upload"></span>
+									<span class="html5dndmarker">Drop file here<span> or </span></span>
+									<span class="buttons-area">
+										<input id="upload-button<?php echo $v['thumb_id']; ?>" type="file" />
+										<input id="trigger-button<?php echo $v['thumb_id']; ?>" type="button" value="Select File" class="button" />
+									</span>
+								</span>
+								<div class="progress animate invis">
+									<span><span></span></span>
+								</div>
+							</td>
+							<td class="date column-date"><?php echo $date; ?></td>
+						</tr>
+						<?php
 					} ?>
 					</tbody>
 				</table>
@@ -1242,10 +1278,10 @@ class DG_Admin {
 							$log_entry[2] = preg_replace( '/[ ^](attachment #)(\d+)[., ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $log_entry[2] );
 
 							// bold the place where log entry was submitted
-							$log_entry[2] = preg_replace( '/^(\((?:\w+::)?\w+\)) /', '<strong>\1</strong> ', $log_entry[2] );
+							$log_entry[2] = preg_replace( '/^(\((?:\w+(?:::|->))?\w+\)) /', '<strong>\1</strong> ', $log_entry[2] );
 
 							// italicize any function references within log entry
-							$log_entry[2] = preg_replace( '/(\(?\w+::\w+\)?)/m', '<i>\1</i>', $log_entry[2] );
+							$log_entry[2] = preg_replace( '/(\(?\w+(?:::|->)\w+\)?)/m', '<i>\1</i>', $log_entry[2] );
 
 							echo '<tr><td class="date column-date" data-sort-value="' . $log_entry[0] . '"><span class="logLabel date">' . $date . '</span></td>' .
 							     '<td class="column-level">' . $levels[ $log_entry[1] ] . '</td>' .
