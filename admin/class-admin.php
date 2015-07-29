@@ -1275,7 +1275,7 @@ class DG_Admin {
 							$date      = DocumentGallery::localDateTimeFromTimestamp( $log_entry[0] );
 
 							// convert attachment names to links
-							$log_entry[2] = preg_replace( '/[ ^](attachment #)(\d+)[., ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $log_entry[2] );
+							$log_entry[2] = preg_replace( '/[ ^](attachment #)(\d+)[.,: ]/i', ' <a href="' . home_url() . '/?attachment_id=\2" target="_blank">\1<strong>\2</strong></a> ', $log_entry[2] );
 
 							// bold the place where log entry was submitted
 							$log_entry[2] = preg_replace( '/^(\((?:\w+(?:::|->))?\w+\)) /', '<strong>\1</strong> ', $log_entry[2] );
