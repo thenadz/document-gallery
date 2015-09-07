@@ -114,10 +114,10 @@ class DG_Logger {
 		foreach ( $blogs as $blog ) {
 			$blog_num       = ! is_null( $blog ) ? $blog : get_current_blog_id();
 			$options        = self::getOptions( $blog );
-			$purge_interval = $options['purge_interval'] * DAY_IN_SECONDS;
+			$purge_time     = $time - $options['purge_interval'] * DAY_IN_SECONDS;
 
 			// purging is disabled for this blog
-			if ( $purge_interval <= 0 ) {
+			if ( $purge_time >= $time ) {
 				continue;
 			}
 
@@ -132,7 +132,7 @@ class DG_Logger {
 
 					// find the first non-expired entry
 					while ( ( $fields = fgetcsv( $fp ) ) !== false ) {
-						if ( ! is_null( $fields ) && $time > ( $fields[0] + $purge_interval ) ) {
+						if ( ! is_null( $fields ) && intval( $fields[0] ) >= $purge_time ) {
 							// we've reached the recent entries -- nothing beyond here will be removed
 							break;
 						}
