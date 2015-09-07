@@ -84,6 +84,7 @@ class DG_Admin {
 			global $dg_options;
 
 			$donate  = '<strong><a href="' . $dg_options['meta']['donate_link'] . '">' .
+			           '<span class="dashicons dashicons-heart"></span> ' .
 			           __( 'Donate', 'document-gallery' ) . '</a></strong>';
 			$links[] = $donate;
 		}
