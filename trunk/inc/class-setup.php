@@ -100,8 +100,11 @@ class DG_Setup {
 	public static function maybeUpdate() {
 		global $dg_options;
 
-		// do update
-		if ( ! is_null( $dg_options ) && ( isset( $dg_options['version'] ) || DG_VERSION !== $dg_options['meta']['version'] ) ) {
+		// version has historically been in two locations -- must check both to continue supporting upgrading from those old versions
+		$old_version = array_key_exists( 'version', $dg_options ) ? $dg_options['version'] : $dg_options['meta']['version'];
+		if ( ! is_null( $dg_options ) && DG_VERSION !== $old_version ) {
+			DG_Logger::writeLog(DG_LogLevel::Detail, "Upgrading Document Gallery from version $old_version to " . DG_VERSION);
+
 			$blogs = array( null );
 
 			if ( is_multisite() ) {
