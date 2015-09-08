@@ -15,9 +15,14 @@ class DG_Admin {
 	/**
 	 * NOTE: This should only ever be accessed through getTabs().
 	 *
-	 * @var multitype:string Associative array containing all tab names, keyed by tab slug.
+	 * @var array Associative array containing all tab names, keyed by tab slug.
 	 */
 	private static $tabs;
+
+	/**
+	 * @var array The URL parameters. Currently only used in the thumbnail mgmt tab.
+	 */
+	private static $URL_params;
 
 	/**
 	 * Returns reference to tabs array, initializing if needed.
@@ -798,9 +803,7 @@ class DG_Admin {
 		$ret = $dg_options;
 
 		// handle setting the Ghostscript path
-		if ( isset( $values['gs'] ) &&
-		     0 != strcmp( $values['gs'], $ret['thumber']['gs'] )
-		) {
+		if ( isset( $values['gs'] ) && 0 != strcmp( $values['gs'], $ret['thumber']['gs'] ) ) {
 			if ( false === strpos( $values['gs'], ';' ) ) {
 				$ret['thumber']['gs'] = $values['gs'];
 			} else {
@@ -924,94 +927,57 @@ class DG_Admin {
 	 */
 	public static function renderThumbnailSection() {
 		include_once DG_PATH . 'inc/class-thumber.php';
+		static $limit_options = array( 10, 25, 75 );
 		$options = DG_Thumber::getOptions();
 
-		$URL_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'Thumbnail' );
-		$att_ids    = array();
+		// find subset of thumbs to be included
+		self::$URL_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'Thumbnail' );
+		$orderby = self::$URL_params['orderby'] = array_key_exists( 'orderby', $_REQUEST ) ? strtolower( $_REQUEST['orderby'] ) : '';
+		$order = self::$URL_params['order'] = array_key_exists( 'order', $_REQUEST ) ? strtolower( $_REQUEST['order'] ) : 'asc';
+		$limit = self::$URL_params['limit'] = array_key_exists( 'limit', $_REQUEST ) ? absint( $_REQUEST['limit'] ) : $limit_options[0];
 
-		if ( isset( $_REQUEST['orderby'] ) && in_array( strtolower( $_REQUEST['orderby'] ), array( 'title', 'date' ) ) ) {
-			$orderby               = strtolower( $_REQUEST['orderby'] );
-			$URL_params['orderby'] = $orderby;
-
-			switch ( $orderby ) {
-				case 'date':
-					foreach ( $options['thumbs'] as $key => $node ) {
-						$keyArray[ $key ]                      = $node['timestamp'];
-						$options['thumbs'][ $key ]['thumb_id'] = $att_ids[] = $key;
-					}
-					break;
-
-				case 'title':
-					foreach ( $options['thumbs'] as $key => $node ) {
-						$keyArray[ $key ]                      = basename( $node['thumb_path'] );
-						$options['thumbs'][ $key ]['thumb_id'] = $att_ids[] = $key;
-					}
-					break;
-			}
-
-			$order = strtolower( $_REQUEST['order'] );
-			if ( ! isset( $_REQUEST['order'] ) || ! in_array( $order, array( 'asc', 'desc' ) ) ) {
-				$order = 'asc';
-			}
-			$URL_params['order'] = $order;
-
-			if ( $order == 'asc' ) {
-				array_multisort( $keyArray, SORT_ASC, $options['thumbs'] );
-			} else {
-				array_multisort( $keyArray, SORT_DESC, $options['thumbs'] );
-			}
-		} else {
-			$orderby = '';
-			foreach ( $options['thumbs'] as $key => $node ) {
-				$options['thumbs'][ $key ]['thumb_id'] = $att_ids[] = $key;
-			}
-		}
-
-		static $limit_options = array( 10, 25, 75 );
-		if ( ! isset( $_REQUEST['limit'] ) || ! in_array( intval( $_REQUEST['limit'] ), $limit_options ) ) {
-			$limit = $limit_options[0];
-		} else {
-			$limit = intval( $_REQUEST['limit'] );
-		}
-
-		$URL_params['limit'] = $limit;
-		$select_limit        = '';
-		foreach ( $limit_options as $l_o ) {
-			$select_limit .= '<option value="' . $l_o . '"' . selected( $limit, $l_o, false ) . '>' . $l_o . '</option>' . PHP_EOL;
-		}
+		$thumbs        = $options['thumbs'];
+		uasort($thumbs, array(__CLASS__, 'cmpThumb'));
 		$thumbs_number = count( $options['thumbs'] );
 		$lastsheet     = ceil( $thumbs_number / $limit );
-		$sheet         = isset( $_REQUEST['sheet'] ) ? intval( $_REQUEST['sheet'] ) : 1;
-		if ( $sheet <= 0 || $sheet > $lastsheet ) {
+		$sheet         = array_key_exists( 'sheet', $_REQUEST ) ? absint( $_REQUEST['sheet'] ) : 1;
+		if ( $sheet === 0 || $sheet > $lastsheet ) {
 			$sheet = 1;
 		}
 
 		$offset = ( $sheet - 1 ) * $limit;
-
-		$att_ids = array_slice( $att_ids, $offset, $limit );
+		$thumbs = array_slice( $thumbs, $offset, $limit, true );
 
 		// https://core.trac.wordpress.org/ticket/12212
-		$atts = array();
-		if ( ! empty( $att_ids ) ) {
-			$atts = get_posts(
+		$posts = array();
+		if ( ! empty( $thumbs ) ) {
+			$posts = get_posts(
 				array(
 					'post_type'   => 'any',
 					'post_status' => 'any',
 					'numberposts' => - 1,
-					'post__in'    => $att_ids,
+					'post__in'    => array_keys($thumbs),
 					'orderby'     => 'post__in'
 				) );
 		}
 
-		$titles   = array();
-		$contents = array();
-		foreach ( $atts as $att ) {
-			$path_parts           = pathinfo( $att->guid );
-			$titles[ $att->ID ]   = !empty($att->post_title) ? $att->post_title : $path_parts['filename'];
-			$types[ $att->ID ]    = $path_parts['extension'];
-			$contents[ $att->ID ] = $att->post_content;
+		foreach ( $posts as $post ) {
+			$path_parts         = pathinfo( $post->guid );
+
+			$t                  = &$thumbs[$post->ID];
+			$t['title']         = !empty($post->post_title) ? $post->post_title : $path_parts['filename'];
+			$t['ext']           = array_key_exists('extension', $path_parts) ? $path_parts['extension'] : '';
+			$t['description']   = $post->post_content;
+			$t['icon']          = array_key_exists('thumb_url', $t)
+										? $t['thumb_url']
+										: DG_Thumber::getDefaultThumbnail( $post->ID );
 		}
-		unset( $atts );
+		unset( $posts );
+
+		$select_limit        = '';
+		foreach ( $limit_options as $l_o ) {
+			$select_limit .= '<option value="' . $l_o . '"' . selected( $limit, $l_o, false ) . '>' . $l_o . '</option>' . PHP_EOL;
+		}
 
 		$thead = '<tr>' .
 		         '<th scope="col" class="manage-column column-cb check-column">' .
@@ -1019,13 +985,13 @@ class DG_Admin {
 		         '<input id="cb-select-all-%1$d" type="checkbox">' .
 		         '</th>' .
 		         '<th scope="col" class="manage-column column-icon">' . __( 'Thumbnail', 'document-gallery' ) . '</th>' .
-		         '<th scope="col" class="manage-column column-title ' . ( ( $orderby != 'title' ) ? 'sortable desc' : 'sorted ' . $order ) . '"><a href="?' . http_build_query( array_merge( $URL_params, array(
+		         '<th scope="col" class="manage-column column-title ' . ( ( $orderby != 'title' ) ? 'sortable desc' : 'sorted ' . $order ) . '"><a href="?' . http_build_query( array_merge( self::$URL_params, array(
 				'orderby' => 'title',
 				'order'   => ( ( $orderby != 'title' ) ? 'asc' : ( ( $order == 'asc' ) ? 'desc' : 'asc' ) )
 			) ) ) . '"><span>' . __( 'File name', 'document-gallery' ) . '</span><span class="sorting-indicator"></span></th>' .
 		         '<th scope="col" class="manage-column column-description">' . __( 'Description', 'document-gallery' ) . '</th>' .
 		         '<th scope="col" class="manage-column column-thumbupload"></th>' .
-		         '<th scope="col" class="manage-column column-date ' . ( ( $orderby != 'date' ) ? 'sortable asc' : 'sorted ' . $order ) . '"><a href="?' . http_build_query( array_merge( $URL_params, array(
+		         '<th scope="col" class="manage-column column-date ' . ( ( $orderby != 'date' ) ? 'sortable asc' : 'sorted ' . $order ) . '"><a href="?' . http_build_query( array_merge( self::$URL_params, array(
 				'orderby' => 'date',
 				'order'   => ( ( $orderby != 'date' ) ? 'desc' : ( ( $order == 'asc' ) ? 'desc' : 'asc' ) )
 			) ) ) . '"><span>' . __( 'Date', 'document-gallery' ) . '</span><span class="sorting-indicator"></span></th>' .
@@ -1036,12 +1002,12 @@ class DG_Admin {
 		              $thumbs_number . ' ' . _n( 'item', 'items', $thumbs_number ) .
 		              '</span>' . ( $lastsheet > 1 ?
 				'<span class="pagination-links">' .
-				'<a class="first-page' . ( $sheet == 1 ? ' disabled' : '' ) . '" title="' . __( 'Go to the first page', 'document-gallery' ) . '"' . ( $sheet == 1 ? '' : ' href="?' . http_build_query( $URL_params ) . '"' ) . '>«</a>' .
-				'<a class="prev-page' . ( $sheet == 1 ? ' disabled' : '' ) . '" title="' . __( 'Go to the previous page', 'document-gallery' ) . '"' . ( $sheet == 1 ? '' : ' href="?' . http_build_query( array_merge( $URL_params, array( 'sheet' => $sheet - 1 ) ) ) . '"' ) . '>‹</a>' .
+				'<a class="first-page' . ( $sheet == 1 ? ' disabled' : '' ) . '" title="' . __( 'Go to the first page', 'document-gallery' ) . '"' . ( $sheet == 1 ? '' : ' href="?' . http_build_query( self::$URL_params ) . '"' ) . '>«</a>' .
+				'<a class="prev-page' . ( $sheet == 1 ? ' disabled' : '' ) . '" title="' . __( 'Go to the previous page', 'document-gallery' ) . '"' . ( $sheet == 1 ? '' : ' href="?' . http_build_query( array_merge( self::$URL_params, array( 'sheet' => $sheet - 1 ) ) ) . '"' ) . '>‹</a>' .
 				'<span class="paging-input">' .
 				'<input class="current-page" title="' . __( 'Current page', 'document-gallery' ) . '" type="text" name="paged" value="' . $sheet . '" size="' . strlen( $sheet ) . '" maxlength="' . strlen( $sheet ) . '"> ' . __( 'of', 'document-gallery' ) . ' <span class="total-pages">' . $lastsheet . '</span></span>' .
-				'<a class="next-page' . ( $sheet == $lastsheet ? ' disabled' : '' ) . '" title="' . __( 'Go to the next page', 'document-gallery' ) . '"' . ( $sheet == $lastsheet ? '' : ' href="?' . http_build_query( array_merge( $URL_params, array( 'sheet' => $sheet + 1 ) ) ) . '"' ) . '>›</a>' .
-				'<a class="last-page' . ( $sheet == $lastsheet ? ' disabled' : '' ) . '" title="' . __( 'Go to the last page', 'document-gallery' ) . '"' . ( $sheet == $lastsheet ? '' : ' href="?' . http_build_query( array_merge( $URL_params, array( 'sheet' => $lastsheet ) ) ) . '"' ) . '>»</a>' .
+				'<a class="next-page' . ( $sheet == $lastsheet ? ' disabled' : '' ) . '" title="' . __( 'Go to the next page', 'document-gallery' ) . '"' . ( $sheet == $lastsheet ? '' : ' href="?' . http_build_query( array_merge( self::$URL_params, array( 'sheet' => $sheet + 1 ) ) ) . '"' ) . '>›</a>' .
+				'<a class="last-page' . ( $sheet == $lastsheet ? ' disabled' : '' ) . '" title="' . __( 'Go to the last page', 'document-gallery' ) . '"' . ( $sheet == $lastsheet ? '' : ' href="?' . http_build_query( array_merge( self::$URL_params, array( 'sheet' => $lastsheet ) ) ) . '"' ) . '>»</a>' .
 				'</span>' : ' <b>|</b> ' ) .
 		              '<span class="displaying-num"><select dir="rtl" class="limit_per_page">' . $select_limit . '</select> ' . __( 'items per page', 'document-gallery' ) . '</span>' .
 		              '</div>' .
@@ -1049,7 +1015,7 @@ class DG_Admin {
 		?>
 
 		<script type="text/javascript">
-			var URL_params = <?php echo wp_json_encode( $URL_params ); ?>;
+			var URL_params = <?php echo wp_json_encode( self::$URL_params ); ?>;
 		</script>
 		<div class="thumbs-list-wrapper">
 			<div>
@@ -1063,39 +1029,30 @@ class DG_Admin {
 					<?php printf( $thead, 2 ); ?>
 					</tfoot>
 					<tbody><?php
-					$i = 0;
-					foreach ( $options['thumbs'] as $v ) {
-						if ( $i < $offset ) {
-							$i ++;
-							continue;
-						}
-						if ( ++ $i > $offset + $limit ) {
-							break;
-						}
-
-						$icon        = isset( $v['thumb_url'] ) ? $v['thumb_url'] : DG_Thumber::getDefaultThumbnail( $v['thumb_id'] );
-						$title       = isset( $titles[ $v['thumb_id'] ] ) ? $titles[ $v['thumb_id'] ] : '';
-						$type        = $types[ $v['thumb_id'] ];
-						$description = $contents[ $v['thumb_id'] ];
-						$date        = DocumentGallery::localDateTimeFromTimestamp( $v['timestamp'] );
+					foreach ( $thumbs as $tid => $thumb ) {
+						$icon        = $thumb['icon'];
+						$title       = $thumb['title'];
+						$ext         = $thumb['ext'];
+						$description = $thumb['description'];
+						$date        = DocumentGallery::localDateTimeFromTimestamp( $thumb['timestamp'] );
 						?>
-						<tr data-entry="<?php echo $v['thumb_id']; ?>">
+						<tr data-entry="<?php echo $tid; ?>">
 							<td scope="row" class="check-column">
 								<input
 									type="checkbox"
 									class="cb-ids"
 									name="<?php echo DG_OPTION_NAME; ?>[ids][]"
-									value="<?php echo $v['thumb_id']; ?>">
+									value="<?php echo $tid; ?>">
 							</td>
 							<td class="column-icon media-icon"><img src="<?php echo $icon; ?>" /></td>
 							<td class="title column-title">
 								<strong>
 									<a
-										href="<?php echo home_url( '/?attachment_id=' . $v['thumb_id'] ); ?>"
+										href="<?php echo home_url( '/?attachment_id=' . $tid ); ?>"
 										target="_blank"
 										title="<?php sprintf( __( "View '%s' attachment page", 'document-gallery' ), $title ); ?>">
 										<span class="editable-title"><?php echo $title; ?></span>
-										<sup><?php echo $type; ?></sup>
+										<sup><?php echo $ext; ?></sup>
 									</a>
 								</strong>
 								<span class="dashicons dashicons-edit"></span>
@@ -1118,8 +1075,8 @@ class DG_Admin {
 									<span class="dashicons dashicons-upload"></span>
 									<span class="html5dndmarker">Drop file here<span> or </span></span>
 									<span class="buttons-area">
-										<input id="upload-button<?php echo $v['thumb_id']; ?>" type="file" />
-										<input id="trigger-button<?php echo $v['thumb_id']; ?>" type="button" value="Select File" class="button" />
+										<input id="upload-button<?php echo $tid; ?>" type="file" />
+										<input id="trigger-button<?php echo $tid; ?>" type="button" value="Select File" class="button" />
 									</span>
 								</span>
 								<div class="progress animate invis">
@@ -1379,6 +1336,27 @@ class DG_Admin {
 		}
 
 		print '</select> ' . $args['description'];
+	}
+
+	/**
+	 * @param $t1 array Thumbnail array #1.
+	 * @param $t2 array Thumbnail array #2
+	 *
+	 * @return int The result of comparing the two thumbnail arrays using arguments in $URL_params.
+	 */
+	public static function cmpThumb($t1, $t2) {
+		$ret = 0;
+		switch (self::$URL_params['orderby']) {
+			case 'date':
+				$ret = $t1['timestamp'] - $t2['timestamp'];
+				break;
+
+			case 'title':
+				$ret = strcmp( basename( $t1['thumb_path'] ), basename( $t2['thumb_path'] ) );
+				break;
+		}
+
+		return 'asc' === self::$URL_params['order'] ? $ret : -$ret;
 	}
 
 	/**
