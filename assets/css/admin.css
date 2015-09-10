@@ -89,6 +89,10 @@ td.title.column-title, .column-thumbupload {
     text-align: left !important;
 }
 
+td.column-icon.media-icon {
+    height: 70px;
+}
+
 td.media-icon img {
     width: auto;
     height: auto;
