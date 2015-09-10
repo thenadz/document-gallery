@@ -937,7 +937,7 @@ class DG_Admin {
 		$limit = self::$URL_params['limit'] = array_key_exists( 'limit', $_REQUEST ) ? absint( $_REQUEST['limit'] ) : $limit_options[0];
 
 		$thumbs        = $options['thumbs'];
-		uasort($thumbs, array(__CLASS__, 'cmpThumb'));
+		uasort( $thumbs, array( __CLASS__, 'cmpThumb' ) );
 		$thumbs_number = count( $options['thumbs'] );
 		$lastsheet     = ceil( $thumbs_number / $limit );
 		$sheet         = array_key_exists( 'sheet', $_REQUEST ) ? absint( $_REQUEST['sheet'] ) : 1;
@@ -956,7 +956,7 @@ class DG_Admin {
 					'post_type'   => 'any',
 					'post_status' => 'any',
 					'numberposts' => - 1,
-					'post__in'    => array_keys($thumbs),
+					'post__in'    => array_keys( $thumbs ),
 					'orderby'     => 'post__in'
 				) );
 		}
@@ -965,10 +965,10 @@ class DG_Admin {
 			$path_parts         = pathinfo( $post->guid );
 
 			$t                  = &$thumbs[$post->ID];
-			$t['title']         = !empty($post->post_title) ? $post->post_title : $path_parts['filename'];
-			$t['ext']           = array_key_exists('extension', $path_parts) ? $path_parts['extension'] : '';
+			$t['title']         = !empty( $post->post_title ) ? $post->post_title : $path_parts['filename'];
+			$t['ext']           = array_key_exists( 'extension', $path_parts ) ? $path_parts['extension'] : '';
 			$t['description']   = $post->post_content;
-			$t['icon']          = array_key_exists('thumb_url', $t)
+			$t['icon']          = array_key_exists( 'thumb_url', $t )
 										? $t['thumb_url']
 										: DG_Thumber::getDefaultThumbnail( $post->ID );
 		}
