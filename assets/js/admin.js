@@ -307,7 +307,7 @@ jQuery(document).ready(function () {
             if (cell.find('.editable-description').css('display') == 'none') {
                 return;
             }
-            cell.find('.editable-description').hide().after('<textarea>' + cell.find('.editable-description').text() + '</textarea>');
+            cell.find('.editable-description').hide().after('<textarea>' + cell.find('.editable-description').html() + '</textarea>');
             cell.find('textarea').focus();
         } else {
             return;
@@ -358,7 +358,7 @@ jQuery(document).ready(function () {
         } else {
             return;
         }
-        if (newContent.val() == updateGoal.text()) {
+        if (newContent.val() == updateGoal.text() || ( cell.hasClass('column-description') && newContent.val() == updateGoal.html() )) {
             jQuery(this).next('.dashicons-no').click();
             return;
         }
@@ -371,7 +371,11 @@ jQuery(document).ready(function () {
                 if (xhr.responseText.indexOf("\n") == -1) {
                     eval('var response = ' + xhr.responseText + ';');
                     if (response.result) {
-                        updateGoal.text(newContent.val());
+                        if (cell.hasClass('column-description')) {
+                            updateGoal.html(newContent.val());
+                        } else {
+                            updateGoal.text(newContent.val());
+                        }
                         cell.find('.dashicons-no').click();
                         cell.addClass('responseSuccess').delay(2000).queue(function () {
                             jQuery(this).removeClass('responseSuccess').dequeue();
