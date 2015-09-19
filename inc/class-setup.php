@@ -72,8 +72,6 @@ class DG_Setup {
 			'meta'       => array(
 				// current DG version
 				'version'     => DG_VERSION,
-				// items per page at Thumbnail Management tab
-				'items_per_page' => 10,
 				// URL to donate to plugin development
 				'donate_link' => $donate_link
 			),
@@ -328,7 +326,6 @@ class DG_Setup {
 	private static function threePointFour( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.4', '<' ) ) {
 			unset( $options['validation'] );
-			$options['meta']['items_per_page'] = 10;
 
 			if ( ! DocumentGallery::isValidOptionsStructure( $options ) ) {
 				DG_Logger::writeLog(
