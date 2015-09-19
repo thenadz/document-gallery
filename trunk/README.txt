@@ -2,9 +2,9 @@
 Contributors: dan.rossiter, demur
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
-Requires at least: 3.6
-Tested up to: 4.2.2
-Stable tag: 3.3.1
+Requires at least: 4.1
+Tested up to: 4.3
+Stable tag: 3.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -437,6 +437,17 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.4 =
+* **Enhancement:** To address recent issues resulting from corrupt plugin options, we're making option validation no longer
+  optional. This was an advanced feature that most users were likely not aware of, but it allows us to provide more
+  robust option management moving forward. Any options that have been previously corrupted will be reset during upgrading
+  to this version of DG.
+* **Enhancement:** Various under-the-hood tweaks in preparation for supporting numerous additional file types
+  (eg: MS Office). [Stay tuned.](https://wordpress.org/support/topic/notice-google-drive-viewer-not-working)
+* **Bug Fix:** Log purging was not working correctly. Issue is resolved.
+* **Bug Fix:** There were some CSS changes in WP 3.3 which broke some styling in the DG settings dialogs. These have
+  been resolved.
 
 = 3.3.1 =
 * **Bug Fix:** A couple of the translation files (Finnish & Ukrainian) were named incorrectly, resulting in them
