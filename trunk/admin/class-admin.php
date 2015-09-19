@@ -1087,12 +1087,12 @@ class DG_Admin {
 	 * @return int The limit, which may or may not be a member of $limit_options.
 	 */
 	private static function getLimitParam($limit_options) {
-		$umeta_limit = get_user_meta( get_current_user_id(), 'dg_items_per_page', true );
-		$limit       = array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : ( $umeta_limit ? $umeta_limit : $limit_options[0] );
-		if ( $limit !== $umeta_limit ) {
-			update_user_meta( get_current_user_id(), 'dg_items_per_page', $limit );
+		$options = DocumentGallery::getOptions();
+		$limit   = array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $options['meta']['items_per_page'];
+		if ( $limit !== $options['meta']['items_per_page'] ) {
+			$options['meta']['items_per_page'] = $limit;
+			DocumentGallery::setOptions( $options );
 		}
-
 		return $limit;
 	}
 
