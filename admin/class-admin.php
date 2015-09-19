@@ -515,11 +515,11 @@ class DG_Admin {
 		//       per page load, re-returning the previous result on any
 		//       subsequent calls.
 		static $ret = null;
-		if ( is_null( $ret ) ) {
-			if ( empty( $values['tab'] ) || ! array_key_exists( $values['tab'], self::getTabs() ) ) {
-				reset( self::getTabs() );
-				$values['tab'] = key( self::getTabs() );
-			}
+		if ( is_null( $values ) ) {
+			$ret = $values;
+		}
+
+		if ( array_key_exists( 'tab', $values ) && array_key_exists( $values['tab'], self::getTabs() ) ) {
 			$funct = 'validate' . $values['tab'] . 'Settings';
 			unset( $values['tab'] );
 			$ret = DG_Admin::$funct( $values );
@@ -600,9 +600,9 @@ class DG_Admin {
 		if ( ! $thumbs_cleared ) {
 			foreach ( $dg_options['thumber']['active'] as $k => $v ) {
 				if ( ! $v && $ret['thumber']['active'][ $k ] ) {
-					foreach ( $dg_options['thumber']['thumbs'] as $k => $v ) {
+					foreach ( $dg_options['thumber']['thumbs'] as $k2 => $v2 ) {
 						if ( empty( $v['thumber'] ) ) {
-							unset( $ret['thumber']['thumbs'][ $k ] );
+							unset( $ret['thumber']['thumbs'][ $k2 ] );
 						}
 					}
 					break;
@@ -1087,13 +1087,7 @@ class DG_Admin {
 	 * @return int The limit, which may or may not be a member of $limit_options.
 	 */
 	private static function getLimitParam($limit_options) {
-		$options = DocumentGallery::getOptions();
-		$limit   = array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $options['meta']['items_per_page'];
-		if ( $limit !== $options['meta']['items_per_page'] ) {
-			$options['meta']['items_per_page'] = $limit;
-			DocumentGallery::setOptions( $options );
-		}
-		return $limit;
+		return array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $limit_options[0];
 	}
 
 	/**
