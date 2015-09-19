@@ -321,11 +321,14 @@ class DG_Setup {
 
 	/**
 	 * Removes the validation option. Validation is now non-optional.
+	 * Adds the meta items_per_page default value.
+	 *
 	 * @param array $options The options to be modified.
 	 */
 	private static function threePointFour( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.4', '<' ) ) {
 			unset( $options['validation'] );
+			$options['meta']['items_per_page'] = 10;
 
 			if ( ! DocumentGallery::isValidOptionsStructure( $options ) ) {
 				DG_Logger::writeLog(
