@@ -913,13 +913,15 @@ class DG_Admin {
 	public static function renderThumbnailSection() {
 		include_once DG_PATH . 'inc/class-thumber.php';
 		static $limit_options = array( 10, 25, 75 );
+		static $order_options = array( 'asc', 'desc' );
+		static $orderby_options = array( 'date', 'title' );
 		$options = DG_Thumber::getOptions();
 
 		// find subset of thumbs to be included
 		self::$URL_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'Thumbnail' );
-		$orderby = self::$URL_params['orderby'] = array_key_exists( 'orderby', $_REQUEST ) ? strtolower( $_REQUEST['orderby'] ) : '';
-		$order = self::$URL_params['order'] = array_key_exists( 'order', $_REQUEST ) ? strtolower( $_REQUEST['order'] ) : 'asc';
-		$limit = self::$URL_params['limit'] = array_key_exists( 'limit', $_REQUEST ) ? absint( $_REQUEST['limit'] ) : $limit_options[0];
+		$orderby = self::$URL_params['orderby'] = self::getOrderbyParam($orderby_options);
+		$order = self::$URL_params['order'] = self::getOrderParam($order_options);
+		$limit = self::$URL_params['limit'] = self::getLimitParam($limit_options);
 
 		$thumbs        = $options['thumbs'];
 		uasort( $thumbs, array( __CLASS__, 'cmpThumb' ) );
@@ -1078,6 +1080,35 @@ class DG_Admin {
 			</div>
 		</div>
 	<?php }
+
+	/**
+	 * @param $limit_options array The possible options for limit. If no limit was provided then this is used to find a default limit.
+	 *
+	 * @return int The limit, which may or may not be a member of $limit_options.
+	 */
+	private static function getLimitParam($limit_options) {
+		return array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $limit_options[0];
+	}
+
+	/**
+	 * @param $order_options array The possible options for order.
+	 *
+	 * @return string The order value.
+	 */
+	private static function getOrderParam($order_options) {
+		$ret = array_key_exists( 'order', $_REQUEST ) ? strtolower( $_REQUEST['order'] ) : '';
+		return in_array($ret, $order_options) ? $ret : $order_options[0];
+	}
+
+	/**
+	 * @param $orderby_options array The possible options for orderby.
+	 *
+	 * @return string The orderby value.
+	 */
+	private static function getOrderbyParam($orderby_options) {
+		$ret = array_key_exists( 'orderby', $_REQUEST ) ? strtolower( $_REQUEST['orderby'] ) : '';
+		return in_array($ret, $orderby_options) ? $ret : $orderby_options[0];
+	}
 
 	/**
 	 * Adds meta box to the attchements' edit pages.
