@@ -81,9 +81,7 @@ class DG_Setup {
 				'enabled'        => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				// max age of log entry (days)
 				'purge_interval' => 7
-			),
-			// whether to validate DG option structure on save
-			'validation' => false
+			)
 		);
 	}
 
@@ -99,11 +97,14 @@ class DG_Setup {
 	 */
 	public static function maybeUpdate() {
 		global $dg_options;
+		if ( is_null( $dg_options ) ) {
+			return;
+		}
 
 		// version has historically been in two locations -- must check both to continue supporting upgrading from those old versions
 		$old_version = array_key_exists( 'version', $dg_options ) ? $dg_options['version'] : $dg_options['meta']['version'];
 		if ( ! is_null( $dg_options ) && DG_VERSION !== $old_version ) {
-			DG_Logger::writeLog(DG_LogLevel::Detail, "Upgrading Document Gallery from version $old_version to " . DG_VERSION);
+			DG_Logger::writeLog( DG_LogLevel::Detail, "Upgrading Document Gallery from version $old_version to " . DG_VERSION );
 
 			$blogs = array( null );
 
@@ -136,6 +137,7 @@ class DG_Setup {
 		self::threePointOne( $options );
 		self::threePointTwo( $options );
 		self::threePointThree( $options );
+		self::threePointFour( $options );
 
 		// update plugin meta data
 		$options['meta']['version']     = DG_VERSION;
@@ -311,6 +313,25 @@ class DG_Setup {
 				} elseif ( is_bool( $block ) && isset( $options[$class] ) && ! is_bool( $options[$class] ) ) {
 					$options[$class] = DG_Util::toBool( $options[$class], $block );
 				}
+			}
+		}
+	}
+
+	/**
+	 * Removes the validation option. Validation is now non-optional.
+	 * @param array $options The options to be modified.
+	 */
+	private static function threePointFour( &$options ) {
+		if ( version_compare( $options['meta']['version'], '3.4', '<' ) ) {
+			unset( $options['validation'] );
+
+			if ( ! DocumentGallery::isValidOptionsStructure( $options ) ) {
+				DG_Logger::writeLog(
+					DG_LogLevel::Error,
+					"Found invalid options structure. Reverting to default options.",
+					false,
+					true );
+				$options = self::getDefaultOptions();
 			}
 		}
 	}
