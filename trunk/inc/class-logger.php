@@ -226,8 +226,9 @@ class DG_Logger {
 			}
 
 			if ( isset( $node['function'] ) ) {
+				// only include args for first item in stack trace
 				$args = '';
-				if ( isset( $node['args'] ) ) {
+				if ( 1 === $i && isset( $node['args'] ) ) {
 					$args = implode( ', ', array_map( array( __CLASS__, 'print_r' ), $node['args'] ) );
 				}
 
@@ -242,12 +243,12 @@ class DG_Logger {
 	/**
 	 * Wraps print_r passing true for the return argument.
 	 *
-	 * @param unknown $v Value to be printed.
+	 * @param mixed $v Value to be printed.
 	 *
 	 * @return string Printed value.
 	 */
 	private static function print_r( $v ) {
-		return print_r( $v, true );
+		return preg_replace( '/\s+/', ' ', print_r( $v, true ) );
 	}
 
 	/**
