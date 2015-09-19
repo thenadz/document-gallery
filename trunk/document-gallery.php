@@ -43,10 +43,8 @@ add_action( 'wpmu_new_blog', array( 'DG_Setup', 'activateNewBlog' ) );
 register_uninstall_hook( __FILE__, array( 'DG_Setup', 'uninstall' ) );
 DG_Setup::maybeUpdate();
 
-// validate options if desired
-if ( $dg_options['validation'] ) {
-	add_action( 'init', array( 'DocumentGallery', 'addValidation' ) );
-}
+// ensure we don't allow invalid option structure
+add_action( 'init', array( 'DocumentGallery', 'addValidation' ) );
 
 // I18n
 add_action( 'plugins_loaded', array( 'DocumentGallery', 'loadTextDomain' ) );

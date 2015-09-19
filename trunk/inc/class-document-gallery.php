@@ -123,19 +123,23 @@ class DocumentGallery {
 			$ret = $new;
 		} else {
 			$ret = $old;
-			DG_Logger::writeLog( DG_LogLevel::Error, 'Attempted to save invalid options.' . PHP_EOL . print_r( $new, true ), true, true );
+			DG_Logger::writeLog(
+				DG_LogLevel::Error,
+				'Attempted to save invalid options.' . PHP_EOL . preg_replace( '/\s+/', ' ', print_r( $new, true ) ),
+				true,
+				true );
 		}
 
 		return $ret;
 	}
 
 	/**
-	 * @param array|unknown $o The options structure to validate.
+	 * @param array|mixed $o The options structure to validate.
 	 * @param array $schema The schema to validate against (note that only keys matter -- non-array values are ignored).
 	 *
 	 * @return bool Whether the given options structure matches the schema.
 	 */
-	private static function isValidOptionsStructure( $o, $schema = null ) {
+	public static function isValidOptionsStructure( $o, $schema = null ) {
 		if ( is_null( $schema ) ) {
 			$schema = DG_Setup::getDefaultOptions( true );
 		}

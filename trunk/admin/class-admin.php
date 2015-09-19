@@ -470,18 +470,6 @@ class DG_Admin {
 			) );
 
 		add_settings_field(
-			'advanced_validation', __( 'Option Validation', 'document-gallery' ),
-			array( __CLASS__, 'renderCheckboxField' ),
-			DG_OPTION_NAME, 'advanced',
-			array(
-				'label_for'   => 'label_advanced_validation',
-				'name'        => 'validation',
-				'value'       => esc_attr( $dg_options['validation'] ),
-				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Whether option structure should be validated before save. This is not generally necessary.', 'document-gallery' )
-			) );
-
-		add_settings_field(
 			'advanced_thumb_timeout', __( 'Thumbnail Generation Timeout', 'document-gallery' ),
 			array( __CLASS__, 'renderTextField' ),
 			DG_OPTION_NAME, 'advanced',
@@ -822,9 +810,6 @@ class DG_Admin {
 					__( 'Invalid timeout given: ', 'document-gallery' ) . $values['timeout'] );
 			}
 		}
-
-		// validation checkbox
-		$ret['validation'] = isset( $values['validation'] );
 
 		// logging settings
 		$ret['logging']['enabled'] = isset( $values['logging_enabled'] );
