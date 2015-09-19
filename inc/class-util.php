@@ -47,7 +47,7 @@ class DG_Util {
 	/**
 	 * Converts provided value to bool.
 	 *
-	 * @param unknown $val To be converted.
+	 * @param mixed $val To be converted.
 	 * @param bool|NULL $default The value to return if unable to parse $val.
 	 *
 	 * @return bool|NULL Bool value if can be parsed, else NULL.

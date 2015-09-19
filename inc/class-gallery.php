@@ -206,10 +206,10 @@ class DG_Gallery {
 	/**
 	 *
 	 * @param string $key The key to reference the current value in the defaults array.
-	 * @param unknown $value The value to be sanitized.
+	 * @param mixed $value The value to be sanitized.
 	 * @param array $errs The array of errors, which will be appended with any errors found.
 	 *
-	 * @return unknown The sanitized value, falling back to the current default value when invalid value given.
+	 * @return mixed The sanitized value, falling back to the current default value when invalid value given.
 	 */
 	private static function sanitizeParameter( $key, $value, &$errs ) {
 		// all sanitize methods must be in the following form: sanitize<UpperCammelCaseKey>
