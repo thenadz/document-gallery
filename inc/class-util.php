@@ -36,6 +36,15 @@ class DG_Util {
 	}
 
 	/**
+	 * @param mixed $maybeint Data you wish to have converted to a positive integer.
+	 *
+	 * @return int A positive integer.
+	 */
+	public static function posint($maybeint) {
+		return max(absint($maybeint), 1);
+	}
+
+	/**
 	 * Converts provided value to bool.
 	 *
 	 * @param unknown $val To be converted.
