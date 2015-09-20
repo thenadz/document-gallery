@@ -771,14 +771,16 @@ class DG_Thumber {
 		if ( $ext = pathinfo( $filename, PATHINFO_EXTENSION ) ) {
 			$res = preg_grep( '/^(?:.*\|)?' . $ext . '(?:\|.*)?$/i', self::getAllExts() );
 			$res = reset( $res );
-			if ( $res !== false ) {
-				return $ext;
+			if ( $res === false ) {
+				$ext = false;
 			}
-		} elseif ( ( $info = getimagesize( $filename ) ) && ( $ext = image_type_to_extension( $info[2], false ) ) ) {
+		}
+
+		if ( ! $ext && ( $info = getimagesize( $filename ) ) && ( $ext = image_type_to_extension( $info[2], false ) ) ) {
 			return $ext;
 		}
 
-		return false;
+		return $ext;
 	}
 
 	/**
