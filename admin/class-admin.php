@@ -515,14 +515,20 @@ class DG_Admin {
 		//       per page load, re-returning the previous result on any
 		//       subsequent calls.
 		static $ret = null;
-		if ( is_null( $values ) ) {
-			$ret = $values;
-		}
+		if ( is_null( $ret ) ) {
+			if ( empty( $values['tab'] ) || ! array_key_exists( $values['tab'], self::getTabs() ) ) {
+				global $dg_options;
+				return $dg_options;
+			} else {
+				if ( array_key_exists( 'ajax', $values ) ) {
+					unset( $values['ajax'] );
+					define( 'DOING_AJAX', true );
+				}
 
-		if ( array_key_exists( 'tab', $values ) && array_key_exists( $values['tab'], self::getTabs() ) ) {
-			$funct = 'validate' . $values['tab'] . 'Settings';
-			unset( $values['tab'] );
-			$ret = DG_Admin::$funct( $values );
+				$funct = 'validate' . $values['tab'] . 'Settings';
+				unset( $values['tab'] );
+				$ret = DG_Admin::$funct( $values );
+			}
 		}
 
 		return $ret;
@@ -680,10 +686,10 @@ class DG_Admin {
 		// Thumbnail file manual refresh (one at a time)
 		// upload value is a marker
 		elseif ( isset( $values['upload'] ) && isset( $_FILES['file'] ) && isset( $ret['thumber']['thumbs'][ $ID ] ) ) {
-			$old_path          = $ret['thumber']['thumbs'][ $ID ]['thumb_path'];
+			$old_path          = DG_Util::hasThumb( $ID ) ? $ret['thumber']['thumbs'][ $ID ]['thumb_path'] : null;
 			$uploaded_filename = self::validateUploadedFile();
 			if ( $uploaded_filename && DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) {
-				if ( $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] !== $old_path ) {
+				if ( ! is_null( $old_path ) && $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] !== $old_path ) {
 					@unlink( $old_path );
 				}
 				$responseArr['result']           = true;
@@ -692,8 +698,10 @@ class DG_Admin {
 			}
 		}
 
-		if ( isset( $values['ajax'] ) ) {
-			wp_send_json( $responseArr );
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+			@header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+			echo wp_json_encode( $responseArr );
+			add_filter( 'wp_redirect', array( __CLASS__, '_exit' ), 1, 0 );
 		}
 
 		return $ret;
@@ -1169,19 +1177,21 @@ class DG_Admin {
 		} else {
 			$ID = - 1;
 		}
+
 		if ( isset( $_POST[ DG_OPTION_NAME ]['upload'] ) && isset( $_FILES['file'] ) && isset( $dg_options['thumber']['thumbs'][ $ID ] ) ) {
-			$old_path          = $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'];
+			$old_path          = DG_Util::hasThumb($ID) ? $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] : null;
 			$uploaded_filename = self::validateUploadedFile();
 			if ( $uploaded_filename && DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) {
-				if ( $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] !== $old_path ) {
+				if ( ! is_null($old_path) && $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] !== $old_path ) {
 					@unlink( $old_path );
 				}
 				$responseArr['result'] = true;
 				$responseArr['url']    = $dg_options['thumber']['thumbs'][ $ID ]['thumb_url'];
 			}
 		}
+
 		if ( isset( $_POST[ DG_OPTION_NAME ]['ajax'] ) ) {
-			wp_send_json($responseArr);
+			wp_send_json( $responseArr );
 		}
 	}
 
@@ -1373,6 +1383,13 @@ class DG_Admin {
 		}
 
 		return 'asc' === self::$URL_params['order'] ? $ret : -$ret;
+	}
+
+	/**
+	 * Wraps the PHP exit language construct.
+	 */
+	public static function _exit() {
+		exit;
 	}
 
 	/**
