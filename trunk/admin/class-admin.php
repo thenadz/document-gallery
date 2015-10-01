@@ -868,7 +868,7 @@ class DG_Admin {
 	public static function renderCssSection() {
 		global $dg_options; ?>
 		<p><?php printf(
-				__( 'Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.' ),
+				__( 'Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.', 'document-gallery' ),
 				DG_URL . 'assets/css/style.css' ); ?></p>
 		<table class="form-table">
 			<tbody>
