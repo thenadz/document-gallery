@@ -54,11 +54,17 @@ class DG_Document {
 	 */
 	public function __toString() {
 		include_once DG_PATH . 'inc/class-thumber.php';
+		$options = DG_Thumber::getOptions();
 
 		$thumb = $this->gallery->useFancyThumbs()
-			? DG_Thumber::getThumbnail( $this->ID )
+			? DG_Thumber::getThumbnail( $this->ID, 1, false )
 			: DG_Thumber::getDefaultThumbnail( $this->ID );
+		if ($thumb == null) {
+			$thumb = DG_Thumber::getDefaultThumbnail( $this->ID );
+		}
+
 		$target   = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
+		$data = !array_key_exists($this->ID, $options['thumbs']) ? (' data-dg-id="' . $this->ID . '"') : '';
 
 		$repl        = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path );
 		$find        = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%' );
@@ -72,7 +78,7 @@ class DG_Document {
 		}
 
 		$doc_icon =
-			'   <div class="document-icon">' . PHP_EOL .
+			'   <div class="document-icon"'. $data . '>' . PHP_EOL .
 			'      <a href="%link%" target="%target%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
 			'   </div>' . PHP_EOL .
 			$description;
