@@ -77,12 +77,17 @@ if ( is_admin() ) {
 	if ( DG_Admin::doRegisterSettings() ) {
 		add_action( 'admin_init', array( 'DG_Admin', 'registerSettings' ) );
 	}
+
+	add_action( 'wp_ajax_dg_generate_icons', array( 'DocumentGallery', 'ajaxGenerateIcons' ) );
+	add_action( 'wp_ajax_nopriv_dg_generate_icons', array( 'DocumentGallery', 'ajaxGenerateIcons' ) );
 } else {
 	// styling for gallery
 	if ( apply_filters( 'dg_use_default_gallery_style', true ) ) {
 		add_action( 'wp_enqueue_scripts', array( 'DocumentGallery', 'enqueueGalleryStyle' ) );
 	}
 	add_action( 'wp_print_scripts', array( 'DocumentGallery', 'printCustomStyle' ) );
+
+	add_action( 'wp_enqueue_scripts', array( 'DocumentGallery', 'enqueueGalleryScript' ) );
 }
 
 // adds 'dg' shortcode
