@@ -47,7 +47,15 @@
                 // find all of the relevant elements and set the img src
                 for (var id in response) {
                     if (response.hasOwnProperty(id)) {
-                        jQuery('.document-icon[data-dg-id="' + id + '"] img').attr('src', response[id]);
+                        var target = jQuery('.document-icon[data-dg-id="' + id + '"] img');
+                        if (target.attr('src') !== response[id]) {
+                            (function(id, target) {
+                                target.fadeOut('fast', function () {
+                                    jQuery(this).attr('src', response[id]);
+                                    jQuery(this).fadeIn('fast');
+                                })
+                            })(id, target);
+                        }
                     }
                 }
 
