@@ -1,8 +1,14 @@
 (function() {
+    // distinct list of all attachment IDs populated
     var ids = [];
+
+    // the HTML elements to be updates
     var pendingIcons;
+
+    // current index in pendingIcons
     var i = 0;
 
+    // find all document-icons without icons generated and start processing
     jQuery(document).ready(function() {
         pendingIcons = jQuery('.document-icon[data-dg-id]');
         retrieveNextIcons();
@@ -12,11 +18,17 @@
      * Sends AJAX request to server requesting some of the not-yet-generated icons (if any).
      */
     function retrieveNextIcons() {
-        var batchLimit = 1;
+        // max number of icons to retrieve per AJAX request
+        var batchLimit = 2;
+
+        // IDs already retrieved
         var idBatch = [];
 
         for (; i < pendingIcons.length; i++) {
             var id = jQuery(pendingIcons[i]).data('dg-id');
+
+            // if we have multiple galleries, we could have multiple elements
+            // needing the same icon amd no need to request multiple times
             if (-1 !== jQuery.inArray(id, ids)) {
                 continue;
             }
@@ -30,10 +42,11 @@
         }
 
         if (idBatch.length != 0) {
+            // request the next batch of icons
             jQuery.post(ajaxurl, { action: 'dg_generate_icons', ids: idBatch }, function(response) {
+                // find all of the relevant elements and set the img src
                 for (var id in response) {
                     if (response.hasOwnProperty(id)) {
-                        console.log('Adding src (' + response[id] + ') for ID = ' + id);
                         jQuery('.document-icon[data-dg-id="' + id + '"] img').attr('src', response[id]);
                     }
                 }
