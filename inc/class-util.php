@@ -96,4 +96,25 @@ class DG_Util {
 
 		return $default;
 	}
+
+	/**
+	 * Wrapper method which handles deciding whether to include minified assets. Minified files are not used
+	 * in WP_DEBUG mode to make troubleshooting easier.
+	 *
+	 * @param $handle string Unique identifier for the script/style.
+	 * @param $src string Relative path to asset from DG_URL.
+	 * @param array $deps Any assets depended on by asset to be enqueued.
+	 * @param bool $in_footer For scripts, dictates whether to put in footer.
+	 */
+	public static function enqueueAsset( $handle, $src, $deps = array(), $in_footer = true ) {
+		if ( !defined('WP_DEBUG') || !WP_DEBUG ) {
+			$src = preg_replace('/^(.*)\.(css|js)$/', '$1.min.$2', $src, 1);
+		}
+
+		if ( preg_match( '/.js/', $src ) ) {
+			wp_enqueue_script( $handle, DG_URL . $src, $deps, DG_VERSION, $in_footer );
+		} else {
+			wp_enqueue_style( $handle, DG_URL . $src, $deps, DG_VERSION );
+		}
+	}
 }
