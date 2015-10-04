@@ -65,11 +65,6 @@ class DG_Thumber {
 	 * @return string                      URL to the thumbnail.
 	 */
 	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = true ) {
-		static $start = null;
-		if ( is_null( $start ) ) {
-			$start = time();
-		}
-
 		$options = self::getOptions();
 
 		// if we haven't saved a thumb, generate one
@@ -77,11 +72,6 @@ class DG_Thumber {
 			// short-circuit generation if not required
 			if ( ! $generate_if_missing ) {
 				return null;
-			}
-
-			// prevent page timing out or user waiting too long for page
-			if ( ( time() - $start ) > $options['timeout'] ) {
-				return self::getDefaultThumbnail( $ID, $pg );
 			}
 
 			// do the processing
