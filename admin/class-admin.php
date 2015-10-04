@@ -470,20 +470,6 @@ class DG_Admin {
 			) );
 
 		add_settings_field(
-			'advanced_thumb_timeout', __( 'Thumbnail Generation Timeout', 'document-gallery' ),
-			array( __CLASS__, 'renderTextField' ),
-			DG_OPTION_NAME, 'advanced',
-			array(
-				'label_for'   => 'label_advanced_thumb_timeout',
-				'name'        => 'timeout',
-				'value'       => esc_attr( $dg_options['thumber']['timeout'] ),
-				'type'        => 'number" min="1" step="1',
-				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Max number of seconds to wait for thumbnail generation before defaulting to filetype icons.', 'document-gallery' ) .
-				                 ' <em>' . __( 'Note that generation will continue where timeout happened next time the gallery is loaded.', 'document-gallery' ) . '</em>'
-			) );
-
-		add_settings_field(
 			'advanced_gs', __( 'Ghostscript Absolute Path', 'document-gallery' ),
 			array( __CLASS__, 'renderTextField' ),
 			DG_OPTION_NAME, 'advanced',
@@ -805,17 +791,6 @@ class DG_Admin {
 			} else {
 				add_settings_error( DG_OPTION_NAME, 'thumber-gs',
 					__( 'Invalid Ghostscript path given: ', 'document-gallery' ) . $values['gs'] );
-			}
-		}
-
-		// handle setting timeout
-		if ( isset( $values['timeout'] ) ) {
-			$timeout = (int) $values['timeout'];
-			if ( $timeout > 0 ) {
-				$ret['thumber']['timeout'] = $timeout;
-			} else {
-				add_settings_error( DG_OPTION_NAME, 'thumber-timeout',
-					__( 'Invalid timeout given: ', 'document-gallery' ) . $values['timeout'] );
 			}
 		}
 
