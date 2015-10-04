@@ -35,9 +35,7 @@ class DG_Setup {
 				// max width to generate thumbnails
 				'width'   => 200,
 				// max height to generate thumbnails
-				'height'  => 200,
-				// time after which to quite trying to generate new thumbanils for gallery
-				'timeout' => 30
+				'height'  => 200
 			),
 			'gallery'    => array(
 				// default: link directly to file (true to link to attachment pg)
@@ -138,6 +136,7 @@ class DG_Setup {
 		self::threePointTwo( $options );
 		self::threePointThree( $options );
 		self::threePointFour( $options );
+		self::threePointFive( $options );
 
 		// update plugin meta data
 		$options['meta']['version']     = DG_VERSION;
@@ -335,6 +334,18 @@ class DG_Setup {
 					true );
 				$options = self::getDefaultOptions();
 			}
+		}
+	}
+
+	/**
+	 * There is no longer a concept of gallery load timeout. Missing thumbnails are asynchronously generated after
+	 * a gallery is first rendered via AJAX requests.
+	 *
+	 * @param array $options The options to be modified.
+	 */
+	private static function threePointFive( &$options ) {
+		if ( version_compare( $options['meta']['version'], '3.5', '<' ) ) {
+			unset( $options['thumber']['timeout'] );
 		}
 	}
 
