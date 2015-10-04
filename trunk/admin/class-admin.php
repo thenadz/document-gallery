@@ -114,7 +114,7 @@ class DG_Admin {
 	public static function enqueueScriptsAndStyles( $hook ) {
 		if ( in_array( $hook, array( DG_Admin::$hook, 'post.php', 'post-new.php' ), true ) ) {
 			// Settings Page
-			wp_enqueue_style( 'document-gallery-admin', DG_URL . 'assets/css/admin.min.css', null, DG_VERSION );
+			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/css/admin.css' );
 
 			// gracefully degrade for older WP versions
 			if ( version_compare( get_bloginfo( 'version' ), '3.8', '<' ) ) { ?>
@@ -127,14 +127,14 @@ class DG_Admin {
 				</style>
 			<?php }
 
-			wp_enqueue_script( 'document-gallery-admin', DG_URL . 'assets/js/admin.min.js', array( 'jquery' ), DG_VERSION, true );
+			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
 			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
 			if ( $hook !== self::$hook ) { //if $hook is 'post.php' or 'post-new.php'
 				wp_localize_script( 'document-gallery-admin', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
 				// Media Manager
 				global $dg_options;
-				wp_enqueue_script( 'document-gallery-media-manager', DG_URL . 'assets/js/media_manager.min.js', array( 'media-views' ), DG_VERSION, true );
+				DG_Util::enqueueAsset( 'document-gallery-media-manager', 'assets/js/media_manager.min.js', array( 'media-views' ) );
 				wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
 					'documentGalleryMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
 					'documentGalleryButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
