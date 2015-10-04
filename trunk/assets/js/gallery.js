@@ -43,25 +43,30 @@
 
         if (idBatch.length != 0) {
             // request the next batch of icons
-            jQuery.post(ajaxurl, { action: 'dg_generate_icons', ids: idBatch }, function(response) {
-                // find all of the relevant elements and set the img src
-                for (var id in response) {
-                    if (response.hasOwnProperty(id)) {
-                        var target = jQuery('.document-icon[data-dg-id="' + id + '"] img');
-                        if (target.attr('src') !== response[id]) {
-                            (function(id, target) {
-                                target.fadeOut('fast', function () {
-                                    jQuery(this).attr('src', response[id]);
-                                    jQuery(this).fadeIn('fast');
-                                })
-                            })(id, target);
-                        }
-                    }
-                }
-
-                // start next batch once this response is processed
-                retrieveNextIcons();
-            });
+            jQuery.post(ajaxurl, { action: 'dg_generate_icons', ids: idBatch }, processRetrievedThumbnails);
         }
+    }
+
+    /**
+     * Find all of the relevant elements and set the img src, then start next batch of thumbnail retrieval.
+     * @param response Associative array mapping attachment ID to thumbnail URL.
+     */
+    function processRetrievedThumbnails(response) {
+        for (var id in response) {
+            if (response.hasOwnProperty(id)) {
+                var target = jQuery('.document-icon[data-dg-id="' + id + '"] img');
+                if (target.attr('src') !== response[id]) {
+                    (function(id, target) {
+                        target.fadeOut('fast', function () {
+                            jQuery(this).attr('src', response[id]);
+                            jQuery(this).fadeIn('fast');
+                        })
+                    })(id, target);
+                }
+            }
+        }
+
+        // start next batch once this response is processed
+        retrieveNextIcons();
     }
 })();
