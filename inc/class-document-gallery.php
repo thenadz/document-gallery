@@ -33,14 +33,14 @@ class DocumentGallery {
 	 * Enqueue standard DG CSS.
 	 */
 	public static function enqueueGalleryStyle() {
-		wp_enqueue_style( 'document-gallery', DG_URL . 'assets/css/style.css', null, DG_VERSION );
+		wp_enqueue_style( 'document-gallery', DG_URL . 'assets/css/style.min.css', null, DG_VERSION );
 	}
 
 	/**
 	 * Enqueue script for Document Gallery frontend.
 	 */
 	public static function enqueueGalleryScript() {
-		wp_enqueue_script( 'document-gallery', DG_URL . 'assets/js/gallery.js', array( 'jquery' ), DG_VERSION );
+		wp_enqueue_script( 'document-gallery', DG_URL . 'assets/js/gallery.min.js', array( 'jquery' ), DG_VERSION );
 	}
 
 	/**
