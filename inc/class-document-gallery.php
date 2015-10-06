@@ -33,7 +33,14 @@ class DocumentGallery {
 	 * Enqueue standard DG CSS.
 	 */
 	public static function enqueueGalleryStyle() {
-		wp_enqueue_style( 'document-gallery', DG_URL . 'assets/css/style.css', null, DG_VERSION );
+		DG_Util::enqueueAsset( 'document-gallery', 'assets/css/style.css' );
+	}
+
+	/**
+	 * Enqueue script for Document Gallery frontend.
+	 */
+	public static function enqueueGalleryScript() {
+		DG_Util::enqueueAsset( 'document-gallery', 'assets/js/gallery.js', array( 'jquery' ) );
 	}
 
 	/**
@@ -45,6 +52,13 @@ class DocumentGallery {
 		if ( ! empty( $dg_options['css']['text'] ) ) {
 			echo '<style type="text/css">' . $dg_options['css']['text'] . '</style>' . PHP_EOL;
 		}
+
+		// need AJAX URL variable in frontend
+		?>
+		<script type="text/javascript">
+			var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
+		</script>
+		<?php
 	}
 
 	/*==========================================================================
@@ -61,6 +75,21 @@ class DocumentGallery {
 	/*==========================================================================
 		* HELPER FUNCTIONS
 	   *=========================================================================*/
+
+	/**
+	 * Accepts AJAX request containing list of IDs to be generated and returned.
+	 */
+	public static function ajaxGenerateIcons() {
+		$ret = array();
+
+		if ( array_key_exists( 'ids', $_REQUEST ) ) {
+			foreach ($_REQUEST['ids'] as $id) {
+				$ret[$id] = DG_Thumber::getThumbnail($id);
+			}
+		}
+
+		wp_send_json($ret);
+	}
 
 	/**
 	 * @param int $blog ID of the blog to be retrieved in multisite env.
@@ -105,7 +134,7 @@ class DocumentGallery {
 	 */
 	public static function addValidation() {
 		add_filter( 'pre_update_option_' . DG_OPTION_NAME, array(
-			'DocumentGallery',
+			__CLASS__,
 			'validateOptionsStructure'
 		), 10, 2 );
 	}

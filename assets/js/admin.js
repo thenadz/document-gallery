@@ -227,7 +227,7 @@ jQuery(document).ready(function () {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200 && xhr.responseText.indexOf("\n") == -1) {
                             jQuery(progressBarValue).parent().addClass('success');
-                            eval('var response = ' + xhr.responseText + ';');
+                            var response = jQuery.parseJSON(xhr.responseText);
                             if (response.result) {
                                 // check if generated thumbnail has the same url
                                 if (response.url === theImg.attr('src')) {
@@ -369,7 +369,7 @@ jQuery(document).ready(function () {
                 cell.addClass('trans');
                 cell.find('.edit-controls').removeClass('waiting');
                 if (xhr.responseText.indexOf("\n") == -1) {
-                    eval('var response = ' + xhr.responseText + ';');
+                    var response = jQuery.parseJSON(xhr.responseText);
                     if (response.result) {
                         if (cell.hasClass('column-description')) {
                             updateGoal.html(newContent.val());
