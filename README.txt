@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
 Tested up to: 4.3
-Stable tag: 3.4.2
+Stable tag: 3.5.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -437,6 +437,16 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.5.1 =
+* **Bug Fix:** There was a minor bug in `3.5` with the new gallery loading logic. It was a compatibility issue with
+  other plugins.
+
+= 3.5 =
+* **Enhancement:** No more waiting a **LONG** time for your new gallery to load. If you create a new gallery and view
+  it, rendering will complete immediately and the thumbnails will be generated after your gallery initially loads.
+  This should provide a significantly improved user experience!
+* **Enhancement:** All JS and CSS files are now served compressed, making your WordPress that much faster!
 
 = 3.4.2 =
 * **Bug Fix:** Resolves issues in handling manual thumbnail uploads that were introduced in `3.4`.
