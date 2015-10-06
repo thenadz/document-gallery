@@ -50,19 +50,33 @@ class DG_Document {
 	 * Returns HTML representing this Document.
 	 * @filter dg_icon_template Filters the DG icon HTML. Passes a single
 	 *    bool value indicating whether the gallery is using descriptions or not.
-	 * @return string
+	 * @return string The gallery HTML.
 	 */
 	public function __toString() {
 		include_once DG_PATH . 'inc/class-thumber.php';
+		$options = DG_Thumber::getOptions();
 
-		$thumb = $this->gallery->useFancyThumbs()
-			? DG_Thumber::getThumbnail( $this->ID )
-			: DG_Thumber::getDefaultThumbnail( $this->ID );
-		$target   = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
-
-		$repl        = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path );
-		$find        = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%' );
+		$thumb       = null;
+		$data        = '';
 		$description = '';
+		$target      = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
+
+		if ( $this->gallery->useFancyThumbs() ) {
+			if ( array_key_exists( $this->ID, $options['thumbs'] ) ) {
+				// icon has already been generated so include it in generated gallery
+				$thumb = DG_Thumber::getThumbnail( $this->ID, 1, false );
+			} else {
+				// include a data-* attribute for client side to asynchronously request icon after gallery load
+				$data = ' data-dg-id="' . $this->ID . '"';
+			}
+		}
+
+		if ( is_null($thumb) ) {
+			$thumb = DG_Thumber::getDefaultThumbnail( $this->ID );
+		}
+
+		$repl = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path );
+		$find = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%' );
 
 		// if descriptions then add filterable tag and value to replaced tag
 		if ( $this->gallery->useDescriptions() ) {
@@ -72,7 +86,7 @@ class DG_Document {
 		}
 
 		$doc_icon =
-			'   <div class="document-icon">' . PHP_EOL .
+			'   <div class="document-icon"'. $data . '>' . PHP_EOL .
 			'      <a href="%link%" target="%target%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
 			'   </div>' . PHP_EOL .
 			$description;

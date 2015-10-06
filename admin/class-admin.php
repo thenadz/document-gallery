@@ -114,7 +114,7 @@ class DG_Admin {
 	public static function enqueueScriptsAndStyles( $hook ) {
 		if ( in_array( $hook, array( DG_Admin::$hook, 'post.php', 'post-new.php' ), true ) ) {
 			// Settings Page
-			wp_enqueue_style( 'document-gallery-admin', DG_URL . 'assets/css/admin.css', null, DG_VERSION );
+			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/css/admin.css' );
 
 			// gracefully degrade for older WP versions
 			if ( version_compare( get_bloginfo( 'version' ), '3.8', '<' ) ) { ?>
@@ -127,14 +127,14 @@ class DG_Admin {
 				</style>
 			<?php }
 
-			wp_enqueue_script( 'document-gallery-admin', DG_URL . 'assets/js/admin.js', array( 'jquery' ), DG_VERSION, true );
+			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
 			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
 			if ( $hook !== self::$hook ) { //if $hook is 'post.php' or 'post-new.php'
 				wp_localize_script( 'document-gallery-admin', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
 				// Media Manager
 				global $dg_options;
-				wp_enqueue_script( 'document-gallery-media-manager', DG_URL . 'assets/js/media_manager.js', array( 'media-views' ), DG_VERSION, true );
+				DG_Util::enqueueAsset( 'document-gallery-media-manager', 'assets/js/media_manager.min.js', array( 'media-views' ) );
 				wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
 					'documentGalleryMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
 					'documentGalleryButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
@@ -470,20 +470,6 @@ class DG_Admin {
 			) );
 
 		add_settings_field(
-			'advanced_thumb_timeout', __( 'Thumbnail Generation Timeout', 'document-gallery' ),
-			array( __CLASS__, 'renderTextField' ),
-			DG_OPTION_NAME, 'advanced',
-			array(
-				'label_for'   => 'label_advanced_thumb_timeout',
-				'name'        => 'timeout',
-				'value'       => esc_attr( $dg_options['thumber']['timeout'] ),
-				'type'        => 'number" min="1" step="1',
-				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Max number of seconds to wait for thumbnail generation before defaulting to filetype icons.', 'document-gallery' ) .
-				                 ' <em>' . __( 'Note that generation will continue where timeout happened next time the gallery is loaded.', 'document-gallery' ) . '</em>'
-			) );
-
-		add_settings_field(
 			'advanced_gs', __( 'Ghostscript Absolute Path', 'document-gallery' ),
 			array( __CLASS__, 'renderTextField' ),
 			DG_OPTION_NAME, 'advanced',
@@ -808,17 +794,6 @@ class DG_Admin {
 			}
 		}
 
-		// handle setting timeout
-		if ( isset( $values['timeout'] ) ) {
-			$timeout = (int) $values['timeout'];
-			if ( $timeout > 0 ) {
-				$ret['thumber']['timeout'] = $timeout;
-			} else {
-				add_settings_error( DG_OPTION_NAME, 'thumber-timeout',
-					__( 'Invalid timeout given: ', 'document-gallery' ) . $values['timeout'] );
-			}
-		}
-
 		// logging settings
 		$ret['logging']['enabled'] = isset( $values['logging_enabled'] );
 		if ( isset( $values['logging_purge_interval'] ) ) {
@@ -868,7 +843,7 @@ class DG_Admin {
 	public static function renderCssSection() {
 		global $dg_options; ?>
 		<p><?php printf(
-				__( 'Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.' ),
+				__( 'Enter custom CSS styling for use with document galleries. To see which ids and classes you can style, take a look at <a href="%s" target="_blank">style.css</a>.', 'document-gallery' ),
 				DG_URL . 'assets/css/style.css' ); ?></p>
 		<table class="form-table">
 			<tbody>
