@@ -134,7 +134,7 @@ class DG_Admin {
 
 				// Media Manager
 				global $dg_options;
-				DG_Util::enqueueAsset( 'document-gallery-media-manager', 'assets/js/media_manager.min.js', array( 'media-views' ) );
+				DG_Util::enqueueAsset( 'document-gallery-media-manager', 'assets/js/media_manager.js', array( 'media-views' ) );
 				wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
 					'documentGalleryMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
 					'documentGalleryButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
