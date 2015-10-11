@@ -11,7 +11,7 @@
             var id = jQuery(this).data('dg-id');
 
             // if we have multiple galleries, we could have multiple elements
-            // needing the same icon amd no need to request multiple times
+            // needing the same icon and no need to request multiple times
             if (-1 === jQuery.inArray(id, ids)) {
                 ids.push(id);
             }
