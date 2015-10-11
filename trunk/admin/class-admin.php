@@ -904,7 +904,7 @@ class DG_Admin {
 		self::$URL_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'Thumbnail' );
 		$orderby = self::$URL_params['orderby'] = self::getOrderbyParam($orderby_options);
 		$order = self::$URL_params['order'] = self::getOrderParam($order_options);
-		$limit = self::$URL_params['limit'] = self::getLimitParam($limit_options);
+		$limit = self::$URL_params['limit'] = self::getLimitParam();
 
 		$thumbs        = $options['thumbs'];
 		uasort( $thumbs, array( __CLASS__, 'cmpThumb' ) );
@@ -1065,12 +1065,17 @@ class DG_Admin {
 	<?php }
 
 	/**
-	 * @param $limit_options array The possible options for limit. If no limit was provided then this is used to find a default limit.
-	 *
 	 * @return int The limit, which may or may not be a member of $limit_options.
 	 */
-	private static function getLimitParam($limit_options) {
-		return array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $limit_options[0];
+	private static function getLimitParam() {
+		global $dg_options;
+		$limit = array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $dg_options['meta']['items_per_page'];
+		if ( $limit !== $dg_options['meta']['items_per_page'] ) {
+			$dg_options['meta']['items_per_page'] = $limit;
+			DocumentGallery::setOptions( 'Whatever stuff goes here' );
+		}
+
+		return $limit;
 	}
 
 	/**

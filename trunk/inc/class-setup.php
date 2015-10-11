@@ -70,6 +70,8 @@ class DG_Setup {
 			'meta'       => array(
 				// current DG version
 				'version'     => DG_VERSION,
+				// items per page at Thumbnail Management tab
+				'items_per_page' => 10,
 				// URL to donate to plugin development
 				'donate_link' => $donate_link
 			),
@@ -137,6 +139,7 @@ class DG_Setup {
 		self::threePointThree( $options );
 		self::threePointFour( $options );
 		self::threePointFive( $options );
+		self::threePointSix( $options );
 
 		// update plugin meta data
 		$options['meta']['version']     = DG_VERSION;
@@ -318,7 +321,6 @@ class DG_Setup {
 
 	/**
 	 * Removes the validation option. Validation is now non-optional.
-	 * Adds the meta items_per_page default value.
 	 *
 	 * @param array $options The options to be modified.
 	 */
@@ -329,7 +331,7 @@ class DG_Setup {
 			if ( ! DocumentGallery::isValidOptionsStructure( $options ) ) {
 				DG_Logger::writeLog(
 					DG_LogLevel::Error,
-					"Found invalid options structure. Reverting to default options.",
+					'Found invalid options structure. Reverting to default options.',
 					false,
 					true );
 				$options = self::getDefaultOptions();
@@ -346,6 +348,17 @@ class DG_Setup {
 	private static function threePointFive( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.5', '<' ) ) {
 			unset( $options['thumber']['timeout'] );
+		}
+	}
+
+	/**
+	 * Adds the meta items_per_page default value.
+	 *
+	 * @param array $options The options to be modified.
+	 */
+	private static function threePointSix( &$options ) {
+		if ( version_compare( $options['meta']['version'], '3.6', '<' ) ) {
+			$options['meta']['items_per_page'] = 10;
 		}
 	}
 
