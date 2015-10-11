@@ -969,7 +969,7 @@ class DG_Admin {
 
 		$pagination = '<div class="alignleft bulkactions"><button class="button action deleteSelected">' . __( 'Delete Selected', 'document-gallery' ) . '</button></div><div class="tablenav-pages">' .
 		              '<span class="displaying-num">' .
-		              $thumbs_number . ' ' . _n( 'item', 'items', $thumbs_number ) .
+		              $thumbs_number . ' ' . _n( 'item', 'items', $thumbs_number, 'document-gallery' ) .
 		              '</span>' . ( $lastsheet > 1 ?
 				'<span class="pagination-links">' .
 				'<a class="first-page' . ( $sheet == 1 ? ' disabled' : '' ) . '" title="' . __( 'Go to the first page', 'document-gallery' ) . '"' . ( $sheet == 1 ? '' : ' href="?' . http_build_query( self::$URL_params ) . '"' ) . '>«</a>' .
