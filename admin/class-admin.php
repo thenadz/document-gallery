@@ -134,20 +134,39 @@ class DG_Admin {
 
 				// Media Manager
 				global $dg_options;
-				DG_Util::enqueueAsset( 'document-gallery-media-manager', 'assets/js/media_manager.js', array( 'media-views' ) );
-				wp_localize_script( 'document-gallery-media-manager', 'DGl10n', array(
-					'documentGalleryMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
-					'documentGalleryButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
-					'cancelDocumentGalleryTitle' => '&#8592; ' . __( 'Cancel Document Gallery', 'document-gallery' ),
-					'updateDocumentGallery'      => __( 'Update Document Gallery', 'document-gallery' ),
-					'insertDocumentGallery'      => __( 'Insert Document Gallery', 'document-gallery' ),
-					'addToDocumentGallery'       => __( 'Add to Document Gallery', 'document-gallery' ),
-					'addToDocumentGalleryTitle'  => __( 'Add to Document Gallery', 'document-gallery' ),
-					'editDocumentGalleryTitle'   => __( 'Edit Document Gallery', 'document-gallery' )
+				DG_Util::enqueueAsset( 'dg-media-manager', 'assets/js/media_manager.js', array( 'media-views' ) );
+				wp_localize_script( 'dg-media-manager', 'DGl10n', array(
+					'dgMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
+					'dgButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
+					'canceldgTitle' => '&#8592; ' . __( 'Cancel Document Gallery', 'document-gallery' ),
+					'updatedg'      => __( 'Update Document Gallery', 'document-gallery' ),
+					'insertdg'      => __( 'Insert Document Gallery', 'document-gallery' ),
+					'addTodg'       => __( 'Add to Document Gallery', 'document-gallery' ),
+					'addTodgTitle'  => __( 'Add to Document Gallery', 'document-gallery' ),
+					'editdgTitle'   => __( 'Edit Document Gallery', 'document-gallery' ),
 				) );
-				wp_localize_script( 'document-gallery-media-manager', 'documentGalleryDefaults', $dg_options['gallery'] );
+				wp_localize_script( 'dg-media-manager', 'dgDefaults', $dg_options['gallery'] );
+				wp_localize_script( 'dg-media-manager', 'dgThumbnails', self::gatherThumbnails() );
 			}
 		}
+	}
+
+	/**
+	 * TEMP dev "solution" (for testing only) while there is no proper way to process shortcode via ajax and
+	 *  check&get any thumb for selected attachments by ids (without generation thumbs) via ajax
+	 *
+	 * Gather Thumbnails.
+	 */
+	public static function gatherThumbnails() {
+		global $dg_options;
+		$ret = array();
+		foreach ( $dg_options['thumber']['thumbs'] as $k => $v ) {
+			$ret[ $k ] = empty( $v['thumb_url'] ) ? DG_Thumber::getDefaultThumbnail( $k ) : $v['thumb_url'];
+		}
+		$ret['height'] = $dg_options['thumber']['height'];
+		$ret['width']  = $dg_options['thumber']['width'];
+
+		return $ret;
 	}
 
 	/**
