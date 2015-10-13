@@ -1,8 +1,8 @@
 (function($) {
-    // distinct list of all attachment IDs populated
+    // distinct list of all document IDs to be fetched via AJAX requests
     var ids;
 
-    // current index in pendingIcons
+    // current index in ids array
     var i;
 
     // find all document-icons without icons generated and start processing
