@@ -77,27 +77,6 @@ class DocumentGallery {
 	   *=========================================================================*/
 
 	/**
-	 * Accepts AJAX request containing list of IDs to be generated and returned.
-	 * Returns associative array mapping ID to thumbnail URL for all icons that were generated,
-	 * skipping any that could not be processed.
-	 */
-	public static function ajaxGenerateIcons() {
-		$ret = array();
-
-		if ( array_key_exists( 'ids', $_REQUEST ) ) {
-			foreach ( $_REQUEST['ids'] as $id ) {
-				// only return URL if different from default -- default image is already displayed on the client side
-				$url = DG_Thumber::getThumbnail( $id );
-				if ( $url !== DG_Thumber::getDefaultThumbnail( $id ) ) {
-					$ret[$id] = $url;
-				}
-			}
-		}
-
-		wp_send_json($ret);
-	}
-
-	/**
 	 * @param int $blog ID of the blog to be retrieved in multisite env.
 	 *
 	 * @return array Options for the blog.
