@@ -499,18 +499,18 @@ td.column-title.trans, td.column-description.trans {
 }
 
 td .dashicons-edit, td .edit-controls {
-    position: absolute;
     display: none;
-    right: 12px;
+    position: absolute;
     top: 5px;
+    right: 12px;
 }
 
 td .dashicons-edit, .edit-controls .dashicons-yes, .edit-controls .dashicons-no, .edit-controls .dashicons-update {
     z-index: 100;
     font-size: x-large;
     cursor: pointer;
-    height: auto;
     width: auto;
+    height: auto;
 }
 
 td .dashicons-edit, .edit-controls .dashicons-update {
