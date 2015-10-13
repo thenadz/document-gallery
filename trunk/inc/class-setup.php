@@ -50,6 +50,8 @@ class DG_Setup {
 				'order'         => 'ASC',
 				// which property to order by
 				'orderby'       => 'menu_order',
+				// whether to paginate galleries with a "limit"
+				'paginate'      => true,
 				// AND or OR
 				'relation'      => 'AND',
 				// the status the post must be in when returned by DG
@@ -57,7 +59,7 @@ class DG_Setup {
 				// the type of post to be returned
 				'post_type'     => 'attachment',
 				// the max number of thumbnails to return
-				'limit'         => - 1,
+				'limit'         => -1,
 				// # of columns to be used in gallery
 				'columns'       => 4,
 				// whether to open documents in new window
@@ -353,11 +355,13 @@ class DG_Setup {
 
 	/**
 	 * Adds the meta items_per_page default value.
+	 * Paginate option was added.
 	 *
 	 * @param array $options The options to be modified.
 	 */
-	private static function threePointSix( &$options ) {
+	private static function  threePointSix( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.6', '<' ) ) {
+			$options['gallery']['paginate'] = true;
 			$options['meta']['items_per_page'] = 10;
 		}
 	}
