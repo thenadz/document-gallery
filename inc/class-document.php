@@ -67,7 +67,7 @@ class DG_Document {
 				$thumb = DG_Thumber::getThumbnail( $this->ID, 1, false );
 			} else {
 				// include a data-* attribute for client side to asynchronously request icon after gallery load
-				$data = ' data-dg-id="' . $this->ID . '"';
+				$data = ' data-id="' . $this->ID . '"';
 			}
 		}
 

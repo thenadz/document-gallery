@@ -11,10 +11,10 @@ DG_Gallery::init();
 class DG_Gallery {
 
 	/*==========================================================================
-		* PRIVATE FIELDS
-		*=========================================================================*/
+	* PRIVATE FIELDS
+	*=========================================================================*/
 
-	private $atts, $taxa;
+	private $atts, $given_atts, $taxa;
 	private $docs = array();
 	private $errs = array();
 
@@ -22,8 +22,8 @@ class DG_Gallery {
 	private static $no_docs, $comment, $unary_err, $binary_err;
 
 	/*==========================================================================
-		* PUBLIC FUNCTIONS
-		*=========================================================================*/
+	* PUBLIC FUNCTIONS
+	*=========================================================================*/
 
 	/**
 	 * @return bool Whether to link to attachment pg.
@@ -54,8 +54,8 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-		* GET AND SET OPTIONS
-		*=========================================================================*/
+	* GET AND SET OPTIONS
+	*=========================================================================*/
 
 	/**
 	 * @param int $blog The blog we're retrieving options for (null => current blog).
@@ -79,8 +79,8 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-		* INIT GALLERY
-		*=========================================================================*/
+	* INIT GALLERY
+	*=========================================================================*/
 
 	/**
 	 * Initializes static values for this class.
@@ -104,10 +104,12 @@ class DG_Gallery {
 	public function __construct( $atts ) {
 		include_once DG_PATH . 'inc/class-document.php';
 
+		// get_post will return null during AJAX requests
 		$post = get_post();
+		$post_id = !is_null( $post ) ? $post->ID : -1;
 
 		// empty string is passed when no arguments are given, but constructor expects an array
-		$atts = empty( $atts ) ? array() : $atts;
+		$atts = $this->given_atts = array_merge( array( 'id' => $post_id ), ( empty( $atts ) ? array() : $atts ) );
 
 		if ( ! empty( $atts['ids'] ) ) {
 			// 'ids' is explicitly ordered, unless you specify otherwise.
@@ -137,13 +139,13 @@ class DG_Gallery {
 		 * @deprecated localpost will be removed at some point.
 		 */
 		if ( ! empty( $atts['localpost'] ) ) {
-			$atts['id'] = - 1;
+			$atts['id'] = -1;
 			unset( $atts['localpost'] );
 		}
 
 		// merge options w/ default values not stored in options
 		$defaults = array_merge(
-			array( 'id' => $post->ID, 'include' => '', 'exclude' => '' ),
+			array( 'id' => $post_id, 'include' => '', 'exclude' => '', 'skip' => 0 ),
 			self::getOptions() );
 
 		// values used to construct tax query (may be empty)
@@ -268,7 +270,7 @@ class DG_Gallery {
 	 * @return int The sanitized columns value.
 	 */
 	public static function sanitizeColumns( $value, &$err ) {
-		return $value != - 1 ? absint( $value ) : null;
+		return $value != -1 ? absint( $value ) : null;
 	}
 
 	/**
@@ -328,7 +330,7 @@ class DG_Gallery {
 	 * @return int The sanitized id value.
 	 */
 	private static function sanitizeId( $value, &$err ) {
-		return $value != - 1 ? absint( $value ) : null;
+		return $value != -1 ? absint( $value ) : null;
 	}
 
 	/**
@@ -376,7 +378,7 @@ class DG_Gallery {
 	private static function sanitizeLimit( $value, &$err ) {
 		$ret = intval( $value );
 
-		if ( is_null( $ret ) || $ret < - 1 ) {
+		if ( is_null( $ret ) || $ret < -1 ) {
 			$err = sprintf( self::$unary_err, 'limit', '>= -1' );
 			$ret = null;
 		}
@@ -483,6 +485,24 @@ class DG_Gallery {
 	/**
 	 * Takes the provided value and returns a sanitized value.
 	 *
+	 * @param string $value The paginate value to be sanitized.
+	 * @param string &$err String to be initialized with error, if any.
+	 *
+	 * @return string The sanitized paginate value.
+	 */
+	private static function sanitizePaginate( $value, &$err ) {
+		$ret = DG_Util::toBool( $value );
+
+		if ( is_null( $ret ) ) {
+			$err = sprintf( self::$binary_err, 'paginate', 'true', 'false', $value );
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Takes the provided value and returns a sanitized value.
+	 *
 	 * @param string $value The post_status value to be sanitized.
 	 * @param string &$err String to be initialized with error, if any.
 	 *
@@ -575,6 +595,25 @@ class DG_Gallery {
 	/**
 	 * Takes the provided value and returns a sanitized value.
 	 *
+	 * @param string $value The skip value to be sanitized.
+	 * @param string &$err String to be initialized with error, if any.
+	 *
+	 * @return string The sanitized skip value.
+	 */
+	private static function sanitizeSkip( $value, &$err ) {
+		$ret = intval( $value );
+
+		if ( is_null( $ret ) || $ret < 0 ) {
+			$err = sprintf( self::$unary_err, 'skip', '>= 0' );
+			$ret = null;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Takes the provided value and returns a sanitized value.
+	 *
 	 * @param string $operator The operator value to be sanitized.
 	 *
 	 * @return string The sanitized operator value.
@@ -608,6 +647,7 @@ class DG_Gallery {
 	private function getDocuments() {
 		$query = array(
 			'numberposts'    => $this->atts['limit'],
+			'offset'         => $this->atts['skip'],
 			'orderby'        => $this->atts['orderby'],
 			'order'          => $this->atts['order'],
 			'post_status'    => $this->atts['post_status'],
@@ -805,9 +845,10 @@ class DG_Gallery {
 			return self::$no_docs;
 		}
 
+		$data     = wp_json_encode( $this->given_atts );
 		$selector = "document-gallery-$instance";
 		$template =
-			"<div id='$selector' class='%class%'>" . PHP_EOL .
+			"<div id='$selector' class='%class%' data-shortcode='$data'>" . PHP_EOL .
 			'%icons%' . PHP_EOL .
 			'</div>' . PHP_EOL;
 
@@ -853,6 +894,10 @@ class DG_Gallery {
 
 		// allow user to wrap gallery output
 		$gallery = apply_filters( 'dg_gallery_template', '%rows%', $this->useDescriptions() );
+
+		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
+			$gallery = "<div class='dg-paginate-wrapper'>$gallery<div><a href='#' class='paginate left'>Prev</a> | <a href='#' class='paginate right'>Next</a></div></div>";
+		}
 
 		return self::$comment . str_replace( '%rows%', $core, $gallery );
 	}
