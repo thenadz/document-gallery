@@ -1091,7 +1091,7 @@ class DG_Admin {
 		$limit = array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $dg_options['meta']['items_per_page'];
 		if ( $limit !== $dg_options['meta']['items_per_page'] ) {
 			$dg_options['meta']['items_per_page'] = $limit;
-			DocumentGallery::setOptions( 'Whatever stuff goes here' );
+			DocumentGallery::setOptions( $dg_options );
 		}
 
 		return $limit;
