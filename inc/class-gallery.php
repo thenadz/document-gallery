@@ -104,12 +104,12 @@ class DG_Gallery {
 	public function __construct( $atts ) {
 		include_once DG_PATH . 'inc/class-document.php';
 
+		// empty string is passed when no arguments are given, but constructor expects an array
+		$atts = empty( $atts ) ? array() : $atts;
+
 		// get_post will return null during AJAX requests
 		$post = get_post();
 		$post_id = !is_null( $post ) ? $post->ID : -1;
-
-		// empty string is passed when no arguments are given, but constructor expects an array
-		$atts = $this->given_atts = array_merge( array( 'id' => $post_id ), ( empty( $atts ) ? array() : $atts ) );
 
 		if ( ! empty( $atts['ids'] ) ) {
 			// 'ids' is explicitly ordered, unless you specify otherwise.
@@ -141,6 +141,17 @@ class DG_Gallery {
 		if ( ! empty( $atts['localpost'] ) ) {
 			$atts['id'] = -1;
 			unset( $atts['localpost'] );
+		}
+
+		// build the structure to be used in data-shortcode attribute with sanitized values
+		$this->given_atts = array_merge( array( 'id' => $post_id ), $atts );
+		foreach ( $this->given_atts as $k => &$v ) {
+			$v = self::sanitizeParameter( $k, $v );
+		}
+
+		// need to undo nulling of -1 ID for version sent out to JSON
+		if ( is_null( $this->given_atts['id'] ) ) {
+			$this->given_atts['id'] = -1;
 		}
 
 		// merge options w/ default values not stored in options
@@ -213,8 +224,8 @@ class DG_Gallery {
 	 *
 	 * @return mixed The sanitized value, falling back to the current default value when invalid value given.
 	 */
-	private static function sanitizeParameter( $key, $value, &$errs ) {
-		// all sanitize methods must be in the following form: sanitize<UpperCammelCaseKey>
+	private static function sanitizeParameter( $key, $value, &$errs = null ) {
+		// all sanitize methods must be in the following form: sanitize<UpperCamelCaseKey>
 		$funct    = $key;
 		$funct[0] = strtoupper( $funct[0] );
 		$funct    = 'sanitize' . preg_replace_callback( '/_([a-z])/', array( __CLASS__, 'secondCharToUpper' ), $funct );
@@ -237,7 +248,9 @@ class DG_Gallery {
 			$defaults = self::getOptions();
 			$ret      = $defaults[ $key ];
 
-			$errs[ $key ] = $err;
+			if ( ! is_null($errs) ) {
+				$errs[ $key ] = $err;
+			}
 		}
 
 		return $ret;
