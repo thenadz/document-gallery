@@ -659,13 +659,18 @@ class DG_Gallery {
 	 */
 	private function getDocuments() {
 		$query = array(
-			'numberposts'    => $this->atts['limit'],
-			'offset'         => $this->atts['skip'],
-			'orderby'        => $this->atts['orderby'],
-			'order'          => $this->atts['order'],
-			'post_status'    => $this->atts['post_status'],
-			'post_type'      => $this->atts['post_type'],
-			'post_mime_type' => $this->atts['mime_types']
+			'posts_per_page'    => $this->atts['limit'],
+			'offset'            => $this->atts['skip'],
+			'orderby'           => $this->atts['orderby'],
+			'order'             => $this->atts['order'],
+			'post_status'       => $this->atts['post_status'],
+			'post_type'         => $this->atts['post_type'],
+			'post_mime_type'    => $this->atts['mime_types'],
+			'post__in'          => array(),
+			'post__not_in'      => array(),
+			'meta_key'          => '',
+			'suppress_filters'  => true,
+			'meta_value'        =>''
 		);
 
 		$this->setTaxa( $query );
@@ -676,8 +681,8 @@ class DG_Gallery {
 
 		// NOTE: Derived from gallery shortcode
 		if ( ! empty( $this->atts['include'] ) ) {
-			$query['include'] = $this->atts['include'];
-			$attachments      = get_posts( $query );
+			$query['post__in'] = wp_parse_id_list( $this->atts['include'] );
+			$attachments       = (new WP_Query())->query( $query );
 		} else {
 			// id == 0    => all attachments w/o a parent
 			// id == null => all matched attachments
