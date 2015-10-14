@@ -156,7 +156,7 @@ class DG_Gallery {
 
 		// merge options w/ default values not stored in options
 		$defaults = array_merge(
-			array( 'id' => $post_id, 'include' => '', 'exclude' => '', 'skip' => 0 ),
+			array( 'id' => $post_id, 'include' => '', 'exclude' => '' ),
 			self::getOptions() );
 
 		// values used to construct tax query (may be empty)
