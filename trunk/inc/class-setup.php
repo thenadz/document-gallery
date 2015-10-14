@@ -40,30 +40,32 @@ class DG_Setup {
 			'gallery'    => array(
 				// default: link directly to file (true to link to attachment pg)
 				'attachment_pg' => false,
+				// # of columns to be used in gallery
+				'columns'       => 4,
 				// include the attachment description in output
 				'descriptions'  => false,
 				// include thumbnail of actual document in gallery display
 				'fancy'         => true,
+				// the max number of thumbnails to return
+				'limit'         => -1,
 				// comma-delimited list of all mime types to be included
 				'mime_types'    => implode( ',', self::getDefaultMimeTypes() ),
+				// whether to open documents in new window
+				'new_window'    => false,
 				// ascending/descending order for included documents
 				'order'         => 'ASC',
 				// which property to order by
 				'orderby'       => 'menu_order',
 				// whether to paginate galleries with a "limit"
 				'paginate'      => true,
-				// AND or OR
-				'relation'      => 'AND',
 				// the status the post must be in when returned by DG
 				'post_status'   => 'any',
 				// the type of post to be returned
 				'post_type'     => 'attachment',
-				// the max number of thumbnails to return
-				'limit'         => -1,
-				// # of columns to be used in gallery
-				'columns'       => 4,
-				// whether to open documents in new window
-				'new_window'    => false
+				// AND or OR
+				'relation'      => 'AND',
+				// how many documents to skip
+				'skip'          => 0
 			),
 			'css'        => array(
 				// plain text of CSS to be edited by user
@@ -362,6 +364,7 @@ class DG_Setup {
 	private static function  threePointSix( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.6', '<' ) ) {
 			$options['gallery']['paginate'] = true;
+			$options['gallery']['skip'] = 0;
 			$options['meta']['items_per_page'] = 10;
 		}
 	}
