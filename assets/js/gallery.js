@@ -24,7 +24,7 @@
                 atts['skip'] += atts['limit'];
             }
 
-            retrieveGallery(atts, target)
+            retrieveGallery(atts, target);
             e.preventDefault();
         });
     });
