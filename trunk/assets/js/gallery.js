@@ -9,7 +9,8 @@
     $(document).ready(function() {
         resetPendingIcons();
 
-        $('.dg-paginate-wrapper .paginate').click(function (e) {
+        // listen for all pagination click in current DOM and any future elements
+        $('body').delegate('.dg-paginate-wrapper .paginate', 'click', function (e) {
             var target = $(this).closest('.dg-paginate-wrapper');
             var atts = target.children('div[data-shortcode]').data('shortcode');
 
