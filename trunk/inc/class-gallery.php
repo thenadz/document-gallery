@@ -706,10 +706,9 @@ class DG_Gallery {
 	 */
 	private function setTaxa( &$query ) {
 		if ( ! empty( $this->taxa ) ) {
+			static $pattern  = '/(.+)_(?:relation|operator)$/i';
 			$taxa     = array( 'relation' => $this->atts['relation'] );
 			$operator = array();
-			$suffix   = array( 'relation', 'operator' );
-			$pattern  = '/(.+)_(?:' . implode( '|', $suffix ) . ')$/i';
 
 			// find any relations for taxa
 			$iterable = $this->taxa;
