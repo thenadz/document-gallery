@@ -942,10 +942,12 @@ class DG_Gallery {
 				$right_tag = 'span';
 			}
 
+			$prev = __( 'Prev', 'document-gallery' );
+			$next = __( 'Next', 'document-gallery' );
 			$gallery =
 				'<div class="dg-paginate-wrapper">' .
 					$gallery .
-					"<span><$left_tag$left_href class='paginate left'>Prev</$left_tag> | <$right_tag$right_href class='paginate right'>Next</$right_tag></span>" .
+					"<span><$left_tag$left_href class='paginate left'>$prev</$left_tag> | <$right_tag$right_href class='paginate right'>$next</$right_tag></span>" .
 				'</div>';
 		}
 
