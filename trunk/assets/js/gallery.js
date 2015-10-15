@@ -5,9 +5,6 @@
     // current index in ids array
     var i;
 
-    // cached pagination pages
-    var prevPg, nextPg;
-
     // find all document-icons without icons generated and start processing
     $(document).ready(function() {
         resetPendingIcons();
@@ -16,7 +13,6 @@
         $('body').delegate('.dg-paginate-wrapper a.paginate', 'click', function (e) {
             var target = $(this).closest('.dg-paginate-wrapper');
             var atts = target.children('div[data-shortcode]').data('shortcode');
-            var newPg;
 
             if (!atts.hasOwnProperty('skip')) {
                 atts['skip'] = 0;
@@ -24,26 +20,11 @@
 
             if ($(this).hasClass('left')) {
                 atts['skip'] -= atts['limit'];
-
-                nextPg = target;
-                newPg = prevPg;
-                prevPg = null;
             } else {
                 atts['skip'] += atts['limit'];
-
-                prevPg = target;
-                newPg = nextPg;
-                nextPg = null;
             }
 
-            // perform pagination either by cached pg or new pg
-            if (newPg) {
-                target.replaceWith(newPg);
-                resetPendingIcons();
-            } else {
-                retrieveGallery(atts, target);
-            }
-
+            retrieveGallery(atts, target);
             e.preventDefault();
         });
     });
