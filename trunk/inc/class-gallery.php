@@ -661,14 +661,8 @@ class DG_Gallery {
 	 * @throws InvalidArgumentException Thrown when $this->errs is not empty.
 	 */
 	private function getDocuments() {
-		// request 1 more than limit to determine if we need to allow user to to to next pg
-		$limit = $this->atts['limit'];
-		if ( $limit > 0 ) {
-			$limit++;
-		}
-
 		$query = array(
-			'posts_per_page'    => $limit,
+			'posts_per_page'    => $this->atts['limit'],
 			'offset'            => $this->atts['skip'],
 			'orderby'           => $this->atts['orderby'],
 			'order'             => $this->atts['order'],
@@ -679,7 +673,7 @@ class DG_Gallery {
 			'post__not_in'      => array(),
 			'meta_key'          => '',
 			'suppress_filters'  => true,
-			'meta_value'        =>''
+			'meta_value'        => ''
 		);
 
 		$this->setTaxa( $query );
@@ -688,27 +682,21 @@ class DG_Gallery {
 			throw new InvalidArgumentException();
 		}
 
-		// NOTE: Derived from gallery shortcode
 		if ( ! empty( $this->atts['include'] ) ) {
 			$query['post__in'] = wp_parse_id_list( $this->atts['include'] );
-			$attachments       = (new WP_Query())->query( $query );
 		} else {
 			// id == 0    => all attachments w/o a parent
 			// id == null => all matched attachments
 			$query['post_parent'] = $this->atts['id'];
-			if ( ! empty( $exclude ) ) {
-				$query['exclude'] = $this->atts['exclude'];
+			if ( ! empty( $this->atts['exclude'] ) ) {
+				$query['post__not_in'] = wp_parse_id_list( $this->atts['exclude'] );
 			}
-
-			$attachments = get_children( $query );
 		}
 
-		// check whether we have a prev/next page available
+		$wpq            = new WP_Query();
+		$attachments    = $wpq->query( $query );
+		$this->has_next = $wpq->found_posts > ( $this->atts['skip'] + $this->atts['limit'] );
 		$this->has_prev = $this->atts['skip'] > 0;
-		if ( $limit > 0 && count( $attachments ) === $limit ) {
-			array_pop($attachments);
-			$this->has_next = true;
-		}
 
 		return $attachments;
 	}
