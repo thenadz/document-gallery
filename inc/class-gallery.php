@@ -669,11 +669,7 @@ class DG_Gallery {
 			'post_status'       => $this->atts['post_status'],
 			'post_type'         => $this->atts['post_type'],
 			'post_mime_type'    => $this->atts['mime_types'],
-			'post__in'          => array(),
-			'post__not_in'      => array(),
-			'meta_key'          => '',
-			'suppress_filters'  => true,
-			'meta_value'        => ''
+			'suppress_filters'  => true
 		);
 
 		$this->setTaxa( $query );
