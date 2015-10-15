@@ -18,6 +18,9 @@ class DG_Gallery {
 	private $docs = array();
 	private $errs = array();
 
+	private $has_prev = false;
+	private $has_next = false;
+
 	// templates for HTML output
 	private static $no_docs, $comment, $unary_err, $binary_err;
 
@@ -658,8 +661,14 @@ class DG_Gallery {
 	 * @throws InvalidArgumentException Thrown when $this->errs is not empty.
 	 */
 	private function getDocuments() {
+		// request 1 more than limit to determine if we need to allow user to to to next pg
+		$limit = $this->atts['limit'];
+		if ( $limit > 0 ) {
+			$limit++;
+		}
+
 		$query = array(
-			'posts_per_page'    => $this->atts['limit'],
+			'posts_per_page'    => $limit,
 			'offset'            => $this->atts['skip'],
 			'orderby'           => $this->atts['orderby'],
 			'order'             => $this->atts['order'],
@@ -692,6 +701,13 @@ class DG_Gallery {
 			}
 
 			$attachments = get_children( $query );
+		}
+
+		// check whether we have a prev/next page available
+		$this->has_prev = $this->atts['skip'] > 0;
+		if ( $limit > 0 && count( $attachments ) === $limit ) {
+			array_pop($attachments);
+			$this->has_next = true;
 		}
 
 		return $attachments;
@@ -914,7 +930,23 @@ class DG_Gallery {
 		$gallery = apply_filters( 'dg_gallery_template', '%rows%', $this->useDescriptions() );
 
 		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
-			$gallery = "<div class='dg-paginate-wrapper'>$gallery<div><a href='#' class='paginate left'>Prev</a> | <a href='#' class='paginate right'>Next</a></div></div>";
+			$left_href = $right_href = ' href="#"';
+			$left_tag = $right_tag = 'a';
+
+			if ( !$this->has_prev ) {
+				$left_href = '';
+				$left_tag = 'span';
+			}
+			if ( !$this->has_next ) {
+				$right_href = '';
+				$right_tag = 'span';
+			}
+
+			$gallery =
+				'<div class="dg-paginate-wrapper">' .
+					$gallery .
+					"<span><$left_tag$left_href class='paginate left'>Prev</$left_tag> | <$right_tag$right_href class='paginate right'>Next</$right_tag></span>" .
+				'</div>';
 		}
 
 		return self::$comment . str_replace( '%rows%', $core, $gallery );
