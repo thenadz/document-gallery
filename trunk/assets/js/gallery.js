@@ -55,6 +55,8 @@
      * @param target element The element to be updated with the AJAX HTML response.
      */
     function retrieveGallery(atts, target) {
+        // TODO: Cache already-retrieved gallery pages. Need to be careful not to keep too many at a time
+        // (could consume a lot of memory) & handle caching pages for multiple galleries on a single pages.
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
             target.replaceWith(html);
             resetPendingIcons();
