@@ -438,7 +438,7 @@ To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
-= 3.5.1 =
+= 3.5.2 =
 * **Bug Fix:** There was an issue with the Media Manager integration preventing using the Document Gallery creation
   within the "Add Media" dialog.
 
