@@ -366,6 +366,9 @@
                                 // Restore and reset the default state.
                                 controller.setState(controller.options.state);
                                 controller.reset();
+                                if (typeof tinyMCE != 'undefined') {
+                                    tinyMCE.activeEditor.fire('dgUpdate');
+                                }
                             }
                         }
                     }
@@ -455,22 +458,27 @@
         state: [],
 
         edit: function (text, update) {
-            var type = this.type,
-                frame = media[type].edit(text.replace(/\sorder=/ig, ' dgorder=').replace(/\torderby=/ig, ' dgorderby='));
+            // TODO: Refine boundary conditions for omitting passing a shortcode to the Media Manager
+            if (text.indexOf(' mime_types=') > -1 || text.indexOf(' id=') > -1) {
+                tinyMCE.activeEditor.windowManager.alert('This DG shortcode is an advanced one. Sorry there is no way to use standard edit dialog for it. You should switch to text mode to edit shortcode itself.');
+            } else {
+                var type = this.type,
+                    frame = media[type].edit(text.replace(/\sorder=/ig, ' dgorder=').replace(/\torderby=/ig, ' dgorderby='));
 
-            this.pausePlayers && this.pausePlayers();
+                this.pausePlayers && this.pausePlayers();
 
-            _.each(this.state, function (state) {
-                frame.state(state).on('update', function (selection) {
-                    update(media[type].shortcode(selection).string(), type === 'dg');
+                _.each(this.state, function (state) {
+                    frame.state(state).on('update', function (selection) {
+                        update(media[type].shortcode(selection).string(), type === 'dg');
+                    });
                 });
-            });
 
-            frame.on('close', function () {
-                frame.detach();
-            });
+                frame.on('close', function () {
+                    frame.detach();
+                });
 
-            frame.open();
+                frame.open();
+            }
         }
     };
 
@@ -481,38 +489,24 @@
         initialize: function () {
             var attachments = media.dg.attachments(this.shortcode, media.view.settings.post.id),
                 attrs = this.shortcode.attrs.named,
+                sc = this.text,
+                atts = {},
                 self = this;
 
-            attachments.more()
-                .done(function () {
-                    attachments = attachments.toJSON();
-
-                    _.each(attachments, function (attachment) {
-                        if (dgThumbnails.hasOwnProperty(attachment.id)) {
-                            attachment.thumbnail = {
-                                url: dgThumbnails[attachment.id],
-                                width: dgThumbnails.width,
-                                height: dgThumbnails.height
-                            };
-                        } else if (attachment.sizes) {
-                            if (attrs.size && attachment.sizes[attrs.size]) {
-                                attachment.thumbnail = attachment.sizes[attrs.size];
-                            } else if (attachment.sizes.thumbnail) {
-                                attachment.thumbnail = attachment.sizes.thumbnail;
-                            } else if (attachment.sizes.full) {
-                                attachment.thumbnail = attachment.sizes.full;
-                            }
-                        }
-                    });
-
-                    self.render(self.template({
-                        attachments: attachments,
-                        columns: attrs.columns ? parseInt(attrs.columns, 10) : media.dgDefaults.columns
-                    }));
-                })
-                .fail(function (jqXHR, textStatus) {
-                    self.setError(textStatus);
-                });
+            for (prop in attrs) {
+                if (sc.indexOf(' ' + prop + '=') > -1) {
+                    atts[prop] = attrs[prop];
+                }
+            }
+            if (sc.indexOf(' dgorderby=') > -1) {
+                atts['orderby'] = attrs['dgorderby'];
+            }
+            if (sc.indexOf(' dgorder=') > -1) {
+                atts['order'] = attrs['dgorder'];
+            }
+            self.render('<div data-shortcode="' +
+                encodeURIComponent(JSON.stringify(atts)) +
+                '"><div class="loading-placeholder"><div class="dashicons dashicons-admin-media"></div><div class="wpview-loading"><ins></ins></div></div></div>');
         }
     });
 
