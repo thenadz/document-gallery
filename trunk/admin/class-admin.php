@@ -146,27 +146,41 @@ class DG_Admin {
 					'editdgTitle'   => __( 'Edit Document Gallery', 'document-gallery' ),
 				) );
 				wp_localize_script( 'dg-media-manager', 'dgDefaults', $dg_options['gallery'] );
-				wp_localize_script( 'dg-media-manager', 'dgThumbnails', self::gatherThumbnails() );
+
+				// TinyMCE visual editor
+				add_filter( 'mce_external_plugins', array( __CLASS__, 'mce_external_plugins' ) );
+				add_filter( 'mce_css', array( __CLASS__, 'dg_plugin_mce_css' ) );
 			}
 		}
 	}
 
 	/**
-	 * TEMP dev "solution" (for testing only) while there is no proper way to process shortcode via ajax and
-	 *  check&get any thumb for selected attachments by ids (without generation thumbs) via ajax
+	 * Adds assets/js/gallery.js as registered TinyMCE plugin
 	 *
-	 * Gather Thumbnails.
+	 * @param array $plugin_array Previously registered plugins
+	 *
+	 * @return array Total set of plugins
 	 */
-	public static function gatherThumbnails() {
-		global $dg_options;
-		$ret = array();
-		foreach ( $dg_options['thumber']['thumbs'] as $k => $v ) {
-			$ret[ $k ] = empty( $v['thumb_url'] ) ? DG_Thumber::getDefaultThumbnail( $k ) : $v['thumb_url'];
-		}
-		$ret['height'] = $dg_options['thumber']['height'];
-		$ret['width']  = $dg_options['thumber']['width'];
+	public static function mce_external_plugins( $plugin_array ) {
+		$plugin_array['dg'] = DG_URL . 'assets/js/gallery.js';
 
-		return $ret;
+		return $plugin_array;
+	}
+
+	/**
+	 * Adds assets/css/style.css as registered TinyMCE CSS
+	 *
+	 * @param array $mce_css Previously registered CSS
+	 *
+	 * @return array Total set of CSS
+	 */
+	public static function dg_plugin_mce_css( $mce_css ) {
+		if ( ! empty( $mce_css ) ) {
+			$mce_css .= ',';
+		}
+		$mce_css .= str_replace( ',', '%2C', DG_URL . 'assets/css/style.css' );
+
+		return $mce_css;
 	}
 
 	/**
