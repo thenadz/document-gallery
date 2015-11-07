@@ -29,7 +29,7 @@
         });
         if (typeof tinymce != 'undefined') {
             tinymce.PluginManager.add('dg', function (editor, url) {
-                editor.on('LoadContent dgUpdate', function (e) {
+                editor.on('LoadContent dgUpdate undo', function (e) {
                     jQuery(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
                         retrieveGallery(jQuery.parseJSON(decodeURIComponent(jQuery(this).data('shortcode'))), jQuery(this));
                     });
