@@ -108,7 +108,7 @@ class DG_Util {
 	 */
 	public static function enqueueAsset( $handle, $src, $deps = array(), $in_footer = true ) {
 		$src = self::getAssetPath( $src );
-		if ( stripos( strrev($src), 'sj.' ) === 0 ) {
+		if ( stripos( strrev( $src ), 'sj.' ) === 0 ) {
 			wp_enqueue_script( $handle, $src, $deps, DG_VERSION, $in_footer );
 		} else {
 			wp_enqueue_style( $handle, $src, $deps, DG_VERSION );
