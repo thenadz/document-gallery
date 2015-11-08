@@ -107,14 +107,24 @@ class DG_Util {
 	 * @param bool $in_footer For scripts, dictates whether to put in footer.
 	 */
 	public static function enqueueAsset( $handle, $src, $deps = array(), $in_footer = true ) {
+		$src = self::getAssetPath( $src );
+		if ( preg_match( '/.js/', $src ) ) {
+			wp_enqueue_script( $handle, $src, $deps, DG_VERSION, $in_footer );
+		} else {
+			wp_enqueue_style( $handle, $src, $deps, DG_VERSION );
+		}
+	}
+	
+	/**
+	 * Converts path to min version when WP is not running in debug mode and fully-qualifies path.
+	 *
+	 * @param $src string Relative path to asset from DG_URL.
+	 * @return string The fully-qualified, potentially min version of the given path.
+	 */
+	public static function getAssetPath( $src ) {
 		if ( !defined('WP_DEBUG') || !WP_DEBUG ) {
 			$src = preg_replace('/^(.*)\.(css|js)$/', '$1.min.$2', $src, 1);
 		}
-
-		if ( preg_match( '/.js/', $src ) ) {
-			wp_enqueue_script( $handle, DG_URL . $src, $deps, DG_VERSION, $in_footer );
-		} else {
-			wp_enqueue_style( $handle, DG_URL . $src, $deps, DG_VERSION );
-		}
+		return DG_URL . $src;
 	}
 }

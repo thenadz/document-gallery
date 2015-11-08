@@ -151,7 +151,7 @@ class DG_Admin {
 	 * @return array Total set of plugins
 	 */
 	public static function mce_external_plugins( $plugin_array ) {
-		$plugin_array['dg'] = DG_URL . 'assets/js/gallery.js';
+		$plugin_array['dg'] = DG_Util::getAssetPath( 'assets/js/gallery.js' );
 
 		return $plugin_array;
 	}
