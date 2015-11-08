@@ -167,7 +167,7 @@ class DG_Admin {
 		if ( ! empty( $mce_css ) ) {
 			$mce_css .= ',';
 		}
-		$mce_css .= str_replace( ',', '%2C', DG_URL . 'assets/css/style.css' );
+		$mce_css .= str_replace( ',', '%2C', DG_Util::getAssetPath( 'assets/css/style.css' ) );
 
 		return $mce_css;
 	}
