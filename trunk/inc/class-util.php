@@ -123,7 +123,7 @@ class DG_Util {
 	 */
 	public static function getAssetPath( $src ) {
 		if ( !defined('WP_DEBUG') || !WP_DEBUG ) {
-			$src = preg_replace('/^(.*)\.(css|js)$/', '$1.min.$2', $src, 1);
+			$src = preg_replace( '/^(.*)\.(css|js)$/', '$1.min.$2', $src, 1 );
 		}
 		return DG_URL . $src;
 	}
