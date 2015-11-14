@@ -463,7 +463,7 @@
                 tinyMCE.activeEditor.windowManager.alert('This DG shortcode is an advanced one. Sorry there is no way to use standard edit dialog for it. You should switch to text mode to edit shortcode itself.');
             } else {
                 var type = this.type,
-                    frame = media[type].edit(text.replace(/\sorder=/ig, ' dgorder=').replace(/\torderby=/ig, ' dgorderby='));
+                    frame = media[type].edit(text.replace(/\sorder=/ig, ' dgorder=').replace(/\sorderby=/ig, ' dgorderby='));
 
                 this.pausePlayers && this.pausePlayers();
 
