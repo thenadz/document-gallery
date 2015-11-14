@@ -234,6 +234,46 @@
      * @augments Backbone.View
      */
     media.view.Settings.dg = media.view.Settings.extend({
+        update: function( key ) {
+            var value = this.model.get( key ),
+                $setting = this.$('[data-setting="' + key + '"]'),
+                $buttons, $value;
+
+            // Bail if we didn't find a matching setting.
+            if ( ! $setting.length ) {
+                return;
+            }
+
+            // Attempt to determine how the setting is rendered and update
+            // the selected value.
+
+            // Handle dropdowns.
+            if ( $setting.is('select') ) {
+                $value = $setting.find('[value="' + value + '"]');
+
+                if ( $value.length ) {
+                    $setting.find('option').prop( 'selected', false );
+                    $value.prop( 'selected', true );
+                } else {
+                    // If we can't find the desired value, record what *is* selected.
+                    this.model.set( key, $setting.find(':selected').val() );
+                }
+
+                // Handle button groups.
+            } else if ( $setting.hasClass('button-group') ) {
+                $buttons = $setting.find('button').removeClass('active');
+                $buttons.filter( '[value="' + value + '"]' ).addClass('active');
+
+                // Handle text inputs and textareas.
+            } else if ( $setting.is('input[type="text"], input[type="number"], textarea') ) {
+                if ( ! $setting.is(':focus') ) {
+                    $setting.val( value );
+                }
+                // Handle checkboxes.
+            } else if ( $setting.is('input[type="checkbox"]') ) {
+                $setting.prop( 'checked', !! value && 'false' !== value );
+            }
+        },
         className: 'collection-settings dg-settings',
         template: media.template('dg-settings')
     });
@@ -417,6 +457,7 @@
         attachment_pg: dgDefaults.attachment_pg,
         descriptions: dgDefaults.descriptions,
         new_window: dgDefaults.new_window,
+        paginate: dgDefaults.paginate,
         dgorder: dgDefaults.order,
         dgorderby: dgDefaults.orderby
     };
@@ -459,8 +500,8 @@
 
         edit: function (text, update) {
             // TODO: Refine boundary conditions for omitting passing a shortcode to the Media Manager
-            if (text.indexOf(' mime_types=') > -1 || text.indexOf(' id=') > -1) {
-                tinyMCE.activeEditor.windowManager.alert('This DG shortcode is an advanced one. Sorry there is no way to use standard edit dialog for it. You should switch to text mode to edit shortcode itself.');
+            if ( text.search( /\sids\s*=/gi ) == -1 || text.search( /\s(?!(ids|attachment_pg|columns|new_window|descriptions|fancy|orderby|order|paginate|limit)\s*=)[\w\-]+\s*=/gi ) > -1 ) {
+                tinyMCE.activeEditor.windowManager.alert( DGl10n.unfitSCalert );
             } else {
                 var type = this.type,
                     frame = media[type].edit(text.replace(/\sorder=/ig, ' dgorder=').replace(/\sorderby=/ig, ' dgorderby='));

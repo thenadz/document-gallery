@@ -133,6 +133,9 @@ class DG_Admin {
 					'addTodg'       => __( 'Add to Document Gallery', 'document-gallery' ),
 					'addTodgTitle'  => __( 'Add to Document Gallery', 'document-gallery' ),
 					'editdgTitle'   => __( 'Edit Document Gallery', 'document-gallery' ),
+					'unfitSCalert'  => __( 'This DG shortcode is an advanced one. '.
+					                       'Sorry there is no way to use standard edit dialog for it. '.
+					                       'You should switch to text mode to edit shortcode itself.', 'document-gallery' ),
 				) );
 				wp_localize_script( 'dg-media-manager', 'dgDefaults', $dg_options['gallery'] );
 
