@@ -27,11 +27,13 @@
             retrieveGallery(atts, target);
             e.preventDefault();
         });
-        if (typeof tinymce != 'undefined') {
+
+        // handle when we're in visual editor
+        if (typeof tinymce !== 'undefined') {
             tinymce.PluginManager.add('dg', function (editor, url) {
                 editor.on('LoadContent dgUpdate undo', function (e) {
-                    jQuery(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
-                        retrieveGallery(jQuery.parseJSON(decodeURIComponent(jQuery(this).data('shortcode'))), jQuery(this));
+                    $(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
+                        retrieveGallery($.parseJSON(decodeURIComponent($(this).data('shortcode'))), $(this));
                     });
                 });
             });
