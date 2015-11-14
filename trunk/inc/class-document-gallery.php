@@ -56,7 +56,7 @@ class DocumentGallery {
 		// need AJAX URL variable in frontend
 		?>
 		<script type="text/javascript">
-			var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
+			ajaxurl = typeof(ajaxurl) !== 'string' ? '<?php echo admin_url( 'admin-ajax.php' ); ?>' : ajaxurl;
 		</script>
 		<?php
 	}
@@ -186,16 +186,17 @@ class DocumentGallery {
 	 * @return string The local time in the WP date/time format.
 	 */
 	public static function localDateTimeFromTimestamp( $timestamp ) {
-		static $gmt_offet = null;
+		static $gmt_offset = null;
 		static $wp_date_format = null;
 		static $wp_time_format = null;
-		if ( is_null( $gmt_offet ) ) {
-			$gmt_offet      = get_option( 'gmt_offset' );
+		if ( is_null( $gmt_offset ) ) {
+			$gmt_offset     = get_option( 'gmt_offset' );
 			$wp_date_format = get_option( 'date_format' );
 			$wp_time_format = get_option( 'time_format' );
 		}
 
-		return '<span class="nowrap">' . date_i18n( $wp_date_format, $timestamp + $gmt_offet * 3600 ) . '</span> <span class="nowrap">' . date_i18n( $wp_time_format, $timestamp + $gmt_offet * 3600 ) . '</span>';
+		return '<span class="nowrap">' . date_i18n( $wp_date_format, $timestamp + $gmt_offset * 3600 ) . '</span> ' .
+		       '<span class="nowrap">' . date_i18n( $wp_time_format, $timestamp + $gmt_offset * 3600 ) . '</span>';
 	}
 
 	/**
