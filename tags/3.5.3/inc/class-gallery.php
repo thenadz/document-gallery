@@ -11,22 +11,19 @@ DG_Gallery::init();
 class DG_Gallery {
 
 	/*==========================================================================
-	* PRIVATE FIELDS
-	*=========================================================================*/
+		* PRIVATE FIELDS
+		*=========================================================================*/
 
-	private $atts, $given_atts, $taxa;
+	private $atts, $taxa;
 	private $docs = array();
 	private $errs = array();
-
-	private $has_prev = false;
-	private $has_next = false;
 
 	// templates for HTML output
 	private static $no_docs, $comment, $unary_err, $binary_err;
 
 	/*==========================================================================
-	* PUBLIC FUNCTIONS
-	*=========================================================================*/
+		* PUBLIC FUNCTIONS
+		*=========================================================================*/
 
 	/**
 	 * @return bool Whether to link to attachment pg.
@@ -57,8 +54,8 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-	* GET AND SET OPTIONS
-	*=========================================================================*/
+		* GET AND SET OPTIONS
+		*=========================================================================*/
 
 	/**
 	 * @param int $blog The blog we're retrieving options for (null => current blog).
@@ -82,8 +79,8 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-	* INIT GALLERY
-	*=========================================================================*/
+		* INIT GALLERY
+		*=========================================================================*/
 
 	/**
 	 * Initializes static values for this class.
@@ -107,12 +104,10 @@ class DG_Gallery {
 	public function __construct( $atts ) {
 		include_once DG_PATH . 'inc/class-document.php';
 
+		$post = get_post();
+
 		// empty string is passed when no arguments are given, but constructor expects an array
 		$atts = empty( $atts ) ? array() : $atts;
-
-		// get_post will return null during AJAX requests
-		$post = get_post();
-		$post_id = !is_null( $post ) ? $post->ID : -1;
 
 		if ( ! empty( $atts['ids'] ) ) {
 			// 'ids' is explicitly ordered, unless you specify otherwise.
@@ -146,24 +141,13 @@ class DG_Gallery {
 		 * @deprecated localpost will be removed at some point.
 		 */
 		if ( ! empty( $atts['localpost'] ) ) {
-			$atts['id'] = -1;
+			$atts['id'] = - 1;
 			unset( $atts['localpost'] );
-		}
-
-		// build the structure to be used in data-shortcode attribute with sanitized values
-		$this->given_atts = array_merge( array( 'id' => $post_id ), $atts );
-		foreach ( $this->given_atts as $k => &$v ) {
-			$v = self::sanitizeParameter( $k, $v );
-		}
-
-		// need to undo nulling of -1 ID for version sent out to JSON
-		if ( is_null( $this->given_atts['id'] ) ) {
-			$this->given_atts['id'] = -1;
 		}
 
 		// merge options w/ default values not stored in options
 		$defaults = array_merge(
-			array( 'id' => $post_id, 'include' => '', 'exclude' => '' ),
+			array( 'id' => $post->ID, 'include' => '', 'exclude' => '' ),
 			self::getOptions() );
 
 		// values used to construct tax query (may be empty)
@@ -231,8 +215,8 @@ class DG_Gallery {
 	 *
 	 * @return mixed The sanitized value, falling back to the current default value when invalid value given.
 	 */
-	private static function sanitizeParameter( $key, $value, &$errs = null ) {
-		// all sanitize methods must be in the following form: sanitize<UpperCamelCaseKey>
+	private static function sanitizeParameter( $key, $value, &$errs ) {
+		// all sanitize methods must be in the following form: sanitize<UpperCammelCaseKey>
 		$funct    = $key;
 		$funct[0] = strtoupper( $funct[0] );
 		$funct    = 'sanitize' . preg_replace_callback( '/_([a-z])/', array( __CLASS__, 'secondCharToUpper' ), $funct );
@@ -255,9 +239,7 @@ class DG_Gallery {
 			$defaults = self::getOptions();
 			$ret      = $defaults[ $key ];
 
-			if ( ! is_null($errs) ) {
-				$errs[ $key ] = $err;
-			}
+			$errs[ $key ] = $err;
 		}
 
 		return $ret;
@@ -290,7 +272,7 @@ class DG_Gallery {
 	 * @return int The sanitized columns value.
 	 */
 	public static function sanitizeColumns( $value, &$err ) {
-		return $value != -1 ? absint( $value ) : null;
+		return $value != - 1 ? absint( $value ) : null;
 	}
 
 	/**
@@ -350,7 +332,7 @@ class DG_Gallery {
 	 * @return int The sanitized id value.
 	 */
 	private static function sanitizeId( $value, &$err ) {
-		return $value != -1 ? absint( $value ) : null;
+		return $value != - 1 ? absint( $value ) : null;
 	}
 
 	/**
@@ -398,7 +380,7 @@ class DG_Gallery {
 	private static function sanitizeLimit( $value, &$err ) {
 		$ret = intval( $value );
 
-		if ( is_null( $ret ) || $ret < -1 ) {
+		if ( is_null( $ret ) || $ret < - 1 ) {
 			$err = sprintf( self::$unary_err, 'limit', '>= -1' );
 			$ret = null;
 		}
@@ -505,24 +487,6 @@ class DG_Gallery {
 	/**
 	 * Takes the provided value and returns a sanitized value.
 	 *
-	 * @param string $value The paginate value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized paginate value.
-	 */
-	private static function sanitizePaginate( $value, &$err ) {
-		$ret = DG_Util::toBool( $value );
-
-		if ( is_null( $ret ) ) {
-			$err = sprintf( self::$binary_err, 'paginate', 'true', 'false', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
 	 * @param string $value The post_status value to be sanitized.
 	 * @param string &$err String to be initialized with error, if any.
 	 *
@@ -615,25 +579,6 @@ class DG_Gallery {
 	/**
 	 * Takes the provided value and returns a sanitized value.
 	 *
-	 * @param string $value The skip value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized skip value.
-	 */
-	private static function sanitizeSkip( $value, &$err ) {
-		$ret = intval( $value );
-
-		if ( is_null( $ret ) || $ret < 0 ) {
-			$err = sprintf( self::$unary_err, 'skip', '>= 0' );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
 	 * @param string $operator The operator value to be sanitized.
 	 *
 	 * @return string The sanitized operator value.
@@ -666,14 +611,12 @@ class DG_Gallery {
 	 */
 	private function getDocuments() {
 		$query = array(
-			'posts_per_page'    => $this->atts['limit'],
-			'offset'            => $this->atts['skip'],
-			'orderby'           => $this->atts['orderby'],
-			'order'             => $this->atts['order'],
-			'post_status'       => $this->atts['post_status'],
-			'post_type'         => $this->atts['post_type'],
-			'post_mime_type'    => $this->atts['mime_types'],
-			'suppress_filters'  => true
+			'numberposts'    => $this->atts['limit'],
+			'orderby'        => $this->atts['orderby'],
+			'order'          => $this->atts['order'],
+			'post_status'    => $this->atts['post_status'],
+			'post_type'      => $this->atts['post_type'],
+			'post_mime_type' => $this->atts['mime_types']
 		);
 
 		$this->setTaxa( $query );
@@ -682,21 +625,20 @@ class DG_Gallery {
 			throw new InvalidArgumentException();
 		}
 
+		// NOTE: Derived from gallery shortcode
 		if ( ! empty( $this->atts['include'] ) ) {
-			$query['post__in'] = wp_parse_id_list( $this->atts['include'] );
+			$query['include'] = $this->atts['include'];
+			$attachments      = get_posts( $query );
 		} else {
 			// id == 0    => all attachments w/o a parent
 			// id == null => all matched attachments
 			$query['post_parent'] = $this->atts['id'];
-			if ( ! empty( $this->atts['exclude'] ) ) {
-				$query['post__not_in'] = wp_parse_id_list( $this->atts['exclude'] );
+			if ( ! empty( $exclude ) ) {
+				$query['exclude'] = $this->atts['exclude'];
 			}
-		}
 
-		$wpq            = new WP_Query();
-		$attachments    = $wpq->query( $query );
-		$this->has_next = $wpq->found_posts > ( $this->atts['skip'] + $this->atts['limit'] );
-		$this->has_prev = $this->atts['skip'] > 0;
+			$attachments = get_children( $query );
+		}
 
 		return $attachments;
 	}
@@ -710,9 +652,10 @@ class DG_Gallery {
 	 */
 	private function setTaxa( &$query ) {
 		if ( ! empty( $this->taxa ) ) {
-			static $pattern  = '/(.+)_(?:relation|operator)$/i';
 			$taxa     = array( 'relation' => $this->atts['relation'] );
 			$operator = array();
+			$suffix   = array( 'relation', 'operator' );
+			$pattern  = '/(.+)_(?:' . implode( '|', $suffix ) . ')$/i';
 
 			// find any relations for taxa
 			$iterable = $this->taxa;
@@ -866,10 +809,9 @@ class DG_Gallery {
 			return self::$no_docs;
 		}
 
-		$data     = wp_json_encode( $this->given_atts );
 		$selector = "document-gallery-$instance";
 		$template =
-			"<div id='$selector' class='%class%' data-shortcode='$data'>" . PHP_EOL .
+			"<div id='$selector' class='%class%'>" . PHP_EOL .
 			'%icons%' . PHP_EOL .
 			'</div>' . PHP_EOL;
 
@@ -915,28 +857,6 @@ class DG_Gallery {
 
 		// allow user to wrap gallery output
 		$gallery = apply_filters( 'dg_gallery_template', '%rows%', $this->useDescriptions() );
-
-		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
-			$left_href = $right_href = ' href="#"';
-			$left_tag = $right_tag = 'a';
-
-			if ( !$this->has_prev ) {
-				$left_href = '';
-				$left_tag = 'span';
-			}
-			if ( !$this->has_next ) {
-				$right_href = '';
-				$right_tag = 'span';
-			}
-
-			$prev = __( 'Prev', 'document-gallery' );
-			$next = __( 'Next', 'document-gallery' );
-			$gallery =
-				'<div class="dg-paginate-wrapper">' .
-					$gallery .
-					"<span><$left_tag$left_href class='paginate left'>$prev</$left_tag> | <$right_tag$right_href class='paginate right'>$next</$right_tag></span>" .
-				'</div>';
-		}
 
 		return self::$comment . str_replace( '%rows%', $core, $gallery );
 	}
