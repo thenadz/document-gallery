@@ -131,11 +131,15 @@ class DG_Gallery {
 		}
 
 		if ( ! empty( $atts['images'] ) ) {
-			$options = self::getOptions();
-			$mimes   = trim( isset( $atts['mime_types'] ) ? $atts['mime_types'] : $options['mime_types'] );
-			if ( ! preg_match( '/[,^]image[,$]/', $mimes ) ) {
-				$atts['mime_types'] = empty( $mimes ) ? 'image' : ( $mimes . ',image' );
+			if ( DG_Util::toBool( $atts['images'], false ) ) {
+				$options = self::getOptions();
+				$mimes   = trim( isset( $atts['mime_types'] ) ? $atts['mime_types'] : $options['mime_types'] );
+				if ( ! preg_match( '/[,^]image[,$]/', $mimes ) ) {
+					$atts['mime_types'] = empty( $mimes ) ? 'image' : ( $mimes . ',image' );
+				}
 			}
+
+			unset( $atts['images'] );
 		}
 
 		/**
