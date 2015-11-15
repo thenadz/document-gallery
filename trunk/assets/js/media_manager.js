@@ -499,12 +499,12 @@
         state: [],
 
         edit: function (text, update) {
-            // TODO: Refine boundary conditions for omitting passing a shortcode to the Media Manager
-            if ( text.search( /\sids\s*=/gi ) == -1 || text.search( /\s(?!(ids|attachment_pg|columns|new_window|descriptions|fancy|orderby|order|paginate|limit)\s*=)[\w\-]+\s*=/gi ) > -1 ) {
+            // currently the shortcode *must* include ids attribute and may include any of the listed attributes to be editable
+            if ( text.search( /\sids\s*=/gi ) == -1 || text.search( /\s(?!(?:ids|attachment_pg|columns|new_window|descriptions|fancy|orderby|order|paginate|limit)\s*=)[\w\-]+\s*=/gi ) > -1 ) {
                 tinyMCE.activeEditor.windowManager.alert( DGl10n.unfitSCalert );
             } else {
                 var type = this.type,
-                    frame = media[type].edit(text.replace(/\sorder=/ig, ' dgorder=').replace(/\sorderby=/ig, ' dgorderby='));
+                    frame = media[type].edit(text.replace(/\sorder\s*=/ig, ' dgorder=').replace(/\sorderby\s*=/ig, ' dgorderby='));
 
                 this.pausePlayers && this.pausePlayers();
 
