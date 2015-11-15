@@ -357,7 +357,7 @@ class DG_Setup {
 
 	/**
 	 * Adds the meta items_per_page default value.
-	 * Paginate option was added.
+	 * Paginate & skip options were added.
 	 *
 	 * @param array $options The options to be modified.
 	 */
