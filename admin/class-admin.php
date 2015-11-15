@@ -232,7 +232,7 @@ class DG_Admin {
 				'name'        => 'gallery_defaults][attachment_pg',
 				'value'       => esc_attr( $defaults['attachment_pg'] ),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Link to attachment page rather than to file', 'document-gallery' )
+				'description' => __( 'Link to attachment page rather than to file.', 'document-gallery' )
 			) );
 
 		add_settings_field(
@@ -257,7 +257,7 @@ class DG_Admin {
 				'name'        => 'gallery_defaults][descriptions',
 				'value'       => esc_attr( $defaults['descriptions'] ),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Include document descriptions', 'document-gallery' )
+				'description' => __( 'Include document descriptions.', 'document-gallery' )
 			) );
 
 		add_settings_field(
@@ -269,7 +269,7 @@ class DG_Admin {
 				'name'        => 'gallery_defaults][fancy',
 				'value'       => esc_attr( $defaults['fancy'] ),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Use auto-generated document thumbnails', 'document-gallery' )
+				'description' => __( 'Use auto-generated document thumbnails.', 'document-gallery' )
 			) );
 
 		add_settings_field(
@@ -282,7 +282,7 @@ class DG_Admin {
 				'value'       => esc_attr( $defaults['order'] ),
 				'options'     => DG_Gallery::getOrderOptions(),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Ascending or descending sorting of documents', 'document-gallery' )
+				'description' => __( 'Ascending or descending sorting of documents.', 'document-gallery' )
 			) );
 
 		add_settings_field(
@@ -295,7 +295,7 @@ class DG_Admin {
 				'value'       => esc_attr( $defaults['orderby'] ),
 				'options'     => DG_Gallery::getOrderbyOptions(),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Which field to order documents by', 'document-gallery' )
+				'description' => __( 'Which field to order documents by.', 'document-gallery' )
 			) );
 
 		add_settings_field(
@@ -308,7 +308,7 @@ class DG_Admin {
 				'value'       => esc_attr( $defaults['relation'] ),
 				'options'     => DG_Gallery::getRelationOptions(),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Whether matched documents must have all taxa_names (AND) or at least one (OR)', 'document-gallery' )
+				'description' => __( 'Whether matched documents must have all taxa_names (AND) or at least one (OR).', 'document-gallery' )
 			) );
 
 		add_settings_field(
@@ -346,7 +346,19 @@ class DG_Admin {
 				'name'        => 'gallery_defaults][new_window',
 				'value'       => esc_attr( $defaults['new_window'] ),
 				'option_name' => DG_OPTION_NAME,
-				'description' => __( 'Open thumbnail links in new window', 'document-gallery' ) . '.'
+				'description' => __( 'Open thumbnail links in new window.', 'document-gallery' )
+			) );
+
+		add_settings_field(
+			'gallery_defaults_paginate', 'paginate',
+			array( __CLASS__, 'renderCheckboxField' ),
+			DG_OPTION_NAME, 'gallery_defaults',
+			array(
+				'label_for'   => 'label_gallery_defaults_paginate',
+				'name'        => 'gallery_defaults][paginate',
+				'value'       => esc_attr( $defaults['paginate'] ),
+				'option_name' => DG_OPTION_NAME,
+				'description' => __( 'When a limit exists, paginate rather than truncating gallery.', 'document-gallery' )
 			) );
 
 		add_settings_field(
