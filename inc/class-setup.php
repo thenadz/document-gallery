@@ -143,7 +143,7 @@ class DG_Setup {
 		self::threePointThree( $options );
 		self::threePointFour( $options );
 		self::threePointFive( $options );
-		self::threePointSix( $options );
+		self::fourPointZero( $options );
 
 		// update plugin meta data
 		$options['meta']['version']     = DG_VERSION;
@@ -361,8 +361,8 @@ class DG_Setup {
 	 *
 	 * @param array $options The options to be modified.
 	 */
-	private static function  threePointSix( &$options ) {
-		if ( version_compare( $options['meta']['version'], '3.6', '<' ) ) {
+	private static function  fourPointZero( &$options ) {
+		if ( version_compare( $options['meta']['version'], '4.0', '<' ) ) {
 			$options['gallery']['paginate'] = true;
 			$options['gallery']['skip'] = 0;
 			$options['meta']['items_per_page'] = 10;

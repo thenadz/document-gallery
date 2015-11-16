@@ -181,6 +181,11 @@ documents are displayed in ascending or descending order.
 * `none` - No order (available with Version 2.8).
 * `post__in` - Preserve post ID order given in the post__in array.
 
+**Paginate** *(New in Version 4.0)*
+
+When the limit option is not equal to `-1` and paginate is true, the gallery will be split into pages with the limit
+defining the size of each page within the gallery.
+
 **Relation Option** *(New in Version 1.4)*
 
 The relation option should only be used when also using the *category or custom
@@ -437,6 +442,14 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.0 =
+* **Enhancement:** This release includes full integration with the WordPress visual editor. Your Document Galleries
+  will now be visualized within the text editor.
+* **Enhancement:** Galleries now supports pagination. If you've got hundreds or thousands of documents to
+  display, this allows you to present everything in a more manageable manner. To use this functionality, you
+  simply need to set `limit=???` where "???" is how many documents you want displayed per page.
+* **Bug Fix:** Handling of `include` + `limit` attributes in same shortcode were broken. This has been addressed.
 
 = 3.5.3 =
 * **Bug Fix:** The `images` attribute was not being parsed correctly. Thanks to
