@@ -442,6 +442,8 @@ ideas for future Document Gallery development, take a look at our
 = 3.5.4 =
 * **Bug Fix:** There were issues in the structure of HTML generated for galleries. This resulted in issues
   with icon generation.
+* **Notice:** For any developers using PHP filters with Document Gallery, the structure of the content being
+  filtered in `dg_gallery_template` has changed. Documentation has been updated accordingly.
 
 = 3.5.3 =
 * **Bug Fix:** The `images` attribute was not being parsed correctly. Thanks to
