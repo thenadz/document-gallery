@@ -16,6 +16,20 @@ class DG_GallerySanitization {
 
     private static $unary_err, $binary_err;
 
+    /**
+     * @return string The unary error format string.
+     */
+    public static function getUnaryErr() {
+        return self::$unary_err;
+    }
+
+    /**
+     * @return string The binary error format string.
+     */
+    public static function getBinaryErr() {
+        return self::$binary_err;
+    }
+
     /*==========================================================================
      * INIT SANITIZATION
      *=========================================================================*/
