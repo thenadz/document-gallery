@@ -239,10 +239,6 @@ of a gallery: `dg_gallery_template`, `dg_row_template`, and `dg_icon_template`.
 These filtered templates are used when dynamically generating output for each
 gallery.
 
-*NOTE: The `dg_doc_icon` has been deprecated with the release and is
-scheduled to be removed in a future release. If you are using this
-filter, you are encouraged to replace its usages with `dg_icon_template`.*
-
 Each of the following filters provides an bool argument which indicates
 whither the gallery being generated will display descriptions, which
 allows you to handle galleries with and without descriptions differently.
@@ -253,10 +249,12 @@ content prior to or following your document galleries. The filter
 exposes 2 special tags which are replaced during gallery generation
 with data specific to that gallery. The tag is described below:
 
-* **%id%**: This tag is replaced by the document gallery HTML id attribute.
+* **%id%**: The id attribute value for this gallery.
+* **%class%**: The class attribute value for this gallery.
+* **%data%**: The one ore more data-* attributes for the gallery, which are necessary for client-side operations.
 * **%rows%**: This tag is replaced by all of the document gallery rows.
-Everything before this string will be rendered before the gallery and
-everything after this string will be rendered following the gallery.
+  Everything before this string will be rendered before the gallery and
+  everything after this string will be rendered following the gallery.
 
 
 If you wish to modify how gallery rows are generated, `dg_row_template`,
