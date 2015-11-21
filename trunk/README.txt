@@ -376,6 +376,12 @@ CSS being loaded by returning false in `dg_use_default_gallery_style` filter, li
 == Frequently Asked Questions ==
 
 
+= Q: I'm using taxonomies, but nothing is showing up in my gallery =
+
+A: Remember that Document Gallery defaults to retrieving just attachments for the current post/page.
+If you want a broader scope of attachments, you'll also need tell Document Gallery to search everywhere
+like so: `[dg id=-1 category="My Awesome Category"]`.
+
 = Q: Ghostscript is installed on my server, but it's not working! =
 
 A: Document Gallery does a pretty good job of detecting where Ghostscript is installed,
