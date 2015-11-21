@@ -9,15 +9,15 @@ defined( 'WPINC' ) OR exit;
 class DG_Document {
 
 	/*==========================================================================
-		* PRIVATE FIELDS
-		*=========================================================================*/
+	 * PRIVATE FIELDS
+	 *=========================================================================*/
 
 	// general document data
 	private $description, $gallery, $ID, $link, $title, $title_attribute, $path, $extension, $size;
 
 	/*==========================================================================
-		* INIT GALLERY
-		*=========================================================================*/
+	 * INIT GALLERY
+	 *=========================================================================*/
 
 	/**
 	 * Constructs instance of Document.
@@ -39,12 +39,13 @@ class DG_Document {
 		$this->path            = get_attached_file( $attachment->ID );
 		$wp_filetype           = wp_check_filetype_and_ext( $this->path, basename( $this->path ) );
 		$this->extension       = $wp_filetype['ext'];
-		$this->size            = size_format( filesize( $this->path ) );
+		$size                  = @filesize( $this->path );
+		$this->size            = ($size !== false) ? size_format( $size ) : 0;
 	}
 
 	/*==========================================================================
-		* OUTPUT HTML STRING
-		*=========================================================================*/
+	 * OUTPUT HTML STRING
+	 *=========================================================================*/
 
 	/**
 	 * Returns HTML representing this Document.
@@ -67,7 +68,7 @@ class DG_Document {
 				$thumb = DG_Thumber::getThumbnail( $this->ID, 1, false );
 			} else {
 				// include a data-* attribute for client side to asynchronously request icon after gallery load
-				$data = ' data-id="' . $this->ID . '"';
+				$data = 'data-id="' . $this->ID . '"';
 			}
 		}
 
@@ -75,8 +76,8 @@ class DG_Document {
 			$thumb = DG_Thumber::getDefaultThumbnail( $this->ID );
 		}
 
-		$repl = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path );
-		$find = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%' );
+		$repl = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path, $data );
+		$find = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%', '%data%' );
 
 		// if descriptions then add filterable tag and value to replaced tag
 		if ( $this->gallery->useDescriptions() ) {
@@ -86,17 +87,16 @@ class DG_Document {
 		}
 
 		$doc_icon =
-			'   <div class="document-icon"'. $data . '>' . PHP_EOL .
-			'      <a href="%link%" target="%target%"><img src="%img%" title="%title_attribute%" alt="%title_attribute%" /><br>%title%</a>' . PHP_EOL .
+			'   <div class="document-icon">' . PHP_EOL .
+			'      <a href="%link%" target="%target%">' . PHP_EOL .
+			'         <img src="%img%" title="%title_attribute%" alt="%title_attribute%" %data%/>' . PHP_EOL .
+			'         <span class="title">%title%</span>' . PHP_EOL .
+			'      </a>' . PHP_EOL .
 			'   </div>' . PHP_EOL .
 			$description;
 
 		// allow developers to filter icon output
-		$doc_icon = apply_filters(
-			'dg_icon_template',
-			$doc_icon,
-			$this->gallery->useDescriptions(),
-			$this->ID );
+		$doc_icon = apply_filters( 'dg_icon_template', $doc_icon, $this->gallery->useDescriptions(), $this->ID );
 
 		return str_replace( $find, $repl, $doc_icon );
 	}
