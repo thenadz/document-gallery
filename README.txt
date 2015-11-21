@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
 Tested up to: 4.3
-Stable tag: 3.5.3
+Stable tag: 3.5.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,18 +181,13 @@ documents are displayed in ascending or descending order.
 * `none` - No order (available with Version 2.8).
 * `post__in` - Preserve post ID order given in the post__in array.
 
-**Paginate** *(New in Version 4.0)*
-
-When the limit option is not equal to `-1` and paginate is true, the gallery will be split into pages with the limit
-defining the size of each page within the gallery.
-
 **Relation Option** *(New in Version 1.4)*
 
 The relation option should only be used when also using the *category or custom
 taxonomy* option (see above).
 
-When using multiple taxa this option allows you to decide whether the attachments 
-returned must match all of the different taxa specified (AND) or a minimum of one 
+When using multiple taxa this option allows you to decide whether the attachments
+returned must match all of the different taxa specified (AND) or a minimum of one
 taxa match (OR).
 
 *NOTE: This has no bearing on the relationship between different terms for a single
@@ -255,9 +250,10 @@ allows you to handle galleries with and without descriptions differently.
 If you wish to wrap your galleries in some additional content,
 the `dg_gallery_template` is the tool for the job. With it you can include
 content prior to or following your document galleries. The filter
-exposes 1 special tag which is replaced during gallery generation
+exposes 2 special tags which are replaced during gallery generation
 with data specific to that gallery. The tag is described below:
 
+* **%id%**: This tag is replaced by the document gallery HTML id attribute.
 * **%rows%**: This tag is replaced by all of the document gallery rows.
 Everything before this string will be rendered before the gallery and
 everything after this string will be rendered following the gallery.
@@ -303,7 +299,7 @@ for a given attachment.
 
 The value being filtered is an associative array with keys equal to a regular
 expression matching all file extensions supported by the generator and values
-equal to [callables](http://www.php.net/manual/en/language.types.callable.php) 
+equal to [callables](http://www.php.net/manual/en/language.types.callable.php)
 which take an **attachment ID** and a **file page number** as arguments.
 
 The callable given should return false if thumbnail generation fails or
@@ -443,13 +439,11 @@ To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
-= 4.0 =
-* **Enhancement:** This release includes full integration with the WordPress visual editor. Your Document Galleries
-  will now be visualized within the text editor.
-* **Enhancement:** Galleries now supports pagination. If you've got hundreds or thousands of documents to
-  display, this allows you to present everything in a more manageable manner. To use this functionality, you
-  simply need to set `limit=???` where "???" is how many documents you want displayed per page.
-* **Bug Fix:** Handling of `include` + `limit` attributes in same shortcode were broken. This has been addressed.
+= 3.5.4 =
+* **Bug Fix:** There were issues in the structure of HTML generated for galleries. This resulted in issues
+  with icon generation.
+* **Notice:** For any developers using PHP filters with Document Gallery, the structure of the content being
+  filtered in `dg_gallery_template` has changed. Documentation has been updated accordingly.
 
 = 3.5.3 =
 * **Bug Fix:** The `images` attribute was not being parsed correctly. Thanks to
