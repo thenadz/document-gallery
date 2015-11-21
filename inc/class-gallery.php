@@ -363,7 +363,8 @@ class DG_Gallery {
 			if ( $count > 0 && taxonomy_exists( $tmp ) ) {
 				$taxon = $tmp;
 			} else {
-				$this->errs[] = sprintf( self::$unary_err, 'taxon', $taxon );
+				include_once DG_PATH . 'inc/class-gallery-sanitization.php';
+				$this->errs[] = sprintf( DG_GallerySanitization::getUnaryErr(), 'taxon', $taxon );
 				$valid        = false;
 			}
 		}
