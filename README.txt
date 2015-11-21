@@ -4,7 +4,7 @@ Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
 Tested up to: 4.3
-Stable tag: 3.5.3
+Stable tag: 3.5.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -250,9 +250,10 @@ allows you to handle galleries with and without descriptions differently.
 If you wish to wrap your galleries in some additional content,
 the `dg_gallery_template` is the tool for the job. With it you can include
 content prior to or following your document galleries. The filter
-exposes 1 special tag which is replaced during gallery generation
+exposes 2 special tags which are replaced during gallery generation
 with data specific to that gallery. The tag is described below:
 
+* **%id%**: This tag is replaced by the document gallery HTML id attribute.
 * **%rows%**: This tag is replaced by all of the document gallery rows.
 Everything before this string will be rendered before the gallery and
 everything after this string will be rendered following the gallery.
@@ -437,6 +438,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 3.5.4 =
+* **Bug Fix:** There were issues in the structure of HTML generated for galleries. This resulted in issues
+  with icon generation.
 
 = 3.5.3 =
 * **Bug Fix:** The `images` attribute was not being parsed correctly. Thanks to

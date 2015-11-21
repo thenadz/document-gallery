@@ -794,7 +794,7 @@ class DG_Gallery {
 	 */
 	public function __toString() {
 		static $instance = 0;
-		$instance ++;
+		$instance++;
 
 		static $find = null;
 		if ( is_null( $find ) ) {
@@ -809,9 +809,10 @@ class DG_Gallery {
 			return self::$no_docs;
 		}
 
+		$style = '';
 		$selector = "document-gallery-$instance";
 		$template =
-			"<div id='$selector' class='%class%'>" . PHP_EOL .
+			"<div class='%class%'>" . PHP_EOL .
 			'%icons%' . PHP_EOL .
 			'</div>' . PHP_EOL;
 
@@ -840,7 +841,7 @@ class DG_Gallery {
 			// .document-icon as style attribute in element.
 			if ( apply_filters( 'dg_use_default_gallery_style', true ) ) {
 				$itemwidth = $cols > 0 ? ( floor( 100 / $cols ) - 1 ) : 100;
-				$core .= "<style type='text/css'>#$selector .document-icon{width:$itemwidth%}</style>";
+				$style = "<style type='text/css'>#$selector .document-icon{width:$itemwidth%}</style>" . PHP_EOL;
 			}
 
 			for ( $i = 0; $i < $count; $i += $cols ) {
@@ -855,9 +856,9 @@ class DG_Gallery {
 			}
 		}
 
-		// allow user to wrap gallery output
-		$gallery = apply_filters( 'dg_gallery_template', '%rows%', $this->useDescriptions() );
+		// allow user to filter gallery wrapper
+		$gallery = apply_filters( 'dg_gallery_template', '<div id="%id%">' . PHP_EOL . '%rows%</div>', $this->useDescriptions() );
 
-		return self::$comment . str_replace( '%rows%', $core, $gallery );
+		return self::$comment . $style . str_replace( array( '%id%', '%rows%' ), array( $selector, $core ), $gallery );
 	}
 }
