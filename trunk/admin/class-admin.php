@@ -206,6 +206,7 @@ class DG_Admin {
 		global $dg_options;
 
 		include_once DG_PATH . 'inc/class-gallery.php';
+		include_once DG_PATH . 'inc/class-gallery-sanitization.php';
 		include_once DG_PATH . 'inc/class-thumber.php';
 
 		$defaults = $dg_options['gallery'];
@@ -280,7 +281,7 @@ class DG_Admin {
 				'label_for'   => 'label_gallery_defaults_order',
 				'name'        => 'gallery_defaults][order',
 				'value'       => esc_attr( $defaults['order'] ),
-				'options'     => DG_Gallery::getOrderOptions(),
+				'options'     => DG_GallerySanitization::getOrderOptions(),
 				'option_name' => DG_OPTION_NAME,
 				'description' => __( 'Ascending or descending sorting of documents.', 'document-gallery' )
 			) );
@@ -293,7 +294,7 @@ class DG_Admin {
 				'label_for'   => 'label_gallery_defaults_orderby',
 				'name'        => 'gallery_defaults][orderby',
 				'value'       => esc_attr( $defaults['orderby'] ),
-				'options'     => DG_Gallery::getOrderbyOptions(),
+				'options'     => DG_GallerySanitization::getOrderbyOptions(),
 				'option_name' => DG_OPTION_NAME,
 				'description' => __( 'Which field to order documents by.', 'document-gallery' )
 			) );
@@ -306,7 +307,7 @@ class DG_Admin {
 				'label_for'   => 'label_gallery_defaults_relation',
 				'name'        => 'gallery_defaults][relation',
 				'value'       => esc_attr( $defaults['relation'] ),
-				'options'     => DG_Gallery::getRelationOptions(),
+				'options'     => DG_GallerySanitization::getRelationOptions(),
 				'option_name' => DG_OPTION_NAME,
 				'description' => __( 'Whether matched documents must have all taxa_names (AND) or at least one (OR).', 'document-gallery' )
 			) );
@@ -369,7 +370,7 @@ class DG_Admin {
 				'label_for'   => 'label_gallery_defaults_post_status',
 				'name'        => 'gallery_defaults][post_status',
 				'value'       => esc_attr( $defaults['post_status'] ),
-				'options'     => DG_Gallery::getPostStatuses(),
+				'options'     => DG_GallerySanitization::getPostStatuses(),
 				'option_name' => DG_OPTION_NAME,
 				'description' => __( 'Which post status to look for when querying documents.', 'document-gallery' )
 			) );
@@ -382,7 +383,7 @@ class DG_Admin {
 				'label_for'   => 'label_gallery_defaults_post_type',
 				'name'        => 'gallery_defaults][post_type',
 				'value'       => esc_attr( $defaults['post_type'] ),
-				'options'     => DG_Gallery::getPostTypes(),
+				'options'     => DG_GallerySanitization::getPostTypes(),
 				'option_name' => DG_OPTION_NAME,
 				'description' => __( 'Which post type to look for when querying documents.', 'document-gallery' )
 			) );
