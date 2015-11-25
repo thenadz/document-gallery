@@ -28,8 +28,7 @@ $dg_options = get_option( DG_OPTION_NAME, null );
 
 // core functionality
 include_once DG_PATH . 'inc/class-document-gallery.php';
-
-// DG general utility functions
+include_once DG_PATH . 'inc/class-thumb.php';
 include_once DG_PATH . 'inc/class-util.php';
 
 // logging functionality
@@ -51,7 +50,7 @@ add_action( 'plugins_loaded', array( 'DocumentGallery', 'loadTextDomain' ) );
 
 // cleanup cached data when thumbed attachment deleted
 include_once DG_PATH . 'inc/class-thumber.php';
-add_action( 'delete_attachment', array( 'DG_Thumber', 'deleteThumbMeta' ) );
+add_action( 'delete_attachment', array( 'DG_Thumb', 'cleanupAttachmentMeta' ) );
 
 if ( is_admin() ) {
 	// admin house keeping

@@ -10,7 +10,7 @@ class DG_Thumb {
     /**
      * @var array The cached copy of thumbs.
      */
-    private static $thumbs;
+    private static $thumbs = null;
 
     /**
      * @var string The meta key identifying DG thumbs.
@@ -138,7 +138,7 @@ class DG_Thumb {
     private function setMetaValue($meta_value) {
         $split = explode( ':', $meta_value, 4 );
         $this->dimensions = $split[0];
-        $this->timestamp = absint($split[1]);
+        $this->timestamp = absint( $split[1] );
         $this->relative_path = $split[2];
         $this->generator = $split[3];
     }
@@ -156,7 +156,7 @@ class DG_Thumb {
      * @return int Parses dimensions string pulling out the width.
      */
     public function getWidth() {
-        $split = explode( 'x', $this->dimensions );
+        $split = explode( 'x', $this->dimensions, 2 );
         return absint( $split[0] );
     }
 
@@ -164,7 +164,7 @@ class DG_Thumb {
      * @return int Parses dimensions string pulling out the height.
      */
     public function getHeight() {
-        $split = explode( 'x', $this->dimensions );
+        $split = explode( 'x', $this->dimensions, 2 );
         return absint( $split[1] );
     }
 
@@ -201,11 +201,13 @@ class DG_Thumb {
         // thumbs are immutable -- once created they can only be read or deleted
         if ( isset( $this->meta_id ) ) return;
 
-        // post_id + dimensions must be unique so urge the old entry if one exists
+        // post_id + dimensions must be unique so purge the old entry if one exists
         $old_thumb = self::getThumb( $this->post_id, $this->getWidth(), $this->getHeight() );
         if ( ! is_null( $old_thumb ) ) {
             $old_thumb->delete();
         }
+
+        DG_Logger::writeLog( DG_LogLevel::Detail, 'Saving thumb with post_id = ' . $this->post_id );
 
         // perform save to DB
         $values = array( 'post_id' => $this->post_id, 'meta_key' => self::$meta_key, 'meta_value' => $this->getMetaValue() );
@@ -214,7 +216,7 @@ class DG_Thumb {
         $this->meta_id = $wpdb->insert_id;
 
         self::initThumbs();
-        if ( !isset( self::$thumbs[$this->post_id] ) ) {
+        if ( ! isset( self::$thumbs[$this->post_id] ) ) {
             self::$thumbs[$this->post_id] = array();
         }
 
@@ -227,43 +229,49 @@ class DG_Thumb {
     public function delete() {
         if ( ! isset( $this->meta_id ) ) return;
 
+        DG_Logger::writeLog( DG_LogLevel::Detail, 'Deleting thumb with post_id = ' . $this->post_id );
+
         global $wpdb;
         $wpdb->delete( $wpdb->postmeta, array( 'meta_id' => $this->meta_id ), array( '%d' ) );
         self::cleanupThumbFiles( $this );
-        unset( self::$thumbs[$this->post_id][$this->dimensions] );
         unset( $this->meta_id );
+        if ( 1 === sizeof( self::$thumbs[$this->post_id] ) ) {
+            unset( self::$thumbs[$this->post_id] );
+        } else {
+            unset( self::$thumbs[$this->post_id][$this->dimensions] );
+        }
     }
 
     /**
-     * Whether the given attachment has a thumbanil graphic.
+     * Whether the given attachment has a thumb graphic.
      *
      * @param $ID int The id of the attachment to be checked.
-     * @param $width int The width we're seeking.
-     * @param $height int The height we're seeking.
-     * @param $success_matters bool Whether return value should be false when DG_Thumb exists, but is not successful.
+     * @param $dimensions string Optional. The dimensions for the thumbnail we're seeking.
+     * @param $success_matters bool Optional. Whether return value should be false when DG_Thumb exists, but is not successful.
      * @return bool Whether the given attachment has a thumbnail image.
      */
-    public static function thumbExists($ID, $width, $height, $success_matters = true) {
-        $thumbs     = self::getThumbs();
-        $dimensions = $width . 'x' . $height;
+    public static function thumbExists($ID, $dimensions = null, $success_matters = true) {
+        $thumbs = self::getThumbs();
         return
             array_key_exists( $ID, $thumbs ) &&
-            array_key_exists( $dimensions, $thumbs[$ID] ) &&
-            ( ! $success_matters || $thumbs[$ID][$dimensions]->isSuccess() );
+            ( is_null( $dimensions ) || array_key_exists( $dimensions, $thumbs[$ID] ) ) &&
+            ( ! $success_matters ||
+                ( is_null( $dimensions )
+                    ? ( ( $thumb = array_pop( $thumbs[$ID] ) ) && $thumb->isSuccess() )
+                    : $thumbs[$ID][$dimensions]->isSuccess() ) );
     }
 
     /**
-     * Whether the given attachment has a thumbanil graphic.
+     * Whether the given attachment has a thumb graphic.
      *
      * @param $ID int The id of the attachment to be checked.
-     * @param $width int The width we're seeking.
-     * @param $height int The height we're seeking.
+     * @param $dimensions string The dimensions for the thumbnail we're seeking.
      * @return DG_Thumb|null The thumbnail at the requested dimensions.
      */
-    public static function getThumb($ID, $width, $height) {
+    public static function getThumb($ID, $dimensions = null) {
         $ret = null;
-        if ( self::thumbExists( $ID, $width, $height, false ) ) {
-            $ret = self::$thumbs[$ID][$width . 'x' . $height];
+        if ( self::thumbExists( $ID, $dimensions, false ) ) {
+            $ret = ! is_null( $dimensions ) ? self::$thumbs[$ID][$dimensions] : reset( self::$thumbs[$ID] );
         }
 
         return $ret;
@@ -274,15 +282,14 @@ class DG_Thumb {
      */
     private static function initThumbs() {
         if ( !isset( self::$thumbs ) ) {
+            DG_Logger::writeLog( DG_LogLevel::Detail, 'Populating thumbnail cache.' );
             global $wpdb;
             self::$thumbs = array();
 
             $meta_key = self::$meta_key;
             $sql = "SELECT post_id, meta_id, meta_value FROM $wpdb->postmeta WHERE meta_key = '$meta_key'";
-            $result = $wpdb->get_results( $sql );
-            foreach ( $result as $row ) {
-                $var_by_ref = get_object_vars( $row );
-                $key = array_shift( $var_by_ref );
+            foreach ( $wpdb->get_results( $sql ) as $row ) {
+                $key = $row->post_id;
                 if ( !isset( self::$thumbs[$key] ) ) {
                     self::$thumbs[$key] = array();
                 }
@@ -294,11 +301,26 @@ class DG_Thumb {
     }
 
     /**
-     * Gets all thumbs from the DB.
+     * Gets either a nested associative array mapping ID to dimension to thumb or an associative array mapping ID to thumb.
+     *
+     * @param $dimensions string WIDTHxHEIGHT
+     * @return array The matched thumbs.
      */
-    public static function getThumbs() {
+    public static function getThumbs($dimensions = null) {
         self::initThumbs();
-        return self::$thumbs;
+        if ( is_null( $dimensions ) ) {
+            $ret = self::$thumbs;
+        } else {
+            $ret = array();
+            foreach ( self::$thumbs as $thumbs ) {
+                if ( array_key_exists( $dimensions, $thumbs ) ) {
+                    $thumb = $thumbs[$dimensions];
+                    $ret[$thumb->post_id] = $thumb;
+                }
+            }
+        }
+
+        return $ret;
     }
 
     /**
@@ -313,24 +335,26 @@ class DG_Thumb {
             $ids = (array)$ids;
         }
 
-        $postmeta = $wpdb->get_blog_prefix($blog_id) . 'postmeta';
+        $postmeta = $wpdb->get_blog_prefix( $blog_id ) . 'postmeta';
+        $meta_key = self::$meta_key;
+
         self::initThumbs();
 
         if ( ! is_array( $ids ) ) {
-            // cleanup DB
-            $wpdb->delete( $postmeta, array( 'meta_key' => self::$meta_key ), array( '%d' ) );
+            $sql = "DELETE FROM $postmeta WHERE meta_key = '$meta_key'";
+            $result = $wpdb->query( $sql );
 
-            // cleanup filesystem
-            foreach ( self::$thumbs as $thumbs ) {
-                self::cleanupThumbFiles( $thumbs );
+            if ( $result ) {
+                // cleanup filesystem
+                foreach ( self::$thumbs as $thumbs ) {
+                    self::cleanupThumbFiles( $thumbs );
+                }
+
+                self::$thumbs = null;
             }
-
-            unset( self::$thumbs );
         } else {
-            $meta_key = self::$meta_key;
-            $result = $wpdb->query( $wpdb->prepare(
-                "DELETE FROM $postmeta WHERE meta_key = '$meta_key' AND post_id IN(" . rtrim( str_repeat( '%d,', sizeof( $ids ) ), ',' ) . ")",
-                $ids ) );
+            $sql = "DELETE FROM $postmeta WHERE meta_key = '$meta_key' AND post_id IN(" . rtrim( str_repeat( '%d,', sizeof( $ids ) ), ',' ) . ")";
+            $result = $wpdb->query( $wpdb->prepare( $sql, $ids ) );
 
             if ( $result ) {
                 foreach ( $ids as $id ) {
@@ -347,43 +371,34 @@ class DG_Thumb {
      * Delete all thumb entries that do not have an actual image associated with them due to failed generation.
      */
     public static function purgeFailedThumbs() {
-        // find the failed thumbs
-        $failed = array();
-        foreach ( self::getThumbs() as $thumbs ) {
-            foreach ( $thumbs as $thumb ) {
-                if ( ! $thumb->isSuccess() ) {
-                    $failed[] = $thumb;
-                }
-            }
-        }
-
-        // short-circuit if we have nothing to remove
-        if ( ! $failed ) return;
-
         global $wpdb;
-        $wpdb->query( $wpdb->prepare(
-            "DELETE FROM $wpdb->postmeta WHERE meta_id IN(" . rtrim( str_repeat( '%d,', sizeof( $failed ) ), ',' ) . ")",
-            array_map( array( __CLASS__, 'getId' ), $failed ) ) );
-
-        self::cleanupThumbFiles( $failed );
+        $wpdb->query( "DELETE FROM $wpdb->postmeta WHERE meta_key = '" . self::$meta_key . "' AND meta_value LIKE '%:%::'" );
 
         // force re-query next time
-        unset( self::$thumbs );
+        self::$thumbs = null;
     }
 
     /**
-     * @param $thumb DG_Thumb The thumb to retrieve post ID from.
-     * @return int The post_id of the given thumb.
+     * Removes meta data associated w/ attachment.
+     *
+     * @param $id int The post ID.
      */
-    private static function getId($thumb) {
-        return $thumb->post_id;
+    public static function cleanupAttachmentMeta($id) {
+        $thumb = self::getThumb( $id );
+        if ( ! is_null( $thumb ) ) {
+            self::cleanupThumbFiles($thumb);
+        }
     }
 
     /**
      * @param $thumbs array|DG_Thumb Removes files associated with given thumb(s).
      */
     private static function cleanupThumbFiles($thumbs) {
-        foreach ( (array)$thumbs as $thumb ) {
+        if ( is_a( $thumbs, 'DG_Thumb' ) ) {
+            $thumbs = array( $thumbs );
+        }
+
+        foreach ( $thumbs as $thumb ) {
             if ( isset( $thumb->relative_path ) ) {
                 @unlink( $thumb->getPath() );
             }

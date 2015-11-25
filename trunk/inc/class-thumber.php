@@ -38,7 +38,7 @@ class DG_Thumber {
 	 * @param string $path System path to thumbnail.
 	 * @param string $generator Descriptor for generation method -- usually method name.
 	 *
-	 * @return bool Whether set was successful.
+	 * @return DG_Thumb|bool Thumb on success, false on failure.
 	 */
 	public static function setThumbnail( $ID, $path, $generator = 'unknown' ) {
 		return self::thumbnailGenerationHarness( $generator, $ID, $path );
@@ -50,9 +50,12 @@ class DG_Thumber {
 	 * @param int $ID Document ID.
 	 */
 	public static function setThumbnailFailed( $ID ) {
-		$options                  = self::getOptions();
-		$options['thumbs'][ $ID ] = array( 'timestamp' => time() );
-		self::setOptions( $options );
+		$options = self::getOptions();
+		$thumb = new DG_Thumb();
+		$thumb->setPostId( $ID );
+		$thumb->setTimestamp( time() );
+		$thumb->setDimensions( $options['width'] . 'x' . $options['height'] );
+		$thumb->save();
 	}
 
 	/**
@@ -61,18 +64,25 @@ class DG_Thumber {
 	 * @param int $ID Document ID
 	 * @param int $pg Page number to get thumb from.
 	 * @param bool $generate_if_missing Whether to attempt generating the thumbnail if missing.
+	 * @param bool|null &$is_default Whether the returned URL points to a default icon.
 	 *
-	 * @return string                      URL to the thumbnail.
+	 * @return string URL to the thumbnail.
 	 */
-	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = true ) {
+	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = true, &$is_default = null ) {
+		$thumbs = DG_Thumb::getThumbs();
 		$options = self::getOptions();
+		$dimensions = $options['width'] . 'x' . $options['height'];
+		$preexisting = true;
+		$is_default = false;
 
 		// if we haven't saved a thumb, generate one
-		if ( empty( $options['thumbs'][ $ID ] ) ) {
+		if ( ! DG_Thumb::thumbExists( $ID, $dimensions, false ) ) {
 			// short-circuit generation if not required
 			if ( ! $generate_if_missing ) {
 				return null;
 			}
+
+			$preexisting = false;
 
 			// do the processing
 			$file = get_attached_file( $ID );
@@ -88,33 +98,32 @@ class DG_Thumber {
 					}
 
 					if ( self::thumbnailGenerationHarness( $thumber, $ID, $pg ) ) {
-						// harness updates options so we need a new copy
-						$options = self::getOptions();
 						break;
 					}
 				}
 			}
 		}
 
-		$new = empty( $options['thumbs'][ $ID ] );
-		if ( $new || empty( $options['thumbs'][ $ID ]['thumber'] ) ) {
-			if ( $new ) {
+		if ( ! DG_Thumb::thumbExists( $ID, $dimensions ) ) {
+			if ( ! $preexisting ) {
 				self::setThumbnailFailed( $ID );
 			}
 
 			// fallback to default thumb for attachment type
 			$url = self::getDefaultThumbnail( $ID, $pg );
+			$is_default = true;
 		} else {
 			// use generated thumbnail
-			$url = $options['thumbs'][ $ID ]['thumb_url'];
+			$thumbs = DG_Thumb::getThumbs();
+			$url = $thumbs[$ID][$dimensions]->getUrl();
 		}
 
 		return $url;
 	}
 
 	/*==========================================================================
-		* AUDIO VIDEO THUMBNAILS
-		*=========================================================================*/
+	 * AUDIO VIDEO THUMBNAILS
+	 *=========================================================================*/
 
 	/**
 	 * Uses wp_read_video_metadata() and wp_read_audio_metadata() to retrieve
@@ -180,8 +189,8 @@ class DG_Thumber {
 	}
 
 	/*==========================================================================
-		* IMAGICK THUMBNAILS
-		*=========================================================================*/
+	 * IMAGICK THUMBNAILS
+	 *=========================================================================*/
 
 	/**
 	 * Uses WP_Image_Editor_Imagick to generate thumbnails.
@@ -367,8 +376,8 @@ class DG_Thumber {
 	}
 
 	/*==========================================================================
-		* DEFAULT THUMBNAILS
-		*=========================================================================*/
+	 * DEFAULT THUMBNAILS
+	 *=========================================================================*/
 
 	/**
 	 * Get thumbnail for document with given ID from default images.
@@ -467,22 +476,24 @@ class DG_Thumber {
 	}
 
 	/*==========================================================================
-		* GENERAL THUMBNAIL HELPER FUNCTIONS
-		*=========================================================================*/
+	 * GENERAL THUMBNAIL HELPER FUNCTIONS
+	 *=========================================================================*/
 
 	/**
 	 * @return array WP_Post objects for each attachment that has been processed.
 	 */
 	public static function getThumbed() {
-		$options = self::getOptions();
-		$args    = array(
+		$thumbs = DG_Thumb::getThumbs();
+		if ( ! count( $thumbs ) ) return array();
+
+		$args = array(
 			'post_type'     => 'attachment',
 			'post_status'   => 'inherit',
 			'post_per_page' => - 1,
-			'post__in'      => array_keys( $options['thumbs'] )
+			'post__in'      => array_keys( $thumbs )
 		);
 
-		return count( $args['post__in'] ) ? get_posts( $args ) : array();
+		return get_posts( $args );
 	}
 
 	/**
@@ -594,7 +605,7 @@ class DG_Thumber {
 	 * @param int $ID ID for the attachment that we need a thumbnail for.
 	 * @param int|string $pg Page number of the attachment to get a thumbnail for or the system path to the image to be used.
 	 *
-	 * @return bool        Whether generation was successful.
+	 * @return DG_Thumb|bool The generated thumbnail or false on failure.
 	 */
 	private static function thumbnailGenerationHarness( $generator, $ID, $pg = 1 ) {
 		// handle system page in $pg variable
@@ -607,7 +618,6 @@ class DG_Thumber {
 
 		// get some useful stuff
 		$doc_path = get_attached_file( $ID );
-		$doc_url  = wp_get_attachment_url( $ID );
 		$dirname  = dirname( $doc_path );
 		$basename = basename( $doc_path );
 		if ( false === ( $len = strrpos( $basename, '.' ) ) ) {
@@ -617,7 +627,7 @@ class DG_Thumber {
 		$ext     = self::getExt( $temp_path );
 
 		$thumb_name = self::getUniqueThumbName( $dirname, $extless, $ext );
-		$thumb_path = $dirname . DIRECTORY_SEPARATOR . $thumb_name;
+		$thumb_path = "$dirname/$thumb_name";
 
 		// scale generated image down
 		$img = wp_get_image_editor( $temp_path );
@@ -645,18 +655,19 @@ class DG_Thumber {
 
 		// do some cleanup
 		@unlink( $temp_path );
-		self::deleteThumbMeta( $ID );
 
-		// store new thumbnail in DG options
-		$options['thumbs'][ $ID ] = array(
-			'timestamp'  => time(),
-			'thumb_url'  => preg_replace( '#' . preg_quote( $basename ) . '$#', $thumb_name, $doc_url ),
-			'thumb_path' => $thumb_path,
-			'thumber'    => $generator
-		);
-		self::setOptions( $options );
+		// save new thumb
+		DG_Logger::writeLog( DG_LogLevel::Detail, 'Creating thumb object.' );
+		$upload = wp_upload_dir();
+		$thumb  = new DG_Thumb();
+		$thumb->setPostId( $ID );
+		$thumb->setDimensions( $options['width'] . 'x' . $options['height'] );
+		$thumb->setTimestamp( time() );
+		$thumb->setRelativePath( substr( $thumb_path, strlen( $upload['basedir'] ) + 1 ) );
+		$thumb->setGenerator( DG_Util::callableToString( $generator ) );
+		$thumb->save();
 
-		return true;
+		return $thumb;
 	}
 
 	/**
@@ -690,36 +701,6 @@ class DG_Thumber {
 	 */
 	private static function getUniqueThumbName( $dirname, $extless, $ext = 'png' ) {
 		return wp_unique_filename( $dirname, str_replace( '.', '-', $extless ) . '-thumb.' . $ext );
-	}
-
-	/**
-	 * Removes the existing thumbnail/document meta for the attachment(s)
-	 * with the ID(s), if such a thumbnails exists.
-	 *
-	 * @param int|array $ids
-	 *
-	 * @return array All IDs that were deleted -- some subset of IDs requested to be deleted.
-	 */
-	public static function deleteThumbMeta( $ids ) {
-		$options = self::getOptions();
-
-		$deleted = array();
-		foreach ( (array) $ids as $id ) {
-			if ( isset( $options['thumbs'][ $id ] ) ) {
-				if ( isset( $options['thumbs'][ $id ]['thumber'] ) ) {
-					@unlink( $options['thumbs'][ $id ]['thumb_path'] );
-				}
-
-				unset( $options['thumbs'][ $id ] );
-				$deleted[] = $id;
-			}
-		}
-
-		if ( count( $deleted ) > 0 ) {
-			self::setOptions( $options );
-		}
-
-		return $deleted;
 	}
 
 	/**
