@@ -72,6 +72,8 @@ class DG_Admin {
 
 	/**
 	 * Adds settings link to main plugin view.
+	 * @param $links array The links being prepended.
+	 * @return array The given array with settings link prepended.
 	 */
 	public static function addSettingsLink( $links ) {
 		$settings = '<a href="options-general.php?page=' . DG_OPTION_NAME . '">' .
@@ -83,6 +85,9 @@ class DG_Admin {
 
 	/**
 	 * Adds donate link to main plugin view.
+	 * @param $links array The links.
+	 * @param $file string The file.
+	 * @return array The given array with donate link appended.
 	 */
 	public static function addDonateLink( $links, $file ) {
 		if ( $file === DG_BASENAME ) {
@@ -110,6 +115,7 @@ class DG_Admin {
 
 	/**
 	 * Enqueues styles and scripts for the admin settings page.
+	 * @param $hook string The hook.
 	 */
 	public static function enqueueScriptsAndStyles( $hook ) {
 		if ( in_array( $hook, array( DG_Admin::$hook, 'post.php', 'post-new.php' ), true ) ) {
@@ -609,16 +615,8 @@ class DG_Admin {
 
 		// delete thumb cache to force regeneration if max dimensions changed
 		if ( $ret['thumber']['width'] !== $dg_options['thumber']['width'] ||
-		     $ret['thumber']['height'] !== $dg_options['thumber']['height']
-		) {
-			foreach ( $ret['thumber']['thumbs'] as $v ) {
-				if ( isset( $v['thumber'] ) ) {
-					@unlink( $v['thumb_path'] );
-				}
-			}
-
-			$ret['thumber']['thumbs'] = array();
-			$thumbs_cleared           = true;
+		     $ret['thumber']['height'] !== $dg_options['thumber']['height'] ) {
+			DG_Thumb::purgeThumbs();
 		}
 
 		// handle setting the active thumbers
@@ -628,16 +626,7 @@ class DG_Admin {
 
 		// if new thumbers available, clear failed thumbnails for retry
 		if ( ! $thumbs_cleared ) {
-			foreach ( $dg_options['thumber']['active'] as $k => $v ) {
-				if ( ! $v && $ret['thumber']['active'][ $k ] ) {
-					foreach ( $dg_options['thumber']['thumbs'] as $k2 => $v2 ) {
-						if ( empty( $v['thumber'] ) ) {
-							unset( $ret['thumber']['thumbs'][ $k2 ] );
-						}
-					}
-					break;
-				}
-			}
+			DG_Thumb::purgeFailedThumbs();
 		}
 
 		// handle modified CSS
@@ -669,16 +658,8 @@ class DG_Admin {
 		// Thumbnail(s) cleanup;
 		// cleanup value is a marker
 		if ( isset( $values['cleanup'] ) && isset( $values['ids'] ) ) {
-			$deleted = array_values( array_intersect( array_keys( $dg_options['thumber']['thumbs'] ), $values['ids'] ) );
-
-			foreach ( $deleted as $k ) {
-				if ( isset( $ret['thumber']['thumbs'][ $k ]['thumber'] ) ) {
-					@unlink( $ret['thumber']['thumbs'][ $k ]['thumb_path'] );
-				}
-
-				unset( $ret['thumber']['thumbs'][ $k ] );
-			}
-
+			$deleted = array_values( array_intersect( array_keys( DG_Thumb::getThumbs() ), $values['ids'] ) );
+			DG_Thumb::purgeThumbs( $deleted );
 			$responseArr['result']  = true;
 			$responseArr['deleted'] = $deleted;
 		}
@@ -709,17 +690,12 @@ class DG_Admin {
 
 		// Thumbnail file manual refresh (one at a time)
 		// upload value is a marker
-		elseif ( isset( $values['upload'] ) && isset( $_FILES['file'] ) && isset( $ret['thumber']['thumbs'][ $ID ] ) ) {
-			$old_path          = DG_Util::hasThumb( $ID ) ? $ret['thumber']['thumbs'][ $ID ]['thumb_path'] : null;
+		elseif ( isset( $values['upload'] ) && isset( $_FILES['file'] ) && array_key_exists( $ID, DG_Thumb::getThumbs() ) ) {
 			$uploaded_filename = self::validateUploadedFile();
-			if ( $uploaded_filename && DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) {
-				if ( ! is_null( $old_path ) && $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] !== $old_path ) {
-					@unlink( $old_path );
-				}
-				$responseArr['result']           = true;
-				$responseArr['url']              = $dg_options['thumber']['thumbs'][ $ID ]['thumb_url'];
-				$ret['thumber']['thumbs'][ $ID ] = $dg_options['thumber']['thumbs'][ $ID ];
-			}
+            if ( $uploaded_filename && ( $thumb = DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) ) {
+                $responseArr['result'] = true;
+                $responseArr['url']    = $thumb->getUrl();
+            }
 		}
 
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
@@ -944,9 +920,9 @@ class DG_Admin {
 		$order = self::$URL_params['order'] = self::getOrderParam($order_options);
 		$limit = self::$URL_params['limit'] = self::getLimitParam();
 
-		$thumbs        = $options['thumbs'];
+		$thumbs        = DG_Thumb::getThumbs( $options['width'] . 'x' . $options['height'] );
 		uasort( $thumbs, array( __CLASS__, 'cmpThumb' ) );
-		$thumbs_number = count( $options['thumbs'] );
+		$thumbs_number = count( $thumbs );
 		$lastsheet     = ceil( $thumbs_number / $limit );
 		$sheet         = array_key_exists( 'sheet', $_REQUEST ) ? absint( $_REQUEST['sheet'] ) : 1;
 		if ( $sheet === 0 || $sheet > $lastsheet ) {
@@ -972,13 +948,14 @@ class DG_Admin {
 		foreach ( $posts as $post ) {
 			$path_parts         = pathinfo( $post->guid );
 
-			$t                  = &$thumbs[$post->ID];
-			$t['title']         = !empty( $post->post_title ) ? $post->post_title : $path_parts['filename'];
+			$thumb				= $thumbs[$post->ID];
+			$thumbs[$post->ID]  = array();
+			$t					= &$thumbs[$post->ID];
+			$t['timestamp']     = $thumb->getTimestamp();
+			$t['title']         = self::getTitle( $post );
 			$t['ext']           = array_key_exists( 'extension', $path_parts ) ? $path_parts['extension'] : '';
 			$t['description']   = $post->post_content;
-			$t['icon']          = array_key_exists( 'thumb_url', $t )
-										? $t['thumb_url']
-										: DG_Thumber::getDefaultThumbnail( $post->ID );
+			$t['icon']          = $thumb->isSuccess() ? $thumb->getUrl() : DG_Thumber::getDefaultThumbnail( $post->ID );
 		}
 		unset( $posts );
 
@@ -1133,7 +1110,7 @@ class DG_Admin {
 	 */
 	private static function getOrderbyParam($orderby_options) {
 		$ret = array_key_exists( 'orderby', $_REQUEST ) ? strtolower( $_REQUEST['orderby'] ) : '';
-		return in_array($ret, $orderby_options) ? $ret : $orderby_options[0];
+		return in_array( $ret, $orderby_options ) ? $ret : $orderby_options[0];
 	}
 
 	/**
@@ -1155,12 +1132,16 @@ class DG_Admin {
 
 	/**
 	 * Render a Meta Box.
+	 * @param $post WP_Post The post.
 	 */
 	public static function renderMetaBox( $post ) {
-		global $dg_options;
 		wp_nonce_field( DG_OPTION_NAME . '_meta_box', DG_OPTION_NAME . '_meta_box_nonce' );
-		$ID   = $post->ID;
-		$icon = isset( $dg_options['thumber']['thumbs'][ $ID ]['thumb_url'] ) ? $dg_options['thumber']['thumbs'][ $ID ]['thumb_url'] : DG_Thumber::getDefaultThumbnail( $ID );
+		$ID      = $post->ID;
+		$options = DG_Thumber::getOptions();
+		$thumb   = DG_Thumb::getThumb( $ID, $options['width'] . 'x' . $options['height'] );
+		$icon    = ! is_null( $thumb ) && $thumb->isSuccess()
+						? $thumb->getUrl()
+						: DG_Thumber::getDefaultThumbnail( $ID );
 
 		echo '<table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">' .
 		     '<tbody><tr data-entry="' . $ID . '"><td class="column-icon media-icon"><img src="' .
@@ -1174,7 +1155,7 @@ class DG_Admin {
 		     '</span>' .
 		     '</span>' .
 		     '</td></tr></tbody></table>' .
-		     ( empty( $dg_options['thumber']['thumbs'][ $ID ] ) ? '<span class="dashicons dashicons-info"></span><span class="">Please note this attachment hasn&#39;t been used in any Document Gallery instance and so there is no autogenerated thumbnail, in the meantime default one is used instead.</span>' : '' ) . PHP_EOL;
+		     ( is_null( $thumb ) ? '<span class="dashicons dashicons-info"></span><span class="">Please note this attachment hasn&#39;t been used in any Document Gallery instance and so there is no autogenerated thumbnail, in the meantime default one is used instead.</span>' : '' ) . PHP_EOL;
 	}
 
 	/**
@@ -1188,7 +1169,6 @@ class DG_Admin {
 			return;
 		}
 
-		global $dg_options;
 		$responseArr = array( 'result' => false );
 		if ( isset( $_POST[ DG_OPTION_NAME ]['entry'] ) ) {
 			$ID = intval( $_POST[ DG_OPTION_NAME ]['entry'] );
@@ -1196,15 +1176,12 @@ class DG_Admin {
 			$ID = - 1;
 		}
 
-		if ( isset( $_POST[ DG_OPTION_NAME ]['upload'] ) && isset( $_FILES['file'] ) && isset( $dg_options['thumber']['thumbs'][ $ID ] ) ) {
-			$old_path          = DG_Util::hasThumb($ID) ? $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] : null;
+		$thumbs = DG_Thumb::getThumbs();
+		if ( isset( $_POST[DG_OPTION_NAME]['upload'] ) && isset( $_FILES['file'] ) && array_key_exists( $ID, $thumbs ) ) {
 			$uploaded_filename = self::validateUploadedFile();
-			if ( $uploaded_filename && DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) {
-				if ( ! is_null($old_path) && $dg_options['thumber']['thumbs'][ $ID ]['thumb_path'] !== $old_path ) {
-					@unlink( $old_path );
-				}
+			if ( $uploaded_filename && ( $thumb = DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) ) {
 				$responseArr['result'] = true;
-				$responseArr['url']    = $dg_options['thumber']['thumbs'][ $ID ]['thumb_url'];
+				$responseArr['url']    = $thumb->getUrl();
 			}
 		}
 
@@ -1272,7 +1249,7 @@ class DG_Admin {
 						<?php echo $thead; ?>
 						</tfoot>
 						<tbody><?php
-						for ( $i = count( $log_list ); $i > 0; $i -- ) {
+						for ( $i = count( $log_list ); $i > 0; $i-- ) {
 							$log_entry = $log_list[ $i - 1 ];
 							$date      = DocumentGallery::localDateTimeFromTimestamp( $log_entry[0] );
 
@@ -1383,24 +1360,36 @@ class DG_Admin {
 	}
 
 	/**
-	 * @param $t1 array Thumbnail array #1.
-	 * @param $t2 array Thumbnail array #2
+	 * @param $t1 DG_Thumb Thumbnail #1.
+	 * @param $t2 DG_Thumb Thumbnail #2
 	 *
-	 * @return int The result of comparing the two thumbnail arrays using arguments in $URL_params.
+	 * @return int The result of comparing the two thumbs using arguments in $URL_params.
 	 */
 	public static function cmpThumb($t1, $t2) {
 		$ret = 0;
 		switch (self::$URL_params['orderby']) {
 			case 'date':
-				$ret = $t1['timestamp'] - $t2['timestamp'];
+				$ret = $t1->getTimestamp() - $t2->getTimestamp();
 				break;
 
 			case 'title':
-				$ret = strcmp( basename( $t1['thumb_path'] ), basename( $t2['thumb_path'] ) );
+				$ret = strcmp( self::getTitle( $t1->getPostId() ), self::getTitle( $t2->getPostId() ) );
 				break;
 		}
 
 		return 'asc' === self::$URL_params['order'] ? $ret : -$ret;
+	}
+
+	/**
+	 * @param $post int|WP_Post The post to get title of.
+	 * @return string The title.
+	 */
+	private static function getTitle( $post ) {
+		if ( is_numeric( $post ) ) {
+			$post = get_post( $post );
+		}
+
+		return ! empty( $post->post_title ) ? $post->post_title : pathinfo( $post->guid, PATHINFO_FILENAME );
 	}
 
 	/**

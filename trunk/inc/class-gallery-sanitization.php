@@ -461,15 +461,16 @@ class DG_GallerySanitization {
      * Takes the provided value and returns a sanitized value.
      *
      * @param string $operator The operator value to be sanitized.
+     * @param string &$err String to be initialized with error, if any.
      *
      * @return string The sanitized operator value.
      */
-    private function sanitizeOperator( $operator ) {
+    private static function sanitizeOperator( $operator, &$err ) {
         $ret = strtoupper( $operator );
 
         if ( ! in_array( $ret, self::getOperatorOptions() ) ) {
-            $this->errs[] = sprintf( self::$binary_err, 'IN", "NOT IN", "OR', 'AND', $operator );
-            $ret          = null;
+            $err = sprintf( self::$binary_err, 'IN", "NOT IN", "OR', 'AND', $operator );
+            $ret = null;
         } else if ( $ret === 'OR' ) {
             $ret = 'IN';
         }

@@ -43,6 +43,13 @@ class DG_Document {
 		$this->size            = ($size !== false) ? size_format( $size ) : 0;
 	}
 
+	/**
+	 * @return int The attachment ID.
+	 */
+	public function getId() {
+		return $this->ID;
+	}
+
 	/*==========================================================================
 	 * OUTPUT HTML STRING
 	 *=========================================================================*/
@@ -55,24 +62,25 @@ class DG_Document {
 	 */
 	public function __toString() {
 		include_once DG_PATH . 'inc/class-thumber.php';
-		$options = DG_Thumber::getOptions();
 
-		$thumb       = null;
 		$data        = '';
 		$description = '';
 		$target      = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
 
 		if ( $this->gallery->useFancyThumbs() ) {
-			if ( array_key_exists( $this->ID, $options['thumbs'] ) ) {
-				// icon has already been generated so include it in generated gallery
-				$thumb = DG_Thumber::getThumbnail( $this->ID, 1, false );
+			$thumb_obj = DG_Thumb::getThumb( $this->ID );
+			if ( ! is_null( $thumb_obj ) ) {
+				if ( $thumb_obj->isSuccess() ) {
+					// icon has already been generated so include it in generated gallery
+					$thumb = $thumb_obj->getUrl();
+				}
 			} else {
 				// include a data-* attribute for client side to asynchronously request icon after gallery load
 				$data = 'data-id="' . $this->ID . '"';
 			}
 		}
 
-		if ( is_null($thumb) ) {
+		if ( ! isset( $thumb ) ) {
 			$thumb = DG_Thumber::getDefaultThumbnail( $this->ID );
 		}
 
