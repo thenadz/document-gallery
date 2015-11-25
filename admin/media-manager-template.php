@@ -79,7 +79,7 @@
 		<table><tr>
 			<td><span><?php _e('Which field to order documents by', 'document-gallery'); ?></span></td>
 			<td><select data-setting="dgorderby">
-				<?php foreach ( DG_Gallery::getOrderbyOptions() as $i ) : ?>
+				<?php foreach ( DG_GallerySanitization::getOrderbyOptions() as $i ) : ?>
 					<option value="<?php echo esc_attr( $i ); ?>" <#
 						if ( '<?php echo $i ?>' == wp.media.dgDefaults.dgorderby ) {
 							#>selected="selected"<#
@@ -94,7 +94,7 @@
 		<table><tr>
 			<td><span><?php _e('Ascending or descending sorting of documents', 'document-gallery'); ?></span></td>
 			<td><select data-setting="dgorder">
-				<?php foreach ( DG_Gallery::getOrderOptions() as $i ) : ?>
+				<?php foreach ( DG_GallerySanitization::getOrderOptions() as $i ) : ?>
 					<option value="<?php echo esc_attr( $i ); ?>" <#
 						if ( '<?php echo $i ?>' == wp.media.dgDefaults.dgorder ) {
 							#>selected="selected"<#

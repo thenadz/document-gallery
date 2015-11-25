@@ -47,10 +47,6 @@
             var target = $(this).closest('.dg-paginate-wrapper');
             var atts = target.data('shortcode');
 
-            if (!atts.hasOwnProperty('skip')) {
-                atts['skip'] = 0;
-            }
-
             if ($(this).hasClass('left')) {
                 atts['skip'] -= atts['limit'];
             } else {

@@ -1,6 +1,8 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
+include_once DG_PATH . 'inc/class-gallery-sanitization.php';
+
 DG_Gallery::init();
 
 /**
@@ -14,7 +16,7 @@ class DG_Gallery {
 	 * PRIVATE FIELDS
 	 *=========================================================================*/
 
-	private $atts, $given_atts, $taxa;
+	private $atts, $taxa;
 	private $docs = array();
 	private $errs = array();
 
@@ -22,7 +24,7 @@ class DG_Gallery {
 	private $has_next = false;
 
 	// templates for HTML output
-	private static $no_docs, $comment;
+	private static $no_docs, $comment, $defaults;
 
 	/*==========================================================================
 	 * PUBLIC FUNCTIONS
@@ -90,10 +92,11 @@ class DG_Gallery {
 	 */
 	public static function init() {
 		if ( ! isset( self::$comment ) ) {
-			self::$comment    =
+			self::$comment  =
 				PHP_EOL . '<!-- ' . __( 'Generated using Document Gallery. Get yours here: ', 'document-gallery' ) .
 				'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
-			self::$no_docs    = '<!-- ' . __( 'No attachments to display. How boring! :(', 'document-gallery' ) . ' -->';
+			self::$no_docs  = '<!-- ' . __( 'No attachments to display. How boring! :(', 'document-gallery' ) . ' -->';
+			self::$defaults = array_merge( array( 'include' => '', 'exclude' => '' ), self::getOptions() );
 		}
 	}
 
@@ -148,10 +151,7 @@ class DG_Gallery {
 			unset( $atts['localpost'] );
 		}
 
-		// merge options w/ default values not stored in options
-		$defaults = array_merge(
-			array( 'id' => $post_id, 'include' => '', 'exclude' => '' ),
-			self::getOptions() );
+		$defaults = array_merge( array( 'id' => $post_id ), self::$defaults );
 
 		// values used to construct tax query (may be empty)
 		$this->taxa = array_diff_key( $atts, $defaults );
@@ -163,24 +163,12 @@ class DG_Gallery {
 		$this->atts = self::sanitizeDefaults( $defaults, $this->atts, $this->errs );
 
 		// query DB for all documents requested
-		$success = true;
 		try {
 			foreach ( $this->getDocuments() as $doc ) {
 				$this->docs[] = new DG_Document( $doc, $this );
 			}
 		} catch ( InvalidArgumentException $e ) {
 			// errors will be printed in __toString()
-			$success = false;
-		}
-
-		// build the structure to be used in data-shortcode attribute
-		if ( $success ) {
-			$this->given_atts = array_merge( $this->atts, $this->taxa );
-
-			// need to undo nulling of -1 ID for version sent out to JSON
-			if ( is_null( $this->given_atts['id'] ) ) {
-				$this->given_atts['id'] = -1;
-			}
 		}
 	}
 
@@ -194,8 +182,6 @@ class DG_Gallery {
 	 * @return array The sanitized defaults.
 	 */
 	public static function sanitizeDefaults( $old_defaults, $defaults, &$errs ) {
-		include_once DG_PATH . 'inc/class-gallery-sanitization.php';
-
 		if ( is_null( $old_defaults ) ) {
 			$old_defaults = self::getOptions();
 		}
@@ -281,19 +267,21 @@ class DG_Gallery {
 			$operator = array();
 
 			// find any relations for taxa
-			$iterable = $this->taxa;
-			foreach ( $iterable as $key => $value ) {
+			$operator_keys = array();
+			foreach ( $this->taxa as $key => $value ) {
 				if ( preg_match( $pattern, $key, $matches ) ) {
 					$base = $matches[1];
 					if ( array_key_exists( $base, $this->taxa ) ) {
-						$operator[ $base ] = self::sanitizeOperator( $value );
-						unset( $this->taxa[ $key ] );
+						$operator[$base] = DG_GallerySanitization::sanitizeParameter( 'operator', $value, $this->errs );
+						$operator_keys[] = $key;
 					}
 				}
 			}
 
 			// build tax query
 			foreach ( $this->taxa as $taxon => $terms ) {
+				if ( in_array( $taxon, $operator_keys ) ) continue;
+
 				$terms = $this->getTermIdsByNames( $taxon, explode( ',', $terms ) );
 
 				$taxa[] = array(
@@ -363,7 +351,6 @@ class DG_Gallery {
 			if ( $count > 0 && taxonomy_exists( $tmp ) ) {
 				$taxon = $tmp;
 			} else {
-				include_once DG_PATH . 'inc/class-gallery-sanitization.php';
 				$this->errs[] = sprintf( DG_GallerySanitization::getUnaryErr(), 'taxon', $taxon );
 				$valid        = false;
 			}
@@ -402,6 +389,20 @@ class DG_Gallery {
 	 *=========================================================================*/
 
 	/**
+	 * @return array The data to be used in the data-shortcode attribute.
+	 */
+	private function getShortcodeData() {
+		$ret = array_merge( $this->atts, $this->taxa );
+
+		// need to undo nulling of -1 ID for version sent out to JSON
+		if ( is_null( $ret['id'] ) ) {
+			$ret['id'] = -1;
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * @filter dg_gallery_template Allows the user to filter anything content surrounding the generated gallery.
 	 * @filter dg_row_template Filters the outer DG wrapper HTML. Passes a single
 	 *    bool value indicating whether the gallery is using descriptions or not.
@@ -422,10 +423,10 @@ class DG_Gallery {
 
 		$icon_find       = array( '%class%', '%icons%' );
 		$icon_repl		 = array();
-		$gallery_find    = array( '%id%', '%data%', '%rows%', '%class%' );
-		$gallery_repl    = array( "document-gallery-$instance", ("data-shortcode='" . wp_json_encode( $this->given_atts ) . "'"), '' );
-		$gallery_classes = array( 'document-gallery' );
 		$icon_classes    = array( 'document-icon-row' );
+		$gallery_find    = array( '%id%', '%data%', '%rows%', '%class%' );
+		$gallery_repl    = array( "document-gallery-$instance", ( "data-shortcode='" . wp_json_encode( self::getShortcodeData() ) . "'" ), '' );
+		$gallery_classes = array( 'document-gallery' );
 
 		if ( $this->useDescriptions() ) {
 			$icon_classes[] = 'descriptions';
@@ -490,6 +491,16 @@ class DG_Gallery {
 
 		$gallery_repl[] = implode( ' ', $gallery_classes );
 
-		return self::$comment . str_replace( $gallery_find, $gallery_repl, $gallery );
+		$comment = self::$comment;
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$ids = array();
+			foreach ( $this->docs as $doc ) {
+				$ids[] = $doc->getId();
+			}
+
+			$comment .= '<!-- Attachment IDs: ' . implode( $ids, ', ' ) . ' -->' . PHP_EOL;
+		}
+
+		return $comment . str_replace( $gallery_find, $gallery_repl, $gallery );
 	}
 }
