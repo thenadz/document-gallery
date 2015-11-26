@@ -252,14 +252,8 @@ class DG_Thumb {
      * @return bool Whether the given attachment has a thumbnail image.
      */
     public static function thumbExists($ID, $dimensions = null, $success_matters = true) {
-        $thumbs = self::getThumbs();
-        return
-            isset( $thumbs[$ID] ) &&
-            ( is_null( $dimensions ) || isset( $thumbs[$ID][$dimensions] ) ) &&
-            ( ! $success_matters ||
-                ( is_null( $dimensions )
-                    ? ( ( $thumb = array_pop( $thumbs[$ID] ) ) && $thumb->isSuccess() )
-                    : $thumbs[$ID][$dimensions]->isSuccess() ) );
+        $thumb = self::getThumb( $ID, $dimensions );
+        return ! is_null( $thumb ) && ( ! $success_matters || $thumb->isSuccess() );
     }
 
     /**
@@ -270,9 +264,10 @@ class DG_Thumb {
      * @return DG_Thumb|null The thumbnail at the requested dimensions.
      */
     public static function getThumb($ID, $dimensions = null) {
+        $thumbs = self::getThumbs();
         $ret = null;
-        if ( self::thumbExists( $ID, $dimensions, false ) ) {
-            $ret = ! is_null( $dimensions ) ? self::$thumbs[$ID][$dimensions] : reset( self::$thumbs[$ID] );
+        if ( isset( $thumbs[$ID] ) && ( is_null( $dimensions ) || isset( $thumbs[$ID][$dimensions] ) ) ) {
+            $ret = ! is_null( $dimensions ) ? $thumbs[$ID][$dimensions] : reset( $thumbs[$ID] );
         }
 
         return $ret;
