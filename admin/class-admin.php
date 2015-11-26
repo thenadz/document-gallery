@@ -550,7 +550,7 @@ class DG_Admin {
 				global $dg_options;
 				return $dg_options;
 			} else {
-				if ( array_key_exists( 'ajax', $values ) ) {
+				if ( isset( $values['ajax'] ) ) {
 					unset( $values['ajax'] );
 					define( 'DOING_AJAX', true );
 				}
@@ -924,7 +924,7 @@ class DG_Admin {
 		uasort( $thumbs, array( __CLASS__, 'cmpThumb' ) );
 		$thumbs_number = count( $thumbs );
 		$lastsheet     = ceil( $thumbs_number / $limit );
-		$sheet         = array_key_exists( 'sheet', $_REQUEST ) ? absint( $_REQUEST['sheet'] ) : 1;
+		$sheet         = isset( $_REQUEST['sheet'] ) ? absint( $_REQUEST['sheet'] ) : 1;
 		if ( $sheet === 0 || $sheet > $lastsheet ) {
 			$sheet = 1;
 		}
@@ -953,7 +953,7 @@ class DG_Admin {
 			$t					= &$thumbs[$post->ID];
 			$t['timestamp']     = $thumb->getTimestamp();
 			$t['title']         = self::getTitle( $post );
-			$t['ext']           = array_key_exists( 'extension', $path_parts ) ? $path_parts['extension'] : '';
+			$t['ext']           = isset( $path_parts['extension'] ) ? $path_parts['extension'] : '';
 			$t['description']   = $post->post_content;
 			$t['icon']          = $thumb->isSuccess() ? $thumb->getUrl() : DG_Thumber::getDefaultThumbnail( $post->ID );
 		}
@@ -1084,7 +1084,7 @@ class DG_Admin {
 	 */
 	private static function getLimitParam() {
 		global $dg_options;
-		$limit = array_key_exists( 'limit', $_REQUEST ) ? DG_Util::posint( $_REQUEST['limit'] ) : $dg_options['meta']['items_per_page'];
+		$limit = isset( $_REQUEST['limit'] ) ? DG_Util::posint( $_REQUEST['limit'] ) : $dg_options['meta']['items_per_page'];
 		if ( $limit !== $dg_options['meta']['items_per_page'] ) {
 			$dg_options['meta']['items_per_page'] = $limit;
 			DocumentGallery::setOptions( $dg_options );
@@ -1099,7 +1099,7 @@ class DG_Admin {
 	 * @return string The order value.
 	 */
 	private static function getOrderParam($order_options) {
-		$ret = array_key_exists( 'order', $_REQUEST ) ? strtolower( $_REQUEST['order'] ) : '';
+		$ret = isset( $_REQUEST['order'] ) ? strtolower( $_REQUEST['order'] ) : '';
 		return in_array($ret, $order_options) ? $ret : $order_options[0];
 	}
 
@@ -1109,7 +1109,7 @@ class DG_Admin {
 	 * @return string The orderby value.
 	 */
 	private static function getOrderbyParam($orderby_options) {
-		$ret = array_key_exists( 'orderby', $_REQUEST ) ? strtolower( $_REQUEST['orderby'] ) : '';
+		$ret = isset( $_REQUEST['orderby'] ) ? strtolower( $_REQUEST['orderby'] ) : '';
 		return in_array( $ret, $orderby_options ) ? $ret : $orderby_options[0];
 	}
 
@@ -1177,7 +1177,7 @@ class DG_Admin {
 		}
 
 		$thumbs = DG_Thumb::getThumbs();
-		if ( isset( $_POST[DG_OPTION_NAME]['upload'] ) && isset( $_FILES['file'] ) && array_key_exists( $ID, $thumbs ) ) {
+		if ( isset( $_POST[DG_OPTION_NAME]['upload'] ) && isset( $_FILES['file'] ) && isset( $thumbs[$ID] ) ) {
 			$uploaded_filename = self::validateUploadedFile();
 			if ( $uploaded_filename && ( $thumb = DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) ) {
 				$responseArr['result'] = true;

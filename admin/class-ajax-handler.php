@@ -23,7 +23,7 @@ class DG_AjaxHandler {
 	public static function generateIcons() {
 		$ret = array();
 
-		if ( array_key_exists( 'ids', $_REQUEST ) ) {
+		if ( isset( $_REQUEST['ids'] ) ) {
 			foreach ( $_REQUEST['ids'] as $id ) {
 				// only return URL if different from default -- default image is already displayed on the client side
 				$url = DG_Thumber::getThumbnail( $id, 1, true, $is_default );
@@ -41,7 +41,7 @@ class DG_AjaxHandler {
 	 * Returns the resultant gallery HTML.
 	 */
 	public static function generateGallery() {
-		if ( array_key_exists( 'atts', $_REQUEST ) ) {
+		if ( isset( $_REQUEST['atts'] ) ) {
 			@header( 'Content-Type: text/html; charset=' . get_option( 'blog_charset' ) );
 			echo DocumentGallery::doShortcode( $_REQUEST['atts'] );
 		}

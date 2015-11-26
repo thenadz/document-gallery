@@ -254,8 +254,8 @@ class DG_Thumb {
     public static function thumbExists($ID, $dimensions = null, $success_matters = true) {
         $thumbs = self::getThumbs();
         return
-            array_key_exists( $ID, $thumbs ) &&
-            ( is_null( $dimensions ) || array_key_exists( $dimensions, $thumbs[$ID] ) ) &&
+            isset( $thumbs[$ID] ) &&
+            ( is_null( $dimensions ) || isset( $thumbs[$ID][$dimensions] ) ) &&
             ( ! $success_matters ||
                 ( is_null( $dimensions )
                     ? ( ( $thumb = array_pop( $thumbs[$ID] ) ) && $thumb->isSuccess() )
@@ -291,11 +291,20 @@ class DG_Thumb {
             $sql = "SELECT post_id, meta_id, meta_value FROM $wpdb->postmeta WHERE meta_key = '$meta_key'";
             foreach ( $wpdb->get_results( $sql ) as $row ) {
                 $key = $row->post_id;
-                if ( !isset( self::$thumbs[$key] ) ) {
+                $new = new DG_Thumb( $row );
+                if ( ! isset( self::$thumbs[$key] ) ) {
                     self::$thumbs[$key] = array();
+                } elseif ( isset( self::$thumbs[$key][$new->dimensions] ) ) {
+                    // it is possible to end up with duplicate thumbnails -- cleanup here
+                    $old = self::$thumbs[$key][$new->dimensions];
+                   if ( $old->timestamp < $new->timestamp ) {
+                        $old->delete();
+                   } else {
+                       $new->delete();
+                       continue;
+                   }
                 }
 
-                $new = new DG_Thumb( $row );
                 self::$thumbs[$key][$new->dimensions] = $new;
             }
         }
@@ -314,7 +323,7 @@ class DG_Thumb {
         } else {
             $ret = array();
             foreach ( self::$thumbs as $thumbs ) {
-                if ( array_key_exists( $dimensions, $thumbs ) ) {
+                if ( isset( $thumbs[$dimensions] ) ) {
                     $thumb = $thumbs[$dimensions];
                     $ret[$thumb->post_id] = $thumb;
                 }
@@ -359,7 +368,7 @@ class DG_Thumb {
 
             if ( $result ) {
                 foreach ( $ids as $id ) {
-                    if ( array_key_exists( $id, self::$thumbs ) ) {
+                    if ( isset( self::$thumbs[$id] ) ) {
                         self::cleanupThumbFiles( self::$thumbs[$id] );
                         unset( self::$thumbs[$id] );
                     }
