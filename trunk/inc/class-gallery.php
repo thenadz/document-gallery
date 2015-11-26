@@ -271,7 +271,7 @@ class DG_Gallery {
 			foreach ( $this->taxa as $key => $value ) {
 				if ( preg_match( $pattern, $key, $matches ) ) {
 					$base = $matches[1];
-					if ( array_key_exists( $base, $this->taxa ) ) {
+					if ( isset( $this->taxa[$base] ) ) {
 						$operator[$base] = DG_GallerySanitization::sanitizeParameter( 'operator', $value, $this->errs );
 						$operator_keys[] = $key;
 					}
