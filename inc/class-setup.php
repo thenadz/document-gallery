@@ -104,7 +104,7 @@ class DG_Setup {
 		}
 
 		// version has historically been in two locations -- must check both to continue supporting upgrading from those old versions
-		$old_version = array_key_exists( 'version', $dg_options ) ? $dg_options['version'] : $dg_options['meta']['version'];
+		$old_version = isset( $dg_options['version'] ) ? $dg_options['version'] : $dg_options['meta']['version'];
 		if ( ! is_null( $dg_options ) && DG_VERSION !== $old_version ) {
 			DG_Logger::writeLog( DG_LogLevel::Detail, "Upgrading Document Gallery from version $old_version to " . DG_VERSION );
 
@@ -369,7 +369,7 @@ class DG_Setup {
 				$thumb_obj->setPostId( $id );
 				$thumb_obj->setTimestamp( $thumb['timestamp'] );
 				$thumb_obj->setDimensions( $dimensions );
-				if ( array_key_exists( 'thumb_path', $thumb ) ) {
+				if ( isset( $thumb['thumb_path'] ) ) {
 					$thumb_obj->setRelativePath( substr( $thumb['thumb_path'], $upload_len + 1 ) );
 					$thumb_obj->setGenerator( DG_Util::callableToString( $thumb['thumber'] ) );
 				}
