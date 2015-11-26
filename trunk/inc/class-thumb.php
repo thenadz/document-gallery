@@ -399,7 +399,7 @@ class DG_Thumb {
      * @param $thumbs array|DG_Thumb Removes files associated with given thumb(s).
      */
     private static function cleanupThumbFiles($thumbs) {
-        if ( is_a( $thumbs, 'DG_Thumb' ) ) {
+        if ( is_a( $thumbs, __CLASS__ ) ) {
             $thumbs = array( $thumbs );
         }
 
