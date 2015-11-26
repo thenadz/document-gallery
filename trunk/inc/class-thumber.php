@@ -69,7 +69,6 @@ class DG_Thumber {
 	 * @return string URL to the thumbnail.
 	 */
 	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = true, &$is_default = null ) {
-		$thumbs = DG_Thumb::getThumbs();
 		$options = self::getOptions();
 		$dimensions = $options['width'] . 'x' . $options['height'];
 		$preexisting = true;
@@ -104,7 +103,8 @@ class DG_Thumber {
 			}
 		}
 
-		if ( ! DG_Thumb::thumbExists( $ID, $dimensions ) ) {
+		$thumb = DG_Thumb::getThumb( $ID, $dimensions );
+		if ( ! is_null( $thumb ) && $thumb->isSuccess() ) {
 			if ( ! $preexisting ) {
 				self::setThumbnailFailed( $ID );
 			}
@@ -113,9 +113,7 @@ class DG_Thumber {
 			$url = self::getDefaultThumbnail( $ID, $pg );
 			$is_default = true;
 		} else {
-			// use generated thumbnail
-			$thumbs = DG_Thumb::getThumbs();
-			$url = $thumbs[$ID][$dimensions]->getUrl();
+			$url = $thumb->getUrl();
 		}
 
 		return $url;
