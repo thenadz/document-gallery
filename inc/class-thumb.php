@@ -8,6 +8,7 @@
 class DG_Thumb {
 
     /**
+     * TODO: Replace w/ https://codex.wordpress.org/Class_Reference/WP_Object_Cache
      * @var array The cached copy of thumbs.
      */
     private static $thumbs = null;

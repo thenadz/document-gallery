@@ -32,9 +32,8 @@ class DG_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 		$ret = parent::load();
 
 		// set correct page number
-		if ( ! is_wp_error( $ret ) && ! is_null( $this->pg )
-		     && is_callable( array( $this->image, 'setIteratorIndex' ) )
-		) {
+		if ( ! is_null( $this->pg ) && ! is_wp_error( $ret )
+		     && is_callable( array( $this->image, 'setIteratorIndex' ) ) ) {
 			$err = __( 'Failed to set Imagick page number', 'document-gallery' );
 
 			// setIteratorIndex() should return false on failure, but I've found
