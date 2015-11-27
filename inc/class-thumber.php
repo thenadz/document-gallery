@@ -71,8 +71,6 @@ class DG_Thumber {
 	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = true, &$is_default = null ) {
 		$options = self::getOptions();
 		$dimensions = $options['width'] . 'x' . $options['height'];
-		$preexisting = true;
-		$is_default = false;
 
 		// if we haven't saved a thumb, generate one
 		if ( ! DG_Thumb::thumbExists( $ID, $dimensions, false ) ) {
@@ -80,8 +78,6 @@ class DG_Thumber {
 			if ( ! $generate_if_missing ) {
 				return null;
 			}
-
-			$preexisting = false;
 
 			// do the processing
 			$file = get_attached_file( $ID );
@@ -92,7 +88,7 @@ class DG_Thumber {
 				if ( preg_match( $ext_preg, $file ) ) {
 					if ( DG_Logger::logEnabled() ) {
 						$toLog = sprintf( __( 'Attempting to generate thumbnail for attachment #%d with (%s)',
-							'document-gallery' ), $ID, is_array( $thumber ) ? implode( '::', $thumber ) : print_r( $thumber, true ) );
+							'document-gallery' ), $ID, DG_Util::callableToString( $thumber ) );
 						DG_Logger::writeLog( DG_LogLevel::Detail, $toLog );
 					}
 
@@ -104,8 +100,8 @@ class DG_Thumber {
 		}
 
 		$thumb = DG_Thumb::getThumb( $ID, $dimensions );
-		if ( ! is_null( $thumb ) && $thumb->isSuccess() ) {
-			if ( ! $preexisting ) {
+		if ( is_null( $thumb ) || ! $thumb->isSuccess() ) {
+			if ( is_null( $thumb ) ) {
 				self::setThumbnailFailed( $ID );
 			}
 
@@ -114,6 +110,7 @@ class DG_Thumber {
 			$is_default = true;
 		} else {
 			$url = $thumb->getUrl();
+			$is_default = false;
 		}
 
 		return $url;
