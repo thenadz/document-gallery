@@ -3,8 +3,8 @@ Contributors: dan.rossiter, demur
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
-Tested up to: 4.3
-Stable tag: 3.5.4
+Tested up to: 4.4
+Stable tag: 4.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -442,6 +442,24 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.0 =
+* **Enhancement:** The WordPress visual editor now displays a full gallery preview.
+* **Enhancement:** You can now paginate your galleries. This is especially useful in large multi-hundred item galleries.
+  To enable pagination in your galleries, simply use `limit=##`.
+* **Enhancement:** All CSS & JavaScript is now served minified to ensure the fastest possible load time for your site.
+* **Enhancement:** When using taxonomies to generate your galleries (eg: media categories) you can now use term slug
+  instead of the name. *Thanks andremalenfant for suggesting this!*
+* **Enhancement:** The structure of the gallery output has been cleaned up, making it easier to style if you chose to
+  use custom CSS. *NOTE: This modified structure may break existing custom CSS or PHP filtering, so be sure to check
+  this if you're using either of those features.*
+* **Bug Fix:** The storage of the DG thumbnail cache was very broken. Due to how the cache was originally designed, it
+  ran into issues at large scale and on busy sites, which resulted in difficult to track bugs. The entire storage
+  mechanism for the cache has been rewritten from the ground up to address this issue, which will result in faster
+  gallery generation and more reliable performance.
+* **Bug Fix:** In the thumbnail management tab of the DG settings, sorting by title was broken. This has been fixed.
+* **Bug Fix:** `Limit` was not working in cases where the `ids` or `include` attribute were present. This has been fixed.
+* **Tested Up To:** Document Gallery has been tested in WP 4.4 beta.
 
 = 3.5.4 =
 * **Bug Fix:** There were issues in the structure of HTML generated for galleries. This resulted in issues
