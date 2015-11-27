@@ -3,8 +3,8 @@ Contributors: dan.rossiter, demur
 Tags: attachments, thumbnail, documents, gallery, MS office, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
-Tested up to: 4.3
-Stable tag: 3.5.3
+Tested up to: 4.4
+Stable tag: 4.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,18 +181,13 @@ documents are displayed in ascending or descending order.
 * `none` - No order (available with Version 2.8).
 * `post__in` - Preserve post ID order given in the post__in array.
 
-**Paginate** *(New in Version 4.0)*
-
-When the limit option is not equal to `-1` and paginate is true, the gallery will be split into pages with the limit
-defining the size of each page within the gallery.
-
 **Relation Option** *(New in Version 1.4)*
 
 The relation option should only be used when also using the *category or custom
 taxonomy* option (see above).
 
-When using multiple taxa this option allows you to decide whether the attachments 
-returned must match all of the different taxa specified (AND) or a minimum of one 
+When using multiple taxa this option allows you to decide whether the attachments
+returned must match all of the different taxa specified (AND) or a minimum of one
 taxa match (OR).
 
 *NOTE: This has no bearing on the relationship between different terms for a single
@@ -244,10 +239,6 @@ of a gallery: `dg_gallery_template`, `dg_row_template`, and `dg_icon_template`.
 These filtered templates are used when dynamically generating output for each
 gallery.
 
-*NOTE: The `dg_doc_icon` has been deprecated with the release and is
-scheduled to be removed in a future release. If you are using this
-filter, you are encouraged to replace its usages with `dg_icon_template`.*
-
 Each of the following filters provides an bool argument which indicates
 whither the gallery being generated will display descriptions, which
 allows you to handle galleries with and without descriptions differently.
@@ -255,12 +246,15 @@ allows you to handle galleries with and without descriptions differently.
 If you wish to wrap your galleries in some additional content,
 the `dg_gallery_template` is the tool for the job. With it you can include
 content prior to or following your document galleries. The filter
-exposes 1 special tag which is replaced during gallery generation
+exposes 2 special tags which are replaced during gallery generation
 with data specific to that gallery. The tag is described below:
 
+* **%id%**: The id attribute value for this gallery.
+* **%class%**: The class attribute value for this gallery.
+* **%data%**: The one ore more data-* attributes for the gallery, which are necessary for client-side operations.
 * **%rows%**: This tag is replaced by all of the document gallery rows.
-Everything before this string will be rendered before the gallery and
-everything after this string will be rendered following the gallery.
+  Everything before this string will be rendered before the gallery and
+  everything after this string will be rendered following the gallery.
 
 
 If you wish to modify how gallery rows are generated, `dg_row_template`,
@@ -303,7 +297,7 @@ for a given attachment.
 
 The value being filtered is an associative array with keys equal to a regular
 expression matching all file extensions supported by the generator and values
-equal to [callables](http://www.php.net/manual/en/language.types.callable.php) 
+equal to [callables](http://www.php.net/manual/en/language.types.callable.php)
 which take an **attachment ID** and a **file page number** as arguments.
 
 The callable given should return false if thumbnail generation fails or
@@ -382,6 +376,12 @@ CSS being loaded by returning false in `dg_use_default_gallery_style` filter, li
 == Frequently Asked Questions ==
 
 
+= Q: I'm using taxonomies, but nothing is showing up in my gallery =
+
+A: Remember that Document Gallery defaults to retrieving just attachments for the current post/page.
+If you want a broader scope of attachments, you'll also need tell Document Gallery to search everywhere
+like so: `[dg id=-1 category="My Awesome Category"]`.
+
 = Q: Ghostscript is installed on my server, but it's not working! =
 
 A: Document Gallery does a pretty good job of detecting where Ghostscript is installed,
@@ -444,12 +444,28 @@ ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
 
 = 4.0 =
-* **Enhancement:** This release includes full integration with the WordPress visual editor. Your Document Galleries
-  will now be visualized within the text editor.
-* **Enhancement:** Galleries now supports pagination. If you've got hundreds or thousands of documents to
-  display, this allows you to present everything in a more manageable manner. To use this functionality, you
-  simply need to set `limit=???` where "???" is how many documents you want displayed per page.
-* **Bug Fix:** Handling of `include` + `limit` attributes in same shortcode were broken. This has been addressed.
+* **Enhancement:** The WordPress visual editor now displays a full gallery preview.
+* **Enhancement:** You can now paginate your galleries. This is especially useful in large multi-hundred item galleries.
+  To enable pagination in your galleries, simply use `limit=##`.
+* **Enhancement:** All CSS & JavaScript is now served minified to ensure the fastest possible load time for your site.
+* **Enhancement:** When using taxonomies to generate your galleries (eg: media categories) you can now use term slug
+  instead of the name. *Thanks andremalenfant for suggesting this!*
+* **Enhancement:** The structure of the gallery output has been cleaned up, making it easier to style if you chose to
+  use custom CSS. *NOTE: This modified structure may break existing custom CSS or PHP filtering, so be sure to check
+  this if you're using either of those features.*
+* **Bug Fix:** The storage of the DG thumbnail cache was very broken. Due to how the cache was originally designed, it
+  ran into issues at large scale and on busy sites, which resulted in difficult to track bugs. The entire storage
+  mechanism for the cache has been rewritten from the ground up to address this issue, which will result in faster
+  gallery generation and more reliable performance.
+* **Bug Fix:** In the thumbnail management tab of the DG settings, sorting by title was broken. This has been fixed.
+* **Bug Fix:** `Limit` was not working in cases where the `ids` or `include` attribute were present. This has been fixed.
+* **Tested Up To:** Document Gallery has been tested in WP 4.4 beta.
+
+= 3.5.4 =
+* **Bug Fix:** There were issues in the structure of HTML generated for galleries. This resulted in issues
+  with icon generation.
+* **Notice:** For any developers using PHP filters with Document Gallery, the structure of the content being
+  filtered in `dg_gallery_template` has changed. Documentation has been updated accordingly.
 
 = 3.5.3 =
 * **Bug Fix:** The `images` attribute was not being parsed correctly. Thanks to

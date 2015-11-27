@@ -36,18 +36,6 @@ class DG_Util {
 	}
 
 	/**
-	 * Whether the given attachment has a thumbanil graphic.
-	 *
-	 * @param $ID int The id of the attachment to be checked.
-	 * @return bool Whether the given attachment has a thumbnail image.
-	 */
-	public static function hasThumb($ID) {
-		$options = DocumentGallery::getOptions();
-		$thumbs = $options['thumber']['thumbs'];
-		return array_key_exists($ID, $thumbs) && ! empty( $thumbs[ $ID ]['thumber'] );
-	}
-
-	/**
 	 * @param mixed $maybeint Data you wish to have converted to a positive integer.
 	 *
 	 * @return int A positive integer.
