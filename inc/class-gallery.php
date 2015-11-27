@@ -336,11 +336,11 @@ class DG_Gallery {
 	 *
 	 * @param string $x Field to retrieve from matched term.
 	 * @param string $taxon The taxon these terms are a member of.
-	 * @param array $term_names Terms to retrieve.
+	 * @param array $term_idents Terms to retrieve, identified by either slug or name.
 	 *
 	 * @return array All matched terms.
 	 */
-	private function getTermXByNames( $x, $taxon, $term_names ) {
+	private function getTermXByNames( $x, $taxon, $term_idents ) {
 		$ret   = array();
 		$valid = true;
 
@@ -358,12 +358,17 @@ class DG_Gallery {
 
 		// only check terms if we first have a valid taxon
 		if ( $valid ) {
-			foreach ( $term_names as $name ) {
-				if ( ( $term = get_term_by( 'name', $name, $taxon ) ) ) {
+			foreach ( $term_idents as $ident ) {
+				$term = get_term_by( 'slug', $ident, $taxon );
+				if ( ! $term ) {
+					$term = get_term_by( 'name', $ident, $taxon );
+				}
+
+				if ( $term ) {
 					$ret[] = $term->{$x};
 				} else {
-					$this->errs[] = sprintf( __( '%s is not a valid term name in %s.',
-						'document-gallery' ), $name, $taxon );
+					$this->errs[] = sprintf( __( '%s is not a valid term slug/name in %s.',
+						'document-gallery' ), $ident, $taxon );
 				}
 			}
 		}
