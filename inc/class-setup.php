@@ -26,8 +26,6 @@ class DG_Setup {
 
 		return array(
 			'thumber'    => array(
-				// cached thumbnails, keyed by post ID
-				'thumbs'  => array(),
 				// Ghostscript path
 				'gs'      => $gs,
 				// which thumbnail generation methods are available
@@ -106,7 +104,7 @@ class DG_Setup {
 		}
 
 		// version has historically been in two locations -- must check both to continue supporting upgrading from those old versions
-		$old_version = array_key_exists( 'version', $dg_options ) ? $dg_options['version'] : $dg_options['meta']['version'];
+		$old_version = isset( $dg_options['version'] ) ? $dg_options['version'] : $dg_options['meta']['version'];
 		if ( ! is_null( $dg_options ) && DG_VERSION !== $old_version ) {
 			DG_Logger::writeLog( DG_LogLevel::Detail, "Upgrading Document Gallery from version $old_version to " . DG_VERSION );
 
@@ -150,12 +148,7 @@ class DG_Setup {
 		$options['meta']['donate_link'] = self::getDonateLink();
 
 		// remove previously-failed thumbs
-		$thumbs = $options['thumber']['thumbs'];
-		foreach ( $thumbs as $k => $v ) {
-			if ( empty( $v['thumber'] ) ) {
-				unset( $options['thumber']['thumbs'][ $k ] );
-			}
-		}
+		DG_Thumb::purgeFailedThumbs();
 
 		DocumentGallery::setOptions( $options, $blog );
 	}
@@ -358,6 +351,7 @@ class DG_Setup {
 	/**
 	 * Adds the meta items_per_page default value.
 	 * Paginate & skip options were added.
+	 * Moving cached thumbs into postmeta table.
 	 *
 	 * @param array $options The options to be modified.
 	 */
@@ -366,6 +360,24 @@ class DG_Setup {
 			$options['gallery']['paginate'] = true;
 			$options['gallery']['skip'] = 0;
 			$options['meta']['items_per_page'] = 10;
+
+			$upload_dir = wp_upload_dir();
+			$upload_len = strlen( $upload_dir['basedir'] );
+			$dimensions = $options['thumber']['width'] . 'x' . $options['thumber']['height'];
+			foreach ( $options['thumber']['thumbs'] as $id => $thumb ) {
+				$thumb_obj = new DG_Thumb();
+				$thumb_obj->setPostId( $id );
+				$thumb_obj->setTimestamp( $thumb['timestamp'] );
+				$thumb_obj->setDimensions( $dimensions );
+				if ( isset( $thumb['thumb_path'] ) ) {
+					$thumb_obj->setRelativePath( substr( $thumb['thumb_path'], $upload_len + 1 ) );
+					$thumb_obj->setGenerator( DG_Util::callableToString( $thumb['thumber'] ) );
+				}
+
+				$thumb_obj->save();
+			}
+
+			unset( $options['thumber']['thumbs'] );
 		}
 	}
 
@@ -445,17 +457,7 @@ class DG_Setup {
 	 * Runs when DG is uninstalled for an individual blog.
 	 */
 	private static function _uninstall( $blog ) {
-		$options = DG_Thumber::getOptions( $blog );
-		if ( is_null( $options ) ) {
-			return;
-		}
-
-		foreach ( $options['thumbs'] as $val ) {
-			if ( isset( $val['thumber'] ) ) {
-				@unlink( $val['thumb_path'] );
-			}
-		}
-
+		DG_Thumb::purgeThumbs( null, $blog );
 		DocumentGallery::deleteOptions( $blog );
 	}
 

@@ -7,16 +7,45 @@
 
     // find all document-icons without icons generated and start processing
     $(document).ready(function() {
+        sizeGalleryIcons();
         resetPendingIcons();
+        handleVisualEditor();
+        registerPaginationHandler();
+    });
 
-        // listen for all pagination click in current DOM and any future elements
+    /**
+     * Sets the size of the gallery icons based on the column count.
+     * @param gallery If given, the target gallery. Otherwise all galleries on page.
+     */
+    function sizeGalleryIcons(gallery) {
+        (gallery || $('.document-gallery[data-icon-width]')).each(function() {
+            var icon_width = $(this).data('icon-width') + '%';
+            $(this).find('.document-icon').width(icon_width);
+        });
+    }
+
+    /**
+     * Handles necessary logic for when we're rendering gallery preview within visual editor.
+     */
+    function handleVisualEditor() {
+        if (typeof tinymce !== 'undefined') {
+            tinymce.PluginManager.add('dg', function (editor, url) {
+                editor.on('LoadContent dgUpdate undo', function (e) {
+                    $(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
+                        retrieveGallery($.parseJSON(decodeURIComponent($(this).data('shortcode'))), $(this));
+                    });
+                });
+            });
+        }
+    }
+
+    /**
+     * Listen for all pagination clicks in current DOM and any future DOM elements.
+     */
+    function registerPaginationHandler() {
         $('body').delegate('.dg-paginate-wrapper a.paginate', 'click', function (e) {
             var target = $(this).closest('.dg-paginate-wrapper');
-            var atts = target.children('div[data-shortcode]').data('shortcode');
-
-            if (!atts.hasOwnProperty('skip')) {
-                atts['skip'] = 0;
-            }
+            var atts = target.data('shortcode');
 
             if ($(this).hasClass('left')) {
                 atts['skip'] -= atts['limit'];
@@ -27,18 +56,7 @@
             retrieveGallery(atts, target);
             e.preventDefault();
         });
-
-        // handle when we're in visual editor
-        if (typeof tinymce !== 'undefined') {
-            tinymce.PluginManager.add('dg', function (editor, url) {
-                editor.on('LoadContent dgUpdate undo', function (e) {
-                    $(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
-                        retrieveGallery($.parseJSON(decodeURIComponent($(this).data('shortcode'))), $(this));
-                    });
-                });
-            });
-        }
-    });
+    }
 
     /**
      * Collects all of the DG icons that need to be generated and starts requesting them via AJAX.
@@ -47,7 +65,7 @@
         ids = [];
         i = 0;
 
-        $('.document-icon[data-id]').each(function() {
+        $('.document-gallery img[data-id]').each(function() {
             var id = $(this).data('id');
 
             // if we have multiple galleries, we could have multiple elements
@@ -69,7 +87,9 @@
         // TODO: Cache already-retrieved gallery pages. Need to be careful not to keep too many at a time
         // (could consume a lot of memory) & handle caching pages for multiple galleries on a single pages.
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
-            target.replaceWith(html);
+            var jobj = $(html);
+            target.replaceWith(jobj);
+            sizeGalleryIcons(jobj);
             resetPendingIcons();
         });
     }
@@ -105,7 +125,7 @@
     function processRetrievedThumbnails(response) {
         for (var id in response) {
             if (response.hasOwnProperty(id)) {
-                var target = $('.document-icon[data-id="' + id + '"] img');
+                var target = $('.document-gallery img[data-id="' + id + '"]');
                 target.removeAttr('data-id');
 
                 (function(id, target) {

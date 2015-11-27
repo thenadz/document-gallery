@@ -1,6 +1,8 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
+include_once DG_PATH . 'inc/class-gallery-sanitization.php';
+
 DG_Gallery::init();
 
 /**
@@ -11,10 +13,10 @@ DG_Gallery::init();
 class DG_Gallery {
 
 	/*==========================================================================
-	* PRIVATE FIELDS
-	*=========================================================================*/
+	 * PRIVATE FIELDS
+	 *=========================================================================*/
 
-	private $atts, $given_atts, $taxa;
+	private $atts, $taxa;
 	private $docs = array();
 	private $errs = array();
 
@@ -22,11 +24,11 @@ class DG_Gallery {
 	private $has_next = false;
 
 	// templates for HTML output
-	private static $no_docs, $comment, $unary_err, $binary_err;
+	private static $no_docs, $comment, $defaults;
 
 	/*==========================================================================
-	* PUBLIC FUNCTIONS
-	*=========================================================================*/
+	 * PUBLIC FUNCTIONS
+	 *=========================================================================*/
 
 	/**
 	 * @return bool Whether to link to attachment pg.
@@ -57,8 +59,8 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-	* GET AND SET OPTIONS
-	*=========================================================================*/
+	 * GET AND SET OPTIONS
+	 *=========================================================================*/
 
 	/**
 	 * @param int $blog The blog we're retrieving options for (null => current blog).
@@ -82,20 +84,19 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-	* INIT GALLERY
-	*=========================================================================*/
+	 * INIT GALLERY
+	 *=========================================================================*/
 
 	/**
 	 * Initializes static values for this class.
 	 */
 	public static function init() {
 		if ( ! isset( self::$comment ) ) {
-			self::$comment    =
+			self::$comment  =
 				PHP_EOL . '<!-- ' . __( 'Generated using Document Gallery. Get yours here: ', 'document-gallery' ) .
 				'http://wordpress.org/extend/plugins/document-gallery -->' . PHP_EOL;
-			self::$no_docs    = '<!-- ' . __( 'No attachments to display. How boring! :(', 'document-gallery' ) . ' -->';
-			self::$unary_err  = __( 'The %s value entered, "%s", is not valid.', 'document-gallery' );
-			self::$binary_err = __( 'The %s parameter may only be "%s" or "%s." You entered "%s."', 'document-gallery' );
+			self::$no_docs  = '<!-- ' . __( 'No attachments to display. How boring! :(', 'document-gallery' ) . ' -->';
+			self::$defaults = array_merge( array( 'include' => '', 'exclude' => '' ), self::getOptions() );
 		}
 	}
 
@@ -150,21 +151,7 @@ class DG_Gallery {
 			unset( $atts['localpost'] );
 		}
 
-		// build the structure to be used in data-shortcode attribute with sanitized values
-		$this->given_atts = array_merge( array( 'id' => $post_id ), $atts );
-		foreach ( $this->given_atts as $k => &$v ) {
-			$v = self::sanitizeParameter( $k, $v );
-		}
-
-		// need to undo nulling of -1 ID for version sent out to JSON
-		if ( is_null( $this->given_atts['id'] ) ) {
-			$this->given_atts['id'] = -1;
-		}
-
-		// merge options w/ default values not stored in options
-		$defaults = array_merge(
-			array( 'id' => $post_id, 'include' => '', 'exclude' => '' ),
-			self::getOptions() );
+		$defaults = array_merge( array( 'id' => $post_id ), self::$defaults );
 
 		// values used to construct tax query (may be empty)
 		$this->taxa = array_diff_key( $atts, $defaults );
@@ -216,446 +203,11 @@ class DG_Gallery {
 				}
 			} else if ( $sanitized[ $k ] !== $v ) { //Sometimes we get boolean in the string form for checkboxes
 				// sanitize value if different from old value
-				$sanitized[ $k ] = self::sanitizeParameter( $k, $sanitized[ $k ], $errs );
+				$sanitized[ $k ] = DG_GallerySanitization::sanitizeParameter( $k, $sanitized[ $k ], $errs );
 			}
 		}
 
 		return $sanitized;
-	}
-
-	/**
-	 *
-	 * @param string $key The key to reference the current value in the defaults array.
-	 * @param mixed $value The value to be sanitized.
-	 * @param array $errs The array of errors, which will be appended with any errors found.
-	 *
-	 * @return mixed The sanitized value, falling back to the current default value when invalid value given.
-	 */
-	private static function sanitizeParameter( $key, $value, &$errs = null ) {
-		// all sanitize methods must be in the following form: sanitize<UpperCamelCaseKey>
-		$funct    = $key;
-		$funct[0] = strtoupper( $funct[0] );
-		$funct    = 'sanitize' . preg_replace_callback( '/_([a-z])/', array( __CLASS__, 'secondCharToUpper' ), $funct );
-
-		$callable = array( __CLASS__, $funct );
-
-		// avoid looking for method beforehand unless we're running in debug mode -- expensive call
-		if ( DG_Logger::logEnabled() && ! method_exists( __CLASS__, $funct ) ) {
-			DG_Logger::writeLog(
-				DG_LogLevel::Error,
-				__( 'Attempted to call invalid function: ', 'document-gallery' ) . implode( '::', $callable ),
-				true );
-		}
-
-		// call param-specific sanitization
-		$ret = call_user_func_array( $callable, array( $value, &$err ) );
-
-		// check for error and return default
-		if ( isset( $err ) ) {
-			$defaults = self::getOptions();
-			$ret      = $defaults[ $key ];
-
-			if ( ! is_null($errs) ) {
-				$errs[ $key ] = $err;
-			}
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The attachment_pg value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool The sanitized attachment_pg value.
-	 */
-	private static function sanitizeAttachmentPg( $value, &$err ) {
-		$ret = DG_Util::toBool( $value );
-
-		if ( is_null( $ret ) ) {
-			$err = sprintf( self::$binary_err, 'attachment_pg', 'true', 'false', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The columns value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return int The sanitized columns value.
-	 */
-	public static function sanitizeColumns( $value, &$err ) {
-		return $value != -1 ? absint( $value ) : null;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The descriptions value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool The sanitized descriptions value.
-	 */
-	private static function sanitizeDescriptions( $value, &$err ) {
-		$ret = DG_Util::toBool( $value );
-
-		if ( is_null( $ret ) ) {
-			$err = sprintf( self::$binary_err, 'descriptions', 'true', 'false', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The exclude value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool The sanitized exclude value.
-	 */
-	private static function sanitizeExclude( $value, &$err ) {
-		return self::sanitizeIdList( 'Exclude', $value, $err );
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The fancy value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool The sanitized fancy value.
-	 */
-	private static function sanitizeFancy( $value, &$err ) {
-		$ret = DG_Util::toBool( $value );
-
-		if ( is_null( $ret ) ) {
-			$err = sprintf( self::$binary_err, 'fancy', 'true', 'false', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The id value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return int The sanitized id value.
-	 */
-	private static function sanitizeId( $value, &$err ) {
-		return $value != -1 ? absint( $value ) : null;
-	}
-
-	/**
-	 * Takes the provided comma-delimited list of IDs and returns null if it is invalid.
-	 *
-	 * @param string $name Name of the value being sanitized. Used in error string when needed.
-	 * @param string $value The ids value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool|multitype:int The sanitized comma-delimited list of IDs value.
-	 */
-	private static function sanitizeIdList( $name, $value, &$err ) {
-		static $regex = '/(?:|\d+(?:,\d+)*)/';
-
-		$ret = $value;
-
-		if ( ! preg_match( $regex, $value ) ) {
-			$err = sprintf( __( '%s may only be a comma-delimited list of integers.', 'document-gallery' ), $name );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The ids value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool|multitype:int The sanitized ids value.
-	 */
-	private static function sanitizeInclude( $value, &$err ) {
-		return self::sanitizeIdList( 'Include', $value, $err );
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The limit value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return int The sanitized limit value.
-	 */
-	private static function sanitizeLimit( $value, &$err ) {
-		$ret = intval( $value );
-
-		if ( is_null( $ret ) || $ret < -1 ) {
-			$err = sprintf( self::$unary_err, 'limit', '>= -1' );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The mime_types value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized mime_types value.
-	 */
-	private static function sanitizeMimeTypes( $value, &$err ) {
-		// TODO: do some actual sanitization...
-		return $value;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The new_window value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return bool The sanitized new_window value.
-	 */
-	private static function sanitizeNewWindow( $value, &$err ) {
-		$ret = DG_Util::toBool( $value );
-
-		if ( is_null( $ret ) ) {
-			$err = sprintf( self::$binary_err, 'new_window', 'true', 'false', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The order value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized order value.
-	 */
-	private static function sanitizeOrder( $value, &$err ) {
-		$ret = strtoupper( $value );
-
-		if ( ! in_array( $ret, self::getOrderOptions() ) ) {
-			$err = sprintf( self::$binary_err, 'order', 'ASC', 'DESC', $value );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array The valid options for order parameter.
-	 */
-	public static function getOrderOptions() {
-		return array( 'ASC', 'DESC' );
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The orderby value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized orderby value.
-	 */
-	private static function sanitizeOrderby( $value, &$err ) {
-		$ret = ( 'ID' === strtoupper( $value ) ) ? 'ID' : strtolower( $value );
-
-		if ( ! in_array( $ret, self::getOrderbyOptions() ) ) {
-			$err = sprintf( self::$unary_err, 'orderby', $value );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array The valid options for orderby parameter.
-	 */
-	public static function getOrderbyOptions() {
-		return array(
-			'author',
-			'comment_count',
-			'date',
-			'ID',
-			'menu_order',
-			'modified',
-			'name',
-			'none',
-			'parent',
-			'post__in',
-			'rand',
-			'title'
-		);
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The paginate value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized paginate value.
-	 */
-	private static function sanitizePaginate( $value, &$err ) {
-		$ret = DG_Util::toBool( $value );
-
-		if ( is_null( $ret ) ) {
-			$err = sprintf( self::$binary_err, 'paginate', 'true', 'false', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The post_status value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized post_status value.
-	 */
-	private static function sanitizePostStatus( $value, &$err ) {
-		$ret = preg_grep( '/^' . preg_quote( $value ) . '$/i', self::getPostStatuses() );
-		$ret = reset( $ret );
-
-		if ( $ret === false ) {
-			$err = sprintf( self::$unary_err, 'post_status', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array All registered post statuses.
-	 */
-	public static function getPostStatuses() {
-		static $statuses;
-		if ( ! isset( $statuses ) ) {
-			$statuses   = get_post_stati();
-			$statuses[] = 'any';
-			asort( $statuses );
-		}
-
-		return $statuses;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The post_type value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized post_type value.
-	 */
-	private static function sanitizePostType( $value, &$err ) {
-		$ret = preg_grep( '/^' . preg_quote( $value ) . '$/i', self::getPostTypes() );
-		$ret = reset( $ret );
-
-		if ( $ret === false ) {
-			$err = sprintf( self::$unary_err, 'post_type', $value );
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array All registered post types.
-	 */
-	public static function getPostTypes() {
-		static $types;
-		if ( ! isset( $types ) ) {
-			$types   = get_post_types();
-			$types[] = 'any';
-			asort( $types );
-		}
-
-		return $types;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The relation value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized relation value.
-	 */
-	private static function sanitizeRelation( $value, &$err ) {
-		$ret = strtoupper( $value );
-
-		if ( ! in_array( $ret, self::getRelationOptions() ) ) {
-			$err = sprintf( self::$binary_err, 'relation', 'AND', 'OR', $value );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array The valid options for relation parameter.
-	 */
-	public static function getRelationOptions() {
-		return array( 'AND', 'OR' );
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $value The skip value to be sanitized.
-	 * @param string &$err String to be initialized with error, if any.
-	 *
-	 * @return string The sanitized skip value.
-	 */
-	private static function sanitizeSkip( $value, &$err ) {
-		$ret = intval( $value );
-
-		if ( is_null( $ret ) || $ret < 0 ) {
-			$err = sprintf( self::$unary_err, 'skip', '>= 0' );
-			$ret = null;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Takes the provided value and returns a sanitized value.
-	 *
-	 * @param string $operator The operator value to be sanitized.
-	 *
-	 * @return string The sanitized operator value.
-	 */
-	private function sanitizeOperator( $operator ) {
-		$ret = strtoupper( $operator );
-
-		if ( ! in_array( $ret, self::getOperatorOptions() ) ) {
-			$this->errs[] = sprintf( self::$binary_err, 'IN", "NOT IN", "OR', 'AND', $operator );
-			$ret          = null;
-		} else if ( $ret === 'OR' ) {
-			$ret = 'IN';
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array The valid options for *_relation/*_operator parameter.
-	 */
-	public static function getOperatorOptions() {
-		return array( 'IN', 'NOT IN', 'AND', 'OR' );
 	}
 
 	/**
@@ -715,19 +267,21 @@ class DG_Gallery {
 			$operator = array();
 
 			// find any relations for taxa
-			$iterable = $this->taxa;
-			foreach ( $iterable as $key => $value ) {
+			$operator_keys = array();
+			foreach ( $this->taxa as $key => $value ) {
 				if ( preg_match( $pattern, $key, $matches ) ) {
 					$base = $matches[1];
-					if ( array_key_exists( $base, $this->taxa ) ) {
-						$operator[ $base ] = self::sanitizeOperator( $value );
-						unset( $this->taxa[ $key ] );
+					if ( isset( $this->taxa[$base] ) ) {
+						$operator[$base] = DG_GallerySanitization::sanitizeParameter( 'operator', $value, $this->errs );
+						$operator_keys[] = $key;
 					}
 				}
 			}
 
 			// build tax query
 			foreach ( $this->taxa as $taxon => $terms ) {
+				if ( in_array( $taxon, $operator_keys ) ) continue;
+
 				$terms = $this->getTermIdsByNames( $taxon, explode( ',', $terms ) );
 
 				$taxa[] = array(
@@ -782,11 +336,11 @@ class DG_Gallery {
 	 *
 	 * @param string $x Field to retrieve from matched term.
 	 * @param string $taxon The taxon these terms are a member of.
-	 * @param array $term_names Terms to retrieve.
+	 * @param array $term_idents Terms to retrieve, identified by either slug or name.
 	 *
 	 * @return array All matched terms.
 	 */
-	private function getTermXByNames( $x, $taxon, $term_names ) {
+	private function getTermXByNames( $x, $taxon, $term_idents ) {
 		$ret   = array();
 		$valid = true;
 
@@ -797,33 +351,29 @@ class DG_Gallery {
 			if ( $count > 0 && taxonomy_exists( $tmp ) ) {
 				$taxon = $tmp;
 			} else {
-				$this->errs[] = sprintf( self::$unary_err, 'taxon', $taxon );
+				$this->errs[] = sprintf( DG_GallerySanitization::getUnaryErr(), 'taxon', $taxon );
 				$valid        = false;
 			}
 		}
 
 		// only check terms if we first have a valid taxon
 		if ( $valid ) {
-			foreach ( $term_names as $name ) {
-				if ( ( $term = get_term_by( 'name', $name, $taxon ) ) ) {
+			foreach ( $term_idents as $ident ) {
+				$term = get_term_by( 'slug', $ident, $taxon );
+				if ( ! $term ) {
+					$term = get_term_by( 'name', $ident, $taxon );
+				}
+
+				if ( $term ) {
 					$ret[] = $term->{$x};
 				} else {
-					$this->errs[] = sprintf( __( '%s is not a valid term name in %s.',
-						'document-gallery' ), $name, $taxon );
+					$this->errs[] = sprintf( __( '%s is not a valid term slug/name in %s.',
+						'document-gallery' ), $ident, $taxon );
 				}
 			}
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * @param string $string To take second char from.
-	 *
-	 * @return string Capitalized second char of given string.
-	 */
-	private static function secondCharToUpper( $string ) {
-		return strtoupper( $string[1] );
 	}
 
 	/**
@@ -840,8 +390,22 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-		* OUTPUT HTML STRING
-		*=========================================================================*/
+	 * OUTPUT HTML STRING
+	 *=========================================================================*/
+
+	/**
+	 * @return array The data to be used in the data-shortcode attribute.
+	 */
+	private function getShortcodeData() {
+		$ret = array_merge( $this->atts, $this->taxa );
+
+		// need to undo nulling of -1 ID for version sent out to JSON
+		if ( is_null( $ret['id'] ) ) {
+			$ret['id'] = -1;
+		}
+
+		return $ret;
+	}
 
 	/**
 	 * @filter dg_gallery_template Allows the user to filter anything content surrounding the generated gallery.
@@ -851,12 +415,6 @@ class DG_Gallery {
 	 */
 	public function __toString() {
 		static $instance = 0;
-		$instance ++;
-
-		static $find = null;
-		if ( is_null( $find ) ) {
-			$find = array( '%class%', '%icons%' );
-		}
 
 		if ( ! empty( $this->errs ) ) {
 			return '<p>' . implode( '</p><p>', $this->errs ) . '</p>';
@@ -866,56 +424,57 @@ class DG_Gallery {
 			return self::$no_docs;
 		}
 
-		$data     = wp_json_encode( $this->given_atts );
-		$selector = "document-gallery-$instance";
-		$template =
-			"<div id='$selector' class='%class%' data-shortcode='$data'>" . PHP_EOL .
-			'%icons%' . PHP_EOL .
-			'</div>' . PHP_EOL;
+		$instance++;
+
+		$icon_find       = array( '%class%', '%icons%' );
+		$icon_repl		 = array();
+		$icon_classes    = array( 'document-icon-row' );
+		$gallery_find    = array( '%id%', '%data%', '%rows%', '%class%' );
+		$gallery_repl    = array( "document-gallery-$instance", ( "data-shortcode='" . wp_json_encode( self::getShortcodeData() ) . "'" ), '' );
+		$gallery_classes = array( 'document-gallery' );
+
+		if ( $this->useDescriptions() ) {
+			$icon_classes[] = 'descriptions';
+		}
+
+		$icon_repl[] = implode( ' ', $icon_classes );
 
 		$icon_wrapper = apply_filters(
 			'dg_row_template',
-			$template,
+			"<div class='%class%'>" . PHP_EOL . '%icons%' . PHP_EOL . '</div>' . PHP_EOL,
 			$this->useDescriptions() );
 
-		$core    = '';
-		$classes = array( 'document-icon-wrapper' );
-		if ( $this->useDescriptions() ) {
-			$classes[] = 'descriptions';
-		}
-
-		$repl = array( implode( ' ', $classes ) );
 		if ( $this->useDescriptions() ) {
 			foreach ( $this->docs as $doc ) {
-				$repl[1] = $doc;
-				$core .= str_replace( $find, $repl, $icon_wrapper );
+				$icon_repl[1] = $doc;
+				$gallery_repl[2] .= str_replace( $icon_find, $icon_repl, $icon_wrapper );
 			}
 		} else {
 			$count = count( $this->docs );
-			$cols  = ! is_null( $this->atts['columns'] ) ? $this->atts['columns'] : $count;
+			$cols  = !is_null( $this->atts['columns'] ) ? $this->atts['columns'] : $count;
 
-			// TODO: Invalid HTML. WP Core does it this way for [gallery], but consider setting width for each
-			// .document-icon as style attribute in element.
 			if ( apply_filters( 'dg_use_default_gallery_style', true ) ) {
 				$itemwidth = $cols > 0 ? ( floor( 100 / $cols ) - 1 ) : 100;
-				$core .= "<style type='text/css'>#$selector .document-icon{width:$itemwidth%}</style>";
+				$gallery_repl[1] .= " data-icon-width='$itemwidth'";
 			}
 
 			for ( $i = 0; $i < $count; $i += $cols ) {
-				$repl[1] = '';
+				$icon_repl[1] = '';
 
 				$min = min( $i + $cols, $count );
 				for ( $x = $i; $x < $min; $x ++ ) {
-					$repl[1] .= $this->docs[ $x ];
+					$icon_repl[1] .= $this->docs[ $x ];
 				}
 
-				$core .= str_replace( $find, $repl, $icon_wrapper );
+				$gallery_repl[2] .= str_replace( $icon_find, $icon_repl, $icon_wrapper );
 			}
 		}
 
-		// allow user to wrap gallery output
-		$gallery = apply_filters( 'dg_gallery_template', '%rows%', $this->useDescriptions() );
+		// allow user to filter gallery wrapper
+		$gallery = apply_filters( 'dg_gallery_template', '<div id="%id%" class="%class%" %data%>' . PHP_EOL . '%rows%</div>', $this->useDescriptions() );
 
+		// build pagination section
+		// TODO: We should be using WP core get_the_posts_pagination()
 		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
 			$left_href = $right_href = ' href="#"';
 			$left_tag = $right_tag = 'a';
@@ -931,13 +490,22 @@ class DG_Gallery {
 
 			$prev = __( 'Prev', 'document-gallery' );
 			$next = __( 'Next', 'document-gallery' );
-			$gallery =
-				'<div class="dg-paginate-wrapper">' .
-					$gallery .
-					"<span><$left_tag$left_href class='paginate left'>$prev</$left_tag> | <$right_tag$right_href class='paginate right'>$next</$right_tag></span>" .
-				'</div>';
+			$gallery_repl[2] .= "<span class='pagination'><$left_tag$left_href class='paginate left'>$prev</$left_tag> | <$right_tag$right_href class='paginate right'>$next</$right_tag></span>";
+			$gallery_classes[] = 'dg-paginate-wrapper';
 		}
 
-		return self::$comment . str_replace( '%rows%', $core, $gallery );
+		$gallery_repl[] = implode( ' ', $gallery_classes );
+
+		$comment = self::$comment;
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$ids = array();
+			foreach ( $this->docs as $doc ) {
+				$ids[] = $doc->getId();
+			}
+
+			$comment .= '<!-- Attachment IDs: ' . implode( $ids, ', ' ) . ' -->' . PHP_EOL;
+		}
+
+		return $comment . str_replace( $gallery_find, $gallery_repl, $gallery );
 	}
 }
