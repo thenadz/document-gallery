@@ -147,23 +147,23 @@ tr.selected:hover {
     padding-right: 5px;
 }
 
-.general-tab:before {
+#general-tab-header:before {
     content: '\f108';
 }
 
-.thumber-co-tab:before {
+#thumber-co-tab-header:before {
     content: '\f529';
 }
 
-.thumbnail-management-tab:before {
+#thumbnail-management-tab-header:before {
     content: '\f233';
 }
 
-.logging-tab:before {
+#logging-tab-header:before {
     content: '\f163';
 }
 
-.advanced-tab:before {
+#advanced-tab-header:before {
     content: '\f332';
 }
 
