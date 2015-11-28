@@ -1,6 +1,11 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
+$options = DG_Thumber::getOptions();
+if ( DG_Thumber::isThumberCoAvailable() && $options['active']['thumber-co'] ) {
+	include_once DG_PATH . 'inc/thumber-co/class-thumber-co.php';
+}
+
 /**
  * Thumber wraps the functionality required to
  * generate thumbnails for arbitrary documents.
@@ -20,14 +25,15 @@ class DG_Thumber {
 	public static function getDefaultThumbers( $skeleton = false ) {
 		$gs_active = $imagick_active = null;
 		if ( ! $skeleton ) {
-			$gs_active      = (bool) self::getGhostscriptExecutable();
-			$imagick_active = self::isImagickAvailable();
+			$gs_active         = (bool) self::getGhostscriptExecutable();
+			$imagick_active    = self::isImagickAvailable();
 		}
 
 		return array(
-			'av'      => true,
-			'gs'      => $gs_active,
-			'imagick' => $imagick_active
+			'av'         => true,
+			'gs'         => $gs_active,
+			'imagick'    => $imagick_active,
+			'thumber-co' => false
 		);
 	}
 
@@ -241,8 +247,8 @@ class DG_Thumber {
 	}
 
 	/*==========================================================================
-		* GHOSTSCRIPT THUMBNAILS
-		*=========================================================================*/
+	 * GHOSTSCRIPT THUMBNAILS
+	 *=========================================================================*/
 
 	/**
 	 * Get thumbnail for document with given ID using Ghostscript. Imagick could
@@ -368,6 +374,18 @@ class DG_Thumber {
 		}
 
 		return $ret;
+	}
+
+	/*==========================================================================
+	 * THUMBER.CO THUMBNAILS
+	 *=========================================================================*/
+
+	/**
+	 * @return bool Whether Thumber.co may be used in thumbnail generation.
+	 */
+	public static function isThumberCoAvailable() {
+		global $dg_options;
+		return isset( $dg_options['thumber-co']['uid'] ) && isset( $dg_options['thumber-co']['secret'] );
 	}
 
 	/*==========================================================================
