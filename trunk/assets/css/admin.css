@@ -147,19 +147,19 @@ tr.selected:hover {
     padding-right: 5px;
 }
 
-.General-tab:before {
+.general-tab:before {
     content: '\f108';
 }
 
-.Thumbnail-tab:before {
+.thumbnail-management-tab:before {
     content: '\f233';
 }
 
-.Logging-tab:before {
+.logging-tab:before {
     content: '\f163';
 }
 
-.Advanced-tab:before {
+.advanced-tab:before {
     content: '\f332';
 }
 

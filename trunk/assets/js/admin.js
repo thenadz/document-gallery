@@ -25,7 +25,7 @@ jQuery(document).ready(function () {
     jQuery('select.limit_per_page').change(function () {
         jQuery(location).attr('href', '?' + jQuery.param(jQuery.extend(URL_params, {limit: this.value})));
     });
-    jQuery('#tab-Thumbnail').submit(function (event) {
+    jQuery('#thumbnail-management-tab').submit(function (event) {
         event.preventDefault();
         if (jQuery('.cb-ids:checked').length > 0) {
             var a = jQuery(this).attr('action');
@@ -53,7 +53,7 @@ jQuery(document).ready(function () {
         return false;
     });
 
-    jQuery('#tab-Advanced #options-dump').click(function () {
+    jQuery('#advanced-tab #options-dump').click(function () {
         jQuery(this).select();
     });
 
@@ -213,7 +213,7 @@ jQuery(document).ready(function () {
                     target = ajax_object.ajax_url;
                     formData.append('action', 'dg_upload_thumb');
                 } else {
-                    target = jQuery('#tab-Thumbnail').attr('action');
+                    target = jQuery('#thumbnail-management-tab').attr('action');
                 }
                 formData.append('document_gallery[entry]', entry);
                 formData.append('document_gallery[ajax]', 'true');
@@ -342,7 +342,7 @@ jQuery(document).ready(function () {
     jQuery('.edit-controls .dashicons-yes').click(function () {
         var cell = jQuery(this).closest('td');
         var entry = jQuery(this).closest('tr').data('entry');
-        var target = jQuery('#tab-Thumbnail').attr('action');
+        var target = jQuery('#thumbnail-management-tab').attr('action');
         var formData = new FormData(jQuery('[data-entry=' + entry + ']').closest('form')[0]);
         formData.append('document_gallery[entry]', entry);
         formData.append('document_gallery[ajax]', 'true');
