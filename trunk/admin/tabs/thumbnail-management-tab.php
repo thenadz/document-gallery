@@ -1,13 +1,20 @@
 <?php
+defined( 'WPINC' ) OR exit;
 
 $dg_url_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'thumbnail-management-tab' );
 
+/**
+ * Register settings for the tab.
+ */
 function dg_register_settings() {
     add_settings_section(
         'thumbnail_table', '',
         'dg_render_thumbnail_section', DG_OPTION_NAME );
 }
 
+/**
+ * Validate settings for the tab.
+ */
 function dg_validate_settings( $values ) {
     global $dg_options;
     $ret         = $dg_options;

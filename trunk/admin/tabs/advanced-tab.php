@@ -1,5 +1,9 @@
 <?php
+defined( 'WPINC' ) OR exit;
 
+/**
+ * Register settings for the tab.
+ */
 function dg_register_settings() {
     global $dg_options;
 
@@ -51,6 +55,9 @@ function dg_register_settings() {
         'dg_render_options_dump_section', DG_OPTION_NAME );
 }
 
+/**
+ * Validate settings for the tab.
+ */
 function dg_validate_settings( $values ) {
     global $dg_options;
     $ret = $dg_options;
