@@ -40,7 +40,8 @@ class DG_FeaturePointers {
     public static function dg41_1FeaturePointer() {
         $title = '<h3>' . __( 'Configure Document Gallery', 'document-gallery' ) . '</h3>';
         $body = '<p>' . __( 'Did you know Document Gallery has lots of configurable settings allowing you to fine tune ' .
-                            'what your users experience when viewing a gallery?', 'document-gallery' ) . '</p>';
+                            'what your users experience when viewing a gallery? <em>Click the <strong>Settings</strong> ' .
+                            'link above to see for yourself!</em>', 'document-gallery' ) . '</p>';
         self::printFeaturePointer( '#the-list #document-gallery .row-actions', array( 'content' => $title . $body, 'position' => 'top' ) );
     }
 
@@ -50,7 +51,8 @@ class DG_FeaturePointers {
     public static function dg41_2FeaturePointer() {
         $title = '<h3>' . __( 'More Thumbnails!', 'document-gallery' ) . '</h3>';
         $body = '<p>' . __( 'If you need to generate thumbnails for Word documents, PowerPoints, and more then you ' .
-            'need to check out <em>Thumber.co</em>. Free 1-week trial for a limited time!', 'document-gallery' ) . '</p>';
+                            'need to check out Thumber.co. Free 1-week trial for a limited time! <em>Click the ' .
+                            '<strong>Thumber.co</strong> tab above to get started.</em>', 'document-gallery' ) . '</p>';
         self::printFeaturePointer( '#thumber-co-tab-header', array( 'content' => $title . $body, 'position' => 'top' ) );
     }
 
