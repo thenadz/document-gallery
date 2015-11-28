@@ -48,7 +48,7 @@ class DG_Admin {
 			<h2 class="nav-tab-wrapper">
 				<?php foreach ( self::getTabs() as $tab => $name ) {
 					$class = ( $tab === self::$current ) ? ' nav-tab-active' : '';
-					echo '<a class="nav-tab ' . $tab . $class . '" href="?page=' . DG_OPTION_NAME . '&tab=' . $tab . '">' . $name . '</a>';
+					echo '<a id="' . $tab . '-header" class="nav-tab' . $class . '" href="?page=' . DG_OPTION_NAME . '&tab=' . $tab . '">' . $name . '</a>';
 				} ?>
 			</h2>
 
@@ -112,6 +112,9 @@ class DG_Admin {
 	 * @param $hook string The hook.
 	 */
 	public static function enqueueScriptsAndStyles( $hook ) {
+		include_once DG_PATH . 'admin/class-feature-pointers.php';
+		DG_FeaturePointers::enqueueScripts();
+
 		if ( in_array( $hook, array( DG_Admin::$hook, 'post.php', 'post-new.php' ), true ) ) {
 			// Settings Page
 			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/css/admin.css' );
