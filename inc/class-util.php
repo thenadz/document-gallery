@@ -87,7 +87,7 @@ class DG_Util {
 
 	/**
 	 * Wrapper method which handles deciding whether to include minified assets. Minified files are not used
-	 * in WP_DEBUG mode to make troubleshooting easier.
+	 * in SCRIPT_DEBUG mode to make troubleshooting easier.
 	 *
 	 * @param $handle string Unique identifier for the script/style.
 	 * @param $src string Relative path to asset from DG_URL.
