@@ -35,6 +35,13 @@ class DG_Setup {
 				// max height to generate thumbnails
 				'height'  => 200
 			),
+			'thumber-co' => array(
+				'uid'           => null,
+				'secret'        => null,
+				'subscription'  => array(),
+				'direct_upload' => false,
+				'mime_types'    => array()
+			),
 			'gallery'    => array(
 				// default: link directly to file (true to link to attachment pg)
 				'attachment_pg' => false,
@@ -142,6 +149,7 @@ class DG_Setup {
 		self::threePointFour( $options );
 		self::threePointFive( $options );
 		self::fourPointZero( $options );
+		self::fourPointOne( $options );
 
 		// update plugin meta data
 		$options['meta']['version']     = DG_VERSION;
@@ -378,6 +386,24 @@ class DG_Setup {
 			}
 
 			unset( $options['thumber']['thumbs'] );
+		}
+	}
+
+	/**
+	 * Adds integration w/ Thumber.co service.
+	 *
+	 * @param array $options The options to be modified.
+	 */
+	private static function fourPointOne( &$options ) {
+		if ( version_compare( $options['meta']['version'], '4.1', '<' ) ) {
+			$options['thumber']['active']['thumber-co'] = false;
+			$options['thumber-co'] = array(
+					'uid'           => null,
+					'secret'        => null,
+					'subscription'  => array(),
+					'direct_upload' => false,
+					'mime_types'    => array()
+			);
 		}
 	}
 

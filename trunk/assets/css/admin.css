@@ -151,6 +151,10 @@ tr.selected:hover {
     content: '\f108';
 }
 
+.thumber-co-tab:before {
+    content: '\f529';
+}
+
 .thumbnail-management-tab:before {
     content: '\f233';
 }

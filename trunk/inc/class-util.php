@@ -115,4 +115,38 @@ class DG_Util {
 		}
 		return DG_URL . $src;
 	}
+
+	/**
+	 * @return bool Whether the WP host is a public site accessible from the Internet.
+	 */
+	public static function isPublicSite() {
+		$host = parse_url( site_url(), PHP_URL_HOST );
+		$is_ip = filter_var( $host, FILTER_VALIDATE_IP );
+		return $is_ip ? self::isPublicIp( $host ) : self::isPublicHostname( $host );
+	}
+
+	/**
+	 * @param $ip string The IP address.
+	 * @return bool Whether the given IP is public.
+	 */
+	private static function isPublicIp( $ip ) {
+		return false !== filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE )
+				&& '127.0.0.1' !== $ip && '::1' !== $ip;
+	}
+
+	/**
+	 * @param $hostname string The hostname to test.
+	 * @return bool Whether the given hostname has at least one public IP address associated.
+	 */
+	private static function isPublicHostname( $hostname ) {
+		$ret = false;
+		foreach ( gethostbynamel( $hostname ) as $ip ) {
+			if ( self::isPublicIp( $ip ) ) {
+				$ret = true;
+				break;
+			}
+		}
+
+		return $ret;
+	}
 }
