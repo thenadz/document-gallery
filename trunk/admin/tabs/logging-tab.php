@@ -1,11 +1,18 @@
 <?php
+defined( 'WPINC' ) OR exit;
 
+/**
+ * Register settings for the tab.
+ */
 function dg_register_settings() {
     add_settings_section(
         'logging_table', '',
         'dg_render_logging_section', DG_OPTION_NAME );
 }
 
+/**
+ * Validate settings for the tab.
+ */
 function dg_validate_settings( $values ) {
     global $dg_options;
     if (isset($values['clearLog'])) {
