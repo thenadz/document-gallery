@@ -96,7 +96,7 @@ class DG_Util {
 	 */
 	public static function enqueueAsset( $handle, $src, $deps = array(), $in_footer = true ) {
 		$src = self::getAssetPath( $src );
-		if ( stripos( strrev( $src ), 'sj.' ) === 0 ) {
+		if ( self::endsWith( $src, '.js' ) ) {
 			wp_enqueue_script( $handle, $src, $deps, DG_VERSION, $in_footer );
 		} else {
 			wp_enqueue_style( $handle, $src, $deps, DG_VERSION );
@@ -106,14 +106,33 @@ class DG_Util {
 	/**
 	 * Converts path to min version when WP is not running in debug mode and fully-qualifies path.
 	 *
-	 * @param $src string Relative path to asset from DG_URL.
+	 * @param $src string Relative path to non-minified asset from DG_URL.
 	 * @return string The fully-qualified, potentially min version of the given path.
 	 */
 	public static function getAssetPath( $src ) {
-		if ( !defined('WP_DEBUG') || !WP_DEBUG ) {
-			$src = preg_replace( '/^(.*)\.(css|js)$/', '$1.min.$2', $src, 1 );
+		if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+			$parts = explode( '.', $src );
+			$src = $parts[0] . '.min.' . $parts[1];
 		}
 		return DG_URL . $src;
+	}
+
+	/**
+	 * @param $haystack string The string to be tested.
+	 * @param $needle string The value to be tested against.
+	 * @return bool Whether $haystack starts with $needle.
+	 */
+	public static function startsWith( $haystack, $needle ) {
+		return substr( $haystack, 0, strlen( $needle ) ) === $needle;
+	}
+
+	/**
+	 * @param $haystack string The string to be tested.
+	 * @param $needle string The value to be tested against.
+	 * @return bool Whether $haystack ends with $needle.
+	 */
+	public static function endsWith( $haystack, $needle ) {
+		return substr( $haystack, -strlen( $needle ) ) === $needle;
 	}
 
 	/**
