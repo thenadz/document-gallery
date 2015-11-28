@@ -1,5 +1,9 @@
 <?php
+defined( 'WPINC' ) OR exit;
 
+/**
+ * Register settings for the tab.
+ */
 function dg_register_settings() {
     global $dg_options;
 
@@ -187,6 +191,19 @@ function dg_register_settings() {
         ) );
 
     add_settings_field(
+        'thumbnail_generation_thumber-co', __( 'Thumber.co', 'document-gallery' ),
+        array( 'DG_Admin', 'renderCheckboxField' ),
+        DG_OPTION_NAME, 'thumbnail_generation',
+        array(
+            'label_for'   => 'label_thumbnail_generation_thumber-co',
+            'name'        => 'thumbnail_generation][thumber-co',
+            'value'       => esc_attr( $active['thumber-co'] ),
+            'option_name' => DG_OPTION_NAME,
+            'description' => __( 'Use your <a href="http://thumber.co" target="_blank">Thumber.co</a> subscription to remotely generate document thumbnails.' , 'document-gallery' ),
+            'disabled'    => ! DG_Thumber::isThumberCoAvailable()
+        ) );
+
+    add_settings_field(
         'thumbnail_generation_av', __( 'Audio/Video', 'document-gallery' ),
         array( 'DG_Admin', 'renderCheckboxField' ),
         DG_OPTION_NAME, 'thumbnail_generation',
@@ -252,6 +269,9 @@ function dg_register_settings() {
         ) );
 }
 
+/**
+ * Validate settings for the tab.
+ */
 function dg_validate_settings( $values ) {
     global $dg_options;
     $ret = $dg_options;
