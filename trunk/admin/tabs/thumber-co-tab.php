@@ -109,8 +109,7 @@ function dg_validate_settings( $values ) {
 /**
  * Render the Thumber Advanced section.
  */
-function dg_render_thumber_co_section() {
-    include_once DG_PATH . 'inc/class-thumber.php'; ?>
+function dg_render_thumber_co_section() { ?>
     <p><?php _e( '<em>Thumber.co</em> is an external service capable of generating ' .
                  'thumbnails for the tricky file types that Document Gallery can\'t handle on its own. Files such as ' .
                  'Word, PowerPoint, and PDFs can all be processed, allowing you to provide a more complete experience ' .
