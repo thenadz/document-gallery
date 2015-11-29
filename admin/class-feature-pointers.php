@@ -117,9 +117,9 @@ class DG_FeaturePointers {
             $reflect = new ReflectionClass( __CLASS__ );
             $methods = $reflect->getMethods( ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC );
             self::$feature_pointer_methods =
-                array_filter(
-                    array_map( array( __CLASS__, 'getNameFromMethod' ), $methods ),
-                    array( __CLASS__, 'isFilterPointerMethod' ) );
+                array_map(
+                    array( __CLASS__, 'getNameFromMethod' ),
+                    array_filter( $methods, array( __CLASS__, 'isFilterPointerMethod' ) ) );
         }
 
         return self::$feature_pointer_methods;
@@ -133,10 +133,11 @@ class DG_FeaturePointers {
     }
 
     /**
-     * @param $method string The method name.
+     * @param $method ReflectionMethod The method name.
      * @return bool Whether the method name matches the filter pointer pattern.
      */
     private static function isFilterPointerMethod( $method ) {
-        return DG_Util::endsWith( $method, self::$feature_pointer_method_suffix );
+        // NOTE: ReflectionClass#getMethods filtering not working in at least some cases so re-checking for PUBLIC & STATIC
+        return $method->isPublic() && $method->isStatic() && DG_Util::endsWith( $method->name, self::$feature_pointer_method_suffix );
     }
 }
