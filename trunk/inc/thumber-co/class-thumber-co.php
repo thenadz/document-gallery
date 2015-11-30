@@ -85,9 +85,16 @@ class DG_ThumberCo {
       include_once DG_PATH . 'inc/thumber-co/thumber-client/client.php';
       include_once DG_PATH . 'inc/thumber-co/thumber-client/thumb-request.php';
 
+      $options = DG_Thumber::getOptions();
       $url_or_path = get_attached_file( $ID );
+
+      if ( ! self::checkGeometry( $options['width'], $options['height'] ) ) {
+         DG_Logger::writeLog( DG_LogLevel::Detail, "Skipping attachment #$ID as it exceeds Thumber.co subscription geometry limit." );
+         return false;
+      }
+
       if ( ! self::checkFileSize( $url_or_path ) ) {
-         DG_Logger::writeLog( DG_LogLevel::Detail, "Skipping attachment #$ID as it exceeds Thumber.co subscription limits." );
+         DG_Logger::writeLog( DG_LogLevel::Detail, "Skipping attachment #$ID as it exceeds Thumber.co subscription file size limit." );
          return false;
       }
 
@@ -99,8 +106,6 @@ class DG_ThumberCo {
       if ( ! $url_or_path || ! $mime_type ) {
          return false;
       }
-
-      $options = DG_Thumber::getOptions();
 
       $req = new ThumberThumbReq();
       $req->setCallback( self::$webhook );
@@ -134,10 +139,20 @@ class DG_ThumberCo {
       $size = @filesize( $filename );
       if ( $size !== false ) {
          $sub = self::$client->getSubscription();
-         $ret = empty( $sub ) || ( $size > 0 && $size <= $sub['file_size_limit'] );
+         $ret = ( ! $sub || empty( $sub['file_size_limit'] ) ) || ( $size > 0 && $size <= $sub['file_size_limit'] );
       }
 
       return $ret;
+   }
+
+   /**
+    * @param $width int The requested thumb width.
+    * @param $height int The requested thumb height.
+    * @return bool Whether the requested geometry meets subscription limitations.
+    */
+   private static function checkGeometry( $width, $height ) {
+      $sub = self::$client->getSubscription();
+      return ( ! $sub || empty( $sub['thumb_size_limit'] ) ) || ( $width <= $sub['thumb_size_limit'] && $height <= $sub['thumb_size_limit'] );
    }
 
    /**
