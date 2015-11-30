@@ -70,33 +70,7 @@ class DG_FeaturePointers {
         $trace = debug_backtrace();
         $pointer_id = self::getFeaturePointerIdFromMethodName( $trace[1]['function'] );
         ?>
-        <script type="text/javascript">
-            (function($){
-                var options = <?php echo wp_json_encode( $args ); ?>, setup;
-
-                if ( ! options )
-                    return;
-
-                options = $.extend( options, {
-                    close: function() {
-                        $.post( ajaxurl, {
-                            pointer: '<?php echo $pointer_id; ?>',
-                            action: 'dismiss-wp-pointer'
-                        });
-                    }
-                });
-
-                setup = function() {
-                    $('<?php echo $selector; ?>').first().pointer( options ).pointer('open');
-                };
-
-                if ( options.position && options.position.defer_loading )
-                    $(window).bind( 'load.wp-pointers', setup );
-                else
-                    $(document).ready( setup );
-
-            })( jQuery );
-        </script>
+        <script>(function(b){var a=<?php echo wp_json_encode( $args ); ?>,c;a&&(a=b.extend(a,{close:function(){b.post(ajaxurl,{pointer:"<?php echo $pointer_id; ?>",action:"dismiss-wp-pointer"})}}),c=function(){b("<?php echo $selector; ?>").first().pointer(a).pointer("open")},a.position&&a.position.defer_loading?b(window).bind("load.wp-pointers",c):b(document).ready(c))})(jQuery);</script>
         <?php
     }
 
