@@ -20,8 +20,9 @@ class DG_Gallery {
 	private $docs = array();
 	private $errs = array();
 
-	private $has_prev = false;
-	private $has_next = false;
+	private $instance;
+
+	private $pg_count = 1, $cur_pg = 1;
 
 	// templates for HTML output
 	private static $no_docs, $comment, $defaults;
@@ -106,6 +107,9 @@ class DG_Gallery {
 	 * @param array $atts Array of attributes used in shortcode.
 	 */
 	public function __construct( $atts ) {
+		static $instance = 0;
+		$this->instance = ++$instance;
+
 		include_once DG_PATH . 'inc/class-document.php';
 
 		// empty string is passed when no arguments are given, but constructor expects an array
@@ -158,6 +162,13 @@ class DG_Gallery {
 
 		// all recognized attributes go here
 		$this->atts = shortcode_atts( $defaults, $atts );
+
+		// process pagination server side
+		$get_key = 'dg' . $this->instance . '_page';
+		if ( isset( $_GET[$get_key] ) && is_numeric( $_GET[$get_key] ) ) {
+			$pg = DG_Util::posint( $_GET[$get_key] );
+			$this->atts['skip'] = $this->atts['limit'] * ( $pg - 1 );
+		}
 
 		// goes through all values in atts, setting errs as needed
 		$this->atts = self::sanitizeDefaults( $defaults, $this->atts, $this->errs );
@@ -247,8 +258,10 @@ class DG_Gallery {
 
 		$wpq            = new WP_Query();
 		$attachments    = $wpq->query( $query );
-		$this->has_next = $wpq->found_posts > ( $this->atts['skip'] + $this->atts['limit'] );
-		$this->has_prev = $this->atts['skip'] > 0;
+		$this->pg_count = $wpq->max_num_pages;
+		if ( $this->atts['skip'] >= 0 && $this->atts['limit'] > 0 ) {
+			$this->cur_pg   = min( $this->atts['skip'] / $this->atts['limit'] + 1, $wpq->max_num_pages );
+		}
 
 		return $attachments;
 	}
@@ -413,8 +426,6 @@ class DG_Gallery {
 	 * @return string HTML representing this Gallery.
 	 */
 	public function __toString() {
-		static $instance = 0;
-
 		if ( ! empty( $this->errs ) ) {
 			return '<p>' . implode( '</p><p>', $this->errs ) . '</p>';
 		}
@@ -423,13 +434,11 @@ class DG_Gallery {
 			return self::$no_docs;
 		}
 
-		$instance++;
-
 		$icon_find       = array( '%class%', '%icons%' );
 		$icon_repl		 = array();
 		$icon_classes    = array( 'document-icon-row' );
 		$gallery_find    = array( '%id%', '%data%', '%rows%', '%class%' );
-		$gallery_repl    = array( "document-gallery-$instance", ( "data-shortcode='" . wp_json_encode( self::getShortcodeData() ) . "'" ), '' );
+		$gallery_repl    = array( "document-gallery-$this->instance", ( "data-shortcode='" . wp_json_encode( self::getShortcodeData() ) . "'" ), '' );
 		$gallery_classes = array( 'document-gallery' );
 
 		if ( $this->useDescriptions() ) {
@@ -461,7 +470,7 @@ class DG_Gallery {
 				$icon_repl[1] = '';
 
 				$min = min( $i + $cols, $count );
-				for ( $x = $i; $x < $min; $x ++ ) {
+				for ( $x = $i; $x < $min; $x++ ) {
 					$icon_repl[1] .= $this->docs[ $x ];
 				}
 
@@ -473,23 +482,16 @@ class DG_Gallery {
 		$gallery = apply_filters( 'dg_gallery_template', '<div id="%id%" class="%class%" %data%>' . PHP_EOL . '%rows%</div>', $this->useDescriptions() );
 
 		// build pagination section
-		// TODO: We should be using WP core get_the_posts_pagination()
 		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
-			$left_href = $right_href = ' href="#"';
-			$left_tag = $right_tag = 'a';
-
-			if ( !$this->has_prev ) {
-				$left_href = '';
-				$left_tag = 'span';
-			}
-			if ( !$this->has_next ) {
-				$right_href = '';
-				$right_tag = 'span';
-			}
-
-			$prev = __( 'Prev', 'document-gallery' );
-			$next = __( 'Next', 'document-gallery' );
-			$gallery_repl[2] .= "<span class='pagination'><$left_tag$left_href class='paginate left'>$prev</$left_tag> | <$right_tag$right_href class='paginate right'>$next</$right_tag></span>";
+			$args = array(
+				'base'    => '?%_%',
+				'format'  => 'dg' . $this->instance . '_page=%#%',
+				'total'   => $this->pg_count,
+				'current' => $this->cur_pg,
+				'prev_text' => __( '&laquo;' ),
+				'next_text' => __( '&raquo;' )
+			);
+			$gallery_repl[2] .= '<div class="paginate">' . paginate_links( $args ) . '</div>';
 			$gallery_classes[] = 'dg-paginate-wrapper';
 		}
 
