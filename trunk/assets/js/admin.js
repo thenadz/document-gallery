@@ -209,11 +209,12 @@ jQuery(document).ready(function () {
             if (f.type.indexOf('image/') == 0 && typeof dg_admin_vars.upload_limit != 'undefined' && f.size <= parseInt(dg_admin_vars.upload_limit)) {
                 var target, theRow = jQuery('[data-entry=' + entry + ']');
                 var formData = new FormData(theRow.closest('form')[0]);
-                if (typeof ajax_object != 'undefined' && typeof ajax_object.ajax_url != 'undefined') {
-                    target = ajax_object.ajax_url;
-                    formData.append('action', 'dg_upload_thumb');
+                var thumbMgmtTab = jQuery('#thumbnail-management-tab');
+                if (thumbMgmtTab.length) {
+                    target = thumbMgmtTab.attr('action');
                 } else {
-                    target = jQuery('#thumbnail-management-tab').attr('action');
+                    target = ajaxurl;
+                    formData.append('action', 'dg_upload_thumb');
                 }
                 formData.append('document_gallery[entry]', entry);
                 formData.append('document_gallery[ajax]', 'true');

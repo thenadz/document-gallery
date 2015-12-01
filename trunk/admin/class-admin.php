@@ -122,10 +122,14 @@ class DG_Admin {
 			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
 			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
 			if ( $hook !== self::$hook ) { //if $hook is 'post.php' or 'post-new.php'
-				wp_localize_script( 'document-gallery-admin', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-
-				// Media Manager
 				global $dg_options;
+
+				// Media Manager integration
+				add_action( 'admin_print_footer_scripts', array(
+						'DG_Admin',
+						'loadCustomTemplates'
+				) ); //wp_print_scripts || wp_footer
+
 				DG_Util::enqueueAsset( 'dg-media-manager', 'assets/js/media_manager.js', array( 'media-views' ) );
 				wp_localize_script( 'dg-media-manager', 'DGl10n', array(
 					'dgMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
