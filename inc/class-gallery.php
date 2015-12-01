@@ -163,13 +163,6 @@ class DG_Gallery {
 		// all recognized attributes go here
 		$this->atts = shortcode_atts( $defaults, $atts );
 
-		// process pagination server side
-		$get_key = 'dg' . $this->instance . '_page';
-		if ( isset( $_GET[$get_key] ) && is_numeric( $_GET[$get_key] ) ) {
-			$pg = DG_Util::posint( $_GET[$get_key] );
-			$this->atts['skip'] = $this->atts['limit'] * ( $pg - 1 );
-		}
-
 		// goes through all values in atts, setting errs as needed
 		$this->atts = self::sanitizeDefaults( $defaults, $this->atts, $this->errs );
 
@@ -484,8 +477,8 @@ class DG_Gallery {
 		// build pagination section
 		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
 			$args = array(
-				'base'    => '?%_%',
-				'format'  => 'dg' . $this->instance . '_page=%#%',
+				'base'    => '#%_%',
+				'format'  => 'dg_page=%#%',
 				'total'   => $this->pg_count,
 				'current' => $this->cur_pg,
 				'prev_text' => __( '&laquo;' ),
