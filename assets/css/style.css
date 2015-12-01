@@ -23,6 +23,10 @@
     text-align: center;
 }
 
+.dg-paginate-wrapper .paginate {
+    text-align: center;
+}
+
 /* WITHOUT DESCRIPTION */
 .document-gallery .document-icon {
     display: inline-block;

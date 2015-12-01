@@ -43,14 +43,13 @@
      * Listen for all pagination clicks in current DOM and any future DOM elements.
      */
     function registerPaginationHandler() {
-        $('body').delegate('.dg-paginate-wrapper a.paginate', 'click', function (e) {
+        $('body').delegate('.dg-paginate-wrapper .paginate a', 'click', function (e) {
             var target = $(this).closest('.dg-paginate-wrapper');
             var atts = target.data('shortcode');
-
-            if ($(this).hasClass('left')) {
-                atts['skip'] -= atts['limit'];
-            } else {
-                atts['skip'] += atts['limit'];
+            atts['skip'] = 0;
+            var split = $(this).attr('href').split('?')[1].split('=');
+            if ( split.length >= 2 ) {
+                atts['skip'] = atts['limit'] * (split.pop() - 1);
             }
 
             retrieveGallery(atts, target);
