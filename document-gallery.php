@@ -70,12 +70,6 @@ if ( is_admin() ) {
 	add_action( 'add_meta_boxes', array( 'DG_Admin', 'addMetaBox' ) );
 	add_action( 'wp_ajax_dg_upload_thumb', array( 'DG_Admin', 'saveMetaBox' ) );
 
-	// Media Manager integration
-	add_action( 'admin_print_footer_scripts', array(
-		'DG_Admin',
-		'loadCustomTemplates'
-	) ); //wp_print_scripts || wp_footer
-
 	if ( DG_Admin::doRegisterSettings() ) {
 		add_action( 'admin_init', array( 'DG_Admin', 'registerSettings' ) );
 	}
