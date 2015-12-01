@@ -86,7 +86,7 @@
         // TODO: Cache already-retrieved gallery pages. Need to be careful not to keep too many at a time
         // (could consume a lot of memory) & handle caching pages for multiple galleries on a single pages.
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
-            var jobj = $(html);
+            var jobj = $($.parseHTML(html));
             target.replaceWith(jobj);
             sizeGalleryIcons(jobj);
             resetPendingIcons();
