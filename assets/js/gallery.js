@@ -47,7 +47,7 @@
             var target = $(this).closest('.dg-paginate-wrapper');
             var atts = target.data('shortcode');
             atts['skip'] = 0;
-            var split = $(this).attr('href').split('?')[1].split('=');
+            var split = $(this).attr('href').split('#')[1].split('=');
             if ( split.length >= 2 ) {
                 atts['skip'] = atts['limit'] * (split.pop() - 1);
             }
