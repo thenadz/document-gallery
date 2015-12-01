@@ -298,8 +298,8 @@ class DG_Gallery {
 	}
 
 	/*==========================================================================
-		* HELPER FUNCTIONS
-		*=========================================================================*/
+	 * HELPER FUNCTIONS
+	 *=========================================================================*/
 
 	/**
 	 * Returns an array of term ids when provided with a list of term names.
@@ -347,8 +347,7 @@ class DG_Gallery {
 		// taxons may optionally be prefixed by 'tax_' --
 		// this is only useful when avoiding collisions with other attributes
 		if ( ! taxonomy_exists( $taxon ) ) {
-			$tmp = preg_replace( '/^tax_(.*)/', '$1', $taxon, 1, $count );
-			if ( $count > 0 && taxonomy_exists( $tmp ) ) {
+			if ( DG_Util::startsWith( $taxon, 'tax_' ) && ( $tmp = substr( $taxon, 4 ) ) && taxonomy_exists( $tmp ) ) {
 				$taxon = $tmp;
 			} else {
 				$this->errs[] = sprintf( DG_GallerySanitization::getUnaryErr(), 'taxon', $taxon );
