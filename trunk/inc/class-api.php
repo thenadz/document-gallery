@@ -59,7 +59,7 @@ class DG_API {
 	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = false ) {
 		include_once DG_PATH . 'inc/class-thumber.php';
 
-		return DG_Thumber::getThumbnail( $ID, $pg, $generate_if_missing );
+		return DG_Thumber::getInstance()->getThumbnail( $ID, $pg, $generate_if_missing );
 	}
 
 	/**
