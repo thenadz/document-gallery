@@ -101,7 +101,7 @@ class DG_ThumberClient extends ThumberClient {
 		}
 
 		$nonce = $resp->getNonce();
-		$split = explode( DG_ThumberCo::NonceSeparator, $nonce );
+		$split = explode( DG_ThumberCoThumber::NonceSeparator, $nonce );
 		if ( $resp->getSuccess() && count( $split ) === 2 ) {
 			$ID = absint( $split[0] );
 			$tmpfile = get_temp_dir() . self::getTempFile( get_temp_dir() );

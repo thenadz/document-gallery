@@ -1,10 +1,8 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-$options = DG_Thumber::getOptions();
-if ( DG_Thumber::isThumberCoAvailable() && $options['active']['thumber-co'] ) {
-	include_once DG_PATH . 'inc/thumber-co/class-thumber-co.php';
-}
+// NOTE: Child thumbers are included at bottom of this file
+include_once DG_PATH . 'inc/thumbers/class-abstract-thumber.php';
 
 /**
  * Thumber wraps the functionality required to
@@ -12,7 +10,78 @@ if ( DG_Thumber::isThumberCoAvailable() && $options['active']['thumber-co'] ) {
  *
  * @author drossiter
  */
-class DG_Thumber {
+class DG_Thumber extends DG_AbstractThumber {
+
+	/**
+	 * @var DG_Thumber The singleton instance.
+	 */
+	private static $instance;
+
+	/**
+	 * @return DG_Thumber The singleton instance.
+	 */
+	public static function getInstance() {
+		return isset( self::$instance ) ? self::$instance : ( self::$instance = new DG_Thumber() );
+	}
+
+	/**
+	 * Wraps generation of thumbnails for various attachment filetypes.
+	 *
+	 * @param int $ID Document ID
+	 * @param int $pg Page number to get thumb from.
+	 * @param bool $generate_if_missing Whether to attempt generating the thumbnail if missing.
+	 * @param bool|null &$is_default Whether the returned URL points to a default icon.
+	 *
+	 * @return string URL to the thumbnail.
+	 */
+	public function getThumbnail( $ID, $pg = 1, $generate_if_missing = true, &$is_default = null ) {
+		$options = self::getOptions();
+		$dimensions = $options['width'] . 'x' . $options['height'];
+
+		// if we haven't saved a thumb, generate one
+		if ( ! DG_Thumb::thumbExists( $ID, $dimensions, false ) ) {
+			// short-circuit generation if not required
+			if ( ! $generate_if_missing ) {
+				return null;
+			}
+
+			foreach ( self::getThumbers() as $thumber ) {
+				if ( $thumber->supportsAttachment( $ID ) ) {
+					if ( DG_Logger::logEnabled() ) {
+						$toLog = sprintf( __( 'Attempting to generate thumbnail for attachment #%d with (%s)',
+								'document-gallery' ), $ID, get_class( $thumber ) );
+						DG_Logger::writeLog( DG_LogLevel::Detail, $toLog );
+					}
+
+					if ( $generated = self::thumbnailGenerationHarness( $thumber, $ID, $pg ) ) {
+						break;
+					}
+				}
+			}
+		}
+
+		$thumb = isset( $generated ) ? $generated : DG_Thumb::getThumb( $ID, $dimensions );
+		$is_default = ! isset( $thumb ) || ! $thumb->isSuccess();
+		if ( ! isset( $thumb ) ) {
+			$thumb = self::setThumbnailFailed( $ID );
+		}
+
+		return $thumb->isSuccess() ? $thumb->getUrl() : DG_DefaultThumber::getInstance()->getThumbnail( $ID, $pg );
+	}
+
+	/**
+	 * @return array The extensions supported by this thumber.
+	 */
+	protected function getThumberExtensions() {
+		throw new BadFunctionCallException( 'Not implemented.' );
+	}
+
+	/**
+	 * @return int An integer from 0 to 100. Higher priorities will be attempted before lower priority thumbers.
+	 */
+	public function getPriority() {
+		throw new BadFunctionCallException( 'Not implemented.' );
+	}
 
 	/**
 	 * Returns the default mapping of thumber slug to whether it is active or not.
@@ -25,8 +94,8 @@ class DG_Thumber {
 	public static function getDefaultThumbers( $skeleton = false ) {
 		$gs_active = $imagick_active = null;
 		if ( ! $skeleton ) {
-			$gs_active         = (bool) self::getGhostscriptExecutable();
-			$imagick_active    = self::isImagickAvailable();
+			$gs_active         = (bool) DG_GhostscriptThumber::getGhostscriptExecutable();
+			$imagick_active    = DG_ImagickThumber::isImagickAvailable();
 		}
 
 		return array(
@@ -54,6 +123,7 @@ class DG_Thumber {
 	 * Sets the thumbnail for the given attachment ID to a failed state.
 	 *
 	 * @param int $ID Document ID.
+	 * @return DG_Thumb The failed thumbnail.
 	 */
 	public static function setThumbnailFailed( $ID ) {
 		$options = self::getOptions();
@@ -62,458 +132,22 @@ class DG_Thumber {
 		$thumb->setTimestamp( time() );
 		$thumb->setDimensions( $options['width'] . 'x' . $options['height'] );
 		$thumb->save();
-	}
 
-	/**
-	 * Wraps generation of thumbnails for various attachment filetypes.
-	 *
-	 * @param int $ID Document ID
-	 * @param int $pg Page number to get thumb from.
-	 * @param bool $generate_if_missing Whether to attempt generating the thumbnail if missing.
-	 * @param bool|null &$is_default Whether the returned URL points to a default icon.
-	 *
-	 * @return string URL to the thumbnail.
-	 */
-	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = true, &$is_default = null ) {
-		$options = self::getOptions();
-		$dimensions = $options['width'] . 'x' . $options['height'];
-
-		// if we haven't saved a thumb, generate one
-		if ( ! DG_Thumb::thumbExists( $ID, $dimensions, false ) ) {
-			// short-circuit generation if not required
-			if ( ! $generate_if_missing ) {
-				return null;
-			}
-
-			// do the processing
-			$file = get_attached_file( $ID );
-
-			foreach ( self::getThumbers() as $ext_preg => $thumber ) {
-				$ext_preg = '!\.(?:' . $ext_preg . ')$!i';
-
-				if ( preg_match( $ext_preg, $file ) ) {
-					if ( DG_Logger::logEnabled() ) {
-						$toLog = sprintf( __( 'Attempting to generate thumbnail for attachment #%d with (%s)',
-							'document-gallery' ), $ID, DG_Util::callableToString( $thumber ) );
-						DG_Logger::writeLog( DG_LogLevel::Detail, $toLog );
-					}
-
-					if ( self::thumbnailGenerationHarness( $thumber, $ID, $pg ) ) {
-						break;
-					}
-				}
-			}
-		}
-
-		$thumb = DG_Thumb::getThumb( $ID, $dimensions );
-		if ( is_null( $thumb ) || ! $thumb->isSuccess() ) {
-			if ( is_null( $thumb ) ) {
-				self::setThumbnailFailed( $ID );
-			}
-
-			// fallback to default thumb for attachment type
-			$url = self::getDefaultThumbnail( $ID, $pg );
-			$is_default = true;
-		} else {
-			$url = $thumb->getUrl();
-			$is_default = false;
-		}
-
-		return $url;
-	}
-
-	/*==========================================================================
-	 * IMAGE THUMBNAILS
-	 *=========================================================================*/
-
-	/**
-	 * @param string $ID The attachment ID to retrieve thumbnail from.
-	 * @param int $pg Unused.
-	 *
-	 * @return bool|string  False on failure, URL to thumb on success.
-	 */
-	public static function getImageThumbnail( $ID, $pg = 1 ) {
-		$options = self::getOptions();
-		$ret     = false;
-
-		// handle images
-		if ( $icon = image_downsize( $ID, array( $options['width'], $options['height'] ) ) ) {
-			$ret = $icon[0];
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * @return array All extensions recognized as images.
-	 */
-	private static function getImageExts() {
-		return array( 'jpg', 'jpeg', 'jpe', 'gif', 'png' );
-	}
-
-	/*==========================================================================
-	 * AUDIO VIDEO THUMBNAILS
-	 *=========================================================================*/
-
-	/**
-	 * Uses wp_read_video_metadata() and wp_read_audio_metadata() to retrieve
-	 * an embedded image to use as a thumbnail.
-	 *
-	 * @param string $ID The attachment ID to retrieve thumbnail from.
-	 * @param int $pg Unused.
-	 *
-	 * @return bool|string  False on failure, URL to thumb on success.
-	 */
-	public static function getAudioVideoThumbnail( $ID, $pg = 1 ) {
-		include_once DG_WPADMIN_PATH . 'includes/media.php';
-
-		$attachment = get_post( $ID );
-		$doc_path   = get_attached_file( $ID );
-
-		if ( preg_match( '#^video/#', get_post_mime_type( $attachment ) ) ) {
-			$metadata = wp_read_video_metadata( $doc_path );
-		} elseif ( preg_match( '#^audio/#', get_post_mime_type( $attachment ) ) ) {
-			$metadata = wp_read_audio_metadata( $doc_path );
-		}
-
-		// unsupported mime type || no embedded image present
-		if ( ! isset( $metadata ) || empty( $metadata['image']['data'] ) ) {
-			return false;
-		}
-
-		$ext = 'jpg';
-		switch ( $metadata['image']['mime'] ) {
-			case 'image/gif':
-				$ext = 'gif';
-				break;
-			case 'image/png':
-				$ext = 'png';
-				break;
-		}
-
-		$temp_file = self::getTempFile( $ext );
-
-		if ( ! $fp = @fopen( $temp_file, 'wb' ) ) {
-			DG_Logger::writeLog( DG_LogLevel::Error, __( 'Could not open file: ', 'document-gallery' ) . $temp_file );
-
-			return false;
-		}
-
-		if ( ! @fwrite( $fp, $metadata['image']['data'] ) ) {
-			DG_Logger::writeLog( DG_LogLevel::Error, __( 'Could not write file: ', 'document-gallery' ) . $temp_file );
-			fclose( $fp );
-
-			return false;
-		}
-
-		fclose( $fp );
-
-		return $temp_file;
-	}
-
-	/**
-	 * @return array All extensions supported by WP Audio Video Media metadata.
-	 */
-	private static function getAudioVideoExts() {
-		return array_merge( wp_get_audio_extensions(), wp_get_video_extensions() );
-	}
-
-	/*==========================================================================
-	 * IMAGICK THUMBNAILS
-	 *=========================================================================*/
-
-	/**
-	 * Uses WP_Image_Editor_Imagick to generate thumbnails.
-	 *
-	 * @param int $ID The attachment ID to retrieve thumbnail from.
-	 * @param int $pg The page to get the thumbnail of.
-	 *
-	 * @return bool|string  False on failure, URL to thumb on success.
-	 */
-	public static function getImagickThumbnail( $ID, $pg = 1 ) {
-		include_once DG_PATH . 'inc/class-image-editor-imagick.php';
-
-		$doc_path = get_attached_file( $ID );
-		$img      = new DG_Image_Editor_Imagick( $doc_path, $pg - 1 );
-		$err      = $img->load();
-		if ( is_wp_error( $err ) ) {
-			DG_Logger::writeLog(
-				DG_LogLevel::Error,
-				__( 'Failed to open file in Imagick: ', 'document-gallery' ) .
-				$err->get_error_message() );
-
-			return false;
-		}
-
-		$temp_file = self::getTempFile();
-
-		$err = $img->save( $temp_file, 'image/png' );
-		if ( is_wp_error( $err ) ) {
-			DG_Logger::writeLog(
-				DG_LogLevel::Error,
-				__( 'Failed to save image in Imagick: ', 'document-gallery' ) .
-				$err->get_error_message() );
-
-			return false;
-		}
-
-		return $temp_file;
-	}
-
-	/**
-	 * @return bool Whether WP_Image_Editor_Imagick can be used on this system.
-	 */
-	public static function isImagickAvailable() {
-		static $ret = null;
-
-		if ( is_null( $ret ) ) {
-			include_once DG_WPINC_PATH . 'class-wp-image-editor.php';
-			include_once DG_WPINC_PATH . 'class-wp-image-editor-imagick.php';
-			$ret = WP_Image_Editor_Imagick::test();
-		}
-
-		return $ret;
-	}
-
-	/*==========================================================================
-	 * GHOSTSCRIPT THUMBNAILS
-	 *=========================================================================*/
-
-	/**
-	 * Get thumbnail for document with given ID using Ghostscript. Imagick could
-	 * also handle this, but is *much* slower.
-	 *
-	 * @param int $ID The attachment ID to retrieve thumbnail from.
-	 * @param int $pg The page number to make thumbnail of -- index starts at 1.
-	 *
-	 * @return bool|string  False on failure, URL to thumb on success.
-	 */
-	public static function getGhostscriptThumbnail( $ID, $pg = 1 ) {
-		static $gs = null;
-
-		if ( is_null( $gs ) ) {
-			$options = self::getOptions();
-			$gs      = $options['gs'];
-
-			if ( false !== $gs ) {
-				$gs = escapeshellarg( $gs ) . ' -sDEVICE=png16m -dFirstPage=%1$d'
-				      . ' -dLastPage=%1$d -dBATCH -dNOPAUSE -dPDFFitPage -sOutputFile=%2$s %3$s 2>&1';
-			}
-		}
-
-		if ( false === $gs ) {
-			return false;
-		}
-
-		$doc_path  = get_attached_file( $ID );
-		$temp_path = self::getTempFile();
-
-		exec( sprintf( $gs, $pg, $temp_path, $doc_path ), $out, $ret );
-
-		if ( $ret != 0 ) {
-			DG_Logger::writeLog( DG_LogLevel::Error, __( 'Ghostscript failed: ', 'document-gallery' ) . print_r( $out ) );
-			@unlink( $temp_path );
-
-			return false;
-		}
-
-		return $temp_path;
-	}
-
-	/**
-	 * @return array All extensions supported by Ghostscript.
-	 */
-	private static function getGhostscriptExts() {
-		return array( 'pdf', 'ps', 'eps' );
-	}
-
-	/**
-	 * Dynamically determines whether we may call gs through exec().
-	 *
-	 * NOTE: This does not check the options for gs path. Don't use in
-	 * thumbnail generation as it's slow and not configurable.
-	 *
-	 * @return bool|string If available, returns exe path. False otherwise.
-	 */
-	public static function getGhostscriptExecutable() {
-		static $executable = null;
-
-		if ( is_null( $executable ) ) {
-			// we must be able to exec()
-			$executable = self::isExecAvailable();
-			if ( ! $executable ) {
-				return $executable;
-			}
-
-			// find on Windows system
-			if ( 'WIN' === strtoupper( substr( PHP_OS, 0, 3 ) ) ) {
-				// look for environment variable
-				$executable = getenv( 'GSC' );
-				if ( $executable ) {
-					return $executable;
-				}
-
-				// hope GS in the path
-				$executable = exec( 'where gswin*c.exe' );
-				if ( ! empty( $executable ) ) {
-					return $executable;
-				}
-
-				// look directly in filesystem
-				// 64- or 32-bit binary
-				$executable = exec( 'dir /o:n/s/b "C:\Program Files\gs\*gswin*c.exe"' );
-				if ( ! empty( $executable ) ) {
-					return $executable;
-				}
-
-				// 32-bit binary on 64-bit OS
-				$executable = exec( 'dir /o:n/s/b "C:\Program Files (x86)\gs\*gswin32c.exe"' );
-				$executable = empty( $executable ) ? false : $executable;
-
-				return $executable;
-			}
-
-			// handle Linux systems
-			$executable = exec( 'which gs' );
-			if ( ! empty( $executable ) ) {
-				return $executable;
-			}
-
-			// GoDaddy and others aren't setup in such a way that
-			// the above works so we need to fallback to a direct
-			// filesystem check in most common location
-			exec( 'test -e /usr/bin/gs', $dummy, $ret );
-			$executable = ( $ret === 0 ) ? '/usr/bin/gs' : false;
-
-			return $executable;
-		}
-
-		return $executable;
-	}
-
-	/**
-	 * @return bool Whether we can use the GS executable.
-	 */
-	public static function isGhostscriptAvailable() {
-		static $ret = null;
-
-		if ( is_null( $ret ) ) {
-			$options = self::getOptions();
-			$ret     = $options['gs'] && self::isExecAvailable();
-		}
-
-		return $ret;
-	}
-
-	/*==========================================================================
-	 * THUMBER.CO THUMBNAILS
-	 *=========================================================================*/
-
-	/**
-	 * @return bool Whether Thumber.co may be used in thumbnail generation.
-	 */
-	public static function isThumberCoAvailable() {
-		global $dg_options;
-		return isset( $dg_options['thumber-co']['uid'] ) && isset( $dg_options['thumber-co']['secret'] );
-	}
-
-	/*==========================================================================
-	 * DEFAULT THUMBNAILS
-	 *=========================================================================*/
-
-	/**
-	 * Get thumbnail for document with given ID from default images.
-	 *
-	 * @param string $ID The attachment ID to retrieve thumbnail from.
-	 * @param int $pg Unused.
-	 *
-	 * @return string     URL to thumbnail.
-	 */
-	public static function getDefaultThumbnail( $ID, $pg = 1 ) {
-		$icon_url = DG_URL . 'assets/icons/';
-
-		// handle images
-		if ( $name = self::getDefaultIcon( self::getExt( wp_get_attachment_url( $ID ) ) ) ) {
-			$icon = $icon_url . $name;
-		} // fallback to standard WP icons
-		elseif ( ! $icon = wp_mime_type_icon( $ID ) ) {
-			// everything failed. This is bad...
-			$icon = $icon_url . 'missing.png';
-		}
-
-		return $icon;
-	}
-
-	/**
-	 * Returns the name of the image to represent the filetype given.
-	 *
-	 * @param string $ext
-	 *
-	 * @return string Default icon based on extension.
-	 */
-	private static function getDefaultIcon( $ext ) {
-		// Maps file ext to default image name.
-		static $exts = array(
-			// Most Common First
-			'pdf'                                                      => 'pdf.png',
-			// MS Office
-			'doc|docx|docm|dotx|dotm'                                  => 'msdoc.png',
-			'ppt|pot|pps|pptx|pptm|ppsx|ppsm|potx|potm|ppam|sldx|sldm' => 'msppt.png',
-			'xla|xls|xlt|xlw|xlsx|xlsm|xlsb|xltx|xltm|xlam'            => 'msxls.png',
-			'mdb'                                                      => 'msaccess.png',
-			// iWork
-			'key'                                                      => 'key.png',
-			'numbers'                                                  => 'numbers.png',
-			'pages'                                                    => 'pages.png',
-			// Images
-			'jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico'                    => 'image.png',
-			// Video formats
-			'asf|asx|wmv|wmx|wm|avi|divx|flv|mov'                      => 'video.png',
-			'qt|mpeg|mpg|mpe|mp4|m4v|ogv|webm|mkv'                     => 'video.png',
-			// Audio formats
-			'mp3|m4a|m4b|ra|ram|wav|ogg|oga|wma|wax|mka'               => 'audio.png',
-			'midi|mid'                                                 => 'midi.png',
-			// Text formats
-			'txt|tsv|csv'                                              => 'text.png',
-			'rtx'                                                      => 'rtx.png',
-			'rtf'                                                      => 'rtf.png',
-			'ics'                                                      => 'ics.png',
-			'wp|wpd'                                                   => 'wordperfect.png',
-			// Programming
-			'html|htm'                                                 => 'html.png',
-			'css'                                                      => 'css.png',
-			'js'                                                       => 'javascript.png',
-			'class'                                                    => 'java.png',
-			'asc'                                                      => 'asc.png',
-			'c'                                                        => 'c.png',
-			'cc|cpp'                                                   => 'cpp.png',
-			'h'                                                        => 'h.png',
-			// Msc application formats
-			'zip|tar|gzip|gz|bz2|tgz|7z|rar'                           => 'compressed.png',
-			'exe'                                                      => 'exec.png',
-			'swf'                                                      => 'shockwave.png',
-			// OpenDocument formats
-			'odt'                                                      => 'opendocument-text.png',
-			'odp'                                                      => 'opendocument-presentation.png',
-			'ods'                                                      => 'opendocument-spreadsheet.png',
-			'odg'                                                      => 'opendocument-graphics.png',
-			'odb'                                                      => 'opendocument-database.png',
-			'odf'                                                      => 'opendocument-formula.png'
-		);
-
-		foreach ( $exts as $ext_preg => $icon ) {
-			$ext_preg = '!(' . $ext_preg . ')$!i';
-			if ( preg_match( $ext_preg, $ext ) ) {
-				return $icon;
-			}
-		}
-
-		return false;
+		return $thumb;
 	}
 
 	/*==========================================================================
 	 * GENERAL THUMBNAIL HELPER FUNCTIONS
 	 *=========================================================================*/
+
+	/**
+	 * @return array|null Thumber options from DB or null if options not initialized.
+	 */
+	public static function getOptions( $blog = null ) {
+		$options = DocumentGallery::getOptions( $blog );
+
+		return $options['thumber'];
+	}
 
 	/**
 	 * @return array WP_Post objects for each attachment that has been processed.
@@ -533,37 +167,6 @@ class DG_Thumber {
 	}
 
 	/**
-	 * Key: Attachment ID
-	 * Val: array
-	 *      + timestamp - When the thumbnail was generated (or generation failed).
-	 *      + thumb_path - System path to thumbnail image.
-	 *      + thumb_url - URL pointing to the thumbnail for this document.
-	 *      + thumber - Generator used to create thumb OR false if failed to gen.
-	 * @return array|null Thumber options from DB or null if options not initialized.
-	 */
-	public static function getOptions( $blog = null ) {
-		$options = DocumentGallery::getOptions( $blog );
-
-		return $options['thumber'];
-	}
-
-	/**
-	 * Key: Attachment ID
-	 * Val: array
-	 *      + timestamp - When the thumbnail was generated (or generation failed).
-	 *      + thumb_path - System path to thumbnail image.
-	 *      + thumb_url - URL pointing to the thumbnail for this document.
-	 *      + thumber - Generator used to create thumb OR false if failed to gen.
-	 *
-	 * @param array $options Thumber options to store in DB
-	 */
-	private static function setOptions( $options, $blog = null ) {
-		$dg_options            = DocumentGallery::getOptions( $blog );
-		$dg_options['thumber'] = $options;
-		DocumentGallery::setOptions( $dg_options, $blog );
-	}
-
-	/**
 	 * @filter dg_thumbers Allows developers to filter the Thumbers used
 	 * for specific filetypes. Index is the regex to match file extensions
 	 * supported and the value is anything that can be accepted by call_user_func().
@@ -571,63 +174,26 @@ class DG_Thumber {
 	 * to get a thumbnail for, 2nd is the page to take a thumbnail of
 	 * (may not be relevant for some filetypes).
 	 *
-	 * @return array
+	 * @return DG_AbstractThumber[]
 	 */
 	private static function getThumbers() {
 		static $thumbers = null;
 
 		if ( is_null( $thumbers ) ) {
-			$options  = self::getOptions();
-			$active   = $options['active'];
-			$thumbers = array();
-
-			// normal image attachment processing
-			$exts            = implode( '|', self::getImageExts() );
-			$thumbers[$exts] = array( __CLASS__, 'getImageThumbnail' );
-
-			// Audio/Video embedded images
-			if ( $active['av'] ) {
-				$exts            = implode( '|', self::getAudioVideoExts() );
-				$thumbers[$exts] = array( __CLASS__, 'getAudioVideoThumbnail' );
-			}
-
-			// Ghostscript
-			if ( $active['gs'] && self::isGhostscriptAvailable() ) {
-				$exts            = implode( '|', self::getGhostscriptExts() );
-				$thumbers[$exts] = array( __CLASS__, 'getGhostscriptThumbnail' );
-			}
-
-			// Imagick
-			if ( $active['imagick'] && self::isImagickAvailable() ) {
-				include_once DG_PATH . 'inc/class-image-editor-imagick.php';
-				if ( $exts = DG_Image_Editor_Imagick::query_formats() ) {
-					$exts            = implode( '|', $exts );
-					$thumbers[$exts] = array( __CLASS__, 'getImagickThumbnail' );
-				}
-			}
-
 			// allow users to filter thumbers used
-			$thumbers = apply_filters( 'dg_thumbers', $thumbers );
-
-			// strip out anything that can't be called
-			$thumbers = array_filter( $thumbers, 'is_callable' );
+			$thumbers = apply_filters( 'dg_thumbers', array() );
+			$thumbers = array_filter( $thumbers, array( __CLASS__, 'isThumber' ) );
+			usort( $thumbers, array( 'DG_AbstractThumber', 'cmpThumberByPriority' ) );
 
 			// log which thumbers are being used
 			if ( DG_Logger::logEnabled() ) {
 				if ( count( $thumbers ) > 0 ) {
-					$entry = __( 'Thumbnail Generators: ', 'document-gallery' );
-					foreach ( $thumbers as $k => $v ) {
-						$thumber = DG_Util::callableToString($v);
-
-						// TODO: The following works for all internal regexes, but may have unpredictable
-						// results if developer adds additional thumbnail generators using different regexes
-						$filetypes = str_replace( '|', ', ', $k );
-
-						$entry .= PHP_EOL . "$thumber: $filetypes";
-					}
+					$names = array_map( 'get_class', $thumbers );
+					$entry = __( 'Thumbnail Generators: ', 'document-gallery' ) . implode( ', ', $names );
 				} else {
 					$entry = __( 'No thumbnail generators enabled.', 'document-gallery' );
 				}
+
 				DG_Logger::writeLog( DG_LogLevel::Detail, $entry );
 			}
 		}
@@ -636,12 +202,27 @@ class DG_Thumber {
 	}
 
 	/**
+	 * @param $maybe_thumber mixed Variable to be tested.
+	 * @return bool Whether given variable is a thumber.
+	 */
+	private static function isThumber( $maybe_thumber ) {
+		$ret = is_a( $maybe_thumber, 'DG_AbstractThumber' );
+		if ( !$ret ) {
+			DG_Logger::writeLog(
+				DG_LogLevel::Error,
+				'Attempted to add non-DG_AbstractThumber in thumbnail generation: ' . print_r( $maybe_thumber, true ) );
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * Template that handles generating a thumbnail.
 	 *
 	 * If image has already been generated through other means, $pg may be set to the system path where the
 	 * thumbnail is located. In this case, $generator will not be invoked, but *will* be kept for historical purposes.
 	 *
-	 * @param callable $generator Takes ID and pg and returns path to temp file or false.
+	 * @param DG_AbstractThumber|string $generator Takes ID and pg and returns path to temp file or false.
 	 * @param int $ID ID for the attachment that we need a thumbnail for.
 	 * @param int|string $pg Page number of the attachment to get a thumbnail for or the system path to the image to be used.
 	 *
@@ -651,8 +232,15 @@ class DG_Thumber {
 		// handle system page in $pg variable
 		if ( is_string( $pg ) && ! is_numeric( $pg ) ) {
 			$temp_path = $pg;
-		} // delegate thumbnail generation to $generator
-		elseif ( false === ( $temp_path = call_user_func( $generator, $ID, $pg ) ) ) {
+		} elseif ( is_a( $generator, 'DG_AbstractThumber' ) ) {
+			// delegate thumbnail generation to $generator
+			if ( false === ( $temp_path = $generator->getThumbnail( $ID, $pg ) ) ) {
+				return false;
+			}
+		} else {
+			DG_Logger::writeLog(
+				DG_LogLevel::Error,
+				'Attempted to call thumbnailGenerationHarness with invalid generator: ' . print_r( $generator, true ) );
 			return false;
 		}
 
@@ -704,29 +292,10 @@ class DG_Thumber {
 		$thumb->setDimensions( $options['width'] . 'x' . $options['height'] );
 		$thumb->setTimestamp( time() );
 		$thumb->setRelativePath( substr( $thumb_path, strlen( $upload['basedir'] ) + 1 ) );
-		$thumb->setGenerator( DG_Util::callableToString( $generator ) );
+		$thumb->setGenerator( get_class( $generator ) );
 		$thumb->save();
 
 		return $thumb;
-	}
-
-	/**
-	 * Caller should handle removal of the temp file when finished.
-	 *
-	 * @param string $ext The extension to be given to the temp file.
-	 *
-	 * @return string A temp file with the given extension.
-	 */
-	private static function getTempFile( $ext = 'png' ) {
-		static $base = null;
-		static $tmp;
-
-		if ( is_null( $base ) ) {
-			$base = md5( time() );
-			$tmp  = untrailingslashit( get_temp_dir() );
-		}
-
-		return $tmp . DIRECTORY_SEPARATOR . wp_unique_filename( $tmp, $base . '.' . $ext );
 	}
 
 	/**
@@ -742,71 +311,9 @@ class DG_Thumber {
 	private static function getUniqueThumbName( $dirname, $extless, $ext = 'png' ) {
 		return wp_unique_filename( $dirname, str_replace( '.', '-', $extless ) . '-thumb.' . $ext );
 	}
+}
 
-	/**
-	 * Checks whether exec() may be used.
-	 * Source: http://stackoverflow.com/a/12980534/866618
-	 *
-	 * @return bool Whether exec() is available.
-	 */
-	public static function isExecAvailable() {
-		static $available = null;
-
-		if ( is_null( $available ) ) {
-			$available = true;
-
-			if ( ini_get( 'safe_mode' ) ) {
-				$available = false;
-			} else {
-				$d = ini_get( 'disable_functions' );
-				$s = ini_get( 'suhosin.executor.func.blacklist' );
-				if ( "$d$s" ) {
-					$array     = preg_split( '/,\s*/', "$d,$s" );
-					$available = ! in_array( 'exec', $array );
-				}
-			}
-		}
-
-		return $available;
-	}
-
-	/**
-	 * Formerly achieved with wp_check_filetype(), but it was only returning
-	 * valid results if the active user had permission to upload the given filetype.
-	 *
-	 * @param string $filename Name of the file to get extension from.
-	 *
-	 * @return bool|string Returns the file extension on success, false on failure.
-	 */
-	private static function getExt( $filename ) {
-		if ( $ext = pathinfo( $filename, PATHINFO_EXTENSION ) ) {
-			$res = preg_grep( '/^(?:.*\|)?' . $ext . '(?:\|.*)?$/i', self::getAllExts() );
-			$res = reset( $res );
-			if ( $res === false ) {
-				$ext = false;
-			}
-		}
-
-		if ( ! $ext && ( $info = getimagesize( $filename ) ) && ( $ext = image_type_to_extension( $info[2], false ) ) ) {
-			return $ext;
-		}
-
-		return $ext;
-	}
-
-	/**
-	 * Addresses issues with getting a complete list of supported MIME types as
-	 * described in this issue: https://core.trac.wordpress.org/ticket/32544
-	 * @return array Contains all MIME types supported by WordPress, including custom types added by plugins.
-	 */
-	private static function getAllExts() {
-		return array_keys( array_merge( wp_get_mime_types(), get_allowed_mime_types() ) );
-	}
-
-	/**
-	 * Blocks instantiation. All functions are static.
-	 */
-	private function __construct() {
-
-	}
+// include all internal DG thumbers
+foreach ( glob( DG_PATH . 'inc/thumbers/*.php' ) as $path ) {
+	include_once $path;
 }
