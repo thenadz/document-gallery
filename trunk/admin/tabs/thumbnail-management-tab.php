@@ -130,7 +130,7 @@ function dg_render_thumbnail_section() {
         $t['title']         = dg_get_thumb_title( $post );
         $t['ext']           = isset( $path_parts['extension'] ) ? $path_parts['extension'] : '';
         $t['description']   = $post->post_content;
-        $t['icon']          = $thumb->isSuccess() ? $thumb->getUrl() : DG_Thumber::getDefaultThumbnail( $post->ID );
+        $t['icon']          = $thumb->isSuccess() ? $thumb->getUrl() : DG_DefaultThumber::getInstance()->getThumbnail( $post->ID );
     }
     unset( $posts );
 

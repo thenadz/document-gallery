@@ -391,6 +391,7 @@ class DG_Setup {
 
 	/**
 	 * Adds integration w/ Thumber.co service.
+	 * Update existing thumbs to match new thumbnail generation architecture.
 	 *
 	 * @param array $options The options to be modified.
 	 */
@@ -404,6 +405,23 @@ class DG_Setup {
 					'direct_upload' => false,
 					'mime_types'    => array()
 			);
+
+			$old_thumbs = DG_Thumb::getThumbs();
+			DG_Thumb::purgeThumbs();
+			foreach ( $old_thumbs as $thumb ) {
+				if ( $thumb->isSuccess() ) {
+					$generator = $thumb->getGenerator();
+					if ( $generator == 'DG_Thumber::getGhostscriptThumbnail' ) {
+						$thumb->setGenerator( 'DG_GhostscriptThumber' );
+					} elseif ( $generator == 'DG_Thumber::getImagickThumbnail' ) {
+						$thumb->setGenerator( 'DG_ImagickThumber' );
+					} elseif ( $generator == 'DG_Thumber::getAudioVideoThumbnail' ) {
+						$thumb->setGenerator( 'DG_AudioVideoThumber' );
+					}
+
+					$thumb->save();
+				}
+			}
 		}
 	}
 

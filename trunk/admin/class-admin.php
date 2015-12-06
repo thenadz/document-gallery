@@ -336,7 +336,7 @@ class DG_Admin {
 		$thumb   = DG_Thumb::getThumb( $ID, $options['width'] . 'x' . $options['height'] );
 		$icon    = ! is_null( $thumb ) && $thumb->isSuccess()
 						? $thumb->getUrl()
-						: DG_Thumber::getDefaultThumbnail( $ID );
+						: DG_DefaultThumber::getInstance()->getThumbnail( $ID );
 
 		echo '<table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">' .
 		     '<tbody><tr data-entry="' . $ID . '"><td class="column-icon media-icon"><img src="' .

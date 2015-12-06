@@ -189,7 +189,7 @@ class DG_Thumb {
      * @return bool Whether this instance represents a successful thumb generation.
      */
     public function isSuccess() {
-        return ! empty( $this->relative_path );
+        return ! empty( $this->relative_path ) && ! DG_Util::startsWith( $this->getPath(), DG_PATH );
     }
 
     /**
@@ -202,8 +202,13 @@ class DG_Thumb {
         // thumbs are immutable -- once created they can only be read or deleted
         if ( isset( $this->meta_id ) ) return;
 
+        // don't re-save identical thumb
+        if ( isset( self::$thumbs[$this->post_id][$this->dimensions] ) &&
+            $this == self::$thumbs[$this->post_id][$this->dimensions] ) return;
+
+
         // post_id + dimensions must be unique so purge the old entry if one exists
-        $old_thumb = self::getThumb( $this->post_id, $this->getWidth(), $this->getHeight() );
+        $old_thumb = self::getThumb( $this->post_id, $this->dimensions );
         if ( ! is_null( $old_thumb ) ) {
             $old_thumb->delete();
         }
@@ -309,7 +314,7 @@ class DG_Thumb {
      * Gets either a nested associative array mapping ID to dimension to thumb or an associative array mapping ID to thumb.
      *
      * @param $dimensions string WIDTHxHEIGHT
-     * @return array The matched thumbs.
+     * @return DG_Thumb[] The matched thumbs.
      */
     public static function getThumbs($dimensions = null) {
         self::initThumbs();
