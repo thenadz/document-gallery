@@ -39,14 +39,6 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * @param int $ID The attachment ID to retrieve thumbnail from.
-	 * @return bool Whether the attachment is supported by this thumber.
-	 */
-	public function supportsAttachment( $ID ) {
-		return true;
-	}
-
-	/**
 	 * @return array The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {

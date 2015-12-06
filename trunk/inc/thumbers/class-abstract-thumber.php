@@ -66,7 +66,7 @@ abstract class DG_AbstractThumber {
 	 * @return bool Whether the attachment is supported by this thumber.
 	 */
 	public function supportsAttachment( $ID ) {
-		return in_array( self::getAttachmentExt( $ID ), static::getThumberExtensions() );
+		return in_array( self::getAttachmentExt( $ID ), $this->getThumberExtensions() );
 	}
 
 	/**
