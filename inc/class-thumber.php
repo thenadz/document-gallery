@@ -123,6 +123,35 @@ class DG_Thumber {
 	}
 
 	/*==========================================================================
+	 * IMAGE THUMBNAILS
+	 *=========================================================================*/
+
+	/**
+	 * @param string $ID The attachment ID to retrieve thumbnail from.
+	 * @param int $pg Unused.
+	 *
+	 * @return bool|string  False on failure, URL to thumb on success.
+	 */
+	public static function getImageThumbnail( $ID, $pg = 1 ) {
+		$options = self::getOptions();
+		$ret     = false;
+
+		// handle images
+		if ( $icon = image_downsize( $ID, array( $options['width'], $options['height'] ) ) ) {
+			$ret = $icon[0];
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * @return array All extensions recognized as images.
+	 */
+	private static function getImageExts() {
+		return array( 'jpg', 'jpeg', 'jpe', 'gif', 'png' );
+	}
+
+	/*==========================================================================
 	 * AUDIO VIDEO THUMBNAILS
 	 *=========================================================================*/
 
@@ -401,16 +430,10 @@ class DG_Thumber {
 	 * @return string     URL to thumbnail.
 	 */
 	public static function getDefaultThumbnail( $ID, $pg = 1 ) {
-		$options  = self::getOptions();
-		$width    = $options['width'];
-		$height   = $options['height'];
 		$icon_url = DG_URL . 'assets/icons/';
 
 		// handle images
-		if ( $icon = image_downsize( $ID, array( $width, $height ) ) ) {
-			$icon = $icon[0];
-		} // default extension icon
-		elseif ( $name = self::getDefaultIcon( self::getExt( wp_get_attachment_url( $ID ) ) ) ) {
+		if ( $name = self::getDefaultIcon( self::getExt( wp_get_attachment_url( $ID ) ) ) ) {
 			$icon = $icon_url . $name;
 		} // fallback to standard WP icons
 		elseif ( ! $icon = wp_mime_type_icon( $ID ) ) {
@@ -558,24 +581,28 @@ class DG_Thumber {
 			$active   = $options['active'];
 			$thumbers = array();
 
+			// normal image attachment processing
+			$exts            = implode( '|', self::getImageExts() );
+			$thumbers[$exts] = array( __CLASS__, 'getImageThumbnail' );
+
 			// Audio/Video embedded images
 			if ( $active['av'] ) {
-				$exts              = implode( '|', self::getAudioVideoExts() );
-				$thumbers[ $exts ] = array( __CLASS__, 'getAudioVideoThumbnail' );
+				$exts            = implode( '|', self::getAudioVideoExts() );
+				$thumbers[$exts] = array( __CLASS__, 'getAudioVideoThumbnail' );
 			}
 
 			// Ghostscript
 			if ( $active['gs'] && self::isGhostscriptAvailable() ) {
-				$exts              = implode( '|', self::getGhostscriptExts() );
-				$thumbers[ $exts ] = array( __CLASS__, 'getGhostscriptThumbnail' );
+				$exts            = implode( '|', self::getGhostscriptExts() );
+				$thumbers[$exts] = array( __CLASS__, 'getGhostscriptThumbnail' );
 			}
 
 			// Imagick
 			if ( $active['imagick'] && self::isImagickAvailable() ) {
 				include_once DG_PATH . 'inc/class-image-editor-imagick.php';
 				if ( $exts = DG_Image_Editor_Imagick::query_formats() ) {
-					$exts              = implode( '|', $exts );
-					$thumbers[ $exts ] = array( __CLASS__, 'getImagickThumbnail' );
+					$exts            = implode( '|', $exts );
+					$thumbers[$exts] = array( __CLASS__, 'getImagickThumbnail' );
 				}
 			}
 
