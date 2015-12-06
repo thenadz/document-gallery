@@ -93,7 +93,7 @@ function dg_validate_settings( $values ) {
 function dg_render_advanced_section() {
     include_once DG_PATH . 'inc/class-thumber.php'; ?>
     <p><?php _e( 'Unless you <em>really</em> know what you\'re doing, you should not touch these values.', 'document-gallery' ); ?></p>
-    <?php if ( ! DG_Thumber::isExecAvailable() ) : ?>
+    <?php if ( ! DG_AbstractThumber::isExecAvailable() ) : ?>
         <p>
             <em><?php _e( 'NOTE: <code>exec()</code> is not accessible. Ghostscript will not function.', 'document-gallery' ); ?></em>
         </p>

@@ -1,16 +1,16 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-include_once DG_PATH . 'inc/thumber-co/thumber-client/client.php';
-include_once DG_PATH . 'inc/thumber-co/class-thumber-client.php';
+include_once DG_PATH . 'inc/thumbers/thumber-co/thumber-client/client.php';
+include_once DG_PATH . 'inc/thumbers/thumber-co/class-thumber-client.php';
 
-add_action( 'dg_thumbers', array( 'DG_ThumberCo', 'thumbersFilter' ) );
-add_filter( 'allowed_http_origin', array( 'DG_ThumberCo', 'allowThumberWebhooks' ), 10, 2);
-add_filter( 'upload_mimes', array( 'DG_ThumberCo', 'customMimeTypes' ) );
-add_action( 'admin_post_nopriv_' . DG_ThumberCo::ThumberAction, array( DG_ThumberClient::getInstance(), 'receiveThumbResponse' ), 5, 0);
+add_filter( 'allowed_http_origin', array( 'DG_ThumberCoThumber', 'allowThumberWebhooks' ), 10, 2);
+add_filter( 'upload_mimes', array( 'DG_ThumberCoThumber', 'customMimeTypes' ) );
+add_action( 'admin_post_nopriv_' . DG_ThumberCoThumber::ThumberAction, array( DG_ThumberClient::getInstance(), 'receiveThumbResponse' ), 5, 0);
 
-DG_ThumberCo::init();
-class DG_ThumberCo {
+DG_ThumberCoThumber::init();
+
+class DG_ThumberCoThumber extends DG_AbstractThumber {
 
    /**
     * @const string Name of the action performed in the webhook.
@@ -36,41 +36,13 @@ class DG_ThumberCo {
     * Initializes the static values for this class.
     */
    public static function init() {
-      if ( ! isset( self::$webhook ) ) {
+      $options  = DG_Thumber::getOptions();
+      $active   = $options['active'];
+      if ( $active['thumber-co'] ) {
+         parent::init();
          self::$webhook = admin_url( 'admin-post.php?action=' . self::ThumberAction );
          self::$client = DG_ThumberClient::getInstance();
       }
-   }
-
-   /**
-    * TODO: This should be a configurable option and should include all Thumber types not default WP-supported.
-    * @param $mimes array The MIME types WP knows about.
-    * @return array Modified MIME types -- adding additional supported types.
-    */
-   public static function customMimeTypes($mimes) {
-      $mimes['pub'] = 'application/mspublisher';
-      return $mimes;
-   }
-
-   /**
-    * WP by default will not handle POSTs from Thumber so add a special case for the action we want to handle.
-    * @param $origin
-    * @param $origin_arg
-    *
-    * @return bool Whether WP will handle the action.
-    */
-   public static function allowThumberWebhooks($origin, $origin_arg) {
-      return $origin || ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] === self::ThumberAction );
-   }
-
-   /**
-    *
-    * @param array $thumbers The thumbnail generators being used by Document Gallery.
-    * @return array The thumbnail generators being used by Document Gallery with Thumber.co appended.
-    */
-   public static function thumbersFilter( $thumbers ) {
-      $thumbers[implode( '|', self::$client->getMimeTypes() )] = array( __CLASS__, 'getThumberThumbnail' );
-      return $thumbers;
    }
 
    /**
@@ -79,11 +51,11 @@ class DG_ThumberCo {
     *
     * @return bool Always false. Asynchronously set the thumbnail in webhook later.
     */
-   public static function getThumberThumbnail( $ID, $pg = 1 ) {
+   public function getThumbnail( $ID, $pg = 1 ) {
       global $dg_options;
 
-      include_once DG_PATH . 'inc/thumber-co/thumber-client/client.php';
-      include_once DG_PATH . 'inc/thumber-co/thumber-client/thumb-request.php';
+      include_once DG_PATH . 'inc/thumbers/thumber-co/thumber-client/client.php';
+      include_once DG_PATH . 'inc/thumbers/thumber-co/thumber-client/thumb-request.php';
 
       $options = DG_Thumber::getOptions();
       $url_or_path = get_attached_file( $ID );
@@ -131,6 +103,49 @@ class DG_ThumberCo {
    }
 
    /**
+    * @return array The extensions supported by this thumber.
+    */
+   protected function getThumberExtensions() {
+      return self::$client->getMimeTypes();
+   }
+
+   /**
+    * @return int An integer from 0 to 100. Higher priorities will be attempted before lower priority thumbers.
+    */
+   public function getPriority() {
+      return 5;
+   }
+
+   /**
+    * @return bool Whether Thumber.co may be used in thumbnail generation.
+    */
+   public static function isThumberCoAvailable() {
+      global $dg_options;
+      return isset( $dg_options['thumber-co']['uid'] ) && isset( $dg_options['thumber-co']['secret'] );
+   }
+
+   /**
+    * TODO: This should be a configurable option and should include all Thumber types not default WP-supported.
+    * @param $mimes array The MIME types WP knows about.
+    * @return array Modified MIME types -- adding additional supported types.
+    */
+   public static function customMimeTypes($mimes) {
+      $mimes['pub'] = 'application/mspublisher';
+      return $mimes;
+   }
+
+   /**
+    * WP by default will not handle POSTs from Thumber so add a special case for the action we want to handle.
+    * @param $origin
+    * @param $origin_arg
+    *
+    * @return bool Whether WP will handle the action.
+    */
+   public static function allowThumberWebhooks($origin, $origin_arg) {
+      return $origin || ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] === self::ThumberAction );
+   }
+
+   /**
     * @param string $filename File to be tested.
     * @return bool Whether file is acceptable to be sent to Thumber.
     */
@@ -153,12 +168,5 @@ class DG_ThumberCo {
    private static function checkGeometry( $width, $height ) {
       $sub = self::$client->getSubscription();
       return ( ! $sub || empty( $sub['thumb_size_limit'] ) ) || ( $width <= $sub['thumb_size_limit'] && $height <= $sub['thumb_size_limit'] );
-   }
-
-   /**
-    * Blocks instantiation. All functions are static.
-    */
-   private function __construct() {
-
    }
 }
