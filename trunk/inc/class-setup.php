@@ -13,7 +13,7 @@ class DG_Setup {
 	 *
 	 * @param $skeleton bool When true, expensive values are not calculated. Only keys may be trusted when returning skeleton.
 	 *
-	 * @return array Contains default options for DG.
+	 * @return mixed[][] Contains default options for DG.
 	 */
 	public static function getDefaultOptions( $skeleton = false ) {
 		include_once DG_PATH . 'inc/class-thumber.php';
@@ -95,7 +95,7 @@ class DG_Setup {
 	}
 
 	/**
-	 * @return array The default MIME types to include in gallery.
+	 * @return string[] The default MIME types to include in gallery.
 	 */
 	public static function getDefaultMimeTypes() {
 		return array( 'application', 'video', 'text', 'audio', 'image' );
@@ -168,7 +168,7 @@ class DG_Setup {
 	 *
 	 * The defaults sub-branch in the gallery branch is being flattened into its parent.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function twoPointTwo( &$options ) {
 		if ( isset( $options['version'] ) && version_compare( $options['version'], '2.2', '<' ) ) {
@@ -207,7 +207,7 @@ class DG_Setup {
 	/**
 	 * Some of the data previously stored along with custom CSS is no longer needed.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function twoPointThree( &$options ) {
 		if ( isset( $options['version'] ) && version_compare( $options['version'], '2.3', '<' ) ) {
@@ -245,7 +245,7 @@ class DG_Setup {
 	 * Added "columns" attribute.
 	 * Added "mime_types" attribute.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function threePointZeroBeta( &$options ) {
 		if ( isset( $options['version'] ) /*&& version_compare($options['version'], '3.0.0-beta', '<')*/ ) {
@@ -274,7 +274,7 @@ class DG_Setup {
 	 *
 	 * Added scheduled log purge event to handle rollovers.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function threePointOne( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.1', '<' ) ) {
@@ -292,7 +292,7 @@ class DG_Setup {
 	/**
 	 * Adds 'new_window' under gallery options.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function threePointTwo( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.2', '<' ) ) {
@@ -303,7 +303,7 @@ class DG_Setup {
 	/**
 	 * Removes minified CSS. Fixing corrupt data for boolean fields that may have gotten strings.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function threePointThree( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.3', '<' ) ) {
@@ -327,7 +327,7 @@ class DG_Setup {
 	/**
 	 * Removes the validation option. Validation is now non-optional.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function threePointFour( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.4', '<' ) ) {
@@ -348,7 +348,7 @@ class DG_Setup {
 	 * There is no longer a concept of gallery load timeout. Missing thumbnails are asynchronously generated after
 	 * a gallery is first rendered via AJAX requests.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function threePointFive( &$options ) {
 		if ( version_compare( $options['meta']['version'], '3.5', '<' ) ) {
@@ -361,7 +361,7 @@ class DG_Setup {
 	 * Paginate & skip options were added.
 	 * Moving cached thumbs into postmeta table.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function  fourPointZero( &$options ) {
 		if ( version_compare( $options['meta']['version'], '4.0', '<' ) ) {
@@ -393,7 +393,7 @@ class DG_Setup {
 	 * Adds integration w/ Thumber.co service.
 	 * Update existing thumbs to match new thumbnail generation architecture.
 	 *
-	 * @param array $options The options to be modified.
+	 * @param mixed[][] $options The options to be modified.
 	 */
 	private static function fourPointOne( &$options ) {
 		if ( version_compare( $options['meta']['version'], '4.1', '<' ) ) {

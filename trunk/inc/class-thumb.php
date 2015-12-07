@@ -9,7 +9,7 @@ class DG_Thumb {
 
     /**
      * TODO: Replace w/ https://codex.wordpress.org/Class_Reference/WP_Object_Cache
-     * @var array The cached copy of thumbs.
+     * @var DG_Thumb[] The cached copy of thumbs.
      */
     private static $thumbs = null;
 
@@ -335,7 +335,7 @@ class DG_Thumb {
 
     /**
      * Removes thumbs from the DB.
-     * @param $ids array|int|null Optional. The post IDs to be purged. If not given then all are purged.
+     * @param $ids int[]|int|null Optional. The post IDs to be purged. If not given then all are purged.
      * @param $blog_id null|int Optional. The blog to purge from. Defaults to active blog.
      */
     public static function purgeThumbs($ids = null, $blog_id = null) {
@@ -401,7 +401,7 @@ class DG_Thumb {
     }
 
     /**
-     * @param $thumbs array|DG_Thumb Removes files associated with given thumb(s).
+     * @param $thumbs DG_Thumb[]|DG_Thumb Removes files associated with given thumb(s).
      */
     private static function cleanupThumbFiles($thumbs) {
         if ( is_a( $thumbs, __CLASS__ ) ) {

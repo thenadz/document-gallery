@@ -39,7 +39,7 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
 		return self::getAllExts();
