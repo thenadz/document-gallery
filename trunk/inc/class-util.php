@@ -36,12 +36,30 @@ class DG_Util {
 	}
 
 	/**
-	 * @param mixed $maybeint Data you wish to have converted to a positive integer.
+	 * Caller should handle removal of the temp file when finished.
 	 *
+	 * @param string $ext The extension to be given to the temp file.
+	 *
+	 * @return string A temp file with the given extension.
+	 */
+	public static function getTempFile( $ext = 'png' ) {
+		static $base = null;
+		static $tmp;
+
+		if ( is_null( $base ) ) {
+			$base = md5( time() );
+			$tmp  = untrailingslashit( get_temp_dir() );
+		}
+
+		return $tmp . DIRECTORY_SEPARATOR . wp_unique_filename( $tmp, $base . '.' . $ext );
+	}
+
+	/**
+	 * @param mixed $maybeint Data you wish to have converted to a positive integer.
 	 * @return int A positive integer.
 	 */
-	public static function posint($maybeint) {
-		return max(absint($maybeint), 1);
+	public static function posint( $maybeint ) {
+		return max( absint( $maybeint ), 1 );
 	}
 
 	/**
@@ -49,7 +67,6 @@ class DG_Util {
 	 *
 	 * @param mixed $val To be converted.
 	 * @param bool|NULL $default The value to return if unable to parse $val.
-	 *
 	 * @return bool|NULL Bool value if can be parsed, else NULL.
 	 */
 	public static function toBool( $val, $default = null ) {

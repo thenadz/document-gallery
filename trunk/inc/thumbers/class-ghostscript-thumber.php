@@ -43,7 +43,7 @@ class DG_GhostscriptThumber extends DG_AbstractThumber {
 		}
 
 		$doc_path  = get_attached_file( $ID );
-		$temp_path = self::getTempFile();
+		$temp_path = DG_Util::getTempFile();
 
 		exec( sprintf( $gs, $pg, $temp_path, $doc_path ), $out, $ret );
 

@@ -52,7 +52,7 @@ class DG_AudioVideoThumber extends DG_AbstractThumber {
 				break;
 		}
 
-		$temp_file = self::getTempFile( $ext );
+		$temp_file = DG_Util::getTempFile( $ext );
 
 		if ( ! $fp = @fopen( $temp_file, 'wb' ) ) {
 			DG_Logger::writeLog( DG_LogLevel::Error, __( 'Could not open file: ', 'document-gallery' ) . $temp_file );

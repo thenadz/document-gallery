@@ -19,6 +19,8 @@ class DG_ThumberClient extends ThumberClient {
 	 * Enforce singleton.
 	 */
 	protected function __construct() {
+		parent::__construct();
+
 		global $dg_options;
 
 		$this->uid = $dg_options['thumber-co']['uid'];
@@ -104,7 +106,7 @@ class DG_ThumberClient extends ThumberClient {
 		$split = explode( DG_ThumberCoThumber::NonceSeparator, $nonce );
 		if ( $resp->getSuccess() && count( $split ) === 2 ) {
 			$ID = absint( $split[0] );
-			$tmpfile = get_temp_dir() . self::getTempFile( get_temp_dir() );
+			$tmpfile = DG_Util::getTempFile();
 
 			file_put_contents( $tmpfile, $resp->getDecodedData() );
 
@@ -160,22 +162,5 @@ class DG_ThumberClient extends ThumberClient {
 	 */
 	protected function handleError($err) {
 		DG_Logger::writeLog( DG_LogLevel::Error, $err );
-	}
-
-	/**
-	 * TODO: Bring DG_Thumber equiv. function into DG_Util and use that instead.
-	 *
-	 * @param string $dir The directory that the generated filename is destined.
-	 * @param string $ext The file extension to generate the file with.
-	 * @return string The filename to be used relative to the directory provided.
-	 */
-	private static function getTempFile( $dir, $ext = 'png' ) {
-		static $base;
-
-		if ( ! isset( $base ) ) {
-			$base = md5( time() );
-		}
-
-		return wp_unique_filename( untrailingslashit( $dir ), $base . '.' . $ext );
 	}
 }
