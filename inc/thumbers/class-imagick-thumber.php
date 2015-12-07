@@ -50,7 +50,7 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 			return false;
 		}
 
-		$temp_file = self::getTempFile();
+		$temp_file = DG_Util::getTempFile();
 
 		$err = $img->save( $temp_file, 'image/png' );
 		if ( is_wp_error( $err ) ) {

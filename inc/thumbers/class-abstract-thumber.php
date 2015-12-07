@@ -81,25 +81,6 @@ abstract class DG_AbstractThumber {
 	}
 
 	/**
-	 * Caller should handle removal of the temp file when finished.
-	 *
-	 * @param string $ext The extension to be given to the temp file.
-	 *
-	 * @return string A temp file with the given extension.
-	 */
-	protected static function getTempFile( $ext = 'png' ) {
-		static $base = null;
-		static $tmp;
-
-		if ( is_null( $base ) ) {
-			$base = md5( time() );
-			$tmp  = untrailingslashit( get_temp_dir() );
-		}
-
-		return $tmp . DIRECTORY_SEPARATOR . wp_unique_filename( $tmp, $base . '.' . $ext );
-	}
-
-	/**
 	 * Checks whether exec() may be used.
 	 * Source: http://stackoverflow.com/a/12980534/866618
 	 *
