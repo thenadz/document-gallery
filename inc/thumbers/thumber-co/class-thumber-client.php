@@ -30,9 +30,9 @@ class DG_ThumberClient extends ThumberClient {
 	 * Sends HTTP request to Thumber server.
 	 * @param $type string GET or POST
 	 * @param $url string The URL endpoint being targeted.
-	 * @param $httpHeaders array The headers to be sent.
+	 * @param $httpHeaders string[] The headers to be sent.
 	 * @param $body string The POST body. Ignored if type is GET.
-	 * @return array The result of the request.
+	 * @return mixed[] The result of the request.
 	 */
 	protected function sendToThumber($type, $url, $httpHeaders, $body = '') {
 		$headers = array();
@@ -138,7 +138,7 @@ class DG_ThumberClient extends ThumberClient {
 
 	/**
 	 * Retrieves the supported MIME types from Thumber that are also compatible with WordPress.
-	 * @return array The supported MIME types reported by the Thumber server.
+	 * @return string[] The supported MIME types reported by the Thumber server.
 	 */
 	public function getMimeTypes() {
 		global $dg_options;

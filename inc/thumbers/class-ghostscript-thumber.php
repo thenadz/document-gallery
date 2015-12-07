@@ -57,7 +57,7 @@ class DG_GhostscriptThumber extends DG_AbstractThumber {
 		return $temp_path;
 	}
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
 		return array( 'pdf', 'ps', 'eps' );

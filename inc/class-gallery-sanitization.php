@@ -53,7 +53,7 @@ class DG_GallerySanitization {
      *
      * @param string $key The key to reference the current value in the defaults array.
      * @param mixed $value The value to be sanitized.
-     * @param array $errs The array of errors, which will be appended with any errors found.
+     * @param string[] $errs The array of errors, which will be appended with any errors found.
      *
      * @return mixed The sanitized value, falling back to the current default value when invalid value given.
      */
@@ -283,7 +283,7 @@ class DG_GallerySanitization {
     }
 
     /**
-     * @return array The valid options for order parameter.
+     * @return string[] The valid options for order parameter.
      */
     public static function getOrderOptions() {
         return array( 'ASC', 'DESC' );
@@ -309,7 +309,7 @@ class DG_GallerySanitization {
     }
 
     /**
-     * @return array The valid options for orderby parameter.
+     * @return string[] The valid options for orderby parameter.
      */
     public static function getOrderbyOptions() {
         return array(
@@ -366,7 +366,7 @@ class DG_GallerySanitization {
     }
 
     /**
-     * @return array All registered post statuses.
+     * @return string[] All registered post statuses.
      */
     public static function getPostStatuses() {
         static $statuses;
@@ -399,7 +399,7 @@ class DG_GallerySanitization {
     }
 
     /**
-     * @return array All registered post types.
+     * @return string[] All registered post types.
      */
     public static function getPostTypes() {
         static $types;
@@ -432,7 +432,7 @@ class DG_GallerySanitization {
     }
 
     /**
-     * @return array The valid options for relation parameter.
+     * @return string[] The valid options for relation parameter.
      */
     public static function getRelationOptions() {
         return array( 'AND', 'OR' );
@@ -479,7 +479,7 @@ class DG_GallerySanitization {
     }
 
     /**
-     * @return array The valid options for *_relation/*_operator parameter.
+     * @return string[] The valid options for *_relation/*_operator parameter.
      */
     public static function getOperatorOptions() {
         return array( 'IN', 'NOT IN', 'AND', 'OR' );

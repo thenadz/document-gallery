@@ -19,7 +19,7 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
 		if ( ! ($ret = DG_Image_Editor_Imagick::query_formats()) ) {

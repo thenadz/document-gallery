@@ -45,7 +45,7 @@ abstract class DG_AbstractThumber {
 	}
 
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected abstract function getThumberExtensions();
 
@@ -161,7 +161,7 @@ abstract class DG_AbstractThumber {
 	/**
 	 * Addresses issues with getting a complete list of supported MIME types as
 	 * described in this issue: https://core.trac.wordpress.org/ticket/32544
-	 * @return array Contains all MIME types supported by WordPress, including custom types added by plugins.
+	 * @return string[] Contains all MIME types supported by WordPress, including custom types added by plugins.
 	 */
 	protected static function getAllExts() {
 		return array_keys( array_merge( wp_get_mime_types(), get_allowed_mime_types() ) );
