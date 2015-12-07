@@ -103,7 +103,7 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
    }
 
    /**
-    * @return array The extensions supported by this thumber.
+    * @return string[] The extensions supported by this thumber.
     */
    protected function getThumberExtensions() {
       return self::$client->getMimeTypes();
@@ -126,8 +126,8 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
 
    /**
     * TODO: This should be a configurable option and should include all Thumber types not default WP-supported.
-    * @param $mimes array The MIME types WP knows about.
-    * @return array Modified MIME types -- adding additional supported types.
+    * @param $mimes string[] The MIME types WP knows about.
+    * @return string[] Modified MIME types -- adding additional supported types.
     */
    public static function customMimeTypes($mimes) {
       $mimes['pub'] = 'application/mspublisher';

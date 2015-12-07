@@ -73,7 +73,7 @@ class DG_AudioVideoThumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
 		return array_merge( wp_get_audio_extensions(), wp_get_video_extensions() );

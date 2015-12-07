@@ -6,7 +6,7 @@ DG_ImageThumber::init();
 class DG_ImageThumber extends DG_AbstractThumber {
 
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
 		return array( 'jpg', 'jpeg', 'jpe', 'gif', 'png' );

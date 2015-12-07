@@ -70,7 +70,7 @@ class DG_Thumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * @return array The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
 		throw new BadFunctionCallException( 'Not implemented.' );
@@ -89,7 +89,7 @@ class DG_Thumber extends DG_AbstractThumber {
 	 * @param $skeleton bool When true, values that require computation will be
 	 *        skipped. Useful when only structure of options is needed.
 	 *
-	 * @return array The default thumbnail generation methods.
+	 * @return bool[] The default thumbnail generation methods.
 	 */
 	public static function getDefaultThumbers( $skeleton = false ) {
 		$gs_active = $imagick_active = null;
@@ -141,7 +141,7 @@ class DG_Thumber extends DG_AbstractThumber {
 	 *=========================================================================*/
 
 	/**
-	 * @return array|null Thumber options from DB or null if options not initialized.
+	 * @return mixed[]|null Thumber options from DB or null if options not initialized.
 	 */
 	public static function getOptions( $blog = null ) {
 		$options = DocumentGallery::getOptions( $blog );
@@ -150,7 +150,7 @@ class DG_Thumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * @return array WP_Post objects for each attachment that has been processed.
+	 * @return WP_Post[] Each attachment that has been processed.
 	 */
 	public static function getThumbed() {
 		$thumbs = DG_Thumb::getThumbs();

@@ -28,7 +28,7 @@ class DG_Util {
 	}
 
 	/**
-	 * @return array All blog IDs.
+	 * @return int[] All blog IDs.
 	 */
 	public static function getBlogIds() {
 		global $wpdb;
@@ -91,7 +91,7 @@ class DG_Util {
 	 *
 	 * @param $handle string Unique identifier for the script/style.
 	 * @param $src string Relative path to asset from DG_URL.
-	 * @param array $deps Any assets depended on by asset to be enqueued.
+	 * @param string[] $deps Any assets depended on by asset to be enqueued.
 	 * @param bool $in_footer For scripts, dictates whether to put in footer.
 	 */
 	public static function enqueueAsset( $handle, $src, $deps = array(), $in_footer = true ) {
