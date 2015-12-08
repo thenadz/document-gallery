@@ -8,7 +8,7 @@ defined( 'WPINC' ) OR exit;
   Version: 4.1
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
-  License: GPLv2
+  License: GPLv3
   Text Domain: document-gallery
  */
 
