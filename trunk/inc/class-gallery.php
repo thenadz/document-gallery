@@ -475,7 +475,7 @@ class DG_Gallery {
 		$gallery = apply_filters( 'dg_gallery_template', '<div id="%id%" class="%class%" %data%>' . PHP_EOL . '%rows%</div>', $this->useDescriptions() );
 
 		// build pagination section
-		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
+		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 && $this->pg_count > 1 ) {
 			$args = array(
 				'base'    => '#%_%',
 				'format'  => 'dg_page=%#%',
