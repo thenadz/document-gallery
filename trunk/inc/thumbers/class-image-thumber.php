@@ -19,7 +19,7 @@ class DG_ImageThumber extends DG_AbstractThumber {
 	 * @return bool|string  False on failure, URL to thumb on success.
 	 */
 	public function getThumbnail( $ID, $pg = 1 ) {
-		$options = self::getOptions();
+		$options = DG_Thumber::getOptions();
 		$ret     = false;
 
 		if ( $icon = image_downsize( $ID, array( $options['width'], $options['height'] ) ) ) {
