@@ -111,7 +111,7 @@ class DG_FeaturePointers {
      * @return bool Whether the method name matches the filter pointer pattern.
      */
     private static function isFilterPointerMethod( $method ) {
-        // NOTE: ReflectionClass#getMethods filtering not working in at least some cases so re-checking for PUBLIC & STATIC
+        // NOTE: ReflectionClass returns methods that are static OR public -- must reduce to an AND
         return $method->isPublic() && $method->isStatic() && DG_Util::endsWith( $method->name, self::$feature_pointer_method_suffix );
     }
 }
