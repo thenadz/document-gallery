@@ -370,8 +370,7 @@ class DG_Admin {
 			$ID = - 1;
 		}
 
-		$thumbs = DG_Thumb::getThumbs();
-		if ( isset( $_POST[DG_OPTION_NAME]['upload'] ) && isset( $_FILES['file'] ) && isset( $thumbs[$ID] ) ) {
+		if ( isset( $_POST[DG_OPTION_NAME]['upload'] ) && isset( $_FILES['file'] ) ) {
 			$uploaded_filename = self::validateUploadedFile();
 			if ( $uploaded_filename && ( $thumb = DG_Thumber::setThumbnail( $ID, $uploaded_filename ) ) ) {
 				$responseArr['result'] = true;
