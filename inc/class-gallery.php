@@ -66,7 +66,7 @@ class DG_Gallery {
 	/**
 	 * @param int $blog The blog we're retrieving options for (null => current blog).
 	 *
-	 * @return array Gets gallery branch of DG options array.
+	 * @return mixed[] Gets gallery branch of DG options array.
 	 */
 	public static function getOptions( $blog = null ) {
 		$options = DocumentGallery::getOptions( $blog );
@@ -75,7 +75,7 @@ class DG_Gallery {
 	}
 
 	/**
-	 * @param array $options New value for gallery branch of DG options array.
+	 * @param mixed[] $options New value for gallery branch of DG options array.
 	 * @param int $blog The blog we're retrieving options for (null => current blog).
 	 */
 	public static function setOptions( $options, $blog = null ) {
@@ -104,7 +104,7 @@ class DG_Gallery {
 	/**
 	 * Builds a gallery object with attributes passed.
 	 *
-	 * @param array $atts Array of attributes used in shortcode.
+	 * @param mixed[] $atts Array of attributes used in shortcode.
 	 */
 	public function __construct( $atts ) {
 		static $instance = 0;
@@ -179,11 +179,11 @@ class DG_Gallery {
 	/**
 	 * Cleans up user input, making sure we don't pass crap on to WP core.
 	 *
-	 * @param array $old_defaults The previous set of defaults.
-	 * @param array $defaults The defaults array to sanitize.
-	 * @param array &$errs The array of errors, which will be appended with any errors found.
+	 * @param mixed[] $old_defaults The previous set of defaults.
+	 * @param mixed[] $defaults The defaults array to sanitize.
+	 * @param string[] &$errs The array of errors, which will be appended with any errors found.
 	 *
-	 * @return array The sanitized defaults.
+	 * @return mixed[] The sanitized defaults.
 	 */
 	public static function sanitizeDefaults( $old_defaults, $defaults, &$errs ) {
 		if ( is_null( $old_defaults ) ) {
@@ -217,7 +217,7 @@ class DG_Gallery {
 	/**
 	 * Gets all valid Documents based on the attributes passed by the user.
 	 * NOTE: Keys in returned array are arbitrary and will vary. They should be ignored.
-	 * @return array Contains all documents matching the query.
+	 * @return WP_Post[] Contains all documents matching the query.
 	 * @throws InvalidArgumentException Thrown when $this->errs is not empty.
 	 */
 	private function getDocuments() {
@@ -264,7 +264,7 @@ class DG_Gallery {
 	 * self::$defaults. If they are the name of a taxonomy, they are plugged
 	 * into the query, otherwise $this->errs is appended with an error string.
 	 *
-	 * @param array $query Query to insert tax query into.
+	 * @param mixed[] $query Query to insert tax query into.
 	 */
 	private function setTaxa( &$query ) {
 		if ( ! empty( $this->taxa ) ) {
@@ -312,9 +312,9 @@ class DG_Gallery {
 	 * Also appends an entry onto $errs if any invalid names are found.
 	 *
 	 * @param string $taxon The taxon these terms are a member of.
-	 * @param array $term_names Terms to retrieve.
+	 * @param string[] $term_names Terms to retrieve.
 	 *
-	 * @return array All matched terms.
+	 * @return WP_Term[] All matched terms.
 	 */
 	private function getTermIdsByNames( $taxon, $term_names ) {
 		return $this->getTermXByNames( 'term_id', $taxon, $term_names );
@@ -325,9 +325,9 @@ class DG_Gallery {
 	 * Also appends an entry onto $errs if any invalid names are found.
 	 *
 	 * @param string $taxon The taxon these terms are a member of.
-	 * @param array $term_names Terms to retrieve.
+	 * @param string[] $term_names Terms to retrieve.
 	 *
-	 * @return array All matched terms.
+	 * @return WP_Term[] All matched terms.
 	 */
 	private function getTermSlugsByNames( $taxon, $term_names ) {
 		return $this->getTermXByNames( 'slug', $taxon, $term_names );
@@ -342,9 +342,9 @@ class DG_Gallery {
 	 *
 	 * @param string $x Field to retrieve from matched term.
 	 * @param string $taxon The taxon these terms are a member of.
-	 * @param array $term_idents Terms to retrieve, identified by either slug or name.
+	 * @param string[] $term_idents Terms to retrieve, identified by either slug or name.
 	 *
-	 * @return array All matched terms.
+	 * @return WP_Term[] All matched terms.
 	 */
 	private function getTermXByNames( $x, $taxon, $term_idents ) {
 		$ret   = array();
@@ -399,7 +399,7 @@ class DG_Gallery {
 	 *=========================================================================*/
 
 	/**
-	 * @return array The data to be used in the data-shortcode attribute.
+	 * @return mixed[] The data to be used in the data-shortcode attribute.
 	 */
 	private function getShortcodeData() {
 		$ret = array_merge( $this->atts, $this->taxa );
@@ -475,7 +475,7 @@ class DG_Gallery {
 		$gallery = apply_filters( 'dg_gallery_template', '<div id="%id%" class="%class%" %data%>' . PHP_EOL . '%rows%</div>', $this->useDescriptions() );
 
 		// build pagination section
-		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 ) {
+		if ( $this->atts['paginate'] && $this->atts['limit'] > 0 && $this->pg_count > 1 ) {
 			$args = array(
 				'base'    => '#%_%',
 				'format'  => 'dg_page=%#%',
