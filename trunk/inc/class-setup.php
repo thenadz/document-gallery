@@ -20,7 +20,7 @@ class DG_Setup {
 
 		$gs = $donate_link = null;
 		if ( ! $skeleton ) {
-			$gs          = DG_Thumber::getGhostscriptExecutable();
+			$gs          = DG_GhostscriptThumber::getGhostscriptExecutable();
 			$donate_link = self::getDonateLink();
 		}
 
