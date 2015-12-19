@@ -1,6 +1,7 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
+global $dg_url_params;
 $dg_url_params = array( 'page' => DG_OPTION_NAME, 'tab' => 'thumbnail-management-tab' );
 
 /**
@@ -95,6 +96,7 @@ function dg_render_thumbnail_section() {
     $order = $dg_url_params['order'] = dg_get_order_param( $order_options );
     $limit = $dg_url_params['limit'] = dg_get_limit_param();
 
+    /** @var DG_Thumb[] $thumbs */
     $thumbs        = DG_Thumb::getThumbs( $options['width'] . 'x' . $options['height'] );
     uasort( $thumbs, 'dg_cmp_thumb' );
     $thumbs_number = count( $thumbs );
