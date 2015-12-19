@@ -237,6 +237,9 @@ class DG_Thumber extends DG_AbstractThumber {
 			if ( false === ( $temp_path = $generator->getThumbnail( $ID, $pg ) ) ) {
 				return false;
 			}
+
+			// NOTE: get string representation to be stored with thumb in DB
+			$generator = get_class( $generator );
 		} else {
 			DG_Logger::writeLog(
 				DG_LogLevel::Error,
@@ -292,7 +295,7 @@ class DG_Thumber extends DG_AbstractThumber {
 		$thumb->setDimensions( $options['width'] . 'x' . $options['height'] );
 		$thumb->setTimestamp( time() );
 		$thumb->setRelativePath( substr( $thumb_path, strlen( $upload['basedir'] ) + 1 ) );
-		$thumb->setGenerator( get_class( $generator ) );
+		$thumb->setGenerator( $generator );
 		$thumb->save();
 
 		return $thumb;
