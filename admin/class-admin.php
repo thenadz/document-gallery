@@ -15,7 +15,7 @@ class DG_Admin {
 	/**
 	 * NOTE: This should only ever be accessed through getTabs().
 	 *
-	 * @var array Associative array containing all tab names, keyed by tab slug.
+	 * @var string[] Associative array containing all tab names, keyed by tab slug.
 	 */
 	private static $tabs;
 
@@ -66,8 +66,8 @@ class DG_Admin {
 
 	/**
 	 * Adds settings link to main plugin view.
-	 * @param $links array The links being prepended.
-	 * @return array The given array with settings link prepended.
+	 * @param $links string[] The links being prepended.
+	 * @return string[] The given array with settings link prepended.
 	 */
 	public static function addSettingsLink( $links ) {
 		$settings = '<a href="options-general.php?page=' . DG_OPTION_NAME . '">' .
@@ -79,9 +79,9 @@ class DG_Admin {
 
 	/**
 	 * Adds donate link to main plugin view.
-	 * @param $links array The links.
+	 * @param $links string[] The links.
 	 * @param $file string The file.
-	 * @return array The given array with donate link appended.
+	 * @return string[] The given array with donate link appended.
 	 */
 	public static function addDonateLink( $links, $file ) {
 		if ( $file === DG_BASENAME ) {
@@ -156,30 +156,30 @@ class DG_Admin {
 	/**
 	 * Adds assets/js/gallery.js as registered TinyMCE plugin
 	 *
-	 * @param array $plugin_array Previously registered plugins
+	 * @param string[] $plugins An array of default TinyMCE plugins.
 	 *
-	 * @return array Total set of plugins
+	 * @return string[] Default TinyMCE plugins plus custom DG plugin.
 	 */
-	public static function mce_external_plugins( $plugin_array ) {
-		$plugin_array['dg'] = DG_Util::getAssetPath( 'assets/js/gallery.js' );
+	public static function mce_external_plugins( $plugins ) {
+		$plugins['dg'] = DG_Util::getAssetPath( 'assets/js/gallery.js' );
 
-		return $plugin_array;
+		return $plugins;
 	}
 
 	/**
 	 * Adds assets/css/style.css as registered TinyMCE CSS
 	 *
-	 * @param array $mce_css Previously registered CSS
+	 * @param string $stylesheets Comma-delimited list of stylesheets.
 	 *
-	 * @return array Total set of CSS
+	 * @return string Comma-delimited list of stylesheets.
 	 */
-	public static function dg_plugin_mce_css( $mce_css ) {
-		if ( ! empty( $mce_css ) ) {
-			$mce_css .= ',';
+	public static function dg_plugin_mce_css( $stylesheets ) {
+		if ( ! empty( $stylesheets ) ) {
+			$stylesheets .= ',';
 		}
-		$mce_css .= str_replace( ',', '%2C', DG_Util::getAssetPath( 'assets/css/style.css' ) );
+		$stylesheets .= str_replace( ',', '%2C', DG_Util::getAssetPath( 'assets/css/style.css' ) );
 
-		return $mce_css;
+		return $stylesheets;
 	}
 
 	/**
@@ -204,9 +204,8 @@ class DG_Admin {
 	/**
 	 * Validates submitted options, sanitizing any invalid options.
 	 *
-	 * @param array $values User-submitted new options.
-	 *
-	 * @return array Sanitized new options.
+	 * @param mixed[] $values User-submitted new options.
+	 * @return mixed[] Sanitized new options.
 	 */
 	public static function validateSettings( $values ) {
 		// NOTE: WP double-calls this function -- below logic prevents potential
@@ -336,7 +335,7 @@ class DG_Admin {
 		$thumb   = DG_Thumb::getThumb( $ID, $options['width'] . 'x' . $options['height'] );
 		$icon    = ! is_null( $thumb ) && $thumb->isSuccess()
 						? $thumb->getUrl()
-						: DG_Thumber::getDefaultThumbnail( $ID );
+						: DG_DefaultThumber::getInstance()->getThumbnail( $ID );
 
 		echo '<table id="ThumbsTable" class="wp-list-table widefat fixed media" cellpadding="0" cellspacing="0">' .
 		     '<tbody><tr data-entry="' . $ID . '"><td class="column-icon media-icon"><img src="' .
@@ -388,7 +387,7 @@ class DG_Admin {
 	/**
 	 * Render a checkbox field.
 	 *
-	 * @param array $args
+	 * @param mixed[] $args
 	 */
 	public static function renderCheckboxField( $args ) {
 		$args['disabled'] = isset( $args['disabled'] ) ? $args['disabled'] : false;
@@ -404,7 +403,7 @@ class DG_Admin {
 	/**
 	 * Render a text field.
 	 *
-	 * @param array $args
+	 * @param mixed[] $args
 	 */
 	public static function renderTextField( $args ) {
 		printf( '<input type="%1$s" value="%2$s" name="%3$s[%4$s]" id="%5$s" /> %6$s',
@@ -419,7 +418,7 @@ class DG_Admin {
 	/**
 	 * Accepts a two-dimensional array where each inner array consists of valid arguments for renderTextField.
 	 *
-	 * @param array $args
+	 * @param mixed[] $args
 	 */
 	public static function renderMultiTextField( $args ) {
 		foreach ( $args as $arg ) {
@@ -430,7 +429,7 @@ class DG_Admin {
 	/**
 	 * Render a select field.
 	 *
-	 * @param array $args
+	 * @param mixed[] $args
 	 */
 	public static function renderSelectField( $args ) {
 		printf( '<select name="%1$s[%2$s]" id="%3$s">',

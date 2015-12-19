@@ -130,7 +130,7 @@ function dg_render_thumbnail_section() {
         $t['title']         = dg_get_thumb_title( $post );
         $t['ext']           = isset( $path_parts['extension'] ) ? $path_parts['extension'] : '';
         $t['description']   = $post->post_content;
-        $t['icon']          = $thumb->isSuccess() ? $thumb->getUrl() : DG_Thumber::getDefaultThumbnail( $post->ID );
+        $t['icon']          = $thumb->isSuccess() ? $thumb->getUrl() : DG_DefaultThumber::getInstance()->getThumbnail( $post->ID );
     }
     unset( $posts );
 
@@ -291,8 +291,7 @@ function dg_get_limit_param() {
 }
 
 /**
- * @param $order_options array The possible options for order.
- *
+ * @param $order_options string[] The possible options for order.
  * @return string The order value.
  */
 function dg_get_order_param($order_options) {
@@ -301,8 +300,7 @@ function dg_get_order_param($order_options) {
 }
 
 /**
- * @param $orderby_options array The possible options for orderby.
- *
+ * @param $orderby_options string[] The possible options for orderby.
  * @return string The orderby value.
  */
 function dg_get_orderby_param($orderby_options) {
