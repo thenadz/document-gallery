@@ -406,7 +406,7 @@ class DG_Setup {
 					'mime_types'    => array()
 			);
 
-			$old_thumbs = DG_Thumb::getThumbs();
+			$old_thumbs = DG_Thumb::getThumbs($options['thumber']['width'] . 'x' . $options['thumber']['height']);
 			DG_Thumb::purgeThumbs();
 			foreach ( $old_thumbs as $thumb ) {
 				if ( $thumb->isSuccess() ) {
