@@ -35,8 +35,7 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
     */
    public static function init() {
       $options  = DG_Thumber::getOptions();
-      $active   = $options['active'];
-      if ( $active['thumber-co'] ) {
+      if ( $options['active']['thumber-co'] ) {
          parent::init();
          self::$webhook = admin_url( 'admin-post.php?action=' . self::ThumberAction );
          self::$client = DG_ThumberClient::getInstance();
