@@ -1,8 +1,6 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-DG_GhostscriptThumber::init();
-
 class DG_GhostscriptThumber extends DG_AbstractThumber {
 
 	/**
@@ -148,3 +146,5 @@ class DG_GhostscriptThumber extends DG_AbstractThumber {
 		return 75;
 	}
 }
+
+DG_GhostscriptThumber::init();

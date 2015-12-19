@@ -4,7 +4,7 @@ Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
 Tested up to: 4.4
-Stable tag: 4.1.1
+Stable tag: 4.1.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -306,10 +306,7 @@ The following is an example taken from the Document Gallery source (with a few
 modifications for ease of readability), where we add thumbnail generation for
 all Audio/Video filetypes supported by WordPress:
 
-`// tells DG_AbstractThumber to create an instance of the class and apply to dg_thumbers filter
-ImageThumber::init();
-
- class ImageThumber extends DG_AbstractThumber {
+`class ImageThumber extends DG_AbstractThumber {
 
  	/**
  	 * @return string[] The extensions supported by this thumber.
@@ -341,7 +338,10 @@ ImageThumber::init();
  	public function getPriority() {
  		return 100;
  	}
- }`
+ }
+
+ // tells DG_AbstractThumber to create an instance of the class and apply to dg_thumbers filter
+ ImageThumber::init();`
 
 **Filter Inclusion of Default Document Gallery CSS**
 
@@ -421,6 +421,9 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.1.1 & 4.1.2 =
+* **Bug Fix:** Resolves various errors reported following release.
 
 = 4.1 =
 * **Enhancement:** At long last, support for Microsoft Office files (Word, PowerPoint, Publisher, Visio), as well as a
