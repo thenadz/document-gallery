@@ -315,5 +315,6 @@ class DG_Thumber extends DG_AbstractThumber {
 
 // include all internal DG thumbers
 foreach ( glob( DG_PATH . 'inc/thumbers/*.php' ) as $path ) {
+	/** @noinspection PhpIncludeInspection */
 	include_once $path;
 }
