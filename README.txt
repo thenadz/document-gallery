@@ -428,7 +428,7 @@ ideas for future Document Gallery development, take a look at our
 = 4.1 =
 * **Enhancement:** At long last, support for Microsoft Office files (Word, PowerPoint, Publisher, Visio), as well as a
   boat-load of [other formats](https://www.thumber.co/about#filetypes), has been re-added to Document Gallery by way of
-  integration with the [Thumber.co](https://thumber.co) service. For a small fee you can generate images for all of your
+  integration with the [Thumber.co](https://www.thumber.co) service. For a small fee you can generate images for all of your
   attachments using a service designed specifically to work well with Document Gallery. **For a limited time,
   Thumber.co is offering a free 7-day trial of the basic subscription. If you don't like it, all you have to do is
   cancel and you won't pay a penny.**
