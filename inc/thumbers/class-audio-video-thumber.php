@@ -1,8 +1,6 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-DG_AudioVideoThumber::init();
-
 class DG_AudioVideoThumber extends DG_AbstractThumber {
 
 	/**
@@ -86,3 +84,5 @@ class DG_AudioVideoThumber extends DG_AbstractThumber {
 		return 95;
 	}
 }
+
+DG_AudioVideoThumber::init();

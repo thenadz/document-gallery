@@ -8,8 +8,6 @@ add_filter( 'allowed_http_origin', array( 'DG_ThumberCoThumber', 'allowThumberWe
 add_filter( 'upload_mimes', array( 'DG_ThumberCoThumber', 'customMimeTypes' ) );
 add_action( 'admin_post_nopriv_' . DG_ThumberCoThumber::ThumberAction, array( DG_ThumberClient::getInstance(), 'receiveThumbResponse' ), 5, 0);
 
-DG_ThumberCoThumber::init();
-
 class DG_ThumberCoThumber extends DG_AbstractThumber {
 
    /**
@@ -170,3 +168,5 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
       return ( ! $sub || empty( $sub['thumb_size_limit'] ) ) || ( $width <= $sub['thumb_size_limit'] && $height <= $sub['thumb_size_limit'] );
    }
 }
+
+DG_ThumberCoThumber::init();
