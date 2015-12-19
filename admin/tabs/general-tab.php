@@ -200,7 +200,7 @@ function dg_register_settings() {
             'value'       => esc_attr( $active['thumber-co'] ),
             'option_name' => DG_OPTION_NAME,
             'description' => __( 'Use your <a href="http://thumber.co" target="_blank">Thumber.co</a> subscription to remotely generate document thumbnails.' , 'document-gallery' ),
-            'disabled'    => ! DG_Thumber::isThumberCoAvailable()
+            'disabled'    => ! DG_ThumberCoThumber::isThumberCoAvailable()
         ) );
 
     add_settings_field(
@@ -224,10 +224,10 @@ function dg_register_settings() {
             'name'        => 'thumbnail_generation][gs',
             'value'       => esc_attr( $active['gs'] ),
             'option_name' => DG_OPTION_NAME,
-            'description' => DG_Thumber::isGhostscriptAvailable()
+            'description' => DG_GhostscriptThumber::isGhostscriptAvailable()
                 ? __( 'Use <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a> for faster local PDF processing (compared to Imagick).', 'document-gallery' )
                 : __( 'Your server is not configured to run <a href="http://www.ghostscript.com/" target="_blank">Ghostscript</a>.', 'document-gallery' ),
-            'disabled'    => ! DG_Thumber::isGhostscriptAvailable()
+            'disabled'    => ! DG_GhostscriptThumber::isGhostscriptAvailable()
         ) );
 
     add_settings_field(
@@ -239,10 +239,10 @@ function dg_register_settings() {
             'name'        => 'thumbnail_generation][imagick',
             'value'       => esc_attr( $active['imagick'] ),
             'option_name' => DG_OPTION_NAME,
-            'description' => DG_Thumber::isImagickAvailable()
+            'description' => DG_ImagickThumber::isImagickAvailable()
                 ? __( 'Use <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a> to handle lots of filetypes locally.', 'document-gallery' )
                 : __( 'Your server is not configured to run <a href="http://www.php.net/manual/en/book.imagick.php" target="_blank">Imagick</a>.', 'document-gallery' ),
-            'disabled'    => ! DG_Thumber::isImagickAvailable()
+            'disabled'    => ! DG_ImagickThumber::isImagickAvailable()
         ) );
 
     add_settings_field(

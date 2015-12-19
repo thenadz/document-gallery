@@ -98,7 +98,7 @@
      */
     function retrieveNextIcons() {
         // max number of icons to retrieve per AJAX request
-        var batchLimit = 2;
+        var batchLimit = 4;
 
         // IDs already retrieved
         var idBatch = [];
@@ -113,7 +113,14 @@
 
         if (idBatch.length != 0) {
             // request the next batch of icons
-            $.post(ajaxurl, { action: 'dg_generate_icons', ids: idBatch }, processRetrievedThumbnails);
+            $.ajax({
+                type:     'POST',
+                url:      ajaxurl,
+                dataType: 'json',
+                data:     { action: 'dg_generate_icons', ids: idBatch },
+                success:  processRetrievedThumbnails,
+                error:    function(xhr) { console.error(xhr.responseText); }
+            });
         }
     }
 

@@ -53,7 +53,7 @@ class DG_Logger {
 	 * @param int $skip How many lines to skip before returning rows.
 	 * @param int $limit Max number of lines to read.
 	 *
-	 * @return array|null The rows from the log file or null if failed to open log.
+	 * @return string[][]|null The rows from the log file or null if failed to open log.
 	 */
 	public static function readLog( $skip = 0, $limit = PHP_INT_MAX ) {
 		$ret = null;
@@ -176,7 +176,7 @@ class DG_Logger {
 	 *
 	 * @param int $blog ID of the blog to be retrieved in multisite env.
 	 *
-	 * @return array Logger options for the blog.
+	 * @return mixed[] Logger options for the blog.
 	 */
 	public static function getOptions( $blog = null ) {
 		$options = DocumentGallery::getOptions( $blog );
@@ -196,7 +196,7 @@ class DG_Logger {
 	}
 
 	/**
-	 * @param array $trace Array containing stack trace to be converted to string.
+	 * @param mixed[][] $trace Array containing stack trace to be converted to string.
 	 *
 	 * @return string The stack trace in human-readable form.
 	 */
@@ -295,12 +295,12 @@ class DG_LogLevel {
 	}
 
 	/**
-	 * @var array Backs the getter.
+	 * @var int[] Backs the getter.
 	 */
 	private static $levels = null;
 
 	/**
-	 * @return array Associative array containing all log level names mapped to their int value.
+	 * @return int[] Associative array containing all log level names mapped to their int value.
 	 */
 	public static function getLogLevels() {
 		if ( is_null( self::$levels ) ) {
