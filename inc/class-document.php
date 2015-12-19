@@ -81,7 +81,7 @@ class DG_Document {
 		}
 
 		if ( ! isset( $thumb ) ) {
-			$thumb = DG_Thumber::getDefaultThumbnail( $this->ID );
+			$thumb = DG_DefaultThumber::init()->getThumbnail( $this->ID );
 		}
 
 		$repl = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path, $data );

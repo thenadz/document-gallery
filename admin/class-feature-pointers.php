@@ -8,7 +8,7 @@ class DG_FeaturePointers {
     private static $feature_pointer_method_suffix = 'FeaturePointer';
 
     /**
-     * @var array The cached pointer methods to avoid reflecting multiple times in a given session.
+     * @var string[] The cached pointer methods to avoid reflecting multiple times in a given session.
      */
     private static $feature_pointer_methods;
 
@@ -61,7 +61,7 @@ class DG_FeaturePointers {
      * NOTE: Taken from WP_Internal_Pointers.
      *
      * @param string $selector The HTML elements, on which the pointer should be attached.
-     * @param array  $args Arguments to be passed to the pointer JS (see wp-pointer.js).
+     * @param mixed[]  $args Arguments to be passed to the pointer JS (see wp-pointer.js).
      */
     private static function printFeaturePointer( $selector, $args ) {
         if ( empty( $selector ) || empty( $args ) || empty( $args['content'] ) )
@@ -84,7 +84,7 @@ class DG_FeaturePointers {
 
     /**
      * Reflectively retrieves all of the feature pointer methods, which must end with the feature pointer method suffix.
-     * @return array The names of all public class methods matching the feature pointer pattern.
+     * @return string[] The names of all public class methods matching the feature pointer pattern.
      */
     private static function getFeaturePointerMethods() {
         if ( ! isset( self::$feature_pointer_methods ) ) {
@@ -111,7 +111,7 @@ class DG_FeaturePointers {
      * @return bool Whether the method name matches the filter pointer pattern.
      */
     private static function isFilterPointerMethod( $method ) {
-        // NOTE: ReflectionClass#getMethods filtering not working in at least some cases so re-checking for PUBLIC & STATIC
+        // NOTE: ReflectionClass returns methods that are static OR public -- must reduce to an AND
         return $method->isPublic() && $method->isStatic() && DG_Util::endsWith( $method->name, self::$feature_pointer_method_suffix );
     }
 }
