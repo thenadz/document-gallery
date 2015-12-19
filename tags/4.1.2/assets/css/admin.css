@@ -1,0 +1,838 @@
+@media screen and (max-width: 782px) {
+    .column-title {
+        width: 150px;
+    }
+
+    .column-date {
+        display: table-cell !important;
+        width: auto !important;
+    }
+
+    .nav-tab-wrapper {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    .top .tablenav-pages {
+        display: none;
+    }
+
+    .bottom .tablenav-pages {
+        width: auto !important;
+        margin-top: 0 !important;
+    }
+
+    .bottom .displaying-num {
+        position: inherit !important;
+    }
+}
+
+@media screen and (max-width: 979px) {
+    .column-thumbupload {
+        display: none;
+    }
+
+    .thumbs-list-wrapper {
+        margin-top: 0 !important;
+    }
+}
+
+div.thumbs-list-wrapper, div.log-list-wrapper {
+    text-align: center;
+    margin-top: 1.5em;
+}
+
+div.thumbs-list-wrapper > div, div.log-list-wrapper > div {
+    margin: 0 auto;
+    display: inline-block;
+}
+
+#ThumbsTable, #LogTable {
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    background: #B9C9FE;
+    color: #039;
+    width: 100%;
+    margin: 10px auto;
+}
+
+#ThumbsTable tbody, #LogTable tbody {
+    background: #E8EdFF;
+    color: #669;
+}
+
+#ThumbsTable > tbody > tr:hover, #LogTable > tbody > tr:hover {
+    background: #D0DAFD;
+}
+
+#ThumbsTable > tbody > tr:not(:last-child) td, #LogTable > tbody > tr:not(:last-child) td {
+    border-bottom: 1px solid #B9C9FE;
+}
+
+#ThumbsTable td, #ThumbsTable th, #LogTable td, #LogTable th {
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    padding: 4px;
+}
+
+#LogTable td {
+    text-align: left;
+}
+
+td.title.column-title, .column-thumbupload {
+    text-align: left !important;
+}
+
+td.column-icon.media-icon {
+    height: 70px;
+}
+
+td.media-icon img {
+    width: auto;
+    height: auto;
+    max-width: 80px;
+    max-height: 60px;
+    border: none;
+}
+
+#ThumbsTable img {
+    display: block;
+    margin: 5px auto;
+}
+
+#LogTable td > pre, .spoiler-body > pre, .expander pre, .collapser pre {
+    margin: 0;
+    display: inline-block;
+    white-space: pre-line;
+}
+
+tr.selected {
+    background: #B6ADCE;
+}
+
+tr.selected:hover {
+    background: #D8D3E5 !important;
+}
+
+.check-column, .column-icon {
+    white-space: nowrap;
+    width: 80px;
+}
+
+.column-entry, .column-title {
+    /*width: 100%;*/
+}
+
+.column-thumbupload {
+    white-space: nowrap;
+    width: 35%;
+}
+
+#document_gallery_gen_box .column-thumbupload {
+    width: auto;
+    padding-left: 7em;
+}
+
+.nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after {
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    font: normal 20px/1 'dashicons';
+    vertical-align: text-bottom;
+    padding-right: 5px;
+}
+
+#general-tab-header:before {
+    content: '\f108';
+}
+
+#thumber-co-tab-header:before {
+    content: '\f529';
+}
+
+#thumbnail-management-tab-header:before {
+    content: '\f233';
+}
+
+#logging-tab-header:before {
+    content: '\f163';
+}
+
+#advanced-tab-header:before {
+    content: '\f332';
+}
+
+.deleteSelected:before, .clearLog:before {
+    content: '\f182';
+}
+
+.expandAll:before {
+    content: '\f211';
+}
+
+.collapseAll:before {
+    content: '\f506';
+}
+
+.expandAll, .collapseAll {
+    display: none;
+}
+
+#ThumbsTable .title a:after, #LogTable > tbody a:after {
+    content: '\f504';
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    font-family: 'dashicons';
+    font-size: inherit;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    line-height: 1;
+    vertical-align: inherit;
+    padding-left: 5px;
+}
+
+#LogTable > tbody a {
+    -webkit-transition: none;
+    transition: none;
+    text-decoration: none;
+    outline: 0;
+}
+
+#LogTable > tbody pre strong {
+    font-weight: bolder;
+}
+
+#LogTable > tbody a:active, #LogTable > tbody a:hover {
+    color: #2ea2cc;
+}
+
+.levelSelector {
+    float: right;
+}
+
+.logLabel {
+    padding: 0 10px;
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: bolder;
+    border: none !important;
+    float: left;
+    margin-left: 1px;
+    margin-top: 1px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    border-radius: 100px;
+    cursor: context-menu;
+}
+
+.logLabel.warning {
+    background: #F89406;
+}
+
+.logLabel.detail {
+    background: #3A87AD;
+}
+
+.logLabel.error {
+    background: #CC0000;
+}
+
+.logLabel.date {
+    background: #999999;
+    /*white-space: nowrap;*/
+    font-weight: inherit;
+}
+
+.logLabel.date:before {
+    font-size: inherit;
+    vertical-align: middle;
+    padding-bottom: 0.2em;
+    content: '\f469';
+}
+
+.spoiler-body {
+    padding: 1px 6px 2px;
+    display: none;
+    border-top: 1px solid #C3CBD1;
+    background: #F5F5F5;
+}
+
+.column-entry {
+    text-align: left !important;
+}
+
+.expander pre, .collapser pre {
+    vertical-align: middle;
+    float: left;
+    white-space: pre-wrap;
+}
+
+.expander, .collapser {
+    display: table;
+    vertical-align: middle;
+    width: 100%;
+    cursor: pointer;
+}
+
+.expander > div, .collapser > div {
+    display: table-cell;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.dashicons.dashicons-arrow-down-alt2, .dashicons.dashicons-arrow-up-alt2 {
+    float: right;
+    padding-right: 15px;
+}
+
+.levelSelector > *, .dashicons {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.levelSelector > input[type=checkbox] {
+    display: none;
+}
+
+.levelSelector > input[type=checkbox] + label {
+    color: #6B6B6B;
+    font-weight: bolder;
+    margin: 4px 0;
+    overflow: auto;
+    text-align: center;
+    padding: 3px 8px;
+    display: table-cell;
+    background-color: #F5F5F5;
+    background-image: -moz-linear-gradient(top, #FFF, #E6E6E6);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FFF), to(#E6E6E6));
+    background-image: -webkit-linear-gradient(top, #FFF, #E6E6E6);
+    background-image: -o-linear-gradient(top, #FFF, #E6E6E6);
+    background-image: linear-gradient(to bottom, #FFF, #E6E6E6);
+    background-repeat: repeat-x;
+    border: 1px solid #CCC;
+    border-color: #E6E6E6 #E6E6E6 #BFBFBF;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-bottom-color: #B3B3B3;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFFFF', endColorstr='#FFE6E6E6', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.levelSelector > input[type=checkbox] + label:first-of-type {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.levelSelector > input[type=checkbox] + label:last-of-type {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.levelSelector > input[type=checkbox]:checked + label {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.levelSelector > input[type=checkbox] + label.errorLevel {
+    color: #CC0000;
+}
+
+.levelSelector > input[type=checkbox]:checked + label.errorLevel {
+    background-color: #CC0000;
+    color: #FFF;
+}
+
+.levelSelector > input[type=checkbox] + label.warningLevel {
+    color: #F89406;
+}
+
+.levelSelector > input[type=checkbox]:checked + label.warningLevel {
+    background-color: #F89406;
+    color: #FFF;
+}
+
+.levelSelector > input[type=checkbox] + label.detailLevel {
+    color: #3A87AD;
+}
+
+.levelSelector > input[type=checkbox]:checked + label.detailLevel {
+    background-color: #3A87AD;
+    color: #FFF;
+}
+
+.noLog {
+    font-size: x-large;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 20ex;
+    line-height: 150%;
+}
+
+.loggingON, .loggingOFF {
+    font-weight: bolder;
+}
+
+.loggingON {
+    color: green;
+}
+
+.loggingOFF {
+    color: red;
+}
+
+th input {
+    margin-left: 0 !important;
+    margin-top: 1px !important;
+}
+
+td input {
+    margin-right: 0 !important;
+}
+
+textarea[readonly], input[readonly], select[readonly] {
+    background-color: #DCDCDC;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.column-level {
+    white-space: nowrap;
+    width: 6em;
+}
+
+.column-date {
+    width: 16em !important;
+}
+
+.column-thumbupload {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+.column-thumbupload > * {
+    visibility: hidden;
+}
+
+.column-thumbupload .dashicons {
+    font-size: x-large;
+    padding-top: 2px;
+    padding-left: 16px;
+    padding-right: 10px;
+    vertical-align: text-bottom;
+}
+
+/*Attempt to add fancy shadows*/
+/*#ThumbsTable tr:hover {
+   z-index: 3;
+   border-color: #ccc;
+   -webkit-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   -moz-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   -ms-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}*/
+#ThumbsTable tr:hover .column-thumbupload > *, #document_gallery_gen_box #ThumbsTable tr .column-thumbupload > * {
+    visibility: visible;
+}
+
+.dragover {
+    outline: 3px dashed #83b4d8;
+}
+
+.html5dndmarker span {
+    padding: 0 10px;
+}
+
+.buttons-area input:first-child, .invis {
+    display: none !important;
+}
+
+#document_gallery_gen_box h3 span {
+    font-weight: 100;
+}
+
+#document_gallery_gen_box h3 span i b {
+    font-weight: 500;
+}
+
+th.column-description {
+    text-align: left !important;
+}
+
+.editable-description {
+    max-height: 70px;
+    overflow-y: auto;
+    text-align: justify;
+}
+
+.column-description textarea {
+    height: 65px;
+    width: 100%;
+}
+
+td.column-title, td.column-description {
+    position: relative;
+}
+
+td.column-title.trans, td.column-description.trans {
+    background-color: inherit;
+    transition: background-color 1s linear;
+    -o-transition: background-color 1s linear;
+    -moz-transition: background-color 1s linear;
+    -webkit-transition: background-color 1s linear;
+}
+
+td .dashicons-edit, td .edit-controls {
+    display: none;
+    position: absolute;
+    top: 5px;
+    right: 12px;
+}
+
+td .dashicons-edit, .edit-controls .dashicons-yes, .edit-controls .dashicons-no, .edit-controls .dashicons-update {
+    z-index: 100;
+    font-size: x-large;
+    cursor: pointer;
+    width: auto;
+    height: auto;
+}
+
+td .dashicons-edit, .edit-controls .dashicons-update {
+    color: #0074A2;
+}
+
+.edit-controls:hover, .edit-controls.waiting {
+    opacity: 1;
+}
+
+.edit-controls {
+    opacity: 0.1;
+}
+
+.edit-controls .dashicons-yes {
+    color: green;
+}
+
+.edit-controls .dashicons-no {
+    color: red;
+}
+
+.edit-controls.waiting .dashicons-yes, .edit-controls.waiting .dashicons-no {
+    display: none;
+}
+
+.edit-controls .dashicons-update {
+    display: none;
+    cursor: default;
+}
+
+.edit-controls.waiting .dashicons-update, .deleteSelected.waiting:before {
+    display: block;
+    -webkit-animation: spin 1s linear infinite;
+    -moz-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+}
+
+.deleteSelected.waiting:before {
+    content: '\f463';
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 0;
+}
+
+@-moz-keyframes spin {
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+.responseSuccess {
+    background-color: greenyellow !important;
+}
+
+.responseFail {
+    background-color: crimson !important;
+}
+
+td.column-title .dashicons-edit, td.column-description .dashicons-edit {
+    height: 0;
+    opacity: 0;
+    display: block;
+    overflow: hidden;
+    transition: opacity 1s ease-out;
+    -o-transition: opacity 1s ease-out;
+    -moz-transition: opacity 1s ease-out;
+    -webkit-transition: opacity 1s ease-out;
+}
+
+td.column-title:hover .dashicons-edit, td.column-description:hover .dashicons-edit {
+    opacity: 1;
+    height: auto;
+}
+
+td.column-title input {
+    width: 75%;
+}
+
+.manual-download {
+    display: block;
+    text-align: center;
+}
+
+.editable-description::-webkit-scrollbar, .column-description textarea::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+.editable-description::-webkit-scrollbar-track-piece, .column-description textarea::-webkit-scrollbar-track-piece {
+    background-color: #FFFFFF;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.editable-description::-webkit-scrollbar-thumb:vertical, .column-description textarea::-webkit-scrollbar-thumb:vertical {
+    height: 5px;
+    background-color: #9B9B9B;;
+    -webkit-border-radius: 5px;
+}
+
+.dg-settings label.setting {
+    margin: 2px 0;
+}
+
+.dg-settings label.setting table {
+    width: 100%;
+    padding-right: 8px;
+}
+
+.dg-settings label.setting table tr td:last-of-type, .dg-settings label.setting table tr td:last-of-type * {
+    text-align: right !important;
+    float: none !important;
+    margin: auto 0 !important;
+}
+
+.dg-settings label.setting table tr td:last-of-type select {
+    max-width: none !important;
+}
+
+.dg-settings label.setting table tr td span {
+    text-align: left !important;
+    float: none !important;
+}
+
+.progress {
+    border: 0;
+    width: 100%;
+    height: 18px;
+    position: relative;
+    background-color: #F1F1F1; /*#F3F3F3*/
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+    -webkit-box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+    -moz-box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.column-thumbupload .progress {
+    visibility: visible !important;
+}
+
+.progress > span {
+    border: 0;
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    position: relative;
+    -webkit-transition: width 0.5s linear;
+    -moz-transition: width 0.5s linear;
+    -o-transition: width 0.5s linear;
+    transition: width 0.5s linear;
+    background-color: #7AD03A; /*#0074A2*/
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+    background-image: linear-gradient(
+            90deg,
+            rgb(43, 194, 83) 37%,
+            rgb(84, 240, 84) 69%
+    );
+    background-image: -moz-linear-gradient(
+            90deg,
+            rgb(43, 194, 83) 37%,
+            rgb(84, 240, 84) 69%
+    );
+    background-image: -o-linear-gradient(
+            90deg,
+            rgb(43, 194, 83) 37%,
+            rgb(84, 240, 84) 69%
+    );
+    background-image: -webkit-gradient(
+            linear,
+            left bottom,
+            left top,
+            color-stop(0, rgb(43, 194, 83)),
+            color-stop(1, rgb(84, 240, 84))
+    );
+    -webkit-box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.progress > span:after, .progress.animate > span > span {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    content: '';
+    overflow: hidden;
+    position: absolute;
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+    background-image: -webkit-gradient(
+            linear, 0 0, 100% 100%,
+            color-stop(.25, rgba(255, 255, 255, .2)),
+            color-stop(.25, transparent), color-stop(.5, transparent),
+            color-stop(.5, rgba(255, 255, 255, .2)),
+            color-stop(.75, rgba(255, 255, 255, .2)),
+            color-stop(.75, transparent), to(transparent)
+    );
+    background-image: -moz-linear-gradient(
+            315deg,
+            rgba(255, 255, 255, .2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .2) 50%,
+            rgba(255, 255, 255, .2) 75%,
+            transparent 75%,
+            transparent
+    );
+    background-image: -o-linear-gradient(
+            315deg,
+            rgba(255, 255, 255, .2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .2) 50%,
+            rgba(255, 255, 255, .2) 75%,
+            transparent 75%,
+            transparent
+    );
+    background-image: linear-gradient(
+            315deg,
+            rgba(255, 255, 255, .2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .2) 50%,
+            rgba(255, 255, 255, .2) 75%,
+            transparent 75%,
+            transparent
+    );
+    -webkit-background-size: 50px 50px;
+    -moz-background-size: 50px 50px;
+    background-size: 50px 50px;
+    -webkit-animation: move 2s linear infinite;
+    -moz-animation: move 2s linear infinite;
+    -ms-animation: move 2s linear infinite;
+    animation: move 2s linear infinite;
+}
+
+@-webkit-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+@-moz-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+@-ms-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+@keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+.progress.animate > span:after {
+    display: none;
+}
+
+.progress.success > span {
+    background-color: green;
+    width: 100% !important;
+    background-image: none !important;
+}
+
+.progress.fail > span {
+    background-color: red;
+    background-image: none !important;
+}
+
+.progress.nostripes > span > span, .progress.nostripes > span:after,
+.progress.success > span > span, .progress.success > span:after,
+.progress.fail > span > span, .progress.fail > span:after {
+    -webkit-animation: none;
+    -moz-animation: none;
+    -ms-animation: none;
+    animation: none;
+    background-image: none;
+}
