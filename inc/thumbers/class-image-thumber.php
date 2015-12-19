@@ -1,8 +1,6 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-DG_ImageThumber::init();
-
 class DG_ImageThumber extends DG_AbstractThumber {
 
 	/**
@@ -36,3 +34,5 @@ class DG_ImageThumber extends DG_AbstractThumber {
 		return 100;
 	}
 }
+
+DG_ImageThumber::init();
