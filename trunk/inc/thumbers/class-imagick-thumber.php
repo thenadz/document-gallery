@@ -3,8 +3,6 @@ defined( 'WPINC' ) OR exit;
 
 include_once DG_PATH . 'inc/class-image-editor-imagick.php';
 
-DG_ImagickThumber::init();
-
 class DG_ImagickThumber extends DG_AbstractThumber {
 
 	/**
@@ -86,3 +84,5 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 		return 50;
 	}
 }
+
+DG_ImagickThumber::init();
