@@ -314,7 +314,7 @@ class DG_Thumb {
      * Gets either a nested associative array mapping ID to dimension to thumb or an associative array mapping ID to thumb.
      *
      * @param $dimensions string WIDTHxHEIGHT
-     * @return DG_Thumb[] The matched thumbs.
+     * @return DG_Thumb[]|DG_Thumb[][] The matched thumbs.
      */
     public static function getThumbs($dimensions = null) {
         self::initThumbs();
