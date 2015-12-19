@@ -53,7 +53,7 @@ class DG_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 	}
 
 	/**
-	 * @return array|bool The formats supported by Imagick, or false
+	 * @return string[]|bool The formats supported by Imagick, or false
 	 */
 	public static function query_formats() {
 		try {

@@ -1,10 +1,10 @@
 === Document Gallery ===
 Contributors: dan.rossiter, demur
-Tags: attachments, thumbnail, documents, gallery, MS office, pdf
+Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
 Tested up to: 4.4
-Stable tag: 4.0
+Stable tag: 4.1.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -295,74 +295,53 @@ Document Gallery provides the `dg_thumbers` filter, which allows developers to
 add, remove, or even re-order which methods are used to generate a thumbnail
 for a given attachment.
 
-The value being filtered is an associative array with keys equal to a regular
-expression matching all file extensions supported by the generator and values
-equal to [callables](http://www.php.net/manual/en/language.types.callable.php)
-which take an **attachment ID** and a **file page number** as arguments.
-
-The callable given should return false if thumbnail generation fails or
-a system path to a **temporary** copy of the generated image if generation
-succeeds. The caller will manipulate the file at the returned path so **do not** pass
-in a file path to the original copy of anything as it will be destroyed. Also, do not
-worry about any image resizing or giving the file a sensible name as the caller
-of your method will resize and rename the file before returning.
+The value being filtered is an array of `DG_AbstractThumber` objects. You will want to look at this abstract class,
+located in the DG source under `inc/thumbers` to see how to correctly implement the abstract methods. You'll notice
+that `DG_AbstractThumber::init()` will handle creating a singleton instance of your class (though you can opt not
+to use this logic if you prefer). To register your implementation of `DG_AbstractThumber` using `init()`, you would
+simply call YourThumberClass::init() and all of the work setting up the `dg_thumbers` filter to include your thumber
+will be done for you.
 
 The following is an example taken from the Document Gallery source (with a few
 modifications for ease of readability), where we add thumbnail generation for
 all Audio/Video filetypes supported by WordPress:
 
-`function dg_filter_thumbers($thumbers) {
-    $av_file_types = array_merge(wp_get_audio_extensions(), wp_get_video_extensions());
-    $exts = implode('|', $av_file_types);
-    $thumbers[$exts] = 'dg_get_audio_video_thumbnail';
-}
-add_filter('dg_thumbers', 'dg_filter_thumbers', 10);
+`class ImageThumber extends DG_AbstractThumber {
 
-function dg_get_audio_video_thumbnail($ID, $pg) {
-    include_once ABSPATH . 'wp-admin/includes/media.php';
+ 	/**
+ 	 * @return string[] The extensions supported by this thumber.
+ 	 */
+ 	protected function getThumberExtensions() {
+ 		return array( 'jpg', 'jpeg', 'jpe', 'gif', 'png' );
+ 	}
 
-    $attachment = get_post($ID);
-    $doc_path = get_attached_file($ID);
+ 	/**
+ 	 * @param string $ID The attachment ID to retrieve thumbnail from.
+ 	 * @param int $pg Unused.
+ 	 *
+ 	 * @return bool|string  False on failure, URL to thumb on success.
+ 	 */
+ 	public function getThumbnail( $ID, $pg = 1 ) {
+ 		$options = DG_Thumber::getOptions();
+ 		$ret     = false;
 
-    // get the file metadata
-    if (preg_match('#^video/#', get_post_mime_type($attachment))) {
-       $metadata = wp_read_video_metadata($doc_path);
-    }
-    elseif (preg_match('#^audio/#', get_post_mime_type($attachment))) {
-       $metadata = wp_read_audio_metadata($doc_path);
-    }
+ 		if ( $icon = image_downsize( $ID, array( $options['width'], $options['height'] ) ) ) {
+ 			$ret = $icon[0];
+ 		}
 
-    // unsupported mime type || no embedded image present
-    if(!isset($metadata) || empty($metadata['image']['data'])) {
-       return false;
-    }
+ 		return $ret;
+ 	}
 
-    $ext = 'jpg';
-    switch ($metadata['image']['mime']) {
-       case 'image/gif':
-          $ext = 'gif';
-          break;
-       case 'image/png':
-          $ext = 'png';
-          break;
-    }
+ 	/**
+ 	 * @return int An integer from 0 to 100. Higher priorities will be attempted before lower priority thumbers.
+ 	 */
+ 	public function getPriority() {
+ 		return 100;
+ 	}
+ }
 
-    $tmp_dir = untrailingslashit(get_temp_dir());
-    $temp_file = $tmp_dir . DIRECTORY_SEPARATOR . wp_unique_filename($tmp_dir, md5(time()) . ".$ext");
-
-    if (!$fp = @fopen($temp_file, 'wb')) {
-       return false;
-    }
-
-    if (!@fwrite($fp, $metadata['image']['data'])) {
-       fclose($fp);
-       return false;
-    }
-
-    fclose($fp);
-
-    return $temp_file;
-}`
+ // tells DG_AbstractThumber to create an instance of the class and apply to dg_thumbers filter
+ ImageThumber::init();`
 
 **Filter Inclusion of Default Document Gallery CSS**
 
@@ -442,6 +421,24 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.1.1 & 4.1.2 & 4.1.3 =
+* **Bug Fix:** Resolves various errors reported following `4.1` release.
+
+= 4.1 =
+* **Enhancement:** At long last, support for Microsoft Office files (Word, PowerPoint, Publisher, Visio), as well as a
+  boat-load of [other formats](https://www.thumber.co/about#filetypes), has been re-added to Document Gallery by way of
+  integration with the [Thumber.co](https://thumber.co) service. For a small fee you can generate images for all of your
+  attachments using a service designed specifically to work well with Document Gallery. **For a limited time,
+  Thumber.co is offering a free 7-day trial of the basic subscription. If you don't like it, all you have to do is
+  cancel and you won't pay a penny.**
+* **Enhancement:** The pagination footer now includes more than just "prev" and "next", allowing for quicker navigation
+  of long multi-page galleries. Additionally, the pagination footer will no longer be included if pagination is enabled,
+  but there are less than a page-length's worth of attachments in the gallery.
+* **Enhancement:** Massive rewrite of some core logic that had become unmaintainable. This will mean nothing to most
+  users, with the noted exception that if you were using the `dg_thumbers` filter you'll need to change some things.
+  If this applies to you then you'll want to hold off on upgrading until you've had a chance to rework your usage of the
+  filter to map to the new expected values.
 
 = 4.0 =
 * **Enhancement:** The WordPress visual editor now displays a full gallery preview.

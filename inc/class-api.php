@@ -40,6 +40,7 @@ class DG_API {
 	 * plugin in the future.
 	 *
 	 * @param int $ID The attachment ID.
+	 * @return DG_Thumb The failed thumb.
 	 */
 	public static function setThumbnailFailed( $ID ) {
 		include_once DG_PATH . 'inc/class-thumber.php';
@@ -59,7 +60,7 @@ class DG_API {
 	public static function getThumbnail( $ID, $pg = 1, $generate_if_missing = false ) {
 		include_once DG_PATH . 'inc/class-thumber.php';
 
-		return DG_Thumber::getThumbnail( $ID, $pg, $generate_if_missing );
+		return DG_Thumber::getInstance()->getThumbnail( $ID, $pg, $generate_if_missing );
 	}
 
 	/**
@@ -67,13 +68,9 @@ class DG_API {
 	 * the plugin to attempt to re-generate the thumbnail for this attachment next time it
 	 * is requested in a gallery or through some other means.
 	 *
-	 * @param int|array $ids Which thumbnails to delete.
-	 *
-	 * @return array All IDs that were deleted -- some subset of IDs requested to be deleted.
+	 * @param int|int[] $ids Which thumbnails to delete.
 	 */
 	public static function deleteThumbnails( $ids ) {
-		include_once DG_PATH . 'inc/class-thumber.php';
-
-		return DG_Thumber::deleteThumbMeta( $ids );
+		DG_Thumb::purgeThumbs( $ids );
 	}
 }

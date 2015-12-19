@@ -77,7 +77,7 @@ function dg_validate_settings( $values ) {
     // test whether we can actually auth w/ given credentials
     if ( $has_changed && ! $has_error ) {
         if ( isset( $ret['thumber-co']['uid'] ) && isset( $ret['thumber-co']['secret'] ) ) {
-            include_once DG_PATH . 'inc/thumber-co/class-thumber-co.php';
+            include_once DG_PATH . 'inc/thumbers/thumber-co/class-thumber-co-thumber.php';
 
             // NOTE: We're tricking getSubscription to re-query subscription w/ new credentials
             $dg_options['thumber-co']['subscription'] = null;

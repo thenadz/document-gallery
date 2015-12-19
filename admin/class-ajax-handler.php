@@ -26,7 +26,7 @@ class DG_AjaxHandler {
 		if ( isset( $_REQUEST['ids'] ) ) {
 			foreach ( $_REQUEST['ids'] as $id ) {
 				// only return URL if different from default -- default image is already displayed on the client side
-				$url = DG_Thumber::getThumbnail( $id, 1, true, $is_default );
+				$url = DG_Thumber::getInstance()->getThumbnail( $id, 1, true, $is_default );
 				if ( ! $is_default ) {
 					$ret[$id] = $url;
 				}
