@@ -61,8 +61,9 @@ class DG_Thumber extends DG_AbstractThumber {
 		}
 
 		$thumb = isset( $generated ) ? $generated : DG_Thumb::getThumb( $ID, $dimensions );
-		$is_default = ! isset( $thumb ) || ! $thumb->isSuccess();
-		if ( ! isset( $thumb ) ) {
+		$is_thumb = is_a( $thumb, 'DG_Thumb' );
+		$is_default = ! $is_thumb || ! $thumb->isSuccess();
+		if ( ! $is_thumb ) {
 			$thumb = self::setThumbnailFailed( $ID );
 		}
 
