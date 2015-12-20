@@ -15,7 +15,7 @@ class DocumentGallery {
 	 * Takes values passed from attributes and returns suitable HTML to represent
 	 * all valid attachments requested.
 	 *
-	 * @param array $atts Arguments from the user.
+	 * @param mixed[] $atts Arguments from the user.
 	 *
 	 * @return string HTML for the Document Gallery.
 	 */
@@ -79,7 +79,7 @@ class DocumentGallery {
 	/**
 	 * @param int $blog ID of the blog to be retrieved in multisite env.
 	 *
-	 * @return array Options for the blog.
+	 * @return mixed[] Options for the blog.
 	 */
 	public static function getOptions( $blog = null ) {
 		global $dg_options;
@@ -90,7 +90,7 @@ class DocumentGallery {
 	}
 
 	/**
-	 * @param array $options
+	 * @param mixed[] $options
 	 * @param int $blog ID of the blog to be set in multisite env.
 	 */
 	public static function setOptions( $options, $blog = null ) {
@@ -127,10 +127,10 @@ class DocumentGallery {
 	/**
 	 * Checks whether the given options match the option schema.
 	 *
-	 * @param array $new The new options to be validated.
-	 * @param array $old The old options.
+	 * @param mixed[] $new The new options to be validated.
+	 * @param mixed[] $old The old options.
 	 *
-	 * @return array The options to be saved.
+	 * @return mixed[] The options to be saved.
 	 */
 	public static function validateOptionsStructure( $new, $old ) {
 		if ( self::isValidOptionsStructure( $new ) ) {
@@ -148,8 +148,8 @@ class DocumentGallery {
 	}
 
 	/**
-	 * @param array|mixed $o The options structure to validate.
-	 * @param array $schema The schema to validate against (note that only keys matter -- non-array values are ignored).
+	 * @param mixed[]|mixed $o The options structure to validate.
+	 * @param mixed[] $schema The schema to validate against (note that only keys matter -- non-array values are ignored).
 	 *
 	 * @return bool Whether the given options structure matches the schema.
 	 */
