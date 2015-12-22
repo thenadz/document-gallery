@@ -367,7 +367,7 @@ class DG_Thumb {
 
                 self::$thumbs = null;
             }
-        } else {
+        } else if ( !empty( $ids ) ) {
             $sql = "DELETE FROM $postmeta WHERE meta_key = '$meta_key' AND post_id IN(" . rtrim( str_repeat( '%d,', sizeof( $ids ) ), ',' ) . ")";
             $result = $wpdb->query( $wpdb->prepare( $sql, $ids ) );
 
