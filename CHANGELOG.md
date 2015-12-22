@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 4.1.5 =
+* **Bug Fix:** For a subset of the users upgrading from `4.0` to `4.1.x`, the thumbnail images will have been corrupted
+  during the upgrade process. This release addresses the problem.
+
 = 4.1.1 & 4.1.2 & 4.1.3 & 4.1.4 =
 * **Bug Fix:** Resolves various errors reported following `4.1` release.
 
