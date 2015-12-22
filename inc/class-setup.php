@@ -408,7 +408,7 @@ class DG_Setup {
 			);
 
 			$old_thumbs = DG_Thumb::getThumbs( $options['thumber']['width'] . 'x' . $options['thumber']['height'] );
-			DG_Thumb::purgeThumbs( false );
+			DG_Thumb::purgeThumbs( null, null, false );
 			foreach ( $old_thumbs as $thumb ) {
 				if ( $thumb->isSuccess() ) {
 					$generator = $thumb->getGenerator();
