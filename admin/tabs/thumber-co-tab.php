@@ -77,7 +77,7 @@ function dg_validate_settings( $values ) {
     // test whether we can actually auth w/ given credentials
     if ( $has_changed && ! $has_error ) {
         if ( isset( $ret['thumber-co']['uid'] ) && isset( $ret['thumber-co']['secret'] ) ) {
-            include_once DG_PATH . 'inc/thumber-co/class-thumber-co.php';
+            include_once DG_PATH . 'inc/thumbers/thumber-co/class-thumber-co-thumber.php';
 
             // NOTE: We're tricking getSubscription to re-query subscription w/ new credentials
             $dg_options['thumber-co']['subscription'] = null;
@@ -114,9 +114,9 @@ function dg_render_thumber_co_section() { ?>
                  'thumbnails for the tricky file types that Document Gallery can\'t handle on its own. Files such as ' .
                  'Word, PowerPoint, and PDFs can all be processed, allowing you to provide a more complete experience ' .
                  'to your users. Further information, including a complete list of supported file types is available '.
-                 '<a href="http://thumber.co/about" target="_blank">here</a>.', 'document-gallery' ); ?></p>
+                 '<a href="https://www.thumber.co/about" target="_blank">here</a>.', 'document-gallery' ); ?></p>
 
-    <p><?php _e( 'Once you <a href="http://thumber.co/subscriptions">register for a Thumber.co subscription</a>, simply enter your credentials below to get started!' ); ?></p>
+    <p><?php _e( 'Once you <a href="https://www.thumber.co/subscriptions">register for a Thumber.co subscription</a>, simply enter your credentials below to get started!' ); ?></p>
     <?php if ( ! DG_Util::isPublicSite() ) : ?>
         <p>
             <em><?php _e( 'NOTE: It appears that you are on a private server not accessible from outside your local network. ' .
