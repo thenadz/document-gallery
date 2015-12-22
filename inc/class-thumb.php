@@ -9,7 +9,7 @@ class DG_Thumb {
 
     /**
      * TODO: Replace w/ https://codex.wordpress.org/Class_Reference/WP_Object_Cache
-     * @var array The cached copy of thumbs.
+     * @var DG_Thumb[] The cached copy of thumbs.
      */
     private static $thumbs = null;
 
@@ -189,7 +189,7 @@ class DG_Thumb {
      * @return bool Whether this instance represents a successful thumb generation.
      */
     public function isSuccess() {
-        return ! empty( $this->relative_path );
+        return ! empty( $this->relative_path ) && ! DG_Util::startsWith( $this->getPath(), DG_PATH );
     }
 
     /**
@@ -202,10 +202,15 @@ class DG_Thumb {
         // thumbs are immutable -- once created they can only be read or deleted
         if ( isset( $this->meta_id ) ) return;
 
+        // don't re-save identical thumb
+        if ( isset( self::$thumbs[$this->post_id][$this->dimensions] ) &&
+            $this == self::$thumbs[$this->post_id][$this->dimensions] ) return;
+
+
         // post_id + dimensions must be unique so purge the old entry if one exists
-        $old_thumb = self::getThumb( $this->post_id, $this->getWidth(), $this->getHeight() );
+        $old_thumb = self::getThumb( $this->post_id, $this->dimensions );
         if ( ! is_null( $old_thumb ) ) {
-            $old_thumb->delete();
+            $old_thumb->delete( $old_thumb->relative_path != $this->relative_path );
         }
 
         DG_Logger::writeLog( DG_LogLevel::Detail, 'Saving thumb with post_id = ' . $this->post_id );
@@ -226,8 +231,10 @@ class DG_Thumb {
 
     /**
      * Deletes the current instances from the DB and filesystem.
+     *
+     * @param $delete_files bool Whether files for the thumb should be deleted.
      */
-    public function delete() {
+    public function delete( $delete_files = true ) {
         if ( ! isset( $this->meta_id ) ) return;
 
         DG_Logger::writeLog( DG_LogLevel::Detail, 'Deleting thumb with post_id = ' . $this->post_id );
@@ -309,7 +316,7 @@ class DG_Thumb {
      * Gets either a nested associative array mapping ID to dimension to thumb or an associative array mapping ID to thumb.
      *
      * @param $dimensions string WIDTHxHEIGHT
-     * @return array The matched thumbs.
+     * @return DG_Thumb[]|DG_Thumb[][] The matched thumbs.
      */
     public static function getThumbs($dimensions = null) {
         self::initThumbs();
@@ -330,10 +337,11 @@ class DG_Thumb {
 
     /**
      * Removes thumbs from the DB.
-     * @param $ids array|int|null Optional. The post IDs to be purged. If not given then all are purged.
+     * @param $ids int[]|int|null Optional. The post IDs to be purged. If not given then all are purged.
      * @param $blog_id null|int Optional. The blog to purge from. Defaults to active blog.
+     * @param $delete_files bool Whether files for the thumb should be deleted.
      */
-    public static function purgeThumbs($ids = null, $blog_id = null) {
+    public static function purgeThumbs( $ids = null, $blog_id = null, $delete_files = true ) {
         global $wpdb;
 
         if ( ! is_null( $ids ) ) {
@@ -351,8 +359,10 @@ class DG_Thumb {
 
             if ( $result ) {
                 // cleanup filesystem
-                foreach ( self::$thumbs as $thumbs ) {
-                    self::cleanupThumbFiles( $thumbs );
+                if ( $delete_files ) {
+                    foreach ( self::$thumbs as $thumbs ) {
+                        self::cleanupThumbFiles( $thumbs );
+                    }
                 }
 
                 self::$thumbs = null;
@@ -396,7 +406,7 @@ class DG_Thumb {
     }
 
     /**
-     * @param $thumbs array|DG_Thumb Removes files associated with given thumb(s).
+     * @param $thumbs DG_Thumb[]|DG_Thumb Removes files associated with given thumb(s).
      */
     private static function cleanupThumbFiles($thumbs) {
         if ( is_a( $thumbs, __CLASS__ ) ) {
