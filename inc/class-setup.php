@@ -437,7 +437,7 @@ class DG_Setup {
 			$thumbs = DG_Thumb::getThumbs( $options['thumber']['width'] . 'x' . $options['thumber']['height'] );
 			$ids = array();
 			foreach ( $thumbs as $thumb ) {
-				if ( !@file_exists( $thumb->getPath() ) ) {
+				if ( $thumb->isSuccess() && !@file_exists( $thumb->getPath() ) ) {
 					$ids[] = $thumb->getPostId();
 				}
 			}
