@@ -150,6 +150,7 @@ class DG_Setup {
 		self::threePointFive( $options );
 		self::fourPointZero( $options );
 		self::fourPointOne( $options );
+		self::fourPointOnePointFive( $options );
 
 		// update plugin meta data
 		$options['meta']['version']     = DG_VERSION;
@@ -406,8 +407,8 @@ class DG_Setup {
 					'mime_types'    => array()
 			);
 
-			$old_thumbs = DG_Thumb::getThumbs($options['thumber']['width'] . 'x' . $options['thumber']['height']);
-			DG_Thumb::purgeThumbs();
+			$old_thumbs = DG_Thumb::getThumbs( $options['thumber']['width'] . 'x' . $options['thumber']['height'] );
+			DG_Thumb::purgeThumbs( null, null, false );
 			foreach ( $old_thumbs as $thumb ) {
 				if ( $thumb->isSuccess() ) {
 					$generator = $thumb->getGenerator();
@@ -422,6 +423,26 @@ class DG_Setup {
 					$thumb->save();
 				}
 			}
+		}
+	}
+
+	/**
+	 * Cleans up the mess created in the fourPointOne upgrade script. The
+	 * thumbnail files were removed, while the thumbnail DB entries were left.
+	 *
+	 * @param mixed[][] $options The options to be modified.
+	 */
+	private static function fourPointOnePointFive( &$options ) {
+		if ( version_compare( $options['meta']['version'], '4.1.5', '<' ) ) {
+			$thumbs = DG_Thumb::getThumbs( $options['thumber']['width'] . 'x' . $options['thumber']['height'] );
+			$ids = array();
+			foreach ( $thumbs as $thumb ) {
+				if ( $thumb->isSuccess() && !@file_exists( $thumb->getPath() ) ) {
+					$ids[] = $thumb->getPostId();
+				}
+			}
+
+			DG_Thumb::purgeThumbs( $ids );
 		}
 	}
 

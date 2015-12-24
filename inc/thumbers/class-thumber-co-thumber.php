@@ -6,7 +6,6 @@ include_once DG_PATH . 'inc/thumbers/thumber-co/class-thumber-client.php';
 
 add_filter( 'allowed_http_origin', array( 'DG_ThumberCoThumber', 'allowThumberWebhooks' ), 10, 2);
 add_filter( 'upload_mimes', array( 'DG_ThumberCoThumber', 'customMimeTypes' ) );
-add_action( 'admin_post_nopriv_' . DG_ThumberCoThumber::ThumberAction, array( DG_ThumberClient::getInstance(), 'receiveThumbResponse' ), 5, 0);
 
 class DG_ThumberCoThumber extends DG_AbstractThumber {
 
@@ -167,5 +166,7 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
       return ( ! $sub || empty( $sub['thumb_size_limit'] ) ) || ( $width <= $sub['thumb_size_limit'] && $height <= $sub['thumb_size_limit'] );
    }
 }
+
+add_action( 'admin_post_nopriv_' . DG_ThumberCoThumber::ThumberAction, array( DG_ThumberClient::getInstance(), 'receiveThumbResponse' ), 5, 0);
 
 DG_ThumberCoThumber::init();

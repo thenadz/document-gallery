@@ -210,7 +210,7 @@ class DG_Thumb {
         // post_id + dimensions must be unique so purge the old entry if one exists
         $old_thumb = self::getThumb( $this->post_id, $this->dimensions );
         if ( ! is_null( $old_thumb ) ) {
-            $old_thumb->delete();
+            $old_thumb->delete( $old_thumb->relative_path != $this->relative_path );
         }
 
         DG_Logger::writeLog( DG_LogLevel::Detail, 'Saving thumb with post_id = ' . $this->post_id );
@@ -231,8 +231,10 @@ class DG_Thumb {
 
     /**
      * Deletes the current instances from the DB and filesystem.
+     *
+     * @param $delete_files bool Whether files for the thumb should be deleted.
      */
-    public function delete() {
+    public function delete( $delete_files = true ) {
         if ( ! isset( $this->meta_id ) ) return;
 
         DG_Logger::writeLog( DG_LogLevel::Detail, 'Deleting thumb with post_id = ' . $this->post_id );
@@ -337,8 +339,9 @@ class DG_Thumb {
      * Removes thumbs from the DB.
      * @param $ids int[]|int|null Optional. The post IDs to be purged. If not given then all are purged.
      * @param $blog_id null|int Optional. The blog to purge from. Defaults to active blog.
+     * @param $delete_files bool Whether files for the thumb should be deleted.
      */
-    public static function purgeThumbs($ids = null, $blog_id = null) {
+    public static function purgeThumbs( $ids = null, $blog_id = null, $delete_files = true ) {
         global $wpdb;
 
         if ( ! is_null( $ids ) ) {
@@ -356,13 +359,15 @@ class DG_Thumb {
 
             if ( $result ) {
                 // cleanup filesystem
-                foreach ( self::$thumbs as $thumbs ) {
-                    self::cleanupThumbFiles( $thumbs );
+                if ( $delete_files ) {
+                    foreach ( self::$thumbs as $thumbs ) {
+                        self::cleanupThumbFiles( $thumbs );
+                    }
                 }
 
                 self::$thumbs = null;
             }
-        } else {
+        } else if ( !empty( $ids ) ) {
             $sql = "DELETE FROM $postmeta WHERE meta_key = '$meta_key' AND post_id IN(" . rtrim( str_repeat( '%d,', sizeof( $ids ) ), ',' ) . ")";
             $result = $wpdb->query( $wpdb->prepare( $sql, $ids ) );
 

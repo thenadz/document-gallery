@@ -5,14 +5,25 @@ defined( 'WPINC' ) OR exit;
   Plugin Name: Document Gallery
   Plugin URI: http://wordpress.org/extend/plugins/document-gallery/
   Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 4.1.4
+  Version: 4.1.6
   Author: Dan Rossiter
   Author URI: http://danrossiter.org/
   License: GPLv3
   Text Domain: document-gallery
  */
 
-define( 'DG_VERSION', '4.1.4' );
+define( 'DG_VERSION', '4.1.6' );
+
+if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+	add_action( 'admin_notices', 'dg_php_lt_three' );
+	function dg_php_lt_three() { ?>
+		<div class="error"><p>
+			<?php printf( __( 'Document Gallery requires PHP &ge; 5.3. Your server is running version %s.', 'document-gallery' ), PHP_VERSION ); ?>
+		</p></div>
+	<?php }
+
+	return;
+}
 
 // define helper paths & URLs
 define( 'DG_BASENAME', plugin_basename( __FILE__ ) );
