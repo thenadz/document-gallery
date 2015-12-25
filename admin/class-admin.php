@@ -329,6 +329,11 @@ class DG_Admin {
 	 * @param $post WP_Post The post.
 	 */
 	public static function renderMetaBox( $post ) {
+		// Disabling scripts that have nothing to do with Edit Media pages
+		wp_dequeue_script( 'dg-media-manager' );
+		remove_filter( 'mce_external_plugins', array( __CLASS__, 'mce_external_plugins' ) );
+		remove_filter( 'mce_css', array( __CLASS__, 'dg_plugin_mce_css' ) );
+
 		wp_nonce_field( DG_OPTION_NAME . '_meta_box', DG_OPTION_NAME . '_meta_box_nonce' );
 		$ID      = $post->ID;
 		$options = DG_Thumber::getOptions();

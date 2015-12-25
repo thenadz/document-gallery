@@ -7,6 +7,9 @@
  *
  */
 ( function ($, _) {
+    // Check if environment is suitable for the code to be executed
+    if ( typeof wp.media.collection !== 'function' ) return;
+
     var l10n,
         media = wp.media;
 
@@ -487,70 +490,73 @@
     });
 }(jQuery, _));
 
-// Based on code from /wp-includes/js/mce-view.js WP 4.2
-/*
- * The WordPress core TinyMCE views.
- * View for the dg shortcode.
- */
-(function (window, views, media, $) {
-    var dg;
+// Check if environment is suitable for the code to be executed
+if ( typeof window.wp.mce !== 'undefined' && typeof window.wp.mce.views !== 'undefined' ) {
+    // Based on code from /wp-includes/js/mce-view.js WP 4.2
+    /*
+     * The WordPress core TinyMCE views.
+     * View for the dg shortcode.
+     */
+    (function (window, views, media, $) {
+        var dg;
 
-    base = {
-        state: [],
+        base = {
+            state: [],
 
-        edit: function (text, update) {
-            // currently the shortcode *must* include ids attribute and may include any of the listed attributes to be editable
-            if ( text.search( /\sids\s*=/gi ) == -1 || text.search( /\s(?!(?:ids|attachment_pg|columns|new_window|descriptions|fancy|orderby|order|paginate|limit)\s*=)[\w\-]+\s*=/gi ) > -1 ) {
-                tinyMCE.activeEditor.windowManager.alert( DGl10n.unfitSCalert );
-            } else {
-                var type = this.type,
-                    frame = media[type].edit(text.replace(/\sorder\s*=/ig, ' dgorder=').replace(/\sorderby\s*=/ig, ' dgorderby='));
+            edit: function (text, update) {
+                // currently the shortcode *must* include ids attribute and may include any of the listed attributes to be editable
+                if (text.search(/\sids\s*=/gi) == -1 || text.search(/\s(?!(?:ids|attachment_pg|columns|new_window|descriptions|fancy|orderby|order|paginate|limit)\s*=)[\w\-]+\s*=/gi) > -1) {
+                    tinyMCE.activeEditor.windowManager.alert(DGl10n.unfitSCalert);
+                } else {
+                    var type = this.type,
+                        frame = media[type].edit(text.replace(/\sorder\s*=/ig, ' dgorder=').replace(/\sorderby\s*=/ig, ' dgorderby='));
 
-                this.pausePlayers && this.pausePlayers();
+                    this.pausePlayers && this.pausePlayers();
 
-                _.each(this.state, function (state) {
-                    frame.state(state).on('update', function (selection) {
-                        update(media[type].shortcode(selection).string(), type === 'dg');
+                    _.each(this.state, function (state) {
+                        frame.state(state).on('update', function (selection) {
+                            update(media[type].shortcode(selection).string(), type === 'dg');
+                        });
                     });
-                });
 
-                frame.on('close', function () {
-                    frame.detach();
-                });
+                    frame.on('close', function () {
+                        frame.detach();
+                    });
 
-                frame.open();
-            }
-        }
-    };
-
-    dg = _.extend({}, base, {
-        state: ['dg-edit'],
-        template: media.template('editor-dg'),
-
-        initialize: function () {
-            var attachments = media.dg.attachments(this.shortcode, media.view.settings.post.id),
-                attrs = this.shortcode.attrs.named,
-                sc = this.text,
-                atts = {},
-                self = this;
-
-            for (prop in attrs) {
-                if (sc.indexOf(' ' + prop + '=') > -1) {
-                    atts[prop] = attrs[prop];
+                    frame.open();
                 }
             }
-            if (sc.indexOf(' dgorderby=') > -1) {
-                atts['orderby'] = attrs['dgorderby'];
-            }
-            if (sc.indexOf(' dgorder=') > -1) {
-                atts['order'] = attrs['dgorder'];
-            }
-            self.render('<div data-shortcode="' +
-                encodeURIComponent(JSON.stringify(atts)) +
-                '"><div class="loading-placeholder"><div class="dashicons dashicons-admin-media"></div><div class="wpview-loading"><ins></ins></div></div></div>');
-        }
-    });
+        };
 
-    views.register('dg', _.extend({}, dg));
+        dg = _.extend({}, base, {
+            state: ['dg-edit'],
+            template: media.template('editor-dg'),
 
-})(window, window.wp.mce.views, window.wp.media, window.jQuery);
+            initialize: function () {
+                var attachments = media.dg.attachments(this.shortcode, media.view.settings.post.id),
+                    attrs = this.shortcode.attrs.named,
+                    sc = this.text,
+                    atts = {},
+                    self = this;
+
+                for (prop in attrs) {
+                    if (sc.indexOf(' ' + prop + '=') > -1) {
+                        atts[prop] = attrs[prop];
+                    }
+                }
+                if (sc.indexOf(' dgorderby=') > -1) {
+                    atts['orderby'] = attrs['dgorderby'];
+                }
+                if (sc.indexOf(' dgorder=') > -1) {
+                    atts['order'] = attrs['dgorder'];
+                }
+                self.render('<div data-shortcode="' +
+                    encodeURIComponent(JSON.stringify(atts)) +
+                    '"><div class="loading-placeholder"><div class="dashicons dashicons-admin-media"></div><div class="wpview-loading"><ins></ins></div></div></div>');
+            }
+        });
+
+        views.register('dg', _.extend({}, dg));
+
+    })(window, window.wp.mce.views, window.wp.media, window.jQuery);
+}
