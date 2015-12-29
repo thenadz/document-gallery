@@ -1,13 +1,20 @@
-== Changelog ==
+# Changelog
 
-= 4.1.5 =
+## 4.1.7
+* **Bug Fix:** There was a minor issue on some admin pages that has been resolved.
+
+## 4.1.6
+* **Enhancement:** Added warning to plugins page when a PHP version < 5.3 is being used.
+* **Bug Fix:** Resolves a "class not found" error.
+
+## 4.1.5
 * **Bug Fix:** For a subset of the users upgrading from `4.0` to `4.1.x`, the thumbnail images will have been corrupted
   during the upgrade process. This release addresses the problem.
 
-= 4.1.1 & 4.1.2 & 4.1.3 & 4.1.4 =
+## 4.1.1 & 4.1.2 & 4.1.3 & 4.1.4
 * **Bug Fix:** Resolves various errors reported following `4.1` release.
 
-= 4.1 =
+## 4.1
 * **Enhancement:** At long last, support for Microsoft Office files (Word, PowerPoint, Publisher, Visio), as well as a
   boat-load of [other formats](https://www.thumber.co/about#filetypes), has been re-added to Document Gallery by way of
   integration with the [Thumber.co](https://www.thumber.co) service. For a small fee you can generate images for all of your
@@ -22,7 +29,7 @@
   If this applies to you then you'll want to hold off on upgrading until you've had a chance to rework your usage of the
   filter to map to the new expected values.
 
-= 4.0 =
+## 4.0
 * **Enhancement:** The WordPress visual editor now displays a full gallery preview.
 * **Enhancement:** You can now paginate your galleries. This is especially useful in large multi-hundred item galleries.
   To enable pagination in your galleries, simply use `limit=##`.
@@ -40,34 +47,34 @@
 * **Bug Fix:** `Limit` was not working in cases where the `ids` or `include` attribute were present. This has been fixed.
 * **Tested Up To:** Document Gallery has been tested in WP 4.4 beta.
 
-= 3.5.4 =
+## 3.5.4
 * **Bug Fix:** There were issues in the structure of HTML generated for galleries. This resulted in issues
   with icon generation.
 * **Notice:** For any developers using PHP filters with Document Gallery, the structure of the content being
   filtered in `dg_gallery_template` has changed. Documentation has been updated accordingly.
 
-= 3.5.3 =
+## 3.5.3
 * **Bug Fix:** The `images` attribute was not being parsed correctly. Thanks to
   [kalico](https://wordpress.org/support/profile/kalico) for pointing this out!
 
-= 3.5.2 =
+## 3.5.2
 * **Bug Fix:** There was an issue with the Media Manager integration preventing using the Document Gallery creation
   within the "Add Media" dialog.
 
-= 3.5.1 =
+## 3.5.1
 * **Bug Fix:** There was a minor bug in `3.5` with the new gallery loading logic. It was a compatibility issue with
   other plugins.
 
-= 3.5 =
+## 3.5
 * **Enhancement:** No more waiting a **LONG** time for your new gallery to load. If you create a new gallery and view
   it, rendering will complete immediately and the thumbnails will be generated after your gallery initially loads.
   This should provide a significantly improved user experience!
 * **Enhancement:** All JS and CSS files are now served compressed, making your WordPress that much faster!
 
-= 3.4.2 =
+## 3.4.2
 * **Bug Fix:** Resolves issues in handling manual thumbnail uploads that were introduced in `3.4`.
 
-= 3.4 =
+## 3.4
 * **Enhancement:** To address recent issues resulting from corrupt plugin options, we're making option validation no longer
   optional. This was an advanced feature that most users were likely not aware of, but it allows us to provide more
   robust option management moving forward. Any options that have been previously corrupted will be reset during upgrading
@@ -78,11 +85,11 @@
 * **Bug Fix:** There were some CSS changes in WP 3.3 which broke some styling in the DG settings dialogs. These have
   been resolved.
 
-= 3.3.1 =
+## 3.3.1
 * **Bug Fix:** A couple of the translation files (Finnish & Ukrainian) were named incorrectly, resulting in them
   never actually being loaded.
 
-= 3.3 =
+## 3.3
 * **Enhancement:** Developers using the Document Gallery API now have access to new
   values when using the `dg_icon_template` filter.
   (Thanks to [pierowbmstr](https://wordpress.org/support/profile/pierowbmstr)!)
@@ -92,20 +99,20 @@
 * **Bug Fix:** Resolved Media Manager integration not being available when first creating
   a post.
 
-= 3.2 =
+## 3.2
 * **Enhancement:** The long awaited option to open thumbnail links in a new window
   has been added. Simply use `[dg new_window=true]`.
 
-= 3.1 =
+## 3.1
 * **Enhancement:** The Media Manager can now be used to generate a gallery without
   needing to manually write the shortcode.
 * **Enhancement:** Document Gallery logs can now be rolled over at regular intervals
   to avoid generating massive log files over extended periods of time.
 
-= 3.0.2 =
+## 3.0.2
 * **Bug Fix:** The update process was broken in 3.0 -- this resolves that issue.
 
-= 3.0 =
+## 3.0
 * **Notice:** Google Drive support has been removed as recent changes to how the service functions
   have made it no longer useful in thumbnail generation. A replacement for supporting MS Office
   filetypes (and other filetypes not supported in existing options) is in the works and we hope
@@ -126,28 +133,28 @@
 * **Deprecation:** The `localpost` option has been deprecated and will be removed at a future date.
   If you are currently using `localpost=false` then it should be replaced by `id=-1`.
 
-= 2.3.7 =
+## 2.3.7
 * **Bug Fix:** There was an issue that resulted in an error being thrown in certain situations.
 
-= 2.3.6 =
+## 2.3.6
 * **Bug Fix:** There was an issue that resulted in the the Document Gallery Settings view crashing on some systems.
 
-= 2.3.5 =
+## 2.3.5
 * **Bug Fix:** There was an issue with how custom CSS was being processed that is resolved in this version.
 
-= 2.3.4 =
+## 2.3.4
 * **Bug Fix:** A bug was introduced that broke the `ids` parameter. This is resolved now.
 
-= 2.3.3 =
+## 2.3.3
 * **Bug Fix:** Update script was failing following new release. This resolves that issue.
 
-= 2.3.2 =
+## 2.3.2
 * **Translation:** Russian and Ukrainian translations have been updated.
 
-= 2.3.1 =
+## 2.3.1
 * **Bug Fix:** Resolved a couple of bugs introduced with new `2.3` functionality.
 
-= 2.3 =
+## 2.3
 * **Enhancement:** Taxonomy support now includes handling for both relationships
   between different taxons and relationships between different terms within a single
   taxon. See installation tab for more details.
@@ -163,37 +170,37 @@
 * **Bug Fix:** When Ghostscript chokes on a PDF, it will no longer print the error message
   in the Document Gallery output (instead it will end up in Document Gallery Logging).
 
-= 2.2.7 =
+## 2.2.7
 * **Bug Fix:** There was an issue with a few phrases not being translated in the
   admin dialogs. Dates in the logs were also not being properly translated.
 
-= 2.2.6 =
+## 2.2.6
 * **Enhancement:** Improved how Ghostscript executable is detected.
 
-= 2.2.5 =
+## 2.2.5
 * **Bug Fix:** Resolves a bug where document descriptions were not being displayed
   correctly.
 * **Translation:** Thanks, Marc Liotard and [Traffic Influence](http://www.trafic-influence.com/)
   for updating the French translation to include new phrases throughout the plugin!
 
-= 2.2.4 =
+## 2.2.4
 * **Translation:**: Thanks to [mepmepmep](http://wordpress.org/support/profile/mepmepmep)
   who has just updated the Document Gallery Swedish translation!
 
-= 2.2.3 =
+## 2.2.3
 * **Enhancement:** This will only be relevant to developers. `%descriptions%` tag
   is now available in the `dg_icon_template` filter.
 
-= 2.2.2 =
+## 2.2.2
 * **Bug Fix:** Resolves minor issue in `2.2.1` that resulted in a warning being
   logged while interacting with the new thumbnail management table in the
   Document Gallery settings.
 
-= 2.2.1 =
+## 2.2.1
 * **Bug Fix:** PHP installs older than 5.3 were crashing with version 2.2. This release
   patches the issue.
 
-= 2.2 =
+## 2.2
 * **Note:** This release is the first release where development has been done by
   multiple people. I would like to give a massive thank you to
   [demur](http://wordpress.org/support/profile/demur) who has been an equal
@@ -218,7 +225,7 @@
   aspects of HTML generated by the plugin. Look at the Installation tab for documentation
   on these new filters.
 
-= 2.1.1 =
+## 2.1.1
 * **Translation:** Thanks to [mepmepmep](http://wordpress.org/support/profile/mepmepmep)
   who has translated Document Gallery into Swedish!
 * **Translation:** Thanks to Marc Liotard who has translated Document Gallery into French!
@@ -229,11 +236,11 @@
   near future. Look for a complete makeover of the admin options including
   lots of new ways to configure DG to best meet your needs!
 
-= 2.1 =
+## 2.1
 * **Enhancement:** Document Gallery now supports
   [multisite networks](http://codex.wordpress.org/Create_A_Network).
 
-= 2.0.10 =
+## 2.0.10
 * **Enhancement:** Ghostscript detection should now work correctly on GoDaddy
   and some other hosts that don't properly setup their executables.
 * **Translation:** Thanks *again* to
@@ -242,22 +249,22 @@
   translate Document Gallery into another language, get started
   [here](http://wordpress.org/support/topic/seeking-translators)!
 
-= 2.0.9 =
+## 2.0.9
 * **Bug Fix:** The `order` attribute was documented and implemented as being `ASC`
   or `DEC`, but the latter should actually have been `DESC`. Documentation and
   implementation for this option has been corrected. Thanks again to
   [demur](http://wordpress.org/support/profile/demur) for catching this!
 
-= 2.0.8 =
+## 2.0.8
 * **Enhancement:** Ghostscript will now handle PS and EPS files if enabled.
 * **Bug Fix:** There were a couple of issues in how the `ids` attribute was being
   handled. Thanks, [demur](http://wordpress.org/support/profile/demur) for catching
   these!
 
-= 2.0.7 =
+## 2.0.7
 * **Bug Fix:** `2.0.6` did not fully resolve the bug described below. This should.
 
-= 2.0.6 =
+## 2.0.6
 * **Bug Fix:** If DG failed to automagically detect the location of the
   Ghostscript binary, manually setting the location did not enable using it.
   Thanks for tracking this bug down,
@@ -266,11 +273,11 @@
   for image types.
 * **Tested Up To:** Document Gallery has been tested in WP 3.9 (RC 1).
 
-= 2.0.5 =
+## 2.0.5
 * **Bug Fix:** Rolling back part of CSS enhancments in 2.0.4 that were causing
   errors on some servers. May revisit at a later date.
 
-= 2.0.4 =
+## 2.0.4
 * **Enhancement:** Custom CSS is now loaded faster, meaning faster page loads
   for your users. Tests are showing a speedup of around 30% over where it was
   in the last release.
@@ -279,7 +286,7 @@
   points decrease in size. Thanks for the suggestion,
   [wm](http://wordpress.org/support/profile/webbmasterpianise)!
 
-= 2.0.3 =
+## 2.0.3
 * **Enhancement:** Now handles custom user CSS more securely.
 * **Enhancement:** Now handles calling Ghostscript executable more securely.
 * **Enhancement:** Now provides timing information for gallery generation
@@ -291,21 +298,21 @@
   which finished almost instantly using GS, but took multiple minutes when
   using IM on my test server (results may vary). See new FAQ tab to find out why.
 
-= 2.0.2 =
+## 2.0.2
 * **Bug Fix:** Imagick was actually never working... My bad -- it is now! Thanks to
   [kaldimar](http://wordpress.org/support/profile/kaldimar) for reporting this.
 * **Enhancement:** Document Gallery en el Español por Andrew de
   [WebHostingHub](http://www.webhostinghub.com/). (To help translate to another
   language, [see here](http://wordpress.org/support/topic/seeking-translators).)
 
-= 2.0.1 =
+## 2.0.1
 * **Bug Fix:** Resolves issue with `2.0` where DG options were not properly
   initialized when the plugin was updated. This caused the settings page to
   behave oddly and many other things throughout to not work as expected when
   you updated through the dashboard. Thanks to jawhite & rigbypa for
   [reporting this](http://wordpress.org/support/topic/errors-after-updating-to-20)!
 
-= 2.0 =
+## 2.0
 * **Enhancement:** This release is a **BIG** deal! We are introducing true
   document thumbnails (rather than the boring static images that were the same
   for every document), meaning that you will be able to generate and display
@@ -335,10 +342,10 @@
   [report the issue](http://wordpress.org/support/plugin/document-gallery)
   so that I can resolve it. Thanks!
 
-= 1.4.3 =
+## 1.4.3
 * **Bug Fix:** Resolves minor bug introduced in version 1.4.2. Thanks, tkokholm!
 
-= 1.4.2 =
+## 1.4.2
 * **Note:** This release includes an increase in the minimum WP version to 3.5.
   If you have not yet upgraded to at least this version, you should consider doing
   so as future releases include a number of *fantastic* new features as well as
@@ -355,27 +362,24 @@
   coming weeks!
   PS: If you're really curious, there are some clues in the source code ;)
 
-= 1.4.1 =
+## 1.4.1
 * **Bug Fix:** This resolves a bug introduced in `1.4`, which caused a warning
   to be thrown when no attributes were used (i.e.: `[dg]`). (Thanks to
   [wtfbingo](http://wordpress.org/support/topic/error-after-update-19) for
   pointing this out!)
 
-= 1.4 =
-
+## 1.4
 * **New Feature:** This release features the addition of *category/taxonomy* support,
   [as suggested by Pyo](http://wordpress.org/support/topic/sorting-documents-by-categorytag-or-other-taxonomy).
 * **Under The Hood:** The plugin was completely rewritten for this release. Logic
   was cleaned up to make maintenance easier and facilitate some *big* changes
   planned for version 2.0 of Document Gallery.
 
-= 1.3.1 =
-
+## 1.3.1
 * **Bug Fix:** This resolves a bug introduced in version `1.3`. (Thanks to JKChad
   for pointing this out!)
 
-= 1.3 =
-
+## 1.3
 * **New Feature:** It is now possible to filter the HTML produced to represent
   each individual icon, making it possible to add extra attributes and other
   modifications on the fly as document icons are generated. This will probably
@@ -388,13 +392,11 @@
   generated so that the format of the icon returned now matches the rest of
   the icons.
 
-= 1.2.1 =
-
+## 1.2.1
 * **Bug Fix:** Resolved issue with the `ids` attribute in `1.2` not working.
   Sorry about that!
 
-= 1.2 =
-
+## 1.2
 * **New Feature:** Images can now be included alongside documents in a
   document gallery (using `images=true` attribute).
   (Thanks for the suggestion, Luca!)
@@ -404,38 +406,32 @@
 * **Enhancement:** The CSS stylesheet has been enhanced for more flexibility
   in sizing icons.
 
-= 1.1 =
-
+## 1.1
 * **New Feature:** Included option to link to the attachment page as well as
   to the actual document.
 * **Enhancement:** Added documentation for customizing the appearance of the plugin.
 * **Enhancement:** Many improvements to the backend, including pretty HTML output
   and best practice implementation in calls to WordPress core functions.
 
-= 1.0.4 =
-
+## 1.0.4
 * **Bug Fix:** Removed extra `div` at bottom when number of documents is
   evenly divisible by 4. (Thanks, joero4ri!)
 
-= 1.0.3 =
-
+## 1.0.3
 * **Bug Fix:** Resolved issue with detecting plugin directory. (Thanks,
   Brigitte!)
 * **Enhancement:** Minor improvement to how linking to individual
   documents is handled.
 
-= 1.0.2 =
-
+## 1.0.2
 * **Bug Fix:** Merge for changes in 1.0 did not go through correctly so users
   downloaded the old icon set which broke the plugin. Sorry about that, but
   all is resolved with this release!
 
-= 1.0.1 =
-
+## 1.0.1
 * **Bug Fix:** Resolved issue with long document titles being cut off in some themes.
 
-= 1.0 =
-
+## 1.0
 * **New Feature:** Plugin now has **36 icons** representing **72 filetypes**!
 * **Enhancement:** Optimized gallery generation (faster!)
 * **Enhancement:** Added fallback to WordPress default icons if you happen to
@@ -444,13 +440,11 @@
   work for backward compatibility).
 * **Enhancement:** Gave documentation some **much needed** revisions.
 
-= 0.8.5 =
-
+## 0.8.5
 * **Enhancement:** Added support for
   [OpenDocuments](http://en.wikipedia.org/wiki/OpenDocument).
 
-= 0.8 =
-
+## 0.8
 * **Release:** First public release of Document Gallery.
 * **Feature:** Displays PDF, Word, PowerPoint, Excel, and ZIP documents from a
   given page or post.
