@@ -5,8 +5,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LW
 Requires at least: 4.1
 Tested up to: 4.4
 Stable tag: 4.1.7
-License: GPLv2
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 This plugin generates thumbnails for documents and displays them in a
 gallery-like format for easy sharing.
