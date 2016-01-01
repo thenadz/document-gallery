@@ -17,14 +17,9 @@ class DG_ImageThumber extends DG_AbstractThumber {
 	 * @return bool|string  False on failure, URL to thumb on success.
 	 */
 	public function getThumbnail( $ID, $pg = 1 ) {
-		$options = DG_Thumber::getOptions();
-		$ret     = false;
-
-		if ( $icon = image_downsize( $ID, array( $options['width'], $options['height'] ) ) ) {
-			$ret = $icon[0];
-		}
-
-		return $ret;
+		$img = get_attached_file( $ID );
+		$tmp = DG_Util::getTempFile( self::getExt( $img ) );
+		return @link( $img, $tmp ) ? $tmp : false;
 	}
 
 	/**
