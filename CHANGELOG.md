@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.8
+* **Bug Fix:** There was a minor bug in how thumbnails for image attachments were being generated. It has been addressed.
+
 ## 4.1.7
 * **Bug Fix:** There was a minor issue on some admin pages that has been resolved.
 
