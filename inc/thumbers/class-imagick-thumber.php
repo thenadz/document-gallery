@@ -6,6 +6,11 @@ include_once DG_PATH . 'inc/class-image-editor-imagick.php';
 class DG_ImagickThumber extends DG_AbstractThumber {
 
 	/**
+	 * @var string[] Supported file formats.
+	 */
+	private static $file_formats;
+
+	/**
 	 * Initialize the thumber class for use in thumbnail generation.
 	 */
 	public static function init() {
@@ -13,6 +18,11 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 		$active   = $options['active'];
 		if ( $active['imagick'] && self::isImagickAvailable() ) {
 			parent::init();
+
+			if ( !(self::$file_formats = DG_Image_Editor_Imagick::query_formats()) ) {
+				self::$file_formats = array();
+			}
+			self::$file_formats = array_map( 'strtolower', self::$file_formats );
 		}
 	}
 
@@ -20,11 +30,7 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
-		if ( ! ($ret = DG_Image_Editor_Imagick::query_formats()) ) {
-			$ret = array();
-		}
-
-		return $ret;
+		return self::$file_formats;
 	}
 
 	/**
