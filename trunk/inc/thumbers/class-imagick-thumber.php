@@ -22,7 +22,8 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 			if ( !(self::$file_formats = DG_Image_Editor_Imagick::query_formats()) ) {
 				self::$file_formats = array();
 			}
-			self::$file_formats = array_map( 'strtolower', self::$file_formats );
+			$image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
+			self::$file_formats = array_map( 'strtolower', array_diff( self::$file_formats, $image_exts ) );
 		}
 	}
 
