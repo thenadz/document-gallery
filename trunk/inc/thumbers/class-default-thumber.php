@@ -9,11 +9,6 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	private static $instance;
 
 	/**
-	 * @var string[] Image file extensions.
-	 */
-	private static $image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
-
-	/**
 	 * @return DG_DefaultThumber The singleton instance.
 	 */
 	public static function getInstance() {
@@ -29,11 +24,12 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	 * @return string     URL to thumbnail.
 	 */
 	public function getThumbnail( $ID, $pg = 1 ) {
+		static $image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
 		$icon_url = DG_URL . 'assets/icons/';
 		$ext = self::getExt( wp_get_attachment_url( $ID ) );
 
 		// handle images
-		if ( in_array( $ext, self::$image_exts ) && ( $icon = self::getImageThumbnail( $ID ) ) ) {
+		if ( in_array( $ext, $image_exts ) && ( $icon = self::getImageThumbnail( $ID ) ) ) {
 			// Nothing to do
 		} elseif ( $name = self::getDefaultIcon( $ext ) ) {
 			// try DG custom default icons first
