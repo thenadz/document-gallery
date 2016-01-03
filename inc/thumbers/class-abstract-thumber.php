@@ -45,7 +45,7 @@ abstract class DG_AbstractThumber {
 	}
 
 	/**
-	 * @return string[] The extensions supported by this thumber.
+	 * @return string[] The extensions supported by this thumber in lowercase.
 	 */
 	protected abstract function getThumberExtensions();
 
@@ -66,7 +66,7 @@ abstract class DG_AbstractThumber {
 	 * @return bool Whether the attachment is supported by this thumber.
 	 */
 	public function supportsAttachment( $ID ) {
-		return in_array( self::getAttachmentExt( $ID ), $this->getThumberExtensions() );
+		return in_array( strtolower( self::getAttachmentExt( $ID ) ), $this->getThumberExtensions() );
 	}
 
 	/**

@@ -16,7 +16,7 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	}
 
 	/**
-	 * Get thumbnail for document with given ID from default images.
+	 * Get thumbnail URL for document with given ID from default images.
 	 *
 	 * @param string $ID The attachment ID to retrieve thumbnail from.
 	 * @param int $pg Unused.
@@ -24,18 +24,39 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	 * @return string     URL to thumbnail.
 	 */
 	public function getThumbnail( $ID, $pg = 1 ) {
+		static $image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
 		$icon_url = DG_URL . 'assets/icons/';
+		$ext = self::getExt( wp_get_attachment_url( $ID ) );
 
 		// handle images
-		if ( $name = self::getDefaultIcon( self::getExt( wp_get_attachment_url( $ID ) ) ) ) {
+		if ( in_array( $ext, $image_exts ) && ( $icon = self::getImageThumbnail( $ID ) ) ) {
+			// Nothing to do
+		} elseif ( $name = self::getDefaultIcon( $ext ) ) {
+			// try DG custom default icons first
 			$icon = $icon_url . $name;
-		} // fallback to standard WP icons
-		elseif ( ! $icon = wp_mime_type_icon( $ID ) ) {
+			// then fall back to standard WP default icons
+		} elseif ( ! $icon = wp_mime_type_icon( $ID ) ) {
 			// everything failed. This is bad...
 			$icon = $icon_url . 'missing.png';
 		}
 
 		return $icon;
+	}
+
+	/**
+	 * @param string $ID The attachment ID to retrieve thumbnail from.
+	 *
+	 * @return bool|string  False on failure, URL to thumb on success.
+	 */
+	private static function getImageThumbnail( $ID ) {
+		$options = DG_Thumber::getOptions();
+		$ret     = false;
+
+		if ( $icon = image_downsize( $ID, array( $options['width'], $options['height'] ) ) ) {
+			$ret = $icon[0];
+		}
+
+		return $ret;
 	}
 
 	/**
