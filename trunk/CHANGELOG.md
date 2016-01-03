@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.9
+* **Bug Fix:** Addresses issues with the IMagick thumbnail generation.
+* **Enhancement:** Handling thumbnail generation for image attachments better (should be faster & more reliable).
+
 ## 4.1.8
 * **Bug Fix:** There was a minor bug in how thumbnails for image attachments were being generated. It has been addressed.
 
