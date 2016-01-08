@@ -56,7 +56,7 @@ class DG_Admin {
 				<?php
 				settings_fields( DG_OPTION_NAME );
 				do_settings_sections( DG_OPTION_NAME );
-				if ( self::$current !== 'thumbnail-management-tab' && self::$current != 'logging-tab' ) {
+				if ( self::$current !== 'thumbnail-management-tab' && self::$current !== 'logging-tab' ) {
 					submit_button();
 				}
 				?>
@@ -119,9 +119,7 @@ class DG_Admin {
 			// Settings Page
 			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/css/admin.css' );
 
-			DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
-			wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
-			if ( $hook !== self::$hook ) { //if $hook is 'post.php' or 'post-new.php'
+			if ( $hook !== self::$hook && get_post_type( get_the_ID() ) !== 'attachment' ) { //if $hook is 'post.php' or 'post-new.php' and it's not an attachment page
 				global $dg_options;
 
 				// Media Manager integration
@@ -149,6 +147,9 @@ class DG_Admin {
 				// TinyMCE visual editor
 				add_filter( 'mce_external_plugins', array( __CLASS__, 'mce_external_plugins' ) );
 				add_filter( 'mce_css', array( __CLASS__, 'dg_plugin_mce_css' ) );
+			} else {
+				DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
+				wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
 			}
 		}
 	}
@@ -257,7 +258,7 @@ class DG_Admin {
 		}
 		$info = getimagesize( $upload_path );
 		if ( $info ) {
-			if ( $info['mime'] != $upload_type ) {// in DG_Thumber::getExt() we'll define and set appropriate extension
+			if ( $info['mime'] !== $upload_type ) {// in DG_Thumber::getExt() we'll define and set appropriate extension
 				DG_Logger::writeLog(
 					DG_LogLevel::Warning,
 					__( 'File extension doesn\'t match the MIME type of the image: ', 'document-gallery' ) .
