@@ -309,7 +309,7 @@ class DG_Admin {
 	}
 
 	/**
-	 * Adds meta box to the attchements' edit pages.
+	 * Adds meta box to the attachments' edit pages.
 	 */
 	public static function addMetaBox() {
 		$screens = array( 'attachment' );
