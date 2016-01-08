@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.10
+* **Bug Fix:** Resolves drag/drop issues in the meida manager.
+
 ## 4.1.9
 * **Bug Fix:** Addresses issues with the IMagick thumbnail generation.
 * **Enhancement:** Handling thumbnail generation for image attachments better (should be faster & more reliable).
