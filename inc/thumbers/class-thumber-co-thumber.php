@@ -132,13 +132,17 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
 
    /**
     * WP by default will not handle POSTs from Thumber so add a special case for the action we want to handle.
-    * @param $origin
-    * @param $origin_arg
+    * @param $origin string Origin URL. If not provided, the value of get_http_origin() is used.
+    * @param $origin_arg string Unused.
     *
-    * @return bool Whether WP will handle the action.
+    * @return string Origin URL if allowed, empty string if not.
     */
    public static function allowThumberWebhooks($origin, $origin_arg) {
-      return $origin || ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] === self::ThumberAction );
+      if ( !$origin && isset( $_REQUEST['action'] ) && $_REQUEST['action'] === self::ThumberAction ) {
+         $origin = get_http_origin();
+      }
+
+      return $origin;
    }
 
    /**
