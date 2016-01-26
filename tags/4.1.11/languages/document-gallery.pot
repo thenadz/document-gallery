@@ -1,0 +1,528 @@
+# Copyright (C) 2015 Document Gallery
+# This file is distributed under the same license as the Document Gallery package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Document Gallery 3.3\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/document-gallery\n"
+"POT-Creation-Date: 2015-06-20 17:03:17+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: admin/class-admin.php:30
+msgid "General"
+msgstr ""
+
+#: admin/class-admin.php:31
+msgid "Thumbnail Management"
+msgstr ""
+
+#: admin/class-admin.php:32 admin/class-admin.php:1271
+msgid "Logging"
+msgstr ""
+
+#: admin/class-admin.php:33
+msgid "Advanced"
+msgstr ""
+
+#: admin/class-admin.php:45 admin/class-admin.php:99
+#: admin/media-manager-template.php:5
+msgid "Document Gallery Settings"
+msgstr ""
+
+#: admin/class-admin.php:73
+msgid "Settings"
+msgstr ""
+
+#: admin/class-admin.php:87
+msgid "Donate"
+msgstr ""
+
+#. #-#-#-#-#  plugin.pot (Document Gallery 3.3)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: admin/class-admin.php:100
+msgid "Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:127
+msgid "Create Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:128
+msgid "Create a new Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:129
+msgid "Cancel Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:130
+msgid "Update Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:131
+msgid "Insert Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:132 admin/class-admin.php:133
+msgid "Add to Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:134
+msgid "Edit Document Gallery"
+msgstr ""
+
+#: admin/class-admin.php:178
+msgid "Default Settings"
+msgstr ""
+
+#: admin/class-admin.php:182
+msgid "Thumbnail Generation"
+msgstr ""
+
+#: admin/class-admin.php:186
+msgid "Custom CSS"
+msgstr ""
+
+#: admin/class-admin.php:198
+msgid "Link to attachment page rather than to file"
+msgstr ""
+
+#: admin/class-admin.php:211
+msgid "The number of columns to display when not rendering descriptions."
+msgstr ""
+
+#: admin/class-admin.php:223 admin/media-manager-template.php:50
+msgid "Include document descriptions"
+msgstr ""
+
+#: admin/class-admin.php:235 admin/media-manager-template.php:57
+msgid "Use auto-generated document thumbnails"
+msgstr ""
+
+#: admin/class-admin.php:248 admin/media-manager-template.php:79
+msgid "Ascending or descending sorting of documents"
+msgstr ""
+
+#: admin/class-admin.php:261 admin/media-manager-template.php:64
+msgid "Which field to order documents by"
+msgstr ""
+
+#: admin/class-admin.php:274
+msgid ""
+"Whether matched documents must have all taxa_names (AND) or at least one (OR)"
+msgstr ""
+
+#: admin/class-admin.php:287
+msgid "Limit the number of documents included. -1 means no limit."
+msgstr ""
+
+#: admin/class-admin.php:300
+msgid ""
+"Comma-delimited list of <a href=\"http://en.wikipedia.org/wiki/"
+"Internet_media_type#List_of_common_media_types\">MIME types</a>."
+msgstr ""
+
+#: admin/class-admin.php:312 admin/media-manager-template.php:43
+msgid "Open thumbnail links in new window"
+msgstr ""
+
+#: admin/class-admin.php:325
+msgid "Which post status to look for when querying documents."
+msgstr ""
+
+#: admin/class-admin.php:338
+msgid "Which post type to look for when querying documents."
+msgstr ""
+
+#: admin/class-admin.php:342
+msgid "Audio/Video"
+msgstr ""
+
+#: admin/class-admin.php:350
+msgid "Locally generate thumbnails for audio & video files."
+msgstr ""
+
+#: admin/class-admin.php:363
+msgid ""
+"Use <a href=\"http://www.ghostscript.com/\" target=\"_blank\">Ghostscript</"
+"a> for faster local PDF processing (compared to Imagick)."
+msgstr ""
+
+#: admin/class-admin.php:364
+msgid ""
+"Your server is not configured to run <a href=\"http://www.ghostscript.com/\" "
+"target=\"_blank\">Ghostscript</a>."
+msgstr ""
+
+#: admin/class-admin.php:378
+msgid ""
+"Use <a href=\"http://www.php.net/manual/en/book.imagick.php\" target=\"_blank"
+"\">Imagick</a> to handle lots of filetypes locally."
+msgstr ""
+
+#: admin/class-admin.php:379
+msgid ""
+"Your server is not configured to run <a href=\"http://www.php.net/manual/en/"
+"book.imagick.php\" target=\"_blank\">Imagick</a>."
+msgstr ""
+
+#: admin/class-admin.php:384
+msgid "Max Thumbnail Dimensions"
+msgstr ""
+
+#: admin/class-admin.php:402
+msgid "The max width and height (in pixels) that thumbnails will be generated."
+msgstr ""
+
+#: admin/class-admin.php:432
+msgid "Advanced Thumbnail Generation"
+msgstr ""
+
+#: admin/class-admin.php:436
+msgid "Logging Enabled"
+msgstr ""
+
+#: admin/class-admin.php:444
+msgid "Whether to log debug and error information related to Document Gallery."
+msgstr ""
+
+#: admin/class-admin.php:448
+msgid "Logging Purge Interval"
+msgstr ""
+
+#: admin/class-admin.php:457
+msgid "Number of days to keep old log entries (0 disables purging)."
+msgstr ""
+
+#: admin/class-admin.php:461
+msgid "Option Validation"
+msgstr ""
+
+#: admin/class-admin.php:469
+msgid ""
+"Whether option structure should be validated before save. This is not "
+"generally necessary."
+msgstr ""
+
+#: admin/class-admin.php:473
+msgid "Thumbnail Generation Timeout"
+msgstr ""
+
+#: admin/class-admin.php:482
+msgid ""
+"Max number of seconds to wait for thumbnail generation before defaulting to "
+"filetype icons."
+msgstr ""
+
+#: admin/class-admin.php:483
+msgid ""
+"Note that generation will continue where timeout happened next time the "
+"gallery is loaded."
+msgstr ""
+
+#: admin/class-admin.php:487
+msgid "Ghostscript Absolute Path"
+msgstr ""
+
+#: admin/class-admin.php:496
+msgid "Successfully auto-detected the location of Ghostscript."
+msgstr ""
+
+#: admin/class-admin.php:497
+msgid "Failed to auto-detect the location of Ghostscript."
+msgstr ""
+
+#: admin/class-admin.php:501
+msgid "Options Array Dump"
+msgstr ""
+
+#: admin/class-admin.php:561
+msgid "Invalid width given: "
+msgstr ""
+
+#: admin/class-admin.php:574
+msgid "Invalid height given: "
+msgstr ""
+
+#: admin/class-admin.php:734
+msgid "File extension doesn't match the MIME type of the image: "
+msgstr ""
+
+#: admin/class-admin.php:740
+msgid "Uploaded file size exceeds the allowable limit: "
+msgstr ""
+
+#: admin/class-admin.php:748
+msgid "Uploaded file is not an image: "
+msgstr ""
+
+#: admin/class-admin.php:758
+msgid "Failed to get uploaded file: "
+msgstr ""
+
+#: admin/class-admin.php:802
+msgid "Invalid Ghostscript path given: "
+msgstr ""
+
+#: admin/class-admin.php:813
+msgid "Invalid timeout given: "
+msgstr ""
+
+#: admin/class-admin.php:828
+msgid "Invalid logging purge interval given: "
+msgstr ""
+
+#: admin/class-admin.php:853
+msgid ""
+"The following values will be used by default in the shortcode. You can still "
+"manually set each of these values in each individual shortcode."
+msgstr ""
+
+#: admin/class-admin.php:860
+msgid "Select which tools to use when generating thumbnails."
+msgstr ""
+
+#: admin/class-admin.php:869
+msgid ""
+"Enter custom CSS styling for use with document galleries. To see which ids "
+"and classes you can style, take a look at <a href=\"%s\" target=\"_blank"
+"\">style.css</a>."
+msgstr ""
+
+#: admin/class-admin.php:888
+msgid ""
+"Unless you <em>really</em> know what you're doing, you should not touch "
+"these values."
+msgstr ""
+
+#: admin/class-admin.php:891
+msgid ""
+"NOTE: <code>exec()</code> is not accessible. Ghostscript will not function."
+msgstr ""
+
+#: admin/class-admin.php:902
+msgid ""
+"The following <em>readonly text</em> should be provided when <a href="
+"\"http://wordpress.org/support/plugin/document-gallery\" target=\"_blank"
+"\">reporting a bug</a>:"
+msgstr ""
+
+#: admin/class-admin.php:1016
+msgid "Select All"
+msgstr ""
+
+#: admin/class-admin.php:1019
+msgid "Thumbnail"
+msgstr ""
+
+#: admin/class-admin.php:1023
+msgid "File name"
+msgstr ""
+
+#: admin/class-admin.php:1024
+msgid "Description"
+msgstr ""
+
+#: admin/class-admin.php:1029 admin/class-admin.php:1199
+msgid "Date"
+msgstr ""
+
+#: admin/class-admin.php:1032
+msgid "Delete Selected"
+msgstr ""
+
+#: admin/class-admin.php:1034
+msgid "item"
+msgid_plural "items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/class-admin.php:1037
+msgid "Go to the first page"
+msgstr ""
+
+#: admin/class-admin.php:1038
+msgid "Go to the previous page"
+msgstr ""
+
+#: admin/class-admin.php:1040
+msgid "Current page"
+msgstr ""
+
+#: admin/class-admin.php:1040
+msgid "of"
+msgstr ""
+
+#: admin/class-admin.php:1041
+msgid "Go to the next page"
+msgstr ""
+
+#: admin/class-admin.php:1042
+msgid "Go to the last page"
+msgstr ""
+
+#: admin/class-admin.php:1044
+msgid "items per page"
+msgstr ""
+
+#: admin/class-admin.php:1083
+msgid "View"
+msgstr ""
+
+#: admin/class-admin.php:1084
+msgid "attachment page"
+msgstr ""
+
+#: admin/class-admin.php:1084
+msgid "Attachment not found"
+msgstr ""
+
+#: admin/class-admin.php:1113
+msgid "<b>Thumbnail</b> for <i><b>Document Gallery</b></i>"
+msgstr ""
+
+#: admin/class-admin.php:1200
+msgid "Level"
+msgstr ""
+
+#: admin/class-admin.php:1201
+msgid "Message"
+msgstr ""
+
+#: admin/class-admin.php:1209
+msgid "Expand All"
+msgstr ""
+
+#: admin/class-admin.php:1212
+msgid "Collapse All"
+msgstr ""
+
+#: admin/class-admin.php:1264
+msgid "Clear Log"
+msgstr ""
+
+#: admin/class-admin.php:1271
+msgid "There are no log entries at this time."
+msgstr ""
+
+#: admin/class-admin.php:1271
+msgid "For Your information:"
+msgstr ""
+
+#: admin/class-admin.php:1271
+msgid "is turned ON"
+msgstr ""
+
+#: admin/class-admin.php:1271
+msgid "is turned OFF"
+msgstr ""
+
+#: admin/media-manager-template.php:9
+msgid "Link To"
+msgstr ""
+
+#: admin/media-manager-template.php:12
+msgid "Media File"
+msgstr ""
+
+#: admin/media-manager-template.php:15
+msgid "Attachment Page"
+msgstr ""
+
+#: admin/media-manager-template.php:23
+msgid "Columns"
+msgstr ""
+
+#: inc/class-gallery.php:91
+msgid "Generated using Document Gallery. Get yours here: "
+msgstr ""
+
+#: inc/class-gallery.php:93
+msgid "No attachments to display. How boring! :("
+msgstr ""
+
+#: inc/class-gallery.php:94
+msgid "The %s value entered, \"%s\", is not valid."
+msgstr ""
+
+#: inc/class-gallery.php:95
+msgid "The %s parameter may only be \"%s\" or \"%s.\" You entered \"%s.\""
+msgstr ""
+
+#: inc/class-gallery.php:226
+msgid "Attempted to call invalid function: "
+msgstr ""
+
+#: inc/class-gallery.php:349
+msgid "%s may only be a comma-delimited list of integers."
+msgstr ""
+
+#: inc/class-gallery.php:750
+msgid "%s is not a valid term name in %s."
+msgstr ""
+
+#: inc/class-image-editor-imagick.php:38
+msgid "Failed to set Imagick page number"
+msgstr ""
+
+#: inc/class-thumber.php:95
+msgid "Attempting to generate thumbnail for attachment #%d with (%s)"
+msgstr ""
+
+#: inc/class-thumber.php:168
+msgid "Could not open file: "
+msgstr ""
+
+#: inc/class-thumber.php:174
+msgid "Could not write file: "
+msgstr ""
+
+#: inc/class-thumber.php:213
+msgid "Failed to open file in Imagick: "
+msgstr ""
+
+#: inc/class-thumber.php:225
+msgid "Failed to save image in Imagick: "
+msgstr ""
+
+#: inc/class-thumber.php:285
+msgid "Ghostscript failed: "
+msgstr ""
+
+#: inc/class-thumber.php:577
+msgid "Thumbnail Generators: "
+msgstr ""
+
+#: inc/class-thumber.php:588
+msgid "No thumbnail generators enabled."
+msgstr ""
+
+#: inc/class-thumber.php:638
+msgid "Failed to get image editor: "
+msgstr ""
+
+#: inc/class-thumber.php:650
+msgid "Failed to save image: "
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/extend/plugins/document-gallery/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Display non-images (and images) in gallery format on a page or post with the "
+"[dg] shortcode."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Dan Rossiter"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://danrossiter.org/"
+msgstr ""
