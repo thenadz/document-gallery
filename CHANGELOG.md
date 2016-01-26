@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.11
+* **Bug Fix:** Resolves bug that resulted in various issues, including Jetpack and some core WordPress functionality
+  not working correctly.
+
 ## 4.1.10
 * **Bug Fix:** Resolves drag/drop issues in the meida manager.
 
