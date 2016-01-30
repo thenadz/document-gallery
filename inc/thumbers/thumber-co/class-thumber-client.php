@@ -125,7 +125,6 @@ class DG_ThumberClient extends ThumberClient {
 	 */
 	public function getSubscription($update_options = true) {
 		global $dg_options;
-		$ret = $dg_options['thumber-co']['subscription'];
 		if ( empty( $dg_options['thumber-co']['subscription'] ) ) {
 			static $whitelist = array( 'direct_upload', 'file_size_limit', 'thumb_size_limit' );
 			$ret = array_intersect_key( (array)parent::getSubscription(), array_flip( $whitelist ) );
@@ -135,7 +134,7 @@ class DG_ThumberClient extends ThumberClient {
 			}
 		}
 
-		return $ret;
+		return $dg_options['thumber-co']['subscription'];
 	}
 
 	/**
