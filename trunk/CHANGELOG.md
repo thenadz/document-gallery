@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.12
+* **Bug Fix:** Resolves issues where the visual editor gallery preview was missing for a small subset of shortcode types.
+
 ## 4.1.11
 * **Bug Fix:** Resolves bug that resulted in various issues, including Jetpack and some core WordPress functionality
   not working correctly.
