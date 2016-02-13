@@ -120,7 +120,12 @@ function dg_render_thumber_co_section() { ?>
     <?php if ( ! DG_Util::isPublicSite() ) : ?>
         <p>
             <em><?php _e( 'NOTE: It appears that you are on a private server not accessible from outside your local network. ' .
-                    'Thumber.co must be able to access your site in order for thumbnail conversions to work properly.', 'document-gallery' ); ?></em>
+                    'Thumber must be able to access your site in order for thumbnail conversions to work properly.', 'document-gallery' ); ?></em>
+        </p>
+    <?php endif; ?>
+    <?php if ( !in_array( 'sha256', hash_algos() ) ) : ?>
+        <p>
+            <em><?php _e( 'NOTE: Your server does not support SHA-256 hashing. You will not be able to communicate with Thumber.', 'document-gallery' ); ?></em>
         </p>
     <?php endif; ?>
 <?php }
