@@ -86,8 +86,7 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 	/**
 	 * @return int An integer from 0 to 100. Higher priorities will be attempted before lower priority thumbers.
 	 */
-	public function getPriority()
-	{
+	public function getPriority() {
 		return 50;
 	}
 }
