@@ -1,0 +1,489 @@
+@media screen and (max-width: 782px) {
+   .column-title {
+      width: 150px;
+   }
+   .column-date {
+      display: table-cell !important;
+      width: auto !important;
+   }
+   .nav-tab-wrapper {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+   }
+   .top .tablenav-pages {
+      display: none;
+   }
+   .bottom .tablenav-pages {
+      width: auto !important;
+      margin-top: 0px !important;
+   }
+   .bottom .displaying-num {
+      position: inherit !important;
+   }
+}
+@media screen and (max-width: 979px) {
+   .column-thumbupload {
+      display: none;
+   }
+   .thumbs-list-wrapper {
+      margin-top: 0px !important;
+   }
+}
+
+div.thumbs-list-wrapper, div.log-list-wrapper{
+   text-align:center;
+   margin-top: 1.5em;
+}
+div.thumbs-list-wrapper>div, div.log-list-wrapper>div{
+   margin: 0 auto;
+   display: inline-block;
+}
+#ThumbsTable, #LogTable{
+   border: none;
+   box-shadow: none;
+   -webkit-box-shadow: none;
+   -moz-box-shadow: none;
+   border-radius: 10px;
+   -webkit-border-radius: 10px;
+   -moz-border-radius: 10px;
+   background: #B9C9FE;
+   color: #039;
+   width: 100%;
+   margin: 10px auto;
+}
+#ThumbsTable tbody, #LogTable tbody {
+   background: #e8edff;
+   color: #669;
+}
+#ThumbsTable>tbody>tr:hover, #LogTable>tbody>tr:hover {
+   background: #d0dafd;
+}
+#ThumbsTable>tbody>tr:not(:last-child) td, #LogTable>tbody>tr:not(:last-child) td {
+   border-bottom-color: #b9c9fe;
+   border-bottom-style: solid;
+   border-bottom-width: 1px;
+}
+#ThumbsTable td, #ThumbsTable th, #LogTable td, #LogTable th{
+   text-align: center;
+   vertical-align: middle;
+   margin: 0;
+   padding: 4px;
+}
+#LogTable td {
+   text-align: left;
+}
+td.title.column-title, .column-thumbupload {
+   text-align: left !important;
+}
+#ThumbsTable img{
+   display: block;
+   margin: 5px auto;
+}
+#LogTable td > pre, .spoiler-body > pre, .expander pre, .collapser pre {
+   margin: 0;
+   display: inline-block;
+   white-space: pre-line;
+}
+tr.selected{
+   background: #B6ADCE;
+}
+tr.selected:hover{
+   background: #D8D3E5 !important;
+}
+.check-column, .column-icon {
+   white-space: nowrap;
+   width: 1%;
+}
+.column-entry, .column-title {
+   /*width: 100%;*/
+}
+.column-thumbupload {
+   white-space: nowrap;
+   width: 35%;
+}
+#document_gallery_gen_box .column-thumbupload {
+   width: auto;
+   padding-left: 7em;
+}
+.nav-tab:before, .deleteSelected:before, .clearLog:before, .expandAll:before, .collapseAll:before, .logLabel.date:before, .collapser:after, .expander:after{
+   display: inline-block;
+   -webkit-font-smoothing: antialiased;
+   font: normal 20px/1 'dashicons';
+   vertical-align: text-bottom;
+   padding-right: 5px;
+}
+.General-tab:before{
+   content: '\f108';
+}
+.Thumbnail-tab:before{
+   content: '\f233';
+}
+.Logging-tab:before{
+   content: '\f163';
+}
+.Advanced-tab:before{
+   content: '\f332';
+}
+.deleteSelected:before, .clearLog:before{
+   content: '\f182';
+}
+.expandAll:before {
+   content: '\f211';
+}
+.collapseAll:before {
+   content: '\f506';
+}
+.expandAll, .collapseAll {
+   display: none;
+}
+#ThumbsTable .title a:after, #LogTable>tbody a:after{
+   content: '\f504';
+   display: inline-block;
+   -webkit-font-smoothing: antialiased;
+   font-family: 'dashicons';
+   font-size: inherit;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   line-height: 1;
+   vertical-align: inherit;
+   padding-left: 5px;
+}
+#LogTable>tbody a {
+   -webkit-transition: none;
+   transition: none;
+   text-decoration: none;
+   outline: 0;
+}
+#LogTable>tbody pre strong {
+   font-weight: bolder;
+}
+#LogTable>tbody a:active, #LogTable>tbody a:hover {
+   color: #2ea2cc;
+}
+.levelSelector {
+   float: right;
+}
+.logLabel {
+   padding: 0 10px;
+   color: #fff !important;
+   text-decoration: none;
+   font-weight: bolder;
+   border: none !important;
+   float:left;
+   margin-left: 1px;
+   margin-top: 1px;
+   -webkit-border-radius: 100px;
+   -moz-border-radius: 100px;
+   border-radius: 100px;
+   cursor: context-menu;
+}
+.logLabel.warning {
+   background: #F89406;
+}
+.logLabel.detail {
+   background: #3A87AD;
+}
+.logLabel.error {
+   background: #CC0000;
+}
+.logLabel.date {
+   background: #999999;
+   /*white-space: nowrap;*/
+   font-weight: inherit;
+}
+.logLabel.date:before{
+   font-size: inherit;
+   vertical-align: middle;
+   padding-bottom: 0.2em;
+   content: '\f469';
+}
+.spoiler-body {
+   padding: 1px 6px 2px;
+   display: none;
+   border-top: 1px solid #C3CBD1;
+   background: #F5F5F5;
+}
+.column-entry {
+   text-align: left !important;
+}
+.expander pre, .collapser pre {
+   vertical-align: middle;
+   float: left;
+   white-space: pre-wrap;
+}
+.expander, .collapser {
+   display: table;
+   vertical-align: middle;
+   width: 100%;
+   cursor: pointer;
+}
+.expander > div, .collapser > div {
+   display: table-cell;
+   vertical-align: middle;
+   height: 100%;
+}
+.dashicons.dashicons-arrow-down-alt2, .dashicons.dashicons-arrow-up-alt2 {
+   float: right;
+   padding-right: 15px;
+}
+.levelSelector > *, .dashicons {
+   -webkit-touch-callout: none;
+   -webkit-user-select: none;
+   -khtml-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+}
+.levelSelector > input[type=checkbox] {
+   display:none;
+}
+.levelSelector > input[type=checkbox] + label {
+   color: #6B6B6B;
+   font-weight: bolder;
+   margin: 4px 0px;
+   overflow: auto;
+   text-align: center;
+   padding: 3px 8px;
+   display: table-cell;
+   background-color: #f5f5f5;
+   background-image: -moz-linear-gradient(top,#fff,#e6e6e6);
+   background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#e6e6e6));
+   background-image: -webkit-linear-gradient(top,#fff,#e6e6e6);
+   background-image: -o-linear-gradient(top,#fff,#e6e6e6);
+   background-image: linear-gradient(to bottom,#fff,#e6e6e6);
+   background-repeat: repeat-x;
+   border: 1px solid #ccc;
+   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+   border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+   border-bottom-color: #b3b3b3;
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0);
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+}
+.levelSelector > input[type=checkbox] + label:first-of-type {
+   border-top-left-radius: 4px;
+   border-bottom-left-radius: 4px;
+}
+.levelSelector > input[type=checkbox] + label:last-of-type {
+   border-top-right-radius: 4px;
+   border-bottom-right-radius: 4px;
+}
+.levelSelector > input[type=checkbox]:checked + label {
+   background-image: none;
+   outline: 0;
+   -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+   -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+   box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+}
+.levelSelector > input[type=checkbox] + label.errorLevel {
+   color: #CC0000;
+}
+.levelSelector > input[type=checkbox]:checked + label.errorLevel {
+   background-color: #CC0000;
+   color: #fff;
+}
+.levelSelector > input[type=checkbox] + label.warningLevel {
+   color: #F89406;
+}
+.levelSelector > input[type=checkbox]:checked + label.warningLevel {
+   background-color: #F89406;
+   color: #fff;
+}
+.levelSelector > input[type=checkbox] + label.detailLevel {
+   color: #3A87AD;
+}
+.levelSelector > input[type=checkbox]:checked + label.detailLevel {
+   background-color: #3A87AD;
+   color: #fff;
+}
+.noLog {
+   font-size: x-large;
+   display: block;
+   width: 100%;
+   text-align: center;
+   margin-top: 20ex;
+   line-height: 150%;
+}
+.loggingON, .loggingOFF {
+   font-weight: bolder;
+}
+.loggingON {
+   color: green;
+}
+.loggingOFF {
+   color: red;
+}
+th input{
+   margin-left: 0 !important;
+   margin-top: 1px !important;
+}
+td input{
+   margin-right: 0 !important;
+}
+textarea[readonly], input[readonly], select[readonly] {
+   background-color: #dcdcdc;
+}
+.nowrap {
+   white-space: nowrap;
+}
+.column-level {
+   white-space: nowrap;
+   width: 6em;
+}
+.column-date {
+   width: 16em !important;
+}
+.column-thumbupload {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   cursor: context-menu;
+}
+.column-thumbupload > * {
+   visibility: hidden;
+}
+.column-thumbupload .dashicons {
+   font-size: x-large;
+   padding-top: 2px;
+   padding-left: 16px;
+   padding-right: 10px;
+   vertical-align: text-bottom;
+}
+/*Attempt to add fancy shadows*/
+/*#ThumbsTable tr:hover {
+   z-index: 3;
+   border-color: #ccc;
+   -webkit-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   -moz-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   -ms-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}*/
+#ThumbsTable tr:hover .column-thumbupload > *, #document_gallery_gen_box #ThumbsTable tr .column-thumbupload > * {
+   visibility: visible;
+}
+.dragover {
+   outline: 3px dashed #83b4d8;
+}
+.html5dndmarker span {
+   padding: 0px 10px;
+}
+.buttons-area input:first-child {
+   display: none !important;
+}
+#document_gallery_gen_box h3 span {
+   font-weight: 100;
+}
+#document_gallery_gen_box h3 span i b {
+   font-weight: 500;
+}
+th.column-description {
+   text-align: left !important;
+}
+.editable-description {
+   max-height: 70px;
+   overflow-y: auto;
+   text-align: justify;
+}
+.column-description textarea {
+   height: 65px;
+   width: 100%;
+}
+td.column-title, td.column-description {
+   position: relative;
+}
+td.column-title.trans, td.column-description.trans {
+   background-color: inherit;
+   transition: background-color 1s linear;
+   -moz-transition: background-color 1s linear;
+   -o-transition: background-color 1s linear;
+   -webkit-transition: background-color 1s linear;
+}
+td .dashicons-edit, td .edit-controls {
+   display: none;
+   position: absolute;
+   top: 5px;
+   right: 12px;
+}
+td .dashicons-edit, .edit-controls .dashicons-yes, .edit-controls .dashicons-no {
+   z-index: 100;
+   font-size: x-large;
+   cursor: pointer;
+}
+td .dashicons-edit {
+   color: #0074A2;
+}
+.edit-controls:hover {
+   opacity: 1;
+}
+.edit-controls {
+   opacity: 0.1;
+}
+.edit-controls .dashicons-yes {
+   color: green;
+}
+.edit-controls .dashicons-no {
+   color: red;
+}
+.responseSuccess {
+   background-color: greenyellow !important;
+}
+.responseFail {
+   background-color: crimson !important;
+}
+td.column-title .dashicons-edit, td.column-description .dashicons-edit {
+   display: block;
+   overflow: hidden;
+   height: 0;
+   opacity: 0;
+   transition: opacity 1s ease-out;
+   -moz-transition: opacity 1s ease-out;
+   -o-transition: opacity 1s ease-out;
+   -webkit-transition: opacity 1s ease-out;
+}
+td.column-title:hover .dashicons-edit, td.column-description:hover .dashicons-edit {
+   opacity: 1;
+   height: auto;
+}
+td.column-title input {
+   width: 75%;
+}
+.manual-download {
+   display: block;
+   text-align: center;
+}
+.editable-description::-webkit-scrollbar, .column-description textarea::-webkit-scrollbar {
+   width: 5px;
+   height: 5px;
+}
+.editable-description::-webkit-scrollbar-track-piece, .column-description textarea::-webkit-scrollbar-track-piece {
+   background-color: #ffffff;
+   -webkit-border-radius: 5px;
+}
+.editable-description::-webkit-scrollbar-thumb:vertical, .column-description textarea::-webkit-scrollbar-thumb:vertical {
+   height: 5px;
+   background-color: #9b9b9b;;
+   -webkit-border-radius: 5px;
+}
+.document-gallery-settings label.setting {
+   margin: 2px 0;
+}
+.document-gallery-settings label.setting table {
+   width: 100%;
+   padding-right: 8px;
+}
+.document-gallery-settings label.setting table tr td:last-of-type, .document-gallery-settings label.setting table tr td:last-of-type * {
+   text-align: right !important;
+   float: none !important;
+   margin: auto 0 !important;
+}
+.document-gallery-settings label.setting table tr td:last-of-type select {
+   max-width: none !important;
+}
+.document-gallery-settings label.setting table tr td span {
+   text-align: left !important;
+   float: none !important;
+}

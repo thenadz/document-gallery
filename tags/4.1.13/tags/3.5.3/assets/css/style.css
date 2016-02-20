@@ -1,0 +1,69 @@
+div.document-icon {
+    text-align: center;
+}
+
+div.document-icon img {
+    width: 89px;
+    max-width: 100%;
+    border: none;
+}
+
+div.document-icon a {
+    font-size: 10px;
+    line-height: 12px;
+}
+
+div.document-icon {
+    margin: 5px 0 0;
+}
+
+/* WITHOUT DESCRIPTION */
+div.document-icon {
+    display: inline-block;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+div.document-icon-wrapper {
+    width: 100%;
+    padding: 0;
+    text-align: left;
+}
+
+/* END WITHOUT DESCRIPTION */
+
+/* WITH DESCRIPTION */
+div.descriptions.document-icon-wrapper div.document-icon {
+    max-width: 115px;
+    padding: 0 3px 0 0;
+    float: left;
+}
+
+div.descriptions.document-icon-wrapper {
+    vertical-align: middle;
+    text-align: inherit;
+}
+
+div.descriptions.document-icon-wrapper img {
+    width: 65px;
+    max-width: 100%;
+}
+
+/* clearfix */
+/* can't depend on theme having a clearfix class,
+so build it into dg css */
+div.descriptions.document-icon-wrapper:before,
+div.descriptions.document-icon-wrapper:after {
+    content: "";
+    display: table;
+}
+
+div.descriptions.document-icon-wrapper:after {
+    clear: both;
+}
+
+div.descriptions.document-icon-wrapper {
+    zoom: 1; /* For IE 6/7 (trigger hasLayout) */
+}
+
+/* END WITH DESCRIPTION */
