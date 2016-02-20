@@ -4,7 +4,7 @@ Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
 Tested up to: 4.4
-Stable tag: 4.1.13
+Stable tag: 4.1.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -421,6 +421,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.1.14 =
+* **Bug Fix:** The handling of saving [Thumber.co](https://thumber.co) subscriptions was broken for some use cases.
+  The logic has been updated to work correctly in all cases.
 
 = 4.1.13 =
 * **Enhancement:** HostGator users were noticing an issue where HTTP connection failures would show up while Document
