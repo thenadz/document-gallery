@@ -16,21 +16,30 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 	public static function init() {
 		$options  = DG_Thumber::getOptions();
 		$active   = $options['active'];
-		if ( $active['imagick'] && self::isImagickAvailable() ) {
+		if ( $active['imagick'] ) {
 			parent::init();
-
-			if ( !(self::$file_formats = DG_Image_Editor_Imagick::query_formats()) ) {
-				self::$file_formats = array();
-			}
-			$image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
-			self::$file_formats = array_map( 'strtolower', array_diff( self::$file_formats, $image_exts ) );
 		}
+	}
+
+	/**
+	 * Initialize file formats supported by IMagick.
+	 */
+	private static function initFileFormats() {
+		if ( ! self::isImagickAvailable() || !(self::$file_formats = DG_Image_Editor_Imagick::query_formats()) ) {
+			self::$file_formats = array();
+		}
+		$image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
+		self::$file_formats = array_map( 'strtolower', array_diff( self::$file_formats, $image_exts ) );
 	}
 
 	/**
 	 * @return string[] The extensions supported by this thumber.
 	 */
 	protected function getThumberExtensions() {
+		if ( ! isset( self::$file_formats ) ) {
+			self::initFileFormats();
+		}
+
 		return self::$file_formats;
 	}
 
