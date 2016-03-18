@@ -1,6 +1,13 @@
 # Changelog
 
-## 4.1.14 =
+## 4.2
+* **Enhancement:** Adding support for `tax_name`_include_children attribute, as requested by
+  [John](https://wordpress.org/support/topic/add-shortcode-attribute-for-include_children). Thanks for the suggestion!
+* **Enhancement:** [Thumber.co](https://thumber.co) authentication secret is no longer output in the options
+  dump on the admin settings tab, removing the possibility of this information being inadvertently printed in the
+  support forum.
+
+## 4.1.14
 * **Bug Fix:** The handling of saving [Thumber.co](https://thumber.co) subscriptions was broken for some use cases.
   The logic has been updated to work correctly in all cases.
 
