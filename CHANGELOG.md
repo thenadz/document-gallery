@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.1.14 =
+* **Bug Fix:** The handling of saving [Thumber.co](https://thumber.co) subscriptions was broken for some use cases.
+  The logic has been updated to work correctly in all cases.
+
+## 4.1.13
+* **Enhancement:** HostGator users were noticing an issue where HTTP connection failures would show up while Document
+  Gallery was enabled. This resulted in symptoms like not being able to update plugins. This release modifies behavior
+  to try and bypass this HostGator shortcoming. Work is still being done working with HostGator to try and identify
+  a more complete resolution.
+
 ## 4.1.12
 * **Bug Fix:** Resolves issues where the visual editor gallery preview was missing for a small subset of shortcode types.
 
