@@ -104,7 +104,11 @@ function dg_render_advanced_section() {
  * Renders a readonly textfield containing a dump of current DG options.
  */
 function dg_render_options_dump_section() {
-    global $dg_options; ?>
+    $options = $GLOBALS['dg_options'];
+    if ( !is_null( $options['thumber-co']['secret'] ) )
+        $options['thumber-co']['secret'] = '******';
+
+    ?>
     <p><?php
         _e( 'The following <em>readonly text</em> should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'documet-gallery' );
         ?></p>
@@ -113,7 +117,7 @@ function dg_render_options_dump_section() {
         <tr valign="top">
             <td>
 					<textarea readonly="true" rows="10" cols="50" id="options-dump"
-                              class="large-text code"><?php print_r( $dg_options ); ?></textarea>
+                              class="large-text code"><?php print_r( $options ); ?></textarea>
             </td>
         </tr>
         </tbody>
