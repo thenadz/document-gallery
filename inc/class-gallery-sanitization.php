@@ -216,6 +216,24 @@ class DG_GallerySanitization {
     /**
      * Takes the provided value and returns a sanitized value.
      *
+     * @param string $value The include_children value to be sanitized.
+     * @param string &$err String to be initialized with error, if any.
+     *
+     * @return bool|null The sanitized include_children value.
+     */
+    private static function sanitizeIncludeChildren( $value, &$err ) {
+        $ret = DG_Util::toBool( $value );
+
+        if ( is_null( $ret ) ) {
+            $err = sprintf( self::$binary_err, 'include_children', 'true', 'false', $value );
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Takes the provided value and returns a sanitized value.
+     *
      * @param string $value The limit value to be sanitized.
      * @param string &$err String to be initialized with error, if any.
      *

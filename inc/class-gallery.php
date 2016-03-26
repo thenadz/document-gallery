@@ -268,25 +268,33 @@ class DG_Gallery {
 	 */
 	private function setTaxa( &$query ) {
 		if ( ! empty( $this->taxa ) ) {
-			static $pattern  = '/(.+)_(?:relation|operator)$/i';
-			$taxa     = array( 'relation' => $this->atts['relation'] );
-			$operator = array();
+			static $op_regex  = '/(.+)_(?:relation|operator)$/i';
+			static $inc_child_regex = '/(.+)_include_children$/i';
+			$taxa             = array( 'relation' => $this->atts['relation'] );
+			$operator         = array();
+			$include_children = array();
 
-			// find any relations for taxa
-			$operator_keys = array();
+			// find any taxa-specific settings
+			$excluded_keys = array();
 			foreach ( $this->taxa as $key => $value ) {
-				if ( preg_match( $pattern, $key, $matches ) ) {
+				if ( preg_match( $op_regex, $key, $matches ) ) {
 					$base = $matches[1];
 					if ( isset( $this->taxa[$base] ) ) {
 						$operator[$base] = DG_GallerySanitization::sanitizeParameter( 'operator', $value, $this->errs );
-						$operator_keys[] = $key;
+						$excluded_keys[] = $key;
+					}
+				} elseif ( preg_match( $inc_child_regex, $key, $matches ) ) {
+					$base = $matches[1];
+					if ( isset( $this->taxa[$base] ) ) {
+						$include_children[$base] = DG_GallerySanitization::sanitizeParameter( 'include_children', $value, $this->errs );
+						$excluded_keys[] = $key;
 					}
 				}
 			}
 
 			// build tax query
 			foreach ( $this->taxa as $taxon => $terms ) {
-				if ( in_array( $taxon, $operator_keys ) ) continue;
+				if ( in_array( $taxon, $excluded_keys ) ) continue;
 
 				$terms = $this->getTermIdsByNames( $taxon, explode( ',', $terms ) );
 
@@ -294,6 +302,7 @@ class DG_Gallery {
 					'taxonomy' => $taxon,
 					'field'    => 'id',
 					'terms'    => $terms,
+					'include_children' => isset( $include_children[ $taxon ] ) ? $include_children[$taxon] : true,
 					'operator' => isset( $operator[ $taxon ] ) ? $operator[ $taxon ] : 'IN'
 				);
 			}
