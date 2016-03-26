@@ -120,12 +120,12 @@ class DG_ThumberClient extends ThumberClient {
 
 	/**
 	 * @param $update_options bool Optional. Whether the returned value should be updated in options array.
-	 * @return object|null Returns an object with subscription information. Object includes the following:
-	 * name, monthly_cost, watermark, direct_upload, thumbs_per_hr_limit, file_size_limit, and thumb_size_limit.
+	 * @return array Returns all MIME types that are supported by Thumber and WP.
 	 */
 	public function getSubscription($update_options = true) {
 		global $dg_options;
-		if ( empty( $dg_options['thumber-co']['subscription'] ) ) {
+		$ret = $dg_options['thumber-co']['subscription'];
+		if ( empty( $ret ) ) {
 			static $whitelist = array( 'direct_upload', 'file_size_limit', 'thumb_size_limit' );
 			$ret = array_intersect_key( (array)parent::getSubscription(), array_flip( $whitelist ) );
 			if ( $update_options ) {
@@ -134,7 +134,7 @@ class DG_ThumberClient extends ThumberClient {
 			}
 		}
 
-		return $dg_options['thumber-co']['subscription'];
+		return $ret;
 	}
 
 	/**
