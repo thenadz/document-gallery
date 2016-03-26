@@ -63,7 +63,7 @@ function dg_validate_settings( $values ) {
 
     // handle setting the user secret
     if ( isset( $values['secret'] ) && 0 !== strcmp( $values['secret'], $ret['thumber-co']['secret'] ) ) {
-        static $secret_regex = '/^[-A-Z\d]+$/i';
+        static $secret_regex = '/^[-_A-Z\d]+$/i';
         if ( '' ===  $values['secret'] || preg_match( $secret_regex, $values['secret'] ) ) {
             $ret['thumber-co']['secret'] = ( '' !==  $values['secret'] ) ? $values['secret'] : null;
             $has_changed = true;
