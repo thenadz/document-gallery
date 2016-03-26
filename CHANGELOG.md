@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.2.1
+* **Bug Fix:** There was a bug in validating user secrets for [Thumber.co](https://thumber.co) that has now been addressed.
+
 ## 4.2
 * **Enhancement:** Adding support for `tax_name`_include_children attribute, as requested by
   [John](https://wordpress.org/support/topic/add-shortcode-attribute-for-include_children). Thanks for the suggestion!
