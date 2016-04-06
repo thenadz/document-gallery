@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.2
+* **Bug Fix:** Ghostscript-based thumbnail generation was failing in a rare corner case. Thanks
+  [sigvevidnes](https://wordpress.org/support/profile/sigvevidnes) for identifying this issue!
+
 ## 4.2.1
 * **Bug Fix:** There was a bug in validating user secrets for [Thumber.co](https://thumber.co) that has now been addressed.
 

@@ -3,8 +3,8 @@ Contributors: dan.rossiter, demur
 Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
-Tested up to: 4.4
-Stable tag: 4.2.1
+Tested up to: 4.5
+Stable tag: 4.2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -421,6 +421,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.2.2 =
+* **Bug Fix:** Ghostscript-based thumbnail generation was failing in a rare corner case. Thanks
+  [sigvevidnes](https://wordpress.org/support/profile/sigvevidnes) for identifying this issue!
 
 = 4.2.1 =
 * **Bug Fix:** There was a bug in validating user secrets for [Thumber.co](https://thumber.co) that has now been addressed.
