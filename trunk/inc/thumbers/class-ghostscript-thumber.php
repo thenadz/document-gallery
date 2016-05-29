@@ -43,7 +43,13 @@ class DG_GhostscriptThumber extends DG_AbstractThumber {
 		$doc_path  = get_attached_file( $ID );
 		$temp_path = DG_Util::getTempFile();
 
+		$old_locale = setlocale( LC_CTYPE, 0 );
+		setlocale( LC_CTYPE, 'en_US.UTF-8' );
 		$cmd = sprintf( $gs, $pg, escapeshellarg( $temp_path ), escapeshellarg( $doc_path ) );
+		if ( false !== $old_locale ) {
+			setlocale( LC_CTYPE, $old_locale );
+		}
+
 		DG_Logger::writeLog( DG_LogLevel::Detail, 'Executing: ' . $cmd );
 		exec( $cmd, $out, $ret );
 
