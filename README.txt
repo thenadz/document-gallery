@@ -3,8 +3,8 @@ Contributors: dan.rossiter, demur
 Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.1
-Tested up to: 4.5
-Stable tag: 4.2.3
+Tested up to: 4.6
+Stable tag: 4.2.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -421,6 +421,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.2.4 =
+* **Tested Up To:** Document Gallery has been tested in WP 4.6.
+* **Bug Fix:** Resolves bug in visual editor that would result in the gallery preview never loading in some circumstances.
 
 = 4.2.3 =
 * **Bug Fix:** Ghostscript thumbnail generation where the attachment name includes non-ASCII characters was failing
