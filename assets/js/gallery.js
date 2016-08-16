@@ -19,8 +19,10 @@
      */
     function sizeGalleryIcons(gallery) {
         (gallery || $('.document-gallery[data-icon-width]')).each(function() {
-            var icon_width = $(this).data('icon-width') + '%';
-            $(this).find('.document-icon').width(icon_width);
+            var icon_width = $(this).data('icon-width');
+            if (typeof icon_width !== 'undefined') {
+                $(this).find('.document-icon').width(icon_width + '%');
+            }
         });
     }
 

@@ -1,5 +1,18 @@
 # Changelog
 
+
+## 4.2.4
+* **Tested Up To:** Document Gallery has been tested in WP 4.6.
+* **Bug Fix:** Resolves bug in visual editor that would result in the gallery preview never loading in some circumstances.
+
+## 4.2.3
+* **Bug Fix:** Ghostscript thumbnail generation where the attachment name includes non-ASCII characters was failing
+  on some server configurations. Kevin Hock identified the bug AND provided the fix. Gold star!
+
+## 4.2.2
+* **Bug Fix:** Ghostscript-based thumbnail generation was failing in a rare corner case. Thanks
+  [sigvevidnes](https://wordpress.org/support/profile/sigvevidnes) for identifying this issue!
+
 ## 4.2.1
 * **Bug Fix:** There was a bug in validating user secrets for [Thumber.co](https://thumber.co) that has now been addressed.
 
