@@ -59,6 +59,15 @@ add_action( 'init', array( 'DocumentGallery', 'addValidation' ) );
 // I18n
 add_action( 'plugins_loaded', array( 'DocumentGallery', 'loadTextDomain' ) );
 
+if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+	add_action( ( is_admin() ? 'admin' : 'wp' ) . '_footer', 'dg_debug_data' );
+	function dg_debug_data() {
+		echo '<!-- ' . PHP_EOL;
+		echo 'Document Gallery Count: ' . ( class_exists( 'DG_Gallery' ) ? count( DG_Gallery::getGalleries() ) : 0 ) . PHP_EOL;
+		echo ' -->' . PHP_EOL;
+	}
+}
+
 // cleanup cached data when thumbed attachment deleted
 include_once DG_PATH . 'inc/class-thumber.php';
 add_action( 'delete_attachment', array( 'DG_Thumb', 'cleanupAttachmentMeta' ) );

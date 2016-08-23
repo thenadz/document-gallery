@@ -17,12 +17,28 @@ class DG_Gallery {
 	 *=========================================================================*/
 
 	private $atts, $taxa;
+
+	/**
+	 * @var DG_Document[] The documents in this gallery.
+	 */
 	private $docs = array();
+
+	/**
+	 * @var string[] The errors in this gallery.
+	 */
 	private $errs = array();
 
+	/**
+	 * @var int The instance number across all galleries on this page.
+	 */
 	private $instance;
 
 	private $pg_count = 1, $cur_pg = 1;
+
+	/**
+	 * @var DG_Gallery[] All gallery instances on this page.
+	 */
+	private static $galleries = array();
 
 	// templates for HTML output
 	private static $no_docs, $comment, $defaults;
@@ -59,8 +75,15 @@ class DG_Gallery {
 		return $this->atts['descriptions'];
 	}
 
+	/**
+	 * @return DG_Document[] The documents in this gallery.
+	 */
+	public function getDocuments() {
+		return $this->docs;
+	}
+
 	/*==========================================================================
-	 * GET AND SET OPTIONS
+	 * PUBLIC CLASS METHODS
 	 *=========================================================================*/
 
 	/**
@@ -82,6 +105,51 @@ class DG_Gallery {
 		$dg_options            = DocumentGallery::getOptions( $blog );
 		$dg_options['gallery'] = $options;
 		DocumentGallery::setOptions( $dg_options, $blog );
+	}
+
+	/**
+	 * Cleans up user input, making sure we don't pass crap on to WP core.
+	 *
+	 * @param mixed[] $old_defaults The previous set of defaults.
+	 * @param mixed[] $defaults The defaults array to sanitize.
+	 * @param string[] &$errs The array of errors, which will be appended with any errors found.
+	 *
+	 * @return mixed[] The sanitized defaults.
+	 */
+	public static function sanitizeDefaults( $old_defaults, $defaults, &$errs ) {
+		if ( is_null( $old_defaults ) ) {
+			$old_defaults = self::getOptions();
+		}
+
+		// remove invalid keys
+		$sanitized = is_array( $defaults )
+			? array_intersect_key( $defaults, $old_defaults )
+			: array();
+
+		// add any missing keys & sanitize each new value
+		foreach ( $old_defaults as $k => $v ) {
+			if ( ! isset( $sanitized[ $k ] ) ) {
+				if ( is_bool( $v ) ) {
+					// checkbox
+					$sanitized[ $k ] = false;
+				} else {
+					// missing value
+					$sanitized[ $k ] = $v;
+				}
+			} else if ( $sanitized[ $k ] !== $v ) { //Sometimes we get boolean in the string form for checkboxes
+				// sanitize value if different from old value
+				$sanitized[ $k ] = DG_GallerySanitization::sanitizeParameter( $k, $sanitized[ $k ], $errs );
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * @return DG_Gallery[] The gallery instances on this page.
+	 */
+	public static function getGalleries() {
+		return self::$galleries;
 	}
 
 	/*==========================================================================
@@ -107,6 +175,7 @@ class DG_Gallery {
 	 * @param mixed[] $atts Array of attributes used in shortcode.
 	 */
 	public function __construct( $atts ) {
+		self::$galleries[] = $this;
 		static $instance = 0;
 		$this->instance = ++$instance;
 
@@ -168,7 +237,7 @@ class DG_Gallery {
 
 		// query DB for all documents requested
 		try {
-			foreach ( $this->getDocuments() as $doc ) {
+			foreach ( $this->getAttachments() as $doc ) {
 				$this->docs[] = new DG_Document( $doc, $this );
 			}
 		} catch ( InvalidArgumentException $e ) {
@@ -177,50 +246,12 @@ class DG_Gallery {
 	}
 
 	/**
-	 * Cleans up user input, making sure we don't pass crap on to WP core.
-	 *
-	 * @param mixed[] $old_defaults The previous set of defaults.
-	 * @param mixed[] $defaults The defaults array to sanitize.
-	 * @param string[] &$errs The array of errors, which will be appended with any errors found.
-	 *
-	 * @return mixed[] The sanitized defaults.
-	 */
-	public static function sanitizeDefaults( $old_defaults, $defaults, &$errs ) {
-		if ( is_null( $old_defaults ) ) {
-			$old_defaults = self::getOptions();
-		}
-
-		// remove invalid keys
-		$sanitized = is_array( $defaults )
-			? array_intersect_key( $defaults, $old_defaults )
-			: array();
-
-		// add any missing keys & sanitize each new value
-		foreach ( $old_defaults as $k => $v ) {
-			if ( ! isset( $sanitized[ $k ] ) ) {
-				if ( is_bool( $v ) ) {
-					// checkbox
-					$sanitized[ $k ] = false;
-				} else {
-					// missing value
-					$sanitized[ $k ] = $v;
-				}
-			} else if ( $sanitized[ $k ] !== $v ) { //Sometimes we get boolean in the string form for checkboxes
-				// sanitize value if different from old value
-				$sanitized[ $k ] = DG_GallerySanitization::sanitizeParameter( $k, $sanitized[ $k ], $errs );
-			}
-		}
-
-		return $sanitized;
-	}
-
-	/**
 	 * Gets all valid Documents based on the attributes passed by the user.
 	 * NOTE: Keys in returned array are arbitrary and will vary. They should be ignored.
 	 * @return WP_Post[] Contains all documents matching the query.
 	 * @throws InvalidArgumentException Thrown when $this->errs is not empty.
 	 */
-	private function getDocuments() {
+	private function getAttachments() {
 		$query = array(
 			'posts_per_page'    => $this->atts['limit'],
 			'offset'            => $this->atts['skip'],
