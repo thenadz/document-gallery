@@ -16,6 +16,74 @@ class DG_Document {
 	private $description, $gallery, $ID, $link, $title, $title_attribute, $path, $extension, $size;
 
 	/*==========================================================================
+	 * GETTERS
+	 *=========================================================================*/
+
+	/**
+	 * @return int The attachment ID.
+	 */
+	public function getId() {
+		return $this->ID;
+	}
+
+	/**
+	 * @return string This document's description.
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	 * @return DG_Gallery The gallery which this document is a member.
+	 */
+	public function getGallery() {
+		return $this->gallery;
+	}
+
+	/**
+	 * @return string The link to be followed when clicking this document.
+	 */
+	public function getLink() {
+		return $this->link;
+	}
+
+	/**
+	 * @return string The title of this document.
+	 */
+	public function getTitle() {
+		return $this->title;
+	}
+
+	/**
+	 * @return string The title attribute string.
+	 */
+	public function getTitleAttribute() {
+		return $this->title_attribute;
+	}
+
+	/**
+	 * @return string The path to this document.
+	 */
+	public function getPath() {
+		return $this->path;
+	}
+
+	/**
+	 * @return string The extension of this document's file.
+	 */
+	public function getExtension() {
+		return $this->extension;
+	}
+
+	/**
+	 * @return string The size of this document human-readable formatted.
+	 */
+	public function getSize() {
+		return $this->size;
+	}
+
+
+	/*==========================================================================
 	 * INIT GALLERY
 	 *=========================================================================*/
 
@@ -40,14 +108,7 @@ class DG_Document {
 		$wp_filetype           = wp_check_filetype_and_ext( $this->path, basename( $this->path ) );
 		$this->extension       = $wp_filetype['ext'];
 		$size                  = @filesize( $this->path );
-		$this->size            = ($size !== false) ? size_format( $size ) : 0;
-	}
-
-	/**
-	 * @return int The attachment ID.
-	 */
-	public function getId() {
-		return $this->ID;
+		$this->size            = ($size !== false) ? size_format( $size ) : '0';
 	}
 
 	/*==========================================================================
@@ -63,7 +124,7 @@ class DG_Document {
 	public function __toString() {
 		include_once DG_PATH . 'inc/class-thumber.php';
 
-		$data        = '';
+		$data        = 'data-ext="' . $this->extension . '"';
 		$description = '';
 		$target      = $this->gallery->openLinkInNewWindow() ? '_blank' : '_self';
 
@@ -76,7 +137,7 @@ class DG_Document {
 				}
 			} else {
 				// include a data-* attribute for client side to asynchronously request icon after gallery load
-				$data = 'data-id="' . $this->ID . '"';
+				$data .= ' data-id="' . $this->ID . '"';
 			}
 		}
 

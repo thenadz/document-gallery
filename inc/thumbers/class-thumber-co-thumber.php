@@ -29,12 +29,19 @@ class DG_ThumberCoThumber extends DG_AbstractThumber {
     */
    private static $client;
 
+	/**
+	 * @return bool Whether Thumber.co is enabled.
+	 */
+	public static function thumberEnabled() {
+		$options  = DG_Thumber::getOptions();
+		return $options['active']['thumber-co'];
+	}
+
    /**
     * Initializes the static values for this class.
     */
    public static function init() {
-      $options  = DG_Thumber::getOptions();
-      if ( $options['active']['thumber-co'] ) {
+      if ( self::thumberEnabled() ) {
          parent::init();
          self::$webhook = admin_url( 'admin-post.php?action=' . self::ThumberAction );
          self::$client = DG_ThumberClient::getInstance();
