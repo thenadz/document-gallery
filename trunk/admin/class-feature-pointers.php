@@ -57,6 +57,19 @@ class DG_FeaturePointers {
     }
 
     /**
+     * Feature pointer for visual editor when post contains MS Office files.
+     */
+    public static function dg424_FeaturePointer() {
+        $title = '<h3>' . __( 'More Thumbnails!', 'document-gallery' ) . '</h3>';
+        $body = '<p>' . sprintf( __( 'It looks like your gallery includes Word, PowerPoint, or some other Microsoft Office ' .
+                                     'files. Did you know that Document Gallery can generate thumbanils for these too? ' .
+                                     '<a href="%s">Learn more.</a>', 'document-gallery' ),
+		                         'options-general.php?page=' . DG_OPTION_NAME . '&tab=thumber-co-tab' ) . '</p>';
+        $position = array( 'edge' => 'top', 'align' => 'left', 'defer_loading' => true );
+        self::printFeaturePointer( '#insert-media-button', array( 'content' => $title . $body, 'position' => $position ) );
+    }
+
+    /**
      * Print the pointer JavaScript data.
      * NOTE: Taken from WP_Internal_Pointers.
      *
@@ -67,10 +80,47 @@ class DG_FeaturePointers {
         if ( empty( $selector ) || empty( $args ) || empty( $args['content'] ) )
             return;
 
-        $trace = debug_backtrace();
+	    // optimize version_compare as much as possible based on PHP version
+        $trace = version_compare( PHP_VERSION, '5.4', '>=' )
+            ? debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 )
+            : debug_backtrace( false );
         $pointer_id = self::getFeaturePointerIdFromMethodName( $trace[1]['function'] );
+
+        /* Minified Source:
+            (function($){
+                var options = <?php echo wp_json_encode( $args ); ?>, setup;
+
+                if ( ! options )
+                    return;
+
+                options = $.extend( options, {
+                    close: function() {
+                        $.post( ajaxurl, {
+                            pointer: '<?php echo $pointer_id; ?>',
+                            action: 'dismiss-wp-pointer'
+                        });
+                    }
+                });
+
+                setup = function() {
+                    $('<?php echo $selector; ?>').first().pointer( options ).pointer('open');
+                };
+
+                if ( options.position && options.position.defer_loading ) {
+                    var hdlr = function () {
+                        setup();
+                        $(document).undelegate('<?php echo $selector; ?>', 'dg.ready', hdlr);
+                    };
+                    $(document).delegate('<?php echo $selector; ?>', 'dg.ready', hdlr);
+                } else {
+                    $(document).ready(setup);
+                }
+
+            })( jQuery );
+         */
+
         ?>
-        <script>(function(b){var a=<?php echo wp_json_encode( $args ); ?>,c;a&&(a=b.extend(a,{close:function(){b.post(ajaxurl,{pointer:"<?php echo $pointer_id; ?>",action:"dismiss-wp-pointer"})}}),c=function(){b("<?php echo $selector; ?>").first().pointer(a).pointer("open")},a.position&&a.position.defer_loading?b(window).bind("load.wp-pointers",c):b(document).ready(c))})(jQuery);</script>
+        <script>(function($){var b=<?php echo wp_json_encode( $args ); ?>,c;if(b)if(b=$.extend(b,{close:function(){$.post(ajaxurl,{pointer:"<?php echo $pointer_id; ?>",action:"dismiss-wp-pointer"})}}),c=function(){$("<?php echo $selector; ?>").first().pointer(b).pointer("open")},b.position&&b.position.defer_loading){var d=function(){c();$(document).undelegate("<?php echo $selector; ?>","dg.ready",d)};$(document).delegate("<?php echo $selector; ?>","dg.ready",d)}else $(document).ready(c)})(jQuery);</script>
         <?php
     }
 

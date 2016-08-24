@@ -5,8 +5,19 @@
     // current index in ids array
     var i;
 
+    // whether we're in the visual editor
+    var is_editor;
+
+    // CSS selector to match documents requiring Thumber
+    var thumber_exts = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'pub', 'vsd', 'vsdx'];
+    var thumber_exts_sel = '.document-gallery [data-ext="' + thumber_exts.join('"],[data-ext="') + '"]';
+
+    // whether pointer has already been shown
+    var thumber_pointer_shown = false;
+
     // find all document-icons without icons generated and start processing
     $(document).ready(function() {
+        is_editor = typeof tinymce !== 'undefined';
         sizeGalleryIcons();
         resetPendingIcons();
         handleVisualEditor();
@@ -30,7 +41,7 @@
      * Handles necessary logic for when we're rendering gallery preview within visual editor.
      */
     function handleVisualEditor() {
-        if (typeof tinymce !== 'undefined') {
+        if (is_editor) {
             tinymce.PluginManager.add('dg', function (editor, url) {
                 editor.on('LoadContent dgUpdate undo', function (e) {
                     $(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
@@ -91,9 +102,14 @@
             atts['id'] = wp.media.dgDefaults.id;
         }
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
-            var jobj = $($.parseHTML(html));
-            target.replaceWith(jobj);
-            sizeGalleryIcons(jobj);
+            var parsedHtml = $($.parseHTML(html));
+            if ( is_editor && !thumber_pointer_shown && parsedHtml.find(thumber_exts_sel).length ) {
+                thumber_pointer_shown = true;
+                $('#insert-media-button').trigger('dg.ready');
+            }
+
+            target.replaceWith(parsedHtml);
+            sizeGalleryIcons(parsedHtml);
             resetPendingIcons();
         });
     }
