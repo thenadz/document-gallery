@@ -43,7 +43,7 @@
     function handleVisualEditor() {
         if (is_editor) {
             tinymce.PluginManager.add('dg', function (editor, url) {
-                editor.on('LoadContent dgUpdate undo', function (e) {
+                editor.on('LoadContent update.dg undo', function (e) {
                     $(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
                         retrieveGallery($.parseJSON(decodeURIComponent($(this).data('shortcode'))), $(this));
                     });
@@ -105,7 +105,7 @@
             var parsedHtml = $($.parseHTML(html));
             if ( is_editor && !thumber_pointer_shown && parsedHtml.find(thumber_exts_sel).length ) {
                 thumber_pointer_shown = true;
-                $('#insert-media-button').trigger('dg.ready');
+                $('#insert-media-button').trigger('ready.dg');
             }
 
             target.replaceWith(parsedHtml);

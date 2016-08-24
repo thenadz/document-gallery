@@ -120,7 +120,7 @@ class DG_FeaturePointers {
          */
 
         ?>
-        <script>(function($){var b=<?php echo wp_json_encode( $args ); ?>,c;if(b)if(b=$.extend(b,{close:function(){$.post(ajaxurl,{pointer:"<?php echo $pointer_id; ?>",action:"dismiss-wp-pointer"})}}),c=function(){$("<?php echo $selector; ?>").first().pointer(b).pointer("open")},b.position&&b.position.defer_loading){var d=function(){c();$(document).undelegate("<?php echo $selector; ?>","dg.ready",d)};$(document).delegate("<?php echo $selector; ?>","dg.ready",d)}else $(document).ready(c)})(jQuery);</script>
+        <script>(function($){var b=<?php echo wp_json_encode( $args ); ?>,c;if(b)if(b=$.extend(b,{close:function(){$.post(ajaxurl,{pointer:"<?php echo $pointer_id; ?>",action:"dismiss-wp-pointer"})}}),c=function(){$("<?php echo $selector; ?>").first().pointer(b).pointer("open")},b.position&&b.position.defer_loading){var d=function(){c();$(document).undelegate("<?php echo $selector; ?>","ready.dg",d)};$(document).delegate("<?php echo $selector; ?>","ready.dg",d)}else $(document).ready(c)})(jQuery);</script>
         <?php
     }
 

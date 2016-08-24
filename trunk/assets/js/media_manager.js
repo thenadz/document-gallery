@@ -410,7 +410,7 @@
                                 controller.setState(controller.options.state);
                                 controller.reset();
                                 if (typeof tinyMCE != 'undefined') {
-                                    tinyMCE.activeEditor.fire('dgUpdate');
+                                    tinyMCE.activeEditor.fire('update.dg');
                                 }
                             }
                         }
