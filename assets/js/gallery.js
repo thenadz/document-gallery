@@ -44,7 +44,7 @@
         if (is_editor) {
             tinymce.PluginManager.add('dg', function (editor, url) {
                 editor.on('LoadContent update.dg undo', function (e) {
-                    $(e.target.contentDocument).find('.wpview-type-dg > [data-shortcode]').each(function () {
+                    $(e.target.contentDocument).find('[data-wpview-type="dg"] [data-shortcode]').each(function () {
                         retrieveGallery($.parseJSON(decodeURIComponent($(this).data('shortcode'))), $(this));
                     });
                 });
