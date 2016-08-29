@@ -1,5 +1,7 @@
 # Changelog
 
+## 4.2.5
+* **Bug Fix:** Resolves issue where visual editor gallery preview got stuck loading.
 
 ## 4.2.4
 * **Tested Up To:** Document Gallery has been tested in WP 4.6.
