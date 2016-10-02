@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.2.6
+* **Bug Fix:** Document Gallery was impossible to uninstall on some WordPress systems. This is addressed now.
+
 ## 4.2.5
 * **Bug Fix:** Resolves issue where visual editor gallery preview got stuck loading.
 
