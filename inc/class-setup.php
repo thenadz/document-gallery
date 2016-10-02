@@ -503,7 +503,9 @@ class DG_Setup {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
-		check_admin_referer( 'bulk-plugins' );
+		// TODO: Unclear why this stopped working, but it is now never true,
+		// blocking uninstall, so has to go at least for now.
+		//check_admin_referer( 'bulk-plugins' );
 
 		$blogs = array( null );
 
