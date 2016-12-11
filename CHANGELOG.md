@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.3
+* **Enhancement:** WordPress 4.7 includes native support for PDF thumbnails. Document Gallery was already using some
+  of this, but this update ensures that DG takes full advantage of the new core functionality, including some new
+  logic to allow older WordPress installs running Document Gallery to take advantage of some of the new goodies.
+* **Tested Up To:** Document Gallery has been tested in WP 4.7. Big thanks to
+  [Bjarne](https://wordpress.org/support/users/oldrup/) for help with testing.
+* **Reminder:** Don't forget that [Thumber.co](https://thumber.co) can integrate with Document Gallery to greatly
+  expand supported file types (eg: Word, PowerPoint, Publisher, and Photoshop). Thumber.co offers a 1-week subscription
+  if you want to try it before you buy it!
+
 ## 4.2.6
 * **Bug Fix:** Document Gallery was impossible to uninstall on some WordPress systems. This is addressed now.
 
