@@ -26,10 +26,106 @@ class DG_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 	}
 
 	/**
-	 * Loads the filepath into Imagick object.
+	 * @return string[]|bool The formats supported by Imagick, or false
+	 */
+	public static function query_formats() {
+		try {
+			return @Imagick::queryFormats();
+		} catch ( Exception $ex ) {
+			return false;
+		}
+	}
+
+	/**
+	 * TODO: Can be removed once WP < 4.7 is no longer supported
+	 *
+	 * Checks to see if current environment supports Imagick.
+	 *
+	 * We require Imagick 2.2.0 or greater, based on whether the queryFormats()
+	 * method can be called statically.
+	 *
+	 * @since 3.5.0
+	 *
+	 * @static
+	 * @access public
+	 *
+	 * @param array $args
+	 * @return bool
+	 */
+	public static function test( $args = array() ) {
+		global $wp_version;
+		if ( version_compare( $wp_version, '4.7.0', '>=' ) ) {
+			return parent::test( $args );
+		} else {
+			return parent::test( $args ) && in_array( 'readimage', array_map( 'strtolower', get_class_methods( 'Imagick' ) ) );
+		}
+	}
+
+	/**
+	 * Loads image from $this->file into new Imagick Object.
+	 *
+	 * @since 3.5.0
+	 * @access protected
+	 *
+	 * @return true|WP_Error True if loaded; WP_Error on failure.
 	 */
 	public function load() {
-		$ret = parent::load();
+		if ( $this->image instanceof Imagick ) {
+			return true;
+		}
+
+		global $wp_version;
+		if ( version_compare( $wp_version, '4.7.0', '>=' ) ) {
+			$ret = parent::load();
+		} else {
+			// TODO: Can be removed once WP < 4.7 is no longer supported
+
+			if ( ! is_file( $this->file ) && ! preg_match( '|^https?://|', $this->file ) )
+				$ret = new WP_Error( 'error_loading_image', __('File doesn&#8217;t exist?'), $this->file );
+
+			/*
+			 * Even though Imagick uses less PHP memory than GD, set higher limit
+			 * for users that have low PHP.ini limits.
+			 */
+			if ( version_compare( $wp_version, '4.6.0', '>=' ) ) {
+				wp_raise_memory_limit( 'image' );
+			} else {
+				// TODO: Can be removed once WP < 4.6 is no longer supported
+				@ini_set( 'memory_limit', apply_filters( 'image_memory_limit', WP_MAX_MEMORY_LIMIT ) );
+			}
+
+			try {
+				$this->image = new Imagick();
+				$file_parts = pathinfo( $this->file );
+				$filename = $this->file;
+
+				if ( 'pdf' == strtolower( $file_parts['extension'] ) ) {
+					$filename = $this->pdf_setup();
+				}
+
+				// Reading image after Imagick instantiation because `setResolution`
+				// only applies correctly before the image is read.
+				$this->image->readImage( $filename );
+
+				if ( ! $this->image->valid() ) {
+					$ret = new WP_Error( 'invalid_image', __( 'File is not an image.' ), $this->file );
+				} else {
+					$this->mime_type = $this->get_mime_type( $this->image->getImageFormat() );
+				}
+			}
+			catch ( Exception $e ) {
+				$ret = new WP_Error( 'invalid_image', $e->getMessage(), $this->file );
+			}
+
+			if ( ! isset( $ret ) ) {
+				$updated_size = $this->update_size();
+				if ( is_wp_error( $updated_size ) ) {
+					$ret = $updated_size;
+				} else {
+					$ret = $this->set_quality();
+				}
+			}
+		}
 
 		// set correct page number
 		if ( ! is_null( $this->pg ) && ! is_wp_error( $ret )
@@ -53,13 +149,40 @@ class DG_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 	}
 
 	/**
-	 * @return string[]|bool The formats supported by Imagick, or false
+	 * Sets up Imagick for PDF processing.
+	 * Increases rendering DPI and only loads first page.
+	 *
+	 * @since 4.7.0
+	 * @access protected
+	 *
+	 * @return string|WP_Error File to load or WP_Error on failure.
 	 */
-	public static function query_formats() {
-		try {
-			return @Imagick::queryFormats();
-		} catch ( Exception $ex ) {
-			return false;
+	protected function pdf_setup() {
+		$page = !is_null($this->pg) ? "[{$this->pg}]" : '[0]';
+
+		global $wp_version;
+		if ( version_compare( $wp_version, '4.7.0', '>=' ) ) {
+			$ret = rtrim( parent::pdf_setup(), '[0]' ) . $page;
+		} else {
+			// TODO: Can be removed once WP < 4.7 is no longer supported
+
+			try {
+				// By default, PDFs are rendered in a very low resolution.
+				// We want the thumbnail to be readable, so increase the rendering DPI.
+				$this->image->setResolution( 128, 128 );
+
+				// Only load the first page.
+				$ret = $this->file . $page;
+			}
+			catch ( Exception $e ) {
+				$ret = new WP_Error( 'pdf_setup_failed', $e->getMessage(), $this->file );
+			}
 		}
+
+		if ( is_wp_error( $ret ) ) {
+			DG_Logger::writeLog( DG_LogLevel::Error, $ret->get_error_code() . ': ' . $ret->get_error_message() );
+		}
+
+		return $ret;
 	}
 }

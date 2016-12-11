@@ -86,7 +86,7 @@ class DG_ImagickThumber extends DG_AbstractThumber {
 		static $ret = null;
 
 		if ( is_null( $ret ) ) {
-			$ret = WP_Image_Editor_Imagick::test();
+			$ret = DG_Image_Editor_Imagick::test();
 		}
 
 		return $ret;
