@@ -149,17 +149,18 @@ class DG_ThumberClient extends ThumberClient {
 			// avoid values being removed as a result of current user but also include any MIME types
 			// that are added outside of the default WP values
 			$wp_types = array_merge( wp_get_mime_types(), get_allowed_mime_types() );
-			$allowed = array_map( array( __CLASS__, 'splitExts' ), array_keys( array_intersect( $wp_types, parent::getMimeTypes() ) ) );
-			array_walk_recursive( $allowed, array( __CLASS__, 'addToMimeTypes' ) );
+			$allowed = array_keys( array_intersect( $wp_types, parent::getMimeTypes() ) );
+			foreach ( $allowed as $exts ) {
+				foreach ( explode( '|', $exts ) as $ext ) {
+					$dg_options['thumber-co']['mime_types'][] = $ext;
+				}
+			}
 
 			DocumentGallery::setOptions( $dg_options );
 		}
 
 		return $dg_options['thumber-co']['mime_types'];
 	}
-
-	private static function splitExts( $exts ) { return explode( '|', $exts ); }
-	private static function addToMimeTypes( $v ) { $GLOBALS['dg_options']['thumber-co']['mime_types'][] = $v; }
 
 	/**
 	 * @param $err string Fires on fatal error.
