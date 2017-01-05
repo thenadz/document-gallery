@@ -145,6 +145,12 @@ abstract class DG_AbstractThumber {
 	 * @return string[] Contains all MIME types supported by WordPress, including custom types added by plugins.
 	 */
 	protected static function getAllExts() {
-		return array_keys( array_merge( wp_get_mime_types(), get_allowed_mime_types() ) );
+		$exts = null;
+
+		if ( is_null( $exts ) ) {
+			$exts = array_keys( array_merge( wp_get_mime_types(), get_allowed_mime_types() ) );
+		}
+
+		return $exts;
 	}
 }
