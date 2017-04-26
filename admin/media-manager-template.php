@@ -1,4 +1,4 @@
-<?php /* Custom templates into the DOM */
+<?php /* Custom templates into the DOM (based on /wp-includes/media-template.php) */
 	include_once DG_PATH . 'inc/class-gallery.php';
 ?>
 <script type="text/html" id="tmpl-dg-settings">
