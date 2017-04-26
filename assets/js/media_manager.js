@@ -404,8 +404,11 @@
                                     state = controller.state();
 
                                 controller.close();
-                                //state.trigger( 'update', state.get('library') ); // calling for workflow.state update, so just execute its contents
-                                wp.media.editor.insert(wp.media.dg.shortcode(state.get('library')).string().replace(/\sdgorder=/ig, ' order=').replace(/\sdgorderby=/ig, ' orderby='));
+                                if ( editing ) {
+                                    state.trigger('update', state.get('library')); // calling for workflow.state update, so just execute its contents
+                                } else {
+                                    wp.media.editor.insert(wp.media.dg.shortcode(state.get('library')).string().replace(/\sdgorder=/ig, ' order=').replace(/\sdgorderby=/ig, ' orderby='));
+                                }
 
                                 // Restore and reset the default state.
                                 controller.setState(controller.options.state);
@@ -516,7 +519,7 @@ if ( typeof window.wp.mce !== 'undefined' && typeof window.wp.mce.views !== 'und
 
                     _.each(this.state, function (state) {
                         frame.state(state).on('update', function (selection) {
-                            update(media[type].shortcode(selection).string(), type === 'dg');
+                            update(media[type].shortcode(selection).string().replace(/\sdgorder=/ig, ' order=').replace(/\sdgorderby=/ig, ' orderby='), type === 'dg');
                         });
                     });
 
