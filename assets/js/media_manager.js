@@ -55,6 +55,7 @@
             title: l10n.editdgTitle,
             multiple: false,
             searchable: false,
+            date: false,
             sortable: true,
             display: false,
             content: 'browse',
