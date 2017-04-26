@@ -410,7 +410,7 @@
                                 // Restore and reset the default state.
                                 controller.setState(controller.options.state);
                                 controller.reset();
-                                if (typeof tinyMCE != 'undefined') {
+                                if (typeof tinyMCE != 'undefined' && tinyMCE.activeEditor !== null) {
                                     tinyMCE.activeEditor.fire('update.dg');
                                 }
                             }
