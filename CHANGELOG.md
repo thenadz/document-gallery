@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.2
+* **Bug Fix:** Bug in editing gallery from post editor has been resolved.
+* **Note:** Minimum WordPress version has been bumped from 4.1 to 4.2.
+
 ## 4.3.1
 * **Enhancement:** WordPress 4.7 includes native support for PDF thumbnails. Document Gallery was already using some
   of this, but this update ensures that DG takes full advantage of the new core functionality, including some new
