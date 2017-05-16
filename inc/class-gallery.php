@@ -323,6 +323,10 @@ class DG_Gallery {
 				}
 			}
 
+			// TODO: Need to refactor this whole method to get this filter out of setTaxa
+			// implement with add_action with signature: function dg_query(&$query, $taxa, &$excluded_keys, &$errs)
+			do_action_ref_array( 'dg_query', array( &$query, $this->atts, &$excluded_keys, &$this->errs ) );
+
 			// build tax query
 			foreach ( $this->taxa as $taxon => $terms ) {
 				if ( in_array( $taxon, $excluded_keys ) ) continue;
