@@ -4,7 +4,7 @@ Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.2
 Tested up to: 4.7
-Stable tag: 4.3.2
+Stable tag: 4.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,6 +21,11 @@ Watch the following video for a brief demonstration of Document Gallery in actio
 [youtube http://www.youtube.com/watch?v=Xb7RVzfeUUg]
 
 Read more in the **Installation** tab!
+
+= Partners =
+
+* **WP Real Media Library**: Document Gallery seamlessly integrates with RML by way of a
+  [helper plugin](https://wordpress.org/plugins/dg-real-media-library/).
 
 = Translation =
 
@@ -352,6 +357,18 @@ CSS being loaded by returning false in `dg_use_default_gallery_style` filter, li
 *NOTE: By design, this will **NOT** disable inclusion of any custom CSS set at
 `Dashboard -> Settings -> Document Gallery`*
 
+**Modify Gallery Query**
+
+If you wish to modify the query used by Document Gallery to retrieve attachments to be included in a gallery then
+the `dg_query` action allows you to do exactly that. The signature for the action
+is `function dg_query(&$query, $taxa, &$excluded_keys, &$errs)`. Each parameter is described below:
+
+* **&$query**: This is the query to be modified as documented in [WordPress Codex](https://codex.wordpress.org/Class_Reference/WP_Query).
+* **$taxa**: The list of key/value pairs for arguments passed into `[dg]` that do not match known keys.
+* **&$excluded_keys**: The list of keys to not be processed by DG. If your extension uses a key and is not intended for
+  DG to process, then the key should be added to this list.
+* **&$errs**: The list of errors. If something goes wrong, this list should be appended with a description of what happened.
+
 == Frequently Asked Questions ==
 
 
@@ -421,6 +438,12 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.4 =
+* **Enhancement:** Document Gallery updated to support integration with
+  [WP Real Media Library](https://codecanyon.net/item/wordpress-real-media-library-media-categories-folders/13155134).
+  Simply install the [RML/DG helper plugin](https://wordpress.org/plugins/dg-real-media-library/) to use your RML
+  folders right from Document Gallery!
 
 = 4.3.2 =
 * **Bug Fix:** Bug in editing gallery from post editor has been resolved.

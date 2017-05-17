@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.4
+* **Enhancement:** Document Gallery updated to support integration with
+  [WP Real Media Library](https://codecanyon.net/item/wordpress-real-media-library-media-categories-folders/13155134).
+  Simply install the [RML/DG helper plugin](https://wordpress.org/plugins/dg-real-media-library/) to use your RML
+  folders right from Document Gallery!
+
 ## 4.3.2
 * **Bug Fix:** Bug in editing gallery from post editor has been resolved.
 * **Note:** Minimum WordPress version has been bumped from 4.1 to 4.2.
