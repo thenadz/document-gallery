@@ -13,7 +13,7 @@ class DG_Document {
 	 *=========================================================================*/
 
 	// general document data
-	private $description, $gallery, $ID, $link, $title, $title_attribute, $path, $extension, $size;
+	private $description, $gallery, $ID, $link, $title, $title_attribute, $path, $extension, $size, $date, $time;
 
 	/*==========================================================================
 	 * GETTERS
@@ -109,6 +109,8 @@ class DG_Document {
 		$this->extension       = $wp_filetype['ext'];
 		$size                  = @filesize( $this->path );
 		$this->size            = ($size !== false) ? size_format( $size ) : '0';
+		$this->date            = get_post_time( get_option( 'date_format' ), false, $this->ID );
+		$this->time            = get_post_time( get_option( 'time_format' ), false, $this->ID );
 	}
 
 	/*==========================================================================
@@ -145,8 +147,8 @@ class DG_Document {
 			$thumb = DG_DefaultThumber::init()->getThumbnail( $this->ID );
 		}
 
-		$repl = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path, $data );
-		$find = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%', '%data%' );
+		$repl = array( $this->link, $thumb, $this->title_attribute, $this->title, $target, $this->extension, $this->size, $this->path, $data, $this->date, $this->time  );
+		$find = array( '%link%', '%img%', '%title_attribute%', '%title%', '%target%', '%extension%', '%size%', '%path%', '%data%', '%date%', '%time%' );
 
 		// if descriptions then add filterable tag and value to replaced tag
 		if ( $this->gallery->useDescriptions() ) {
