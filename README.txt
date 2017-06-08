@@ -3,8 +3,8 @@ Contributors: dan.rossiter, demur
 Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.2
-Tested up to: 4.7
-Stable tag: 4.4
+Tested up to: 4.8
+Stable tag: 4.4.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -283,16 +283,47 @@ you need specific to that document. The filter exposes 5 special tags
 which are replaced during gallery generation with document-specific data.
 These tags are as follows:
 
-* **%link%**: The URL that will be loaded when the user clicks the icon.
-* **%target%**: The target attribute for the anchor tag (e.g.: _blank, _self).
-* **%img%**: The URL pointing the the image that will be displayed.
-* **%title%**: The human-readable title of the attachment.
-* **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
+* **%date%**: The date that the attachment was added to WordPress.
 * **%description%**: The attachment description (only present when rendering descriptions).
 * **%extension%**: The document file extension.
+* **%img%**: The URL pointing the the image that will be displayed.
+* **%link%**: The URL that will be loaded when the user clicks the icon.
+* **%path%**: The system path pointing to the document.
 * **%size%**: The human-readable file size formatted by
   [size_format](https://codex.wordpress.org/Function_Reference/size_format).
-* **%path%**: The system path pointing to the document.
+* **%target%**: The target attribute for the anchor tag (e.g.: _blank, _self).
+* **%time%**: The time that the attachment was added to WordPress.
+* **%title%**: The human-readable title of the attachment.
+* **%title_attribute%**: The escaped title (above), safe for using HTML tag attributes.
+
+
+Below is an example that uses all three above filter methods to convert the output from a div-based
+layout to a table-based layout with no icons, displaying the date of upload in the left column and
+the title as a hyperlink to the attachment in the right column.
+
+`function dg_gallery_template($gallery, $use_descriptions) {
+     if ( ! $use_descriptions ) {
+         $gallery = '<table id="%id%" class="%class%" %data%>%rows%</table>';
+     }
+     return $gallery;
+ }
+ add_filter( 'dg_gallery_template', 'dg_gallery_template', 10, 2 );
+
+ function dg_row_template($row, $use_descriptions) {
+     if ( ! $use_descriptions ) {
+         $row = '<tr class="%class%">%icons%</tr>';
+     }
+     return $row;
+ }
+ add_filter( 'dg_row_template', 'dg_row_template', 10, 2 );
+
+ function dg_icon_template($icon, $use_descriptions, $id) {
+     if ( ! $use_descriptions ) {
+         $icon = '<td>%date%</td><td><a href="%link%" target="%target%"><span class="title">%title%</title></td>';
+     }
+     return $icon;
+ }
+ add_filter( 'dg_icon_template', 'dg_icon_template', 10, 3 );`
 
 **Filter Thumbnail Generation Methods**
 
@@ -438,6 +469,9 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.4.1 =
+* **Enhancement:** Added support for `%date%` and `%time%` to  `dg_icon_template`.
 
 = 4.4 =
 * **Enhancement:** Document Gallery updated to support integration with
