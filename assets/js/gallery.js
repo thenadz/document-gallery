@@ -65,7 +65,18 @@
                 atts['skip'] = atts['limit'] * (split.pop() - 1);
             }
 
-            retrieveGallery(atts, target);
+            retrieveGallery(atts, target, function (gallery) {
+                var adminBarHeight = $('#wpadminbar').height() || 0;
+                var targetTop = gallery.offset().top - adminBarHeight;
+
+                // scroll to gallery if top is not visible
+                if ( $(document).scrollTop() > targetTop ) {
+                    $('html, body').animate({
+                        scrollTop: targetTop - 20
+                    }, 'slow');
+                }
+            });
+
             e.preventDefault();
         });
     }
@@ -94,13 +105,16 @@
      * Requests a gallery generated with the given attributes to populate the given target element.
      * @param atts array The gallery shortcode attributes.
      * @param target element The element to be updated with the AJAX HTML response.
+     * @param callback function If provided, will be invoked once new gallery content is loaded with the updated element passed in.
      */
-    function retrieveGallery(atts, target) {
+    function retrieveGallery(atts, target, callback) {
         // TODO: Cache already-retrieved gallery pages. Need to be careful not to keep too many at a time
         // (could consume a lot of memory) & handle caching pages for multiple galleries on a single pages.
         if ( typeof atts['id'] === 'undefined' ) {
             atts['id'] = wp.media.dgDefaults.id;
         }
+
+        // request new gallery page from server
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
             var parsedHtml = $($.parseHTML(html));
             if ( is_editor && !thumber_pointer_shown && parsedHtml.find(thumber_exts_sel).length ) {
@@ -108,9 +122,16 @@
                 $('#insert-media-button').trigger('ready.dg');
             }
 
+            // update gallery element with new content
             target.replaceWith(parsedHtml);
             sizeGalleryIcons(parsedHtml);
             resetPendingIcons();
+
+            // invoke callback if provided
+            if ( typeof callback !== 'undefined' ) {
+                // get the new DOM element
+                callback($('#' + target.attr('id')));
+            }
         });
     }
 
@@ -132,7 +153,7 @@
             idBatch.push(ids[i]);
         }
 
-        if (idBatch.length != 0) {
+        if (idBatch.length !== 0) {
             // request the next batch of icons
             $.ajax({
                 type:     'POST',
