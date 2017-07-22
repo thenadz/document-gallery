@@ -67,9 +67,14 @@
 
             retrieveGallery(atts, target, function (gallery) {
                 var adminBarHeight = $('#wpadminbar').height() || 0;
-                $('html, body').animate({
-                    scrollTop: gallery.offset().top - adminBarHeight - 20
-                }, 'slow');
+                var targetTop = gallery.offset().top - adminBarHeight;
+
+                // scroll to gallery if top is not visible
+                if ( $(document).scrollTop() > targetTop ) {
+                    $('html, body').animate({
+                        scrollTop: targetTop - 20
+                    }, 'slow');
+                }
             });
 
             e.preventDefault();
