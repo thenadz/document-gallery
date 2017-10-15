@@ -26,10 +26,10 @@
 
     /**
      * Sets the size of the gallery icons based on the column count.
-     * @param gallery If given, the target gallery. Otherwise all galleries on page.
+     * @param $gallery If given, the target gallery. Otherwise all galleries on page.
      */
-    function sizeGalleryIcons(gallery) {
-        (gallery || $('.document-gallery[data-icon-width]')).each(function() {
+    function sizeGalleryIcons($gallery) {
+        ($gallery || $('.document-gallery[data-icon-width]')).each(function() {
             var icon_width = $(this).data('icon-width');
             if (typeof icon_width !== 'undefined') {
                 $(this).find('.document-icon').width(icon_width + '%');
@@ -57,15 +57,15 @@
      */
     function registerPaginationHandler() {
         $('body').delegate('.dg-paginate-wrapper .paginate a', 'click', function (e) {
-            var target = $(this).closest('.dg-paginate-wrapper');
-            var atts = target.data('shortcode');
+            var $target = $(this).closest('.dg-paginate-wrapper');
+            var atts = $target.data('shortcode');
             atts['skip'] = 0;
             var split = $(this).attr('href').split('#')[1].split('=');
             if ( split.length >= 2 ) {
                 atts['skip'] = atts['limit'] * (split.pop() - 1);
             }
 
-            retrieveGallery(atts, target, function (gallery) {
+            retrieveGallery(atts, $target, function (gallery) {
                 var adminBarHeight = $('#wpadminbar').height() || 0;
                 var targetTop = gallery.offset().top - adminBarHeight;
 
@@ -104,10 +104,10 @@
     /**
      * Requests a gallery generated with the given attributes to populate the given target element.
      * @param atts array The gallery shortcode attributes.
-     * @param target element The element to be updated with the AJAX HTML response.
+     * @param $target element The element to be updated with the AJAX HTML response.
      * @param callback function If provided, will be invoked once new gallery content is loaded with the updated element passed in.
      */
-    function retrieveGallery(atts, target, callback) {
+    function retrieveGallery(atts, $target, callback) {
         // TODO: Cache already-retrieved gallery pages. Need to be careful not to keep too many at a time
         // (could consume a lot of memory) & handle caching pages for multiple galleries on a single pages.
         if ( typeof atts['id'] === 'undefined' ) {
@@ -116,21 +116,21 @@
 
         // request new gallery page from server
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
-            var parsedHtml = $($.parseHTML(html));
-            if ( is_editor && !thumber_pointer_shown && parsedHtml.find(thumber_exts_sel).length ) {
+            var $parsedHtml = $($.parseHTML(html));
+            if ( is_editor && !thumber_pointer_shown && $parsedHtml.find(thumber_exts_sel).length ) {
                 thumber_pointer_shown = true;
                 $('#insert-media-button').trigger('ready.dg');
             }
 
             // update gallery element with new content
-            target.replaceWith(parsedHtml);
-            sizeGalleryIcons(parsedHtml);
+            $target.replaceWith($parsedHtml);
+            sizeGalleryIcons($parsedHtml);
             resetPendingIcons();
 
             // invoke callback if provided
             if ( typeof callback !== 'undefined' ) {
                 // get the new DOM element
-                callback($('#' + target.attr('id')));
+                callback($('#' + $target.attr('id')));
             }
         });
     }
@@ -173,16 +173,16 @@
     function processRetrievedThumbnails(response) {
         for (var id in response) {
             if (response.hasOwnProperty(id)) {
-                var target = $('.document-gallery img[data-id="' + id + '"]');
-                target.removeAttr('data-id');
+                var $target = $('.document-gallery img[data-id="' + id + '"]');
+                $target.removeAttr('data-id');
 
-                (function(id, target) {
+                (function(id, $target) {
                     var speed = 'fast';
-                    target.fadeOut(speed, function () {
+                    $target.fadeOut(speed, function () {
                         $(this).attr('src', response[id]);
                         $(this).fadeIn(speed);
                     });
-                })(id, target);
+                })(id, $target);
             }
         }
 
