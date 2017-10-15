@@ -117,7 +117,7 @@
         // request new gallery page from server
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
             var $parsedHtml = $($.parseHTML(html));
-            if ( is_editor && !thumber_pointer_shown && $parsedHtml.find(thumber_exts_sel).length ) {
+            if (is_editor && !thumber_pointer_shown && $parsedHtml.find(thumber_exts_sel).length) {
                 thumber_pointer_shown = true;
                 $('#insert-media-button').trigger('ready.dg');
             }
@@ -128,13 +128,14 @@
 
             // update gallery element with new content
             $target.replaceWith($parsedHtml);
-            sizeGalleryIcons($parsedHtml);
+            $target = $('#' + targetId);
+            sizeGalleryIcons($target);
             resetPendingIcons();
 
             // invoke callback if provided
             if ( typeof callback !== 'undefined' ) {
                 // get the new DOM element
-                callback($('#' + targetId));
+                callback($target);
             }
         });
     }
