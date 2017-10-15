@@ -122,6 +122,10 @@
                 $('#insert-media-button').trigger('ready.dg');
             }
 
+            // keep old ID
+            var targetId = $target.attr('id');
+            $parsedHtml.attr('id', targetId);
+
             // update gallery element with new content
             $target.replaceWith($parsedHtml);
             sizeGalleryIcons($parsedHtml);
@@ -130,7 +134,7 @@
             // invoke callback if provided
             if ( typeof callback !== 'undefined' ) {
                 // get the new DOM element
-                callback($('#' + $target.attr('id')));
+                callback($('#' + targetId));
             }
         });
     }
