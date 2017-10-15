@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.4.3
+* **Bug Fix:** The pagination logic was not working correctly, resulting in the gallery not returning to the
+  top after changing to a new page in some situations.
+
+## 4.4.2
+* **Enhancement:** When pagination is enabled for a gallery, navigating to another page will now scroll the page
+  back to the top of the gallery.
+* **Enhancement:** Added support for `%author%` to `dg_icon template` filter.
+
+## 4.4.1
+* **Enhancement:** Added support for `%date%` and `%time%` to  `dg_icon_template`.
+
 ## 4.4
 * **Enhancement:** Document Gallery updated to support integration with
   [WP Real Media Library](https://codecanyon.net/item/wordpress-real-media-library-media-categories-folders/13155134).
@@ -376,7 +388,7 @@
 ## 2.0.2
 * **Bug Fix:** Imagick was actually never working... My bad -- it is now! Thanks to
   [kaldimar](http://wordpress.org/support/profile/kaldimar) for reporting this.
-* **Enhancement:** Document Gallery en el Español por Andrew de
+* **Enhancement:** Document Gallery en el Espa?ol por Andrew de
   [WebHostingHub](http://www.webhostinghub.com/). (To help translate to another
   language, [see here](http://wordpress.org/support/topic/seeking-translators).)
 

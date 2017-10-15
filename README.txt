@@ -4,7 +4,7 @@ Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 4.2
 Tested up to: 4.8
-Stable tag: 4.4.1
+Stable tag: 4.4.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -469,6 +469,15 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 4.4.3 =
+* **Bug Fix:** The pagination logic was not working correctly, resulting in the gallery not returning to the
+  top after changing to a new page in some situations.
+
+= 4.4.2 =
+* **Enhancement:** When pagination is enabled for a gallery, navigating to another page will now scroll the page
+  back to the top of the gallery.
+* **Enhancement:** Added support for `%author%` to `dg_icon template` filter.
 
 = 4.4.1 =
 * **Enhancement:** Added support for `%date%` and `%time%` to  `dg_icon_template`.
