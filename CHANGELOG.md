@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.3
+* **Bug Fix:** The pagination logic was not working correctly, resulting in the gallery not returning to the
+  top after changing to a new page in some situations.
+
 ## 4.4.2
 * **Enhancement:** When pagination is enabled for a gallery, navigating to another page will now scroll the page
   back to the top of the gallery.
