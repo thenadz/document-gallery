@@ -3,8 +3,6 @@ defined( 'WPINC' ) OR exit;
 
 include_once DG_PATH . 'inc/class-gallery-sanitization.php';
 
-DG_Gallery::init();
-
 /**
  * Holds data specific to a given document gallery.
  *
@@ -540,10 +538,12 @@ class DG_Gallery {
 			foreach ( $this->docs as $doc ) {
 				$ids[] = $doc->getId();
 			}
-
-			$comment .= '<!-- Attachment IDs: ' . implode( $ids, ', ' ) . ' -->' . PHP_EOL;
+			
+			$comment .= '<!-- Attachment IDs: ' . implode( ', ', $ids ) . ' -->' . PHP_EOL;
 		}
 
 		return $comment . str_replace( $gallery_find, $gallery_repl, $gallery );
 	}
 }
+
+DG_Gallery::init();

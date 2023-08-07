@@ -28,7 +28,7 @@ class DG_Admin {
 		if ( ! isset( self::$tabs ) ) {
 			self::$tabs = array(
 				'general-tab'              => __( 'General',              'document-gallery' ),
-				'thumber-co-tab'           => __( 'Thumber.co',           'document-gallery' ),
+				/*'thumber-co-tab'           => __( 'Thumber.co',           'document-gallery' ),*/
 				'thumbnail-management-tab' => __( 'Thumbnail Management', 'document-gallery' ),
 				'logging-tab'              => __( 'Logging',              'document-gallery' ),
 				'advanced-tab'             => __( 'Advanced',             'document-gallery' )
