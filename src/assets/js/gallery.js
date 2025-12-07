@@ -5,52 +5,11 @@
     // current index in ids array
     var i;
 
-    // whether we're in the visual editor
-    var is_editor;
-
-    // CSS selector to match documents requiring Thumber
-    var thumber_exts = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'pub', 'vsd', 'vsdx'];
-    var thumber_exts_sel = '.document-gallery [data-ext="' + thumber_exts.join('"],[data-ext="') + '"]';
-
-    // whether pointer has already been shown
-    var thumber_pointer_shown = false;
-
     // find all document-icons without icons generated and start processing
     $(document).ready(function() {
-        is_editor = typeof tinymce !== 'undefined';
-        sizeGalleryIcons();
         resetPendingIcons();
-        handleVisualEditor();
         registerPaginationHandler();
     });
-
-    /**
-     * Sets the size of the gallery icons based on the column count.
-     * @param $gallery If given, the target gallery. Otherwise all galleries on page.
-     */
-    function sizeGalleryIcons($gallery) {
-        ($gallery || $('.document-gallery[data-icon-width]')).each(function() {
-            var icon_width = $(this).data('icon-width');
-            if (typeof icon_width !== 'undefined') {
-                $(this).find('.document-icon').width(icon_width + '%');
-            }
-        });
-    }
-
-    /**
-     * Handles necessary logic for when we're rendering gallery preview within visual editor.
-     */
-    function handleVisualEditor() {
-        if (is_editor) {
-            tinymce.PluginManager.add('dg', function (editor, url) {
-                editor.on('LoadContent update.dg undo', function (e) {
-                    $(e.target.contentDocument).find('[data-wpview-type="dg"] [data-shortcode]').each(function () {
-                        retrieveGallery((typeof $(this).data('shortcode') === 'object' ? $(this).data('shortcode') : JSON.parse(decodeURIComponent($(this).data('shortcode')))), $(this));
-                    });
-                });
-            });
-        }
-    }
 
     /**
      * Listen for all pagination clicks in current DOM and any future DOM elements.
@@ -108,19 +67,9 @@
      * @param callback function If provided, will be invoked once new gallery content is loaded with the updated element passed in.
      */
     function retrieveGallery(atts, $target, callback) {
-        // TODO: Cache already-retrieved gallery pages. Need to be careful not to keep too many at a time
-        // (could consume a lot of memory) & handle caching pages for multiple galleries on a single pages.
-        if ( typeof atts['id'] === 'undefined' ) {
-            atts['id'] = wp.media.dgDefaults.id;
-        }
-
         // request new gallery page from server
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
             var $parsedHtml = $($.parseHTML(html));
-            if (is_editor && !thumber_pointer_shown && $parsedHtml.find(thumber_exts_sel).length) {
-                thumber_pointer_shown = true;
-                $('#insert-media-button').trigger('ready.dg');
-            }
 
             // keep old ID
             var targetId = $target.attr('id');
@@ -129,7 +78,6 @@
             // update gallery element with new content
             $target.replaceWith($parsedHtml);
             $target = $('#' + targetId);
-            sizeGalleryIcons($target);
             resetPendingIcons();
 
             // invoke callback if provided

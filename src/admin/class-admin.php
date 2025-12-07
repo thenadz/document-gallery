@@ -121,74 +121,96 @@ class DG_Admin {
 
 			if ( $hook !== self::$hook && get_post_type( get_the_ID() ) !== 'attachment' ) { //if $hook is 'post.php' or 'post-new.php' and it's not an attachment page
 				global $dg_options;
-
-				// Media Manager integration
-				add_action( 'admin_print_footer_scripts', array(
-						'DG_Admin',
-						'loadCustomTemplates'
-				) ); //wp_print_scripts || wp_footer
-
-				DG_Util::enqueueAsset( 'dg-media-manager', 'assets/js/media_manager.js', array( 'media-views' ) );
-				wp_localize_script( 'dg-media-manager', 'DGl10n', array(
-					'dgMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
-					'dgButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
-					'canceldgTitle' => '&#8592; ' . __( 'Cancel Document Gallery', 'document-gallery' ),
-					'updatedg'      => __( 'Update Document Gallery', 'document-gallery' ),
-					'insertdg'      => __( 'Insert Document Gallery', 'document-gallery' ),
-					'addTodg'       => __( 'Add to Document Gallery', 'document-gallery' ),
-					'addTodgTitle'  => __( 'Add to Document Gallery', 'document-gallery' ),
-					'editdgTitle'   => __( 'Edit Document Gallery', 'document-gallery' ),
-					'unfitSCalert'  => __( 'This DG shortcode is an advanced one. '.
-					                       'Sorry there is no way to use standard edit dialog for it. '.
-					                       'You should switch to text mode to edit shortcode itself.', 'document-gallery' ),
-				) );
-				wp_localize_script( 'dg-media-manager', 'dgDefaults', $dg_options['gallery'] );
-
-				// TinyMCE visual editor
-				add_filter( 'mce_external_plugins', array( __CLASS__, 'mce_external_plugins' ) );
-				add_filter( 'mce_css', array( __CLASS__, 'dg_plugin_mce_css' ) );
+				
+				add_action( 'admin_print_footer_scripts', array( __CLASS__, 'dg_override_filter_object' ), 51);
 			} else {
 				DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
 				wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
 			}
 		}
 	}
-
+	
 	/**
-	 * Adds assets/js/gallery.js as registered TinyMCE plugin
-	 *
-	 * @param string[] $plugins An array of default TinyMCE plugins.
-	 *
-	 * @return string[] Default TinyMCE plugins plus custom DG plugin.
+	 * Overrides the default media library filters to include custom mime types for document galleries.
+	 * This ensures Document Gallery block can display all attachment types while regular galleries remain image-only.
 	 */
-	public static function mce_external_plugins( $plugins ) {
-		$plugins['dg'] = DG_Util::getAssetPath( 'assets/js/gallery.js' );
-
-		return $plugins;
-	}
-
-	/**
-	 * Adds assets/css/style.css as registered TinyMCE CSS
-	 *
-	 * @param string $stylesheets Comma-delimited list of stylesheets.
-	 *
-	 * @return string Comma-delimited list of stylesheets.
-	 */
-	public static function dg_plugin_mce_css( $stylesheets ) {
-		if ( ! empty( $stylesheets ) ) {
-			$stylesheets .= ',';
-		}
-		$stylesheets .= str_replace( ',', '%2C', DG_Util::getAssetPath( 'assets/css/style.css' ) );
-
-		return $stylesheets;
-	}
-
-	/**
-	 * Load Document Gallery Custom templates.
-	 */
-	public static function loadCustomTemplates() {
-		include_once DG_PATH . 'admin/media-manager-template.php';
-	}
+	public static function dg_override_filter_object() { 
+		DG_Logger::writeLog( DG_LogLevel::Detail, 'Entering dg_override_filter_object' );
+		global $dg_options;
+		?>
+		<script type="text/javascript">
+		(function() {
+			// Get Document Gallery's MIME types
+			var dgMimeTypes = '<?php echo esc_js( $dg_options['gallery']['mime_types'] ); ?>';
+			
+			/**
+			 * Check if this is a Document Gallery media frame.
+			 * Document Gallery's MediaUpload component passes allowedTypes which becomes mimeType array.
+			 */
+			function isDocumentGalleryFrame(controller) {
+				if (!controller || !controller.options || !controller.options.mimeType) {
+					return false;
+				}
+				
+				var mimeType = controller.options.mimeType;
+				if (Array.isArray(mimeType)) {
+					return mimeType.join(',') === dgMimeTypes;
+				}
+				
+				return false;
+			}
+			
+			// Override createFilters to set the correct mime type for Document Gallery
+			var originalCreateFilters = wp.media.view.AttachmentFilters.Uploaded.prototype.createFilters;
+			wp.media.view.AttachmentFilters.Uploaded.prototype.createFilters = function() {
+				var controller = this.options.controller;
+				
+				if (isDocumentGalleryFrame(controller)) {
+					this.model.set('type', dgMimeTypes);
+				}
+				
+				originalCreateFilters.apply(this, arguments);
+				
+				if (isDocumentGalleryFrame(controller)) {
+					this.filters.all.props.type = dgMimeTypes;
+				}
+			};
+			
+			// Override GalleryEdit to ensure Document Gallery frames use correct MIME types
+			var originalGalleryEdit = wp.media.controller.GalleryEdit;
+			wp.media.controller.GalleryEdit = originalGalleryEdit.extend({
+				activate: function() {
+					var library = this.get('library');
+					library.observe(wp.Uploader.queue);
+					
+					if (isDocumentGalleryFrame(this.frame) && library && library.props) {
+						library.props.set('type', dgMimeTypes);
+					}
+					
+					this.frame.on('content:render:browse', this.gallerySettings, this);
+				},
+				
+				deactivate: function() {
+					this.get('library').unobserve(wp.Uploader.queue);
+					this.frame.off('content:render:browse', this.gallerySettings, this);
+				},
+				
+				gallerySettings: function(browser) {
+					if (!this.get('sortable')) {
+						return;
+					}
+					
+					var library = this.get('library');
+					if (isDocumentGalleryFrame(this.frame) && library && library.props) {
+						library.props.set('type', dgMimeTypes);
+					}
+					
+					return originalGalleryEdit.prototype.gallerySettings.apply(this, arguments);
+				}
+			});
+		})();
+		</script>
+	<?php }
 
 	/**
 	 * Registers settings for the Document Gallery options page.

@@ -1,10 +1,11 @@
 === Document Gallery ===
 Contributors: dan.rossiter, demur
-Tags: attachments, library, thumbnail, documents, gallery, word, pdf
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
-Requires at least: 4.2
-Tested up to: 6.2.2
-Stable tag: 4.4.4
+Tags: attachments, library, thumbnail, documents, gallery, word, pdf
+Requires at least: 6.1
+Tested up to: 6.9
+Stable tag: 5.0.0
+Requires PHP: 5.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -13,16 +14,38 @@ gallery-like format for easy sharing.
 
 == Description ==
 
-This plugin allows the user to effortlessly create a gallery of documents and
-other attached media, much like the gallery option already available for image
-attachments.
+Display your documents beautifully! Document Gallery creates thumbnail galleries for PDFs, Word documents, PowerPoint presentations, and other file types—just like WordPress does for images.
 
-Read more in the **Installation** tab!
+= Key Features =
 
-*NOTE: After 6+ years dormant, we're working to refresh Document Gallery for
-modern WordPress installs. This version addresses major bugs. Further
-revisions forthcoming, which will more deeply integrate functionality into
-the WordPress editor.*
+* **WordPress Block Editor** - Insert galleries with a single click, configure visually
+* **Automatic Thumbnails** - Generates preview images for documents (PDF, Office files, etc.)
+* **Modern Image Formats** - Full support for WebP and AVIF images (WordPress 6.5+)
+* **Flexible Display** - Grid or list layout with optional descriptions
+* **Smart Filtering** - Show all attachments, current post only, or specific documents
+* **Pagination Support** - Handle large document libraries efficiently
+* **Fully Customizable** - Control columns, sorting, links, and styling
+* **Classic Shortcode** - `[dg]` shortcode available for template use
+
+= Perfect For =
+
+* Document libraries and resource centers
+* Portfolio and work sample galleries
+* Publication and whitepaper collections
+* Course materials and downloads
+* Legal document repositories
+
+= Block Editor Integration =
+
+Click the '+' button in the editor and search for "Document Gallery" to insert a gallery block. All configuration options appear in the sidebar—no shortcode knowledge required. Select specific documents or let the gallery auto-populate based on your criteria.
+
+= Shortcode Support =
+
+The classic `[dg]` shortcode continues to work perfectly for template files, widgets, and power users who prefer code-based configuration. See the Installation tab for all available options.
+
+= Developer Friendly =
+
+Document Gallery provides extensive filters and actions for customizing thumbnail generation, HTML output, and gallery queries. See the Installation tab for complete developer documentation.
 
 = Partners =
 
@@ -51,10 +74,30 @@ it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!
 
 == Installation ==
 
-1. Upload `document-gallery` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `[dg]` in any posts or pages you want a document gallery included. See
-below for additional display options.
+= Automatic Installation =
+
+1. Go to Plugins > Add New in your WordPress admin
+1. Search for "Document Gallery"
+1. Click Install Now, then Activate
+
+= Getting Started =
+
+**Block Editor (Recommended)**
+
+1. Create or edit a post/page
+1. Click the '+' button and search for "Document Gallery"
+1. Insert the block and configure options in the sidebar
+1. Optionally select specific documents, or let it auto-populate
+
+**Shortcode Method**
+
+Add `[dg]` to any post, page, or text widget. See Document Gallery Options below for configuration.
+
+= Manual Installation =
+
+1. Download the plugin from WordPress.org
+1. Upload the `document-gallery` folder to `/wp-content/plugins/`
+1. Activate through the Plugins menu
 
 = Document Gallery Options =
 
@@ -404,6 +447,18 @@ is `function dg_query(&$query, $taxa, &$excluded_keys, &$errs)`. Each parameter 
 
 == Frequently Asked Questions ==
 
+= Q: How do I use the Document Gallery block in the editor? =
+
+A: In the WordPress Block Editor, click the '+' button to add a new block and search
+for "Document Gallery". Once inserted, you'll see a preview of your gallery. Click on
+the block to access the settings panel on the right side, where you can configure:
+
+* **Limit to Current Post** - Toggle to show only attachments from this post or all attachments
+* **Columns, Order, Descriptions** - Control gallery layout and appearance
+* **Document Selection** - Optionally click "Select specific documents" to manually select specific files
+
+The gallery updates in real-time as you adjust settings. No document selection is required
+if you want to show all attachments matching your criteria.
 
 = Q: I'm using taxonomies, but nothing is showing up in my gallery =
 
@@ -451,10 +506,10 @@ returning our thumbnail.
 
 == Screenshots ==
 
-1. Document Gallery integrates directly with the WordPress Media Manager.
-2. The common configuration options are directly accessible through the Media Manager
-interface, but additional configuration can be manually added to the generated
-shortcode.
+1. All gallery options are accessible through the block settings sidebar,
+with real-time preview updates as you make changes.
+2. Document Gallery integrates seamlessly with the WordPress Block Editor,
+providing an intuitive interface for creating and configuring galleries.
 3. This is an example of "fancy" thumbnails. The images are a copy of the front
 page for each document.
 4. This is an example of multiple Document Galleries on a single page (using
@@ -471,6 +526,25 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 5.0.0 =
+* **Major Enhancement:** Full WordPress Block Editor integration! Insert and configure
+  document galleries directly in the editor with an intuitive visual interface.
+* **Enhancement:** All gallery settings now available in the block settings panel with
+  real-time preview updates.
+* **Enhancement:** Added support for modern image formats: WebP (WordPress 5.8+) and
+  AVIF (WordPress 6.5+). Document Gallery now leverages WordPress core thumbnail
+  generation for these formats.
+* **Removed:** TinyMCE/classic editor integration has been removed in favor of modern
+  block editor. The `[dg]` shortcode remains fully supported.
+* **Code Quality:** Replaced deprecated WordPress functions (`get_option('blog_charset')`,
+  improper use of `addslashes()`) with modern equivalents.
+* **Code Quality:** Improved AJAX response handling using WordPress best practices
+  (`wp_send_json()`, proper header checking).
+* **Code Quality:** Removed all dead code from legacy editor integrations.
+* **Compatibility:** Minimum WordPress version updated to 6.1 (Block API v2 requirement).
+* **Compatibility:** Minimum PHP version remains 5.6.
+* **Tested Up To:** Document Gallery has been tested in WordPress 6.9.
 
 = 4.4.4 =
 * **Bug Fix:** We're BACK! After 6+ years dormant, we're working to make Document Gallery fully

@@ -1,0 +1,40 @@
+{
+	"name": "document-gallery",
+	"version": "5.0.0",
+	"description": "Display non-images (and images) in gallery format on a page or post.",
+	"author": "Dan Rossiter",
+	"license": "GPLv3",
+	"homepage": "https://wordpress.org/plugins/document-gallery/",
+	"bugs": {
+		"url": "https://wordpress.org/support/plugin/document-gallery/"
+	},
+	"repository": {
+		"type": "svn",
+		"url": "https://plugins.svn.wordpress.org/document-gallery/"
+	},
+	"main": "build/block/index.js",
+	"scripts": {
+		"build": "npm run check-version && wp-scripts build && npm run minify",
+		"check-version": "node scripts/check-version.js",
+		"minify": "npm run minify:js && npm run minify:css",
+		"minify:js": "terser src/assets/js/admin.js -o src/assets/js/admin.min.js -c -m && terser src/assets/js/gallery.js -o src/assets/js/gallery.min.js -c -m",
+		"minify:css": "csso src/assets/css/admin.css -o src/assets/css/admin.min.css",
+		"check-engines": "wp-scripts check-engines",
+		"check-licenses": "wp-scripts check-licenses",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"lint:md:docs": "wp-scripts lint-md-docs",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start",
+		"test:e2e": "wp-scripts test-e2e",
+		"test:unit": "wp-scripts test-unit-js"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^26.19.0",
+		"csso-cli": "^4.0.2",
+		"terser": "^5.36.0"
+	}
+}

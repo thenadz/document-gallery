@@ -193,8 +193,10 @@ class DG_Gallery {
 			}
 
 			$atts['include'] = $atts['ids'];
-			unset( $atts['ids'] );
 		}
+
+		// handle 'ids' being set to empty
+		unset( $atts['ids'] );
 
 		// allow abbreviated columns attribute
 		if ( ! empty( $atts['cols'] ) ) {
@@ -214,11 +216,15 @@ class DG_Gallery {
 			unset( $atts['images'] );
 		}
 
-		/**
-		 * @deprecated localpost will be removed at some point.
-		 */
-		if ( ! empty( $atts['localpost'] ) ) {
-			$atts['id'] = -1;
+		// Handle localpost attribute from block editor
+		if ( isset( $atts['localpost'] ) ) {
+			if ( DG_Util::toBool( $atts['localpost'], false ) ) {
+				// localpost = true means use current post's attachments
+				$atts['id'] = $post_id;
+			} else {
+				// localpost = false means use all attachments
+				$atts['id'] = -1;
+			}
 			unset( $atts['localpost'] );
 		}
 
@@ -432,8 +438,8 @@ class DG_Gallery {
 	 */
 	private static function negativeInt( $var ) {
 		return ! is_numeric( $var )      // isn't numeric
-		       || (int) $var != $var   // isn't int
-		       || (int) $var < 0;      // isn't positive
+		       || (int) $var != $var     // isn't int
+		       || (int) $var < 0;        // isn't positive
 	}
 
 	/*==========================================================================
@@ -464,7 +470,7 @@ class DG_Gallery {
 		if ( ! empty( $this->errs ) ) {
 			return '<p>' . implode( '</p><p>', $this->errs ) . '</p>';
 		}
-
+		
 		if ( empty( $this->docs ) ) {
 			return self::$no_docs;
 		}
@@ -498,7 +504,7 @@ class DG_Gallery {
 
 			if ( apply_filters( 'dg_use_default_gallery_style', true ) ) {
 				$itemwidth = $cols > 0 ? ( floor( 100 / $cols ) - 1 ) : 100;
-				$gallery_repl[1] .= " data-icon-width='$itemwidth'";
+				$gallery_repl[1] .= " style='--dg-icon-width: {$itemwidth}%'";
 			}
 
 			for ( $i = 0; $i < $count; $i += $cols ) {

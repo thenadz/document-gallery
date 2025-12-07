@@ -24,11 +24,22 @@ class DG_DefaultThumber extends DG_AbstractThumber {
 	 * @return string     URL to thumbnail.
 	 */
 	public function getThumbnail( $ID, $pg = 1 ) {
-		static $image_exts = array( 'jpg', 'jpeg', 'gif', 'png' );
+		global $wp_version;
+		static $image_exts = null;
+		
+		// Initialize supported extensions based on WordPress version
+		if ( is_null( $image_exts ) ) {
+			$image_exts = array( 'jpg', 'jpeg', 'gif', 'png', 'webp', 'pdf' );
+			// AVIF support added in WordPress 6.5
+			if ( version_compare( $wp_version, '6.5', '>=' ) ) {
+				$image_exts[] = 'avif';
+			}
+		}
+		
 		$icon_url = DG_URL . 'assets/icons/';
 		$ext = self::getExt( wp_get_attachment_url( $ID ) );
 
-		// handle images
+		// Try WordPress core thumbnail generation (images, webp, avif, pdf)
 		if ( in_array( $ext, $image_exts ) && ( $icon = self::getImageThumbnail( $ID ) ) ) {
 			// Nothing to do
 		} elseif ( $name = self::getDefaultIcon( $ext ) ) {

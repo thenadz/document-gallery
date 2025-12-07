@@ -192,7 +192,7 @@ class DG_Logger {
 	private static function getLogFileName( $id = null ) {
 		$id = ! is_null( $id ) ? $id : get_current_blog_id();
 
-		return DG_PATH . 'log/' . $id . '.log';
+		return DG_PATH . '../log/' . $id . '.log';
 	}
 
 	/**

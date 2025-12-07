@@ -8,6 +8,8 @@ add_action( 'wp_ajax_nopriv_dg_generate_icons', array( 'DG_AjaxHandler', 'genera
 add_action( 'wp_ajax_dg_generate_gallery', array( 'DG_AjaxHandler', 'generateGallery' ) );
 add_action( 'wp_ajax_nopriv_dg_generate_gallery', array( 'DG_AjaxHandler', 'generateGallery' ) );
 
+add_action( 'wp_prepare_attachment_for_js', array( 'DG_AjaxHandler', 'dg_prepare_attachment_for_js' ), 10, 3 );
+
 /**
  * Handler to isolate AJAX request handling.
  *
@@ -42,10 +44,32 @@ class DG_AjaxHandler {
 	 */
 	public static function generateGallery() {
 		if ( isset( $_REQUEST['atts'] ) ) {
-			@header( 'Content-Type: text/html; charset=' . get_option( 'blog_charset' ) );
+			if ( ! headers_sent() ) {
+				header( 'Content-Type: text/html; charset=' . get_bloginfo( 'charset' ) );
+			}
 			echo DocumentGallery::doShortcode( $_REQUEST['atts'] );
 		}
 
 		wp_die();
+	}
+	
+	/**
+	 * Filters the attachment data prepared for JavaScript.
+	 *
+	 * @since 3.5.0
+	 *
+	 * @param array       $response   Array of prepared attachment data. See {@see wp_prepare_attachment_for_js()}.
+	 * @param WP_Post     $attachment Attachment object.
+	 * @param array|false $meta       Array of attachment meta data, or false if there is none.
+	 */
+	public static function dg_prepare_attachment_for_js( $response, $attachment, $meta ) {
+		$thumb_obj = DG_Thumb::getThumb( $attachment->ID );
+		if ( ! is_null( $thumb_obj ) && $thumb_obj->isSuccess() ) {
+			// icon has already been generated so include it in generated gallery
+			$response['icon'] = $thumb_obj->getUrl();
+		}
+		// else - no cached thumbnail. Fall back to WordPress default.
+		
+		return $response;
 	}
 }

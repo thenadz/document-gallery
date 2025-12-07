@@ -41,7 +41,7 @@ function dg_validate_settings( $values ) {
     elseif ( isset( $values['title'] ) && $ID != - 1 ) {
         $attachment = array(
             'ID'         => $ID,
-            'post_title' => rawurldecode( addslashes( $values['title'] ) )
+            'post_title' => rawurldecode( $values['title'] )
         );
         if ( wp_update_post( $attachment ) ) {
             $responseArr['result'] = true;
@@ -53,7 +53,7 @@ function dg_validate_settings( $values ) {
     elseif ( isset( $values['description'] ) && $ID != - 1 ) {
         $attachment = array(
             'ID'           => $ID,
-            'post_content' => rawurldecode( addslashes( $values['description'] ) )
+            'post_content' => rawurldecode( $values['description'] )
         );
         if ( wp_update_post( $attachment ) ) {
             $responseArr['result'] = true;
@@ -70,13 +70,13 @@ function dg_validate_settings( $values ) {
         }
     }
 
-    if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-        @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
-        echo wp_json_encode( $responseArr );
-        add_filter( 'wp_redirect', 'dg_exit', 1, 0 );
+    // for AJAX, we "return" the response via JSON
+    if ( wp_doing_ajax() ) {
+        wp_send_json( $responseArr );
     }
-
-    return $ret;
+    else {
+        return $ret;
+    }
 }
 
 /**

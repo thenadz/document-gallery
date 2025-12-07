@@ -80,10 +80,8 @@ class DG_FeaturePointers {
         if ( empty( $selector ) || empty( $args ) || empty( $args['content'] ) )
             return;
 
-        // optimize version_compare as much as possible based on PHP version
-        $trace = version_compare( PHP_VERSION, '5.4', '>=' )
-            ? debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 )
-            : debug_backtrace( false );
+        // PHP 5.4+ supports the more efficient DEBUG_BACKTRACE_IGNORE_ARGS flag
+        $trace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
         $pointer_id = self::getFeaturePointerIdFromMethodName( $trace[1]['function'] );
 
         // NOTE: If below JS is modified, *ensure* that minified is also updated

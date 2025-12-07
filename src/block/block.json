@@ -1,0 +1,67 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "document-gallery/document-gallery-block",
+	"version": "0.1.0",
+	"title": "Document Gallery",
+	"category": "widgets",
+	"icon": "media-archive",
+	"attributes": {
+		"ids": {
+			"type": "string"
+		},
+		"columns": {
+			"type": "number"
+		},
+		"fancy": {
+			"type": "boolean"
+		},
+		"relation": {
+			"type": "string"
+		},
+		"limit": {
+			"type": "number"
+		},
+		"mime_types": {
+			"type": "string"
+		},
+		"post_status": {
+			"type": "string"
+		},
+		"post_type": {
+			"type": "string"
+		},
+		"attachment_pg": {
+			"type": "boolean"
+		},
+		"descriptions": {
+			"type": "boolean"
+		},
+		"new_window": {
+			"type": "boolean"
+		},
+		"paginate": {
+			"type": "boolean"
+		},
+		"order": {
+			"type": "string"
+		},
+		"orderby": {
+			"type": "string"
+		},
+		"localpost": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"description": "Block to display a document gallery.",
+	"example": {},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "document-gallery",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}

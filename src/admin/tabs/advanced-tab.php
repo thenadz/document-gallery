@@ -110,7 +110,7 @@ function dg_render_options_dump_section() {
 
     ?>
     <p><?php
-        _e( 'The following <em>readonly text</em> should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'documet-gallery' );
+        _e( 'The following <em>readonly text</em> should be provided when <a href="http://wordpress.org/support/plugin/document-gallery" target="_blank">reporting a bug</a>:', 'document-gallery' );
         ?></p>
     <table class="form-table">
         <tbody>

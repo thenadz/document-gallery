@@ -1,24 +1,29 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-/*
-  Plugin Name: Document Gallery
-  Plugin URI: https://wordpress.org/plugins/document-gallery/
-  Description: Display non-images (and images) in gallery format on a page or post with the [dg] shortcode.
-  Version: 4.4.4
-  Author: Dan Rossiter
-  Author URI: http://danrossiter.org/
-  License: GPLv3
-  Text Domain: document-gallery
+/**
+ * Plugin Name:       Document Gallery
+ * Plugin URI:        https://wordpress.org/plugins/document-gallery/
+ * Description:       Display non-images (and images) in gallery format on a page or post.
+ * Version:           5.0.0
+ * Requires at least: 6.1
+ * Requires PHP:      5.6
+ * Author:            Dan Rossiter
+ * Author URI:        https://www.linkedin.com/in/danrossiter/
+ * License:           GPLv3
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain:       document-gallery
+ *
+ * @package           create-block
  */
 
-define( 'DG_VERSION', '4.4.4' );
+define( 'DG_VERSION', '5.0.0' );
 
-if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
-	add_action( 'admin_notices', 'dg_php_lt_three' );
-	function dg_php_lt_three() { ?>
+if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
+	add_action( 'admin_notices', 'dg_php_lt_five_six' );
+	function dg_php_lt_five_six() { ?>
 		<div class="error"><p>
-			<?php printf( __( 'Document Gallery requires PHP &ge; 5.3. Your server is running version %s.', 'document-gallery' ), PHP_VERSION ); ?>
+			<?php printf( __( 'Document Gallery requires PHP &ge; 5.6. Your server is running version %s.', 'document-gallery' ), PHP_VERSION ); ?>
 		</p></div>
 	<?php }
 
@@ -27,8 +32,8 @@ if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
 
 // define helper paths & URLs
 define( 'DG_BASENAME', plugin_basename( __FILE__ ) );
-define( 'DG_URL', plugin_dir_url( __FILE__ ) );
-define( 'DG_PATH', plugin_dir_path( __FILE__ ) );
+define( 'DG_URL', plugin_dir_url( __FILE__ ) . 'src/' );
+define( 'DG_PATH', plugin_dir_path( __FILE__ ) . 'src/' );
 define( 'DG_WPINC_PATH', ABSPATH . WPINC . '/' );
 define( 'DG_WPADMIN_PATH', ABSPATH . 'wp-admin/' );
 
@@ -101,6 +106,47 @@ if ( is_admin() ) {
 	add_action( 'wp_print_scripts', array( 'DocumentGallery', 'printCustomStyle' ) );
 
 	add_action( 'wp_enqueue_scripts', array( 'DocumentGallery', 'enqueueGalleryScript' ) );
+}
+
+/**
+ * Registers the block using the metadata loaded from the `block.json` file.
+ * Behind the scenes, it registers also all assets so they can be enqueued
+ * through the block editor in the corresponding context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/register_block_type/
+ */
+function document_gallery_block_init() {
+	register_block_type(
+		__DIR__ . '/build/block',
+		array( 'render_callback' => 'document_gallery_block_render_callback' )
+	);
+}
+add_action( 'init', 'document_gallery_block_init' );
+
+/**
+ * Pass default options to block editor script.
+ */
+function document_gallery_block_localize() {
+	global $dg_options;
+	
+	// Script handle is auto-generated: {namespace}-{block-name}-editor-script
+	wp_localize_script(
+		'document-gallery-document-gallery-block-editor-script',
+		'dgBlockConfig',
+		array( 'dgDefaults' => $dg_options['gallery'] )
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'document_gallery_block_localize' );
+
+/**
+ * This function is called when the block is being rendered on the front end of the site
+ *
+ * @param array    $attributes     The array of attributes for this block.
+ * @param string   $content        Rendered block output. ie. <InnerBlocks.Content />.
+ * @param WP_Block $block_instance The instance of the WP_Block class that represents the block being rendered.
+ */
+function document_gallery_block_render_callback( $attributes, $content, $block_instance ) {
+	return DocumentGallery::doShortcode( $attributes );
 }
 
 // adds 'dg' shortcode
