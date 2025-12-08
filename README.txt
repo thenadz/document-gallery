@@ -1,7 +1,7 @@
 === Document Gallery ===
 Contributors: dan.rossiter, demur
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EE5LWRLG933EN&lc=US&item_name=Document%20Gallery%20Plugin&item_number=document%2dgallery&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
-Tags: attachments, library, thumbnail, documents, gallery, word, pdf
+Donate link: https://www.paypal.com/donate/?business=EE5LWRLG933EN&no_recurring=0&item_name=Powering+9%2C000%2B+sites+for+free.+Support+continued+development%2C+new+features%2C+and+reliable+maintenance.+Every+dollar+counts%21&currency_code=USD
+Tags: attachments, library, documents, word, pdf
 Requires at least: 6.1
 Tested up to: 6.9
 Stable tag: 5.0.0
