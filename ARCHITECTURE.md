@@ -530,9 +530,10 @@ add_shortcode('dg', [DocumentGallery, 'doShortcode'])
 
 ### Language Distribution
 ```
-PHP:        ~7,200 lines (72%)
-JavaScript: ~1,844 lines (19%)
-CSS:        ~897 lines (9%)
+PHP:        7,587 lines (76%)
+JavaScript: 1,439 lines (14%)
+CSS:        915 lines (9%)
+Total:      9,941 lines
 ```
 
 ### File Size Distribution (non-minified)
