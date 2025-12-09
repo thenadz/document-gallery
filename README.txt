@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?business=EE5LWRLG933EN&no_recurring=
 Tags: attachments, library, documents, word, pdf
 Requires at least: 6.1
 Tested up to: 6.9
-Stable tag: 5.0.0
+Stable tag: 5.1.0
 Requires PHP: 5.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -69,8 +69,7 @@ Document Gallery includes features intended to make integration with other plugi
 simple. See the bottom of the **Installation** tab for specific documentation on
 the various features provided.
 
-*If this plugin has helped you, please take a moment to [rate
-it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
+*If this plugin has helped you, please take a moment to [rate it](http://wordpress.org/support/view/plugin-reviews/document-gallery#postform)!*
 
 == Installation ==
 
@@ -526,6 +525,10 @@ Note that the display inherits styling from your active theme.
 To see a list of features planned for the future as well as to propose your own
 ideas for future Document Gallery development, take a look at our
 [issue tracker](https://github.com/thenadz/document-gallery/issues).
+
+= 5.1.0 =
+* **Feature:** Restores support for the classic editor which was removed in 5.0.
+  Don't worry - Block Editor support remains as well!
 
 = 5.0.0 =
 * **Major Enhancement:** Full WordPress Block Editor integration! Insert and configure

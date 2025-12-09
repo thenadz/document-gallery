@@ -5,11 +5,31 @@
     // current index in ids array
     var i;
 
+    // whether we're in the visual editor
+    var is_editor;
+
     // find all document-icons without icons generated and start processing
     $(document).ready(function() {
+        is_editor = typeof tinymce !== 'undefined';
         resetPendingIcons();
+        handleVisualEditor();
         registerPaginationHandler();
     });
+
+    /**
+     * Handles necessary logic for when we're rendering gallery preview within classic editor.
+     */
+    function handleVisualEditor() {
+        if (is_editor) {
+            tinymce.PluginManager.add('dg', function (editor, url) {
+                editor.on('LoadContent update.dg undo', function (e) {
+                    $(e.target.contentDocument).find('[data-wpview-type="dg"] [data-shortcode]').each(function () {
+                        retrieveGallery((typeof $(this).data('shortcode') === 'object' ? $(this).data('shortcode') : JSON.parse(decodeURIComponent($(this).data('shortcode')))), $(this));
+                    });
+                });
+            });
+        }
+    }
 
     /**
      * Listen for all pagination clicks in current DOM and any future DOM elements.
@@ -67,6 +87,11 @@
      * @param callback function If provided, will be invoked once new gallery content is loaded with the updated element passed in.
      */
     function retrieveGallery(atts, $target, callback) {
+        // Set default ID for classic editor when not specified
+        if ( typeof atts['id'] === 'undefined' ) {
+            atts['id'] = wp.media.dgDefaults.id;
+        }
+
         // request new gallery page from server
         $.post(ajaxurl, { action: 'dg_generate_gallery', atts: atts }, function(html) {
             var $parsedHtml = $($.parseHTML(html));

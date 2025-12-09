@@ -122,12 +122,68 @@ class DG_Admin {
 			if ( $hook !== self::$hook && get_post_type( get_the_ID() ) !== 'attachment' ) { //if $hook is 'post.php' or 'post-new.php' and it's not an attachment page
 				global $dg_options;
 				
-				add_action( 'admin_print_footer_scripts', array( __CLASS__, 'dg_override_filter_object' ), 51);
+				add_action( 'admin_print_footer_scripts', array( __CLASS__, 'loadCustomTemplates' ) );
+				
+				DG_Util::enqueueAsset( 'dg-media-manager', 'assets/js/media_manager.js', array( 'media-views' ) );
+				
+				wp_localize_script( 'dg-media-manager', 'DGl10n', array(
+					'dgMenuTitle'   => __( 'Create Document Gallery', 'document-gallery' ),
+					'dgButton'      => __( 'Create a new Document Gallery', 'document-gallery' ),
+					'canceldgTitle' => '&#8592; ' . __( 'Cancel Document Gallery', 'document-gallery' ),
+					'updatedg'      => __( 'Update Document Gallery', 'document-gallery' ),
+					'insertdg'      => __( 'Insert Document Gallery', 'document-gallery' ),
+					'addTodg'       => __( 'Add to Document Gallery', 'document-gallery' ),
+					'addTodgTitle'  => __( 'Add to Document Gallery', 'document-gallery' ),
+					'editdgTitle'   => __( 'Edit Document Gallery', 'document-gallery' ),
+					'unfitSCalert'  => __( 'This DG shortcode is an advanced one. '.
+					                       'Sorry there is no way to use standard edit dialog for it. '.
+					                       'You should switch to text mode to edit shortcode itself.', 'document-gallery' ),
+				) );
+				wp_localize_script( 'dg-media-manager', 'dgDefaults', $dg_options['gallery'] );
+				
+				// TinyMCE visual editor
+				add_filter( 'mce_external_plugins', array( __CLASS__, 'mce_external_plugins' ) );
+				add_filter( 'mce_css', array( __CLASS__, 'dg_plugin_mce_css' ) );
 			} else {
 				DG_Util::enqueueAsset( 'document-gallery-admin', 'assets/js/admin.js', array( 'jquery' ) );
 				wp_localize_script( 'document-gallery-admin', 'dg_admin_vars', array( 'upload_limit' => wp_max_upload_size() ) );
 			}
 		}
+	}
+	
+	/**
+	 * Adds assets/js/gallery.js as registered TinyMCE plugin.
+	 *
+	 * @param string[] $plugins An array of default TinyMCE plugins.
+	 *
+	 * @return string[] Default TinyMCE plugins plus custom DG plugin.
+	 */
+	public static function mce_external_plugins( $plugins ) {
+		DG_Logger::writeLog( DG_LogLevel::Detail, 'Entering mce_external_plugins' );
+		$plugins['dg'] = DG_Util::getAssetPath( 'assets/js/gallery.js' );
+		return $plugins;
+	}
+	
+	/**
+	 * Adds assets/css/style.css as registered TinyMCE CSS.
+	 *
+	 * @param string $stylesheets Comma-delimited list of stylesheets.
+	 *
+	 * @return string Comma-delimited list of stylesheets.
+	 */
+	public static function dg_plugin_mce_css( $stylesheets ) {
+		if ( ! empty( $stylesheets ) ) {
+			$stylesheets .= ',';
+		}
+		$stylesheets .= str_replace( ',', '%2C', DG_Util::getAssetPath( 'assets/css/style.css' ) );
+		return $stylesheets;
+	}
+	
+	/**
+	 * Load Document Gallery custom templates for classic editor media modal.
+	 */
+	public static function loadCustomTemplates() {
+		include_once DG_PATH . 'admin/media-manager-template.php';
 	}
 	
 	/**

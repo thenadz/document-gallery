@@ -5,7 +5,7 @@ defined( 'WPINC' ) OR exit;
  * Plugin Name:       Document Gallery
  * Plugin URI:        https://wordpress.org/plugins/document-gallery/
  * Description:       Display non-images (and images) in gallery format on a page or post.
- * Version:           5.0.0
+ * Version:           5.1.0
  * Requires at least: 6.1
  * Requires PHP:      5.6
  * Author:            Dan Rossiter
@@ -17,7 +17,7 @@ defined( 'WPINC' ) OR exit;
  * @package           create-block
  */
 
-define( 'DG_VERSION', '5.0.0' );
+define( 'DG_VERSION', '5.1.0' );
 
 if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 	add_action( 'admin_notices', 'dg_php_lt_five_six' );

@@ -1,6 +1,6 @@
 {
 	"name": "document-gallery",
-	"version": "5.0.0",
+	"version": "5.1.0",
 	"description": "Display non-images (and images) in gallery format on a page or post.",
 	"author": "Dan Rossiter",
 	"license": "GPLv3",
@@ -17,7 +17,7 @@
 		"build": "npm run check-version && wp-scripts build && npm run minify",
 		"check-version": "node scripts/check-version.js",
 		"minify": "npm run minify:js && npm run minify:css",
-		"minify:js": "terser src/assets/js/admin.js -o src/assets/js/admin.min.js -c -m && terser src/assets/js/gallery.js -o src/assets/js/gallery.min.js -c -m",
+		"minify:js": "terser src/assets/js/admin.js -o src/assets/js/admin.min.js -c -m && terser src/assets/js/gallery.js -o src/assets/js/gallery.min.js -c -m && terser src/assets/js/media_manager.js -o src/assets/js/media_manager.min.js -c -m",
 		"minify:css": "csso src/assets/css/admin.css -o src/assets/css/admin.min.css",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",

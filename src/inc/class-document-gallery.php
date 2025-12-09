@@ -40,6 +40,7 @@ class DocumentGallery {
 	 * Enqueue script for Document Gallery frontend.
 	 */
 	public static function enqueueGalleryScript() {
+		DG_Logger::writeLog( DG_LogLevel::Detail, 'Enqueueing gallery.js' );
 		DG_Util::enqueueAsset( 'document-gallery', 'assets/js/gallery.js', array( 'jquery' ) );
 	}
 

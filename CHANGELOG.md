@@ -1,5 +1,17 @@
 # Changelog
 
+## 5.1.0
+* **Feature:** Restores support for the classic editor which was removed in 5.0.
+  Don't worry - Block Editor support remains as well!
+
+## 5.0.0
+* **Major Update:** Complete rewrite with WordPress Block Editor support
+* **Feature:** Native Gutenberg block for visual gallery creation
+* **Feature:** Added WebP and AVIF image format support (WordPress 6.5+)
+* **Enhancement:** Modernized codebase with improved performance and security
+* **Enhancement:** Updated UI with contemporary WordPress design patterns
+* **Note:** WordPress 6.1+ now required (previously 4.2+)
+
 ## 4.4.3
 * **Bug Fix:** The pagination logic was not working correctly, resulting in the gallery not returning to the
   top after changing to a new page in some situations.
