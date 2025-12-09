@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant Editor as Block Editor
+    participant BlockReg as Block Registration
+    participant EditComponent as Edit Component
+    participant Inspector as Inspector Controls
+    participant Server as PHP Backend
+    participant Gallery as DG_Gallery
+    
+    Editor->>BlockReg: User inserts DG block
+    BlockReg->>EditComponent: Load edit.js
+    EditComponent->>Inspector: Display controls in sidebar
+    
+    loop User configures
+        Editor->>Inspector: Change settings
+        Inspector->>EditComponent: Update attributes
+        EditComponent->>EditComponent: Update preview
+    end
+    
+    Editor->>Server: Save post
+    Server->>Server: Store block attributes
+    
+    Note over Server,Gallery: Frontend Rendering
+    
+    Server->>Gallery: Render callback with attributes
+    Gallery->>Server: Generate gallery HTML
+    Server->>Editor: Return rendered content

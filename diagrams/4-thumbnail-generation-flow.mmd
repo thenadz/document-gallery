@@ -1,0 +1,37 @@
+flowchart TD
+    Start([Document needs thumbnail]) --> CheckCache{Thumbnail<br/>cached?}
+    CheckCache -->|Yes| ReturnCache[Return cached thumbnail]
+    CheckCache -->|No| StartGen[Start generation]
+    
+    StartGen --> SelectThumber{Select Thumber<br/>Strategy}
+    
+    SelectThumber --> CheckImagick{Imagick<br/>available?}
+    CheckImagick -->|Yes| UseImagick[ImagickThumber]
+    CheckImagick -->|No| CheckGhost{Ghostscript<br/>available?}
+    
+    CheckGhost -->|Yes & PDF| UseGhost[GhostscriptThumber]
+    CheckGhost -->|No| CheckAV{Audio/Video<br/>file?}
+    
+    CheckAV -->|Yes| UseAV[AudioVideoThumber]
+    CheckAV -->|No| CheckThumberCo{Thumber.co<br/>enabled?}
+    
+    CheckThumberCo -->|Yes| UseThumberCo[ThumberCoThumber]
+    CheckThumberCo -->|No| UseDefault[DefaultThumber<br/>MIME type icon]
+    
+    UseImagick --> Generate[Generate thumbnail]
+    UseGhost --> Generate
+    UseAV --> Generate
+    UseThumberCo --> Generate
+    UseDefault --> Generate
+    
+    Generate --> Cache[Cache thumbnail metadata]
+    Cache --> ReturnNew[Return new thumbnail]
+    
+    ReturnCache --> End([End])
+    ReturnNew --> End
+    
+    style UseImagick fill:#90EE90
+    style UseGhost fill:#FFD700
+    style UseAV fill:#87CEEB
+    style UseThumberCo fill:#DDA0DD
+    style UseDefault fill:#FFA07A

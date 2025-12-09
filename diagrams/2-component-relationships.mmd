@@ -1,0 +1,103 @@
+classDiagram
+    class DocumentGallery {
+        +doShortcode(attributes)
+        +enqueueGalleryStyle()
+        +enqueueGalleryScript()
+        +addValidation()
+        +loadTextDomain()
+    }
+    
+    class DG_Gallery {
+        -Document[] documents
+        -array options
+        +__construct(options)
+        +getDocuments()
+        +getHtml()
+        +buildQuery()
+        +sortDocuments()
+    }
+    
+    class DG_Document {
+        -int id
+        -string title
+        -string description
+        -string link
+        -DG_Thumb thumbnail
+        +__construct(attachment_id)
+        +getHtml()
+        +getThumbnail()
+        +getIcon()
+    }
+    
+    class DG_Thumb {
+        -int attachment_id
+        -string thumb_path
+        +__construct(attachment_id)
+        +getThumbnailPath()
+        +generateThumbnail()
+        +cleanupAttachmentMeta()
+    }
+    
+    class DG_Thumber {
+        +generateThumbnail(attachment_id)
+        +getThumber(mime_type)
+        -selectBestThumber()
+    }
+    
+    class DG_AbstractThumber {
+        <<abstract>>
+        #getThumbnail(attachment_id)
+        #isAvailable()
+        #getPriority()
+    }
+    
+    class DG_ImagickThumber {
+        +getThumbnail(attachment_id)
+        +isAvailable()
+    }
+    
+    class DG_GhostscriptThumber {
+        +getThumbnail(attachment_id)
+        +isAvailable()
+    }
+    
+    class DG_ThumberCoThumber {
+        +getThumbnail(attachment_id)
+        +isAvailable()
+        -callApi()
+    }
+    
+    class DG_DefaultThumber {
+        +getThumbnail(attachment_id)
+        +isAvailable()
+    }
+    
+    class DG_Admin {
+        +addAdminPage()
+        +registerSettings()
+        +addMetaBox()
+        +saveMetaBox()
+    }
+    
+    class DG_Setup {
+        +activate()
+        +maybeUpdate()
+        +uninstall()
+    }
+    
+    class DG_Logger {
+        +log(level, message)
+        +purgeExpiredEntries()
+    }
+    
+    DocumentGallery --> DG_Gallery : creates
+    DG_Gallery --> DG_Document : contains many
+    DG_Document --> DG_Thumb : has one
+    DG_Thumb --> DG_Thumber : uses
+    DG_Thumber --> DG_AbstractThumber : coordinates
+    DG_AbstractThumber <|-- DG_ImagickThumber
+    DG_AbstractThumber <|-- DG_GhostscriptThumber
+    DG_AbstractThumber <|-- DG_ThumberCoThumber
+    DG_AbstractThumber <|-- DG_DefaultThumber
+    DG_Admin --> DG_Setup : manages
+    DG_Thumber --> DG_Logger : logs to

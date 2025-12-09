@@ -1,0 +1,90 @@
+graph TB
+    subgraph "WordPress Core"
+        WP[WordPress]
+        Editor[Block Editor / Classic Editor]
+        Admin[Admin Dashboard]
+        MediaLib[Media Library]
+    end
+    
+    subgraph "Document Gallery Plugin"
+        Main[document-gallery.php<br/>Main Plugin File]
+        
+        subgraph "Core Components"
+            DG[DocumentGallery<br/>Shortcode Handler]
+            Gallery[DG_Gallery<br/>Gallery Builder]
+            Document[DG_Document<br/>Document Model]
+            Thumb[DG_Thumb<br/>Thumbnail Manager]
+        end
+        
+        subgraph "Thumbnail Generation"
+            Thumber[DG_Thumber<br/>Main Thumber]
+            Imagick[ImagickThumber]
+            Ghost[GhostscriptThumber]
+            AV[AudioVideoThumber]
+            Default[DefaultThumber]
+            ThumberCo[ThumberCoThumber]
+        end
+        
+        subgraph "Admin Interface"
+            AdminClass[DG_Admin<br/>Settings Pages]
+            Ajax[AjaxHandler<br/>AJAX Operations]
+            Pointers[FeaturePointers]
+        end
+        
+        subgraph "Block Editor"
+            BlockIndex[index.js<br/>Block Registration]
+            BlockEdit[edit.js<br/>Editor Interface]
+            BlockView[view.js<br/>Frontend View]
+        end
+        
+        subgraph "Support Systems"
+            Logger[DG_Logger<br/>Logging System]
+            Setup[DG_Setup<br/>Install/Update]
+            Util[DG_Util<br/>Utilities]
+            API[DG_API<br/>Public API]
+        end
+    end
+    
+    subgraph "External Services"
+        ThumberCoAPI[Thumber.co API<br/>Cloud Thumbnails]
+        Ghostscript[Ghostscript<br/>Local PDF Processing]
+        ImageMagick[ImageMagick<br/>Image Processing]
+    end
+    
+    WP --> Main
+    Editor --> BlockIndex
+    Admin --> AdminClass
+    MediaLib --> Thumb
+    
+    Main --> DG
+    Main --> Setup
+    DG --> Gallery
+    Gallery --> Document
+    Gallery --> Thumb
+    
+    Thumb --> Thumber
+    Thumber --> Imagick
+    Thumber --> Ghost
+    Thumber --> AV
+    Thumber --> Default
+    Thumber --> ThumberCo
+    
+    BlockIndex --> BlockEdit
+    BlockIndex --> BlockView
+    BlockEdit --> DG
+    BlockView --> DG
+    
+    AdminClass --> Ajax
+    AdminClass --> Pointers
+    
+    Thumber --> Logger
+    Setup --> Logger
+    
+    ThumberCo --> ThumberCoAPI
+    Ghost --> Ghostscript
+    Imagick --> ImageMagick
+    
+    style Main fill:#4A90E2
+    style DG fill:#7ED321
+    style Thumber fill:#F5A623
+    style BlockIndex fill:#BD10E0

@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant User
+    participant WordPress
+    participant DocumentGallery
+    participant DG_Gallery
+    participant DG_Document
+    participant DG_Thumb
+    participant DG_Thumber
+    
+    User->>WordPress: View page with [dg] shortcode
+    WordPress->>DocumentGallery: doShortcode(attributes)
+    DocumentGallery->>DG_Gallery: new DG_Gallery(options)
+    DG_Gallery->>WordPress: Query attachments
+    WordPress-->>DG_Gallery: Attachment IDs
+    
+    loop For each attachment
+        DG_Gallery->>DG_Document: new DG_Document(id)
+        DG_Document->>DG_Thumb: getThumbnail()
+        
+        alt Thumbnail exists
+            DG_Thumb-->>DG_Document: Return cached thumbnail
+        else Generate new
+            DG_Thumb->>DG_Thumber: generateThumbnail(id)
+            DG_Thumber->>DG_Thumber: Select best thumber
+            DG_Thumber-->>DG_Thumb: Return thumbnail path
+            DG_Thumb-->>DG_Document: Return new thumbnail
+        end
+        
+        DG_Document-->>DG_Gallery: Document HTML
+    end
+    
+    DG_Gallery->>DG_Gallery: Build gallery HTML
+    DG_Gallery-->>DocumentGallery: Complete gallery HTML
+    DocumentGallery-->>WordPress: Rendered gallery
+    WordPress-->>User: Display page with gallery
